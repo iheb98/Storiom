@@ -1,0 +1,40 @@
+<mat-toolbar color="primary">
+    <mat-toolbar-row>
+        <button mat-button (click)="opened = !opened"><mat-icon>menu</mat-icon></button>
+    </mat-toolbar-row>
+</mat-toolbar>
+<mat-sidenav-container>
+    <mat-sidenav [(opened)]="opened">
+        <mat-list>
+            <mat-list-item>
+                <a [routerLink]="['/']" routerLinkActive="router-link-active">
+                    <button mat-button>
+                        <fa-icon [icon]="homeIcon"></fa-icon>
+                        Home
+                    </button>
+                </a>
+            </mat-list-item>
+            <mat-list-item>
+                <a [routerLink]="['/stores']" routerLinkActive="router-link-active">
+                    <button mat-button>
+                        <fa-icon [icon]="storeIcon"></fa-icon>
+                        Stores
+                    </button>
+                </a>
+            </mat-list-item>
+            <mat-list-item>
+                <a [routerLink]="['/']" routerLinkActive="router-link-active">
+                    <button mat-button>
+                        <fa-icon [icon]="powerIcon"></fa-icon>
+                        Log out
+                    </button>
+                </a>
+            </mat-list-item>
+        </mat-list>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <div class="full-page">
+            <router-outlet></router-outlet>
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>

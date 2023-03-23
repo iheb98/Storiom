@@ -1,0 +1,27 @@
+{
+  "name": "stock-mngt-backend",
+  "version": "1.0.0",
+  "description": "Stock management application's backend",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "stock"
+  ],
+  "author": "Mohamed IHeb Ferjani",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.19.0",
+    "child_process": "^1.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^9.0.0",
+    "mysql2": "^3.1.1",
+    "nodemon": "^2.0.13",
+    "path": "^0.12.7",
+    "sequelize": "^6.28.0"
+  }
+}
