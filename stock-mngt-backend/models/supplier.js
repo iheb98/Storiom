@@ -32,7 +32,14 @@ module.exports = (sequelize, DataTypes) => {
       field: 'store_id'
     },
     phone: DataTypes.STRING,
-    email: DataTypes.STRING
+    email: DataTypes.STRING,
+    credit: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
+    creatorUserId: {
+      type: DataTypes.INTEGER
+    }
   }, {
     sequelize,
     tableName: 'suppliers',

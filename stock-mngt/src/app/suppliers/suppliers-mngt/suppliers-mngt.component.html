@@ -1,0 +1,91 @@
+<ngx-loading-x [show]="loading" [spinnerColor]="'#683ab7'"></ngx-loading-x>
+<div class="container">
+    <div class="row title-bloc">
+        <h3 class="title">Gestion des fournisseurs</h3>
+    </div>
+
+    <div class="row">
+        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+            <label for="firstName" class="form-label">Prénom</label>
+            <input type="text" class="form-control" id="firstName" [(ngModel)]="firstNameFilter">
+        </div>
+
+        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+            <label for="lastName" class="form-label">Nom</label>
+            <input type="text" class="form-control" id="lastName" [(ngModel)]="lastNameFilter">
+        </div>
+
+        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+            <label for="phone" class="form-label">Téléphone</label>
+            <input type="phone" class="form-control" id="phone" [(ngModel)]="phoneFilter">
+        </div>
+
+        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" [(ngModel)]="emailFilter">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+            <label for="minCreditFilter" class="form-label">Crédit</label>
+            <input type="number" class="form-control amount-input" id="minCreditFilter" [(ngModel)]="minCreditFilter"
+                placeholder="De">
+            <input type="number" class="form-control amount-input" id="maxCreditFilter" [(ngModel)]="maxCreditFilter"
+                placeholder="Jusqu'à">
+        </div>
+    </div>
+
+    <div class="row d-flex justify-content-end">
+        <div class="col-12 col-sm-12 col-md-10 col-lg-10 mb-3 align-add-button">
+            <button class="btn btn-secondary add-button" (click)="create()">Ajouter</button>
+        </div>
+        <div class="col-6 col-sm-6 col-md-2 col-lg-1 mb-3 align-filter-button">
+            <button class="btn btn-secondary" (click)="reset()">Réinitialiser</button>
+        </div>
+        <div class="col-6 col-sm-6 col-md-2 col-lg-1 mb-3 align-filter-button">
+            <button class="btn btn-primary" (click)="filter()">Filtrer</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 table-bloc">
+            <table class="table table-responsive table-hover ">
+                <thead>
+                    <tr>
+                        <th scope="col">Prénom</th>
+                        <th scope="col">Nom</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Téléphone</th>
+                        <th scope="col">Crédit</th>
+                        <th scope="col">Modifier</th>
+                        <th scope="col">Supprimer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let supplier of suppliers">
+                        <td>{{supplier?.firstName}}</td>
+                        <td>{{supplier?.lastName}}</td>
+                        <td>{{supplier?.email}}</td>
+                        <td>{{supplier?.phone}}</td>
+                        <td>{{supplier?.credit}}</td>
+                        <td>
+                            <button class="action-button" (click)="editSupplier(supplier)"><fa-icon
+                                    [icon]="faEdit"></fa-icon></button>
+                        </td>
+                        <td>
+                            <button class="action-button" (click)="deleteSupplier(supplier)"> <fa-icon
+                                    [icon]="faTrash"></fa-icon></button>
+                        </td>
+                    </tr>
+                    <tr *ngIf="count == 0">
+                        <td colspan="7" class="not-found-message">Pas de fournisseur trouvé</td>
+                    </tr>
+                </tbody>
+            </table>
+            <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
+                [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[5,10,20]" [hidePageSize]="false"
+                [pageIndex]="0" aria-label="Select page">
+            </mat-paginator>
+        </div>
+    </div>
+</div>

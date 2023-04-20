@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { Supplier } = require('../models');
+const utility = require('../utility');
 
-router.post('/create', (req, res) => {
-    const { firstName, lastName, phone, email, storeId } = req.body
-    Supplier.create({ firstName, lastName, phone, email, storeId }).then(createdSupplier => {
+
+router.post('/create', utility.authenticate, (req, res) => {
+    const { firstName, lastName, phone, email, storeId, credit } = req.body
+    Supplier.create({ firstName, lastName, phone, email, storeId, credit, creatorUserId: req.user.id }).then(createdSupplier => {
         res.json({
             supplier: createdSupplier
         })
@@ -13,19 +15,96 @@ router.post('/create', (req, res) => {
     })
 })
 
-router.get('/', (req, res, next) => {
-    Supplier.findAll().then(categories => {
-        res.json(categories)
+
+router.put('/edit', utility.authenticate, (req, res) => {
+    const { id, firstName, lastName, phone, email, credit } = req.body
+    Supplier.findOne(
+        {
+            where: {
+                id,
+                creatorUserId: req.user.id
+            }
+        }
+    ).then(supplier => {
+        supplier.firstName = firstName
+        supplier.lastName = lastName
+        supplier.email = email
+        supplier.phone = phone
+        supplier.credit = credit ? credit : 0
+        supplier.save().then(
+            savedSupplier => {
+                res.json({ message: 'Fournisseur modifié', success: true })
+            }
+        ).catch(err => {
+            console.log(err)
+            res.status(500).json({ err: err })
+        })
+    }).catch(err => {
+        console.log(err)
+        res.status(500).json({ err: err })
+    })
+})
+
+router.get('/store/:id', utility.authenticate, (req, res, next) => {
+    const id = req.params.id;
+    Supplier.findAll(utility.paginate({
+        where: {
+            store_id: id,
+            firstName: {
+                [utility.Op.like]: req.query.firstName ? '%' + req.query.firstName + '%' : '%'
+            },
+            lastName: {
+                [utility.Op.like]: req.query.lastName ? '%' + req.query.lastName + '%' : '%'
+            },
+            email: {
+                [utility.Op.like]: req.query.email ? '%' + req.query.email + '%' : '%'
+            },
+            phone: {
+                [utility.Op.like]: req.query.phone ? '%' + req.query.phone + '%' : '%'
+            },
+            credit: utility.fromTo(req.query.creditFrom, req.query.creditTo),
+            creatorUserId: req.user.id
+        }
+    }, { page: req.query.page, pageSize: req.query.size })).then(suppliers => {
+        res.json(suppliers)
     }).catch(err => {
         res.status(500).json(err)
     })
 });
 
-router.delete('/:id', (req, res, next) => {
+router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
+    const id = req.params.id;
+    Supplier.count({
+        where: {
+            store_id: id,
+            firstName: {
+                [utility.Op.like]: req.query.firstName ? '%' + req.query.firstName + '%' : '%'
+            },
+            lastName: {
+                [utility.Op.like]: req.query.lastName ? '%' + req.query.lastName + '%' : '%'
+            },
+            email: {
+                [utility.Op.like]: req.query.email ? '%' + req.query.email + '%' : '%'
+            },
+            phone: {
+                [utility.Op.like]: req.query.phone ? '%' + req.query.phone + '%' : '%'
+            },
+            credit: utility.fromTo(req.query.creditFrom, req.query.creditTo),
+            creatorUserId: req.user.id
+        }
+    }).then(countSuppliers => {
+        res.json(countSuppliers)
+    }).catch(err => {
+        res.status(500).json(err)
+    })
+});
+
+router.delete('/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Supplier.destroy({
         where: {
-            id
+            id,
+            creatorUserId: req.user.id
         }
     }).then(deletedRows => {
         if (deletedRows > 0)
@@ -37,11 +116,12 @@ router.delete('/:id', (req, res, next) => {
     })
 });
 
-router.get('/:id', (req, res, next) => {
+router.get('/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Supplier.findOne({
         where: {
-            id
+            id,
+            creatorUserId: req.user.id
         }, include: ['receipts']
     }).then(supplier => {
         res.json(supplier)
@@ -50,5 +130,6 @@ router.get('/:id', (req, res, next) => {
         res.status(500).json(err)
     })
 });
+
 
 module.exports = router;

@@ -29,6 +29,9 @@ module.exports = {
         type: DataTypes.INTEGER,
         field: 'product_id'
       },
+      creatorUserId: {
+        type: DataTypes.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

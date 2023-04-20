@@ -3,29 +3,32 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { User, Subscription, Address, RefreshToken, Note } = require('../models');
+const utility = require('../utility');
 
 //Register
 router.post('/register', async (req, res) => {
-    const { firstName, lastName, email, password, phone, country, street, city, state, postalCode, language, entryDate, salary, functionInStore, worksInStore } = req.body
+    const { firstName, lastName, email, password, phone, country, street, city, state, postalCode, language, entryDate, salary, functionInStore, worksInStore, superiorId } = req.body
     try {
         const user = await User.findOne({
             where: {
                 email
             }
         })
-        if (user) res.json({ success: false, message: 'The email is already being used' })
+        if (user) res.json({ success: false, errorType: "EMAIL_FOUND", message: 'The email is already being used' })
         else {
             bcrypt.genSalt(10, async (err, salt) => {
                 if (err) res.json(err);
                 bcrypt.hash(password, salt, async (err, hash) => {
                     if (err) res.json(err);
-                    const createdUser = await User.create({ firstName, lastName, email, password, phone, language, password: hash, entryDate, salary, functionInStore, worksInStore })
+                    const createdUser = await User.create({ firstName, lastName, email, password, phone, language, password: hash, entryDate, salary, functionInStore, worksInStore, superiorId })
                     const createdAddress = await Address.create({ userId: createdUser.id, country, street, city, state, postalCode })
                     const createdSubscription = await Subscription.create({ userId: createdUser.id, duration: 'TRIAL' })
-                    const token = generateAccessToken(createdUser.toJSON());
+                    const token = utility.generateAccessToken(createdUser.toJSON());
+                    const refreshToken = await utility.generateRefreshToken(createdUser.toJSON())
                     res.json({
                         success: true,
-                        token
+                        accessToken: token,
+                        refreshToken
                     })
                 })
             })
@@ -41,32 +44,33 @@ router.post('/authenticate', async (req, res, next) => {
     const user = await User.findOne({
         where: {
             email
-        }
+        }, include: ['store']
     });
     if (!user) {
-        return res.json({ success: false, error: "Utilisateur non trouvé" });
+        return res.json({ success: false, errorType: "EMAIL_ERROR", error: "Utilisateur non trouvé" });
     }
 
     comparePassword(password, user.password, async (err, isMatch) => {
         if (err) res.json(err);
         if (isMatch) {
-            const token = generateAccessToken(user.toJSON());
-            const refreshToken = await generateRefreshToken(user.toJSON())
+            const token = utility.generateAccessToken({ id: user.id, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null });
+            const refreshToken = await utility.generateRefreshToken({ id: user.id, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null })
             // **************************************** LOCAL STORAGE **********************************
+            console.log("refresh ",refreshToken)
             res.json({
                 success: true,
-                token,
+                accessToken: token,
                 refreshToken
             })
             //********************************************************
         } else {
-            return res.json({ success: false, error: 'Mot de passe incorrect !' });
+            return res.json({ success: false, errorType: "PASSWORD_ERROR", error: 'Mot de passe incorrect !' });
         }
     })
 
 });
 
-router.post('/notes/create', (req, res) => {
+router.post('/notes/create', utility.authenticate, (req, res) => {
     const { comment, images, userId } = req.body
     Note.create({ comment, images: JSON.stringify(images), userId }).then(createdNote => {
         res.json({
@@ -77,7 +81,7 @@ router.post('/notes/create', (req, res) => {
     })
 })
 
-router.get('/:id/notes', (req, res, next) => {
+router.get('/:id/notes', utility.authenticate, (req, res, next) => {
     const userId = req.params.id;
     Note.findAll({
         where: {
@@ -101,9 +105,15 @@ router.post('/token', async (req, res, next) => {
             }
         })
         if (!foundToken) return res.sendStatus(403)
-        jwt.verify(refreshToken, process.env.SECRET, (err, user) => {
+        jwt.verify(refreshToken, process.env.SECRET, async (err, tokenData) => {
             if (err) return res.sendStatus(403)
-            const accessToken = generateAccessToken({ name: user.name })
+            const user = await User.findOne({
+                where: {
+                    id: tokenData.id
+                }, include: ['store']
+            });
+            console.log(user)
+            const accessToken = utility.generateAccessToken({ id: user.id, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null })
             return res.json({ accessToken })
         })
     } catch (err) {
@@ -132,7 +142,7 @@ router.delete('/logout', async (req, res, next) => {
 
 
 
-router.get('/profile/:id', authenticate, async (req, res, next) => {
+router.get('/profile/:id', utility.authenticate, async (req, res, next) => {
     const id = req.params.id;
     try {
         const user = await User.findOne({
@@ -153,30 +163,8 @@ function comparePassword(candidatePassword, hash, callback) {
     })
 }
 
-function authenticate(req, res, next) {
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
-    if (token == null) return res.sendStatus(401)
-    jwt.verify(token, process.env.SECRET, (err, user) => {
-        if (err) return res.sendStatus(403)
-        req.user = user
-        next()
-    })
-}
 
-function generateAccessToken(user) {
-    return jwt.sign(user, process.env.SECRET, { expiresIn: '15s' })
-}
 
-async function generateRefreshToken(user) {
-    try {
-        const refreshToken = await RefreshToken.create({ value: jwt.sign(user, process.env.SECRET) });
-        console.log(refreshToken.value)
-        return refreshToken.value;
 
-    } catch (err) {
-        return ""
-    }
-}
 
 module.exports = router;

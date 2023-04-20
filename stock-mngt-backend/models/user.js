@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.hasOne(Address, { foreignKey: 'user_id', as: 'address' })
       this.hasOne(Subscription, { foreignKey: 'user_id', as: 'subscription' })
-      this.hasMany(Store, { foreignKey: 'user_id', as: 'stores' })
+      this.hasOne(Store, { foreignKey: 'user_id', as: 'store' })
     }
     toJSON() {
       return { ...this.get(), password: undefined }
@@ -35,7 +35,10 @@ module.exports = (sequelize, DataTypes) => {
     phone: DataTypes.STRING,
     email: DataTypes.STRING,
     password: DataTypes.STRING,
-    language: DataTypes.STRING,
+    language: {
+      type: DataTypes.STRING,
+      defaultValue: 'FR'
+    },
     role: {
       type: DataTypes.ENUM('Owner', 'Admin', 'Worker'),
       defaultValue: 'Owner'
@@ -43,6 +46,9 @@ module.exports = (sequelize, DataTypes) => {
     functionInStore: {
       type: DataTypes.STRING,
       field: 'function_in_store'
+    },
+    superiorId: {
+      type: DataTypes.INTEGER,
     },
     salary: DataTypes.FLOAT,
     entryDate: {

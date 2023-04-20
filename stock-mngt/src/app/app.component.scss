@@ -1,36 +1,46 @@
-mat-sidenav-container{
-    height:100%;
+mat-sidenav-container {
+    height: 100%;
 }
 
-mat-sidenav{
-    width:400px;
+mat-sidenav {
+    width: 400px;
+    padding-top:80px;
     background-color: #eee;
 }
 
+.navbar-fill-remaining-space {
+    flex: 1 1 auto;
+}
+
+.connected-user {
+    width: 60%;
+    text-align: right;
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-right: 20px;
+}
+
+.user-icon {
+    margin: 1px 10px;
+}
+
 @media screen and (max-width: 480px) {
-    mat-sidenav{
-        width:200px;
+    mat-sidenav {
+        width: 200px;
     }
-  }
 
-  
-
-
-
-
-
-
-
-
-
+    mat-sidenav button {
+        font-size: 10px;
+    }
+}
 
 .stores-list {
     border: 1px solid lightgray;
     min-height: 100%;
     margin: 10px 10px 10px 10px;
 }
-
-
 
 .list-item-card {
     border: 1px solid lightgray;
@@ -132,14 +142,23 @@ mat-sidenav{
     font-size: 30px;
 }
 
-mat-list-item a,mat-list-item button{
-    width:100%;
+mat-list-item a,
+mat-list-item button {
+    width: 100%;
     font-size: 25px;
 }
 
-mat-list-item{
-    margin-bottom:20px;
+mat-list-item {
+    margin-bottom: 20px;
 }
+
+mat-toolbar {
+    height: 64px;
+    position:fixed;
+    z-index: 100;
+    width: 100%  !important;
+}
+
 @media screen and (max-width: 480px) {
     mat-sidenav {
         width: 200px;
@@ -148,6 +167,11 @@ mat-list-item{
     .list-item {
         min-height: 450px;
         height: 100%;
+    }
+    mat-list-item a,
+    mat-list-item button {
+        width: 100%;
+        font-size: 15px;
     }
 }
 

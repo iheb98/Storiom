@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const { Store, Brand, Expense } = require('../models');
+const utility = require('../utility');
 
-router.post('/create', (req, res) => {
+router.post('/create', utility.authenticate, (req, res) => {
     const { name, logo, images, description, userId } = req.body
-    Store.create({ name, logo, images: JSON.stringify(images), description, userId }).then(createdStore => {
+    Store.create({ name, logo, images: JSON.stringify(images), active: true, description, userId }).then(createdStore => {
         res.json({
             store: createdStore
         })
@@ -13,7 +14,7 @@ router.post('/create', (req, res) => {
     })
 })
 
-router.post('/expenses/create', (req, res) => {
+router.post('/expenses/create', utility.authenticate, (req, res) => {
     const { amount, comment, date, storeId } = req.body
     Expense.create({ amount, comment, date, storeId }).then(createdExpense => {
         res.json({
@@ -24,7 +25,7 @@ router.post('/expenses/create', (req, res) => {
     })
 })
 
-router.get('/:id/expenses', (req, res) => {
+router.get('/:id/expenses', utility.authenticate, (req, res) => {
     const storeId = req.params.id;
     Expense.findAll({
         where: {
@@ -38,15 +39,7 @@ router.get('/:id/expenses', (req, res) => {
     })
 })
 
-router.get('/', (req, res, next) => {
-    Store.findAll().then(stores => {
-        res.json(stores)
-    }).catch(err => {
-        res.status(500).json(err)
-    })
-});
-
-router.post('/brands/create', (req, res) => {
+router.post('/brands/create', utility.authenticate, (req, res) => {
     const { name, storeId } = req.body
     Brand.create({ name, storeId }).then(createdBrand => {
         res.json(createdBrand)
@@ -55,7 +48,7 @@ router.post('/brands/create', (req, res) => {
     })
 })
 
-router.get('/:id/brands', (req, res) => {
+router.get('/:id/brands', utility.authenticate, (req, res) => {
     const storeId = req.params.id
     Brand.findAll({ where: { storeId } }).then(brands => {
         res.json(brands)
@@ -73,7 +66,7 @@ router.get('/', (req, res, next) => {
 });
 
 // Get the stores of a user by its id
-router.get('/user/:id', (req, res, next) => {
+router.get('/user/:id', utility.authenticate, (req, res, next) => {
     const userId = req.params.id;
     Store.findAll({
         where: {
@@ -86,8 +79,7 @@ router.get('/user/:id', (req, res, next) => {
     })
 });
 
-
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Store.destroy({
         where: {
@@ -103,7 +95,7 @@ router.delete('/:id', (req, res, next) => {
     })
 });
 
-router.get('/:id', (req, res, next) => {
+router.get('/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Store.findOne({
         where: {

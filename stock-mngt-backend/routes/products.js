@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { Product } = require('../models');
+const utility = require('../utility');
 
-router.post('/create', (req, res) => {
+
+router.post('/create', utility.authenticate, (req, res) => {
     const { name, code, buyingPrice, sellingPrice, currency, sizeType, color, size, images, quantity, storeId, supplierId, categoryId, brandId } = req.body
     Product.create({ name, code, buyingPrice, sellingPrice, currency, sizeType, color, size, images: JSON.stringify(images), quantity, storeId, supplierId, categoryId, brandId }).then(createdProduct => {
         res.json({
@@ -13,17 +15,9 @@ router.post('/create', (req, res) => {
     })
 })
 
-router.get('/', (req, res, next) => {
-    Product.findAll().then(products => {
-        res.json(products)
-    }).catch(err => {
-        res.status(500).json(err)
-    })
-});
 
 
-
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Product.destroy({
         where: {
@@ -39,17 +33,16 @@ router.delete('/:id', (req, res, next) => {
     })
 });
 
-router.get('/:id', (req, res, next) => {
+router.get('/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Product.findOne({
         where: {
             id
-        }, include : ['brand','category']
+        }, include: ['brand', 'category']
     }).then(product => {
         res.json(product)
 
     }).catch(err => {
-        console.log(err)
         res.status(500).json(err)
     })
 });

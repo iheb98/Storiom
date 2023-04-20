@@ -29,6 +29,9 @@ module.exports = (sequelize, DataTypes) => {
     productId: {
       type: DataTypes.INTEGER,
       field: 'product_id'
+    },
+    creatorUserId: {
+      type: DataTypes.INTEGER
     }
   }, {
     sequelize,

@@ -41,6 +41,9 @@ module.exports = {
         type: DataTypes.STRING,
         field: 'function_in_store'
       },
+      superiorId:{
+        type: DataTypes.INTEGER,
+      },
       worksInStore: {
         type: DataTypes.STRING,
         field: 'works_in_store'

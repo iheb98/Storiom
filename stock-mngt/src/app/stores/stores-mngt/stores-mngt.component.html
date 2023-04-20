@@ -6,13 +6,15 @@
     </div>
     <div class="page-content">
         <div class="stores-list">
-            <div class="item">
+
+
+            <div *ngFor="let store of (stores$ | async)" class="item">
                 <div class="header">
                     <div class="name">
-                        tessst header dqdqsdsqdsqdsqdsqqdsdsqdsq
+                        {{store?.name}}
                     </div>
                     <div class="actions">
-                        <button class="action-button">
+                        <button class="action-button" (click)="deleteStore(store?.id)">
                             <fa-icon [icon]="faDelete"></fa-icon>
                         </button>
                         <button class="action-button">
@@ -20,142 +22,19 @@
                         </button>
                     </div>
                 </div>
-                <div class="image-container">
-                    <img src="assets/image.jpg" class="image">
-                </div>
-                <div class="footer">
-                    <button class="select-button">
-                        <fa-icon [icon]="faArrowAltCircleRight"></fa-icon>
-                    </button>
+                <div class="image-container" (click)="selectStore(store)">
+                    <img src="{{store?.logo ? 'http://localhost:3000/images/'+store?.logo  : 'assets/storeIcon.png'}}" class="image">
                 </div>
             </div>
 
-
-
-            <div class="item">
-                <div class="header">
-                    <div class="name">
-                        tessst header dqdqsdsqdsqdsqdsqqdsdsqdsq
-                    </div>
-                    <div class="actions">
-                        <button class="action-button">
-                            <fa-icon [icon]="faDelete"></fa-icon>
-                        </button>
-                        <button class="action-button">
-                            <fa-icon [icon]="faEdit"></fa-icon>
-                        </button>
-                    </div>
-                </div>
-                <div class="image-container">
-                    <img src="assets/image.jpg" class="image">
-                </div>
-                <div class="footer">
-                    <button class="select-button">
-                        <fa-icon [icon]="faArrowAltCircleRight"></fa-icon>
-                    </button>
-                </div>
-            </div>
+            
 
             <div class="item">
-                <div class="header">
-                    <div class="name">
-                        tessst header dqdqsdsqdsqdsqdsqqdsdsqdsq
-                    </div>
-                    <div class="actions">
-                        <button class="action-button">
-                            <fa-icon [icon]="faDelete"></fa-icon>
-                        </button>
-                        <button class="action-button">
-                            <fa-icon [icon]="faEdit"></fa-icon>
-                        </button>
-                    </div>
-                </div>
-                <div class="image-container">
-                    <img src="assets/image.jpg" class="image">
-                </div>
-                <div class="footer">
-                    <button class="select-button">
-                        <fa-icon [icon]="faArrowAltCircleRight"></fa-icon>
-                    </button>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="header">
-                    <div class="name">
-                        tessst header dqdqsdsqdsqdsqdsqqdsdsqdsq
-                    </div>
-                    <div class="actions">
-                        <button class="action-button">
-                            <fa-icon [icon]="faDelete"></fa-icon>
-                        </button>
-                        <button class="action-button">
-                            <fa-icon [icon]="faEdit"></fa-icon>
-                        </button>
-                    </div>
-                </div>
-                <div class="image-container">
-                    <img src="assets/image.jpg" class="image">
-                </div>
-                <div class="footer">
-                    <button class="select-button">
-                        <fa-icon [icon]="faArrowAltCircleRight"></fa-icon>
-                    </button>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="header">
-                    <div class="name">
-                        tessst header dqdqsdsqdsqdsqdsqqdsdsqdsq
-                    </div>
-                    <div class="actions">
-                        <button class="action-button">
-                            <fa-icon [icon]="faDelete"></fa-icon>
-                        </button>
-                        <button class="action-button">
-                            <fa-icon [icon]="faEdit"></fa-icon>
-                        </button>
-                    </div>
-                </div>
-                <div class="image-container">
-                    <img src="assets/image.jpg" class="image">
-                </div>
-                <div class="footer">
-                    <button class="select-button">
-                        <fa-icon [icon]="faArrowAltCircleRight"></fa-icon>
-                    </button>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="header">
-                    <div class="name">
-                        tessst header dqdqsdsqdsqdsqdsqqdsdsqdsq
-                    </div>
-                    <div class="actions">
-                        <button class="action-button">
-                            <fa-icon [icon]="faDelete"></fa-icon>
-                        </button>
-                        <button class="action-button">
-                            <fa-icon [icon]="faEdit"></fa-icon>
-                        </button>
-                    </div>
-                </div>
-                <div class="image-container">
-                    <img src="assets/image.jpg" class="image">
-                </div>
-                <div class="footer">
-                    <button class="select-button">
-                        <fa-icon [icon]="faArrowAltCircleRight"></fa-icon>
-                    </button>
-                </div>
-            </div>
-
-            <div class="item">
+                <a [routerLink]="['/stores/add']" routerLinkActive="router-link-active">
                     <button class="add-button">
                         <fa-icon [icon]="faPlus"></fa-icon>
                     </button>
+                </a>
             </div>
         </div>
 

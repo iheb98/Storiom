@@ -6,6 +6,18 @@ const path = require('path');
 //const passport = require('passport');
 const port = process.env.PORT || 3000;
 const cors = require('cors');
+const multer = require('multer');
+const storage = multer.diskStorage(
+  {
+    destination: './images',
+    filename: function (req, file, cb) {
+      cb(null, file.originalname )
+    }
+  }
+)
+const upload = multer({ storage })
+
+
 require('dotenv/config');
 
 // **************************************** CORS ****************************************
@@ -34,8 +46,13 @@ app.use(cors({
 //**************************************************************************************************************
 
 app.use(express.static('.'));
-app.use(bodyparser.json({limit: '50mb'}));
+app.use(bodyparser.json({ limit: '50mb' }));
 
+
+
+app.post('/api/uploadFile', upload.single('file', (req, res) => {
+  let filePath = ''
+}))
 const usersRoute = require('./routes/users');
 const storesRoute = require('./routes/stores');
 const categoriesRoute = require('./routes/categories');
@@ -44,13 +61,13 @@ const suppliersRoute = require('./routes/suppliers');
 const creditsRoute = require('./routes/credits');
 const receiptsRoute = require('./routes/receipts');
 
-app.use('/receipts', receiptsRoute)
-app.use('/credits', creditsRoute)
-app.use('/suppliers', suppliersRoute)
-app.use('/products', productsRoute)
-app.use('/categories', categoriesRoute)
-app.use('/stores', storesRoute)
-app.use('/users', usersRoute)
+app.use('/api/receipts', receiptsRoute)
+app.use('/api/credits', creditsRoute)
+app.use('/api/suppliers', suppliersRoute)
+app.use('/api/products', productsRoute)
+app.use('/api/categories', categoriesRoute)
+app.use('/api/stores', storesRoute)
+app.use('/api/users', usersRoute)
 
 //require('./config/passport')(passport);
 

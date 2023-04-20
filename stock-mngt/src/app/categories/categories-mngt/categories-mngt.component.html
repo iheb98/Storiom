@@ -1,0 +1,129 @@
+<ngx-loading-x [show]="loading" [spinnerColor]="'#683ab7'"></ngx-loading-x>
+<div class="container"  NgxLoadingXBlur [show]="loading">
+    <div class="row title-bloc">
+        <h2 class="title">
+            Gestion des catégories
+        </h2>
+    </div>
+    <div class="row category-bloc">
+
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item">
+            <div class="category-container" [ngClass]="{'selected-mode':mode == 'SELECT'}" (click)="mode = 'SELECT'">
+                <fa-icon [icon]="faSelect" class="icon"></fa-icon> <span class="button-label">Sélectionner</span>
+            </div>
+        </div>
+        
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item">
+            <div class="category-container" [ngClass]="{'selected-mode':mode == 'EDIT'}" (click)="mode = 'EDIT'">
+                <fa-icon [icon]="faEdit" class="icon"></fa-icon> <span class="button-label">Modifier</span>
+
+            </div>
+        </div>
+
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item">
+            <div class="category-container" [ngClass]="{'selected-mode':mode == 'DELETE'}" (click)="mode = 'DELETE'">
+                <fa-icon [icon]="faTrash" class="icon"></fa-icon> <span class="button-label">Supprimer</span>
+            </div>
+        </div>
+    </div>
+    <div class="row category-bloc">
+        <div class="col-12">
+            <h5 class="subcategory-name">
+                Catégories parents
+            </h5>
+        </div>
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item" *ngFor="let item of categories">
+            <div class="category-container" [ngClass]="{'selected':item?.id == selectedCategory?.id}"
+                (click)="selectCategory(item)">
+                <span class="categoriy-name">{{item?.name}}</span>
+            </div>
+        </div>
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item" *ngIf="mode == 'SELECT'">
+            <div class="add-category" (click)="addCategory()">
+                <span>+</span>
+            </div>
+        </div>
+
+    </div>
+    <div class="row category-bloc" *ngIf="selectedCategory">
+        <div class="col-12">
+            <h5 class="subcategory-name">
+                Sous-catégories de {{selectedCategory?.name}}
+            </h5>
+        </div>
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item"
+            *ngFor="let item of selectedCategory?.subCategories">
+            <div class="category-container" [ngClass]="{'selected':item?.id == selectedSubCategory1?.id}"
+                (click)="selectSubCategory1(item)">
+                <span class="categoriy-name">{{item?.name}}</span>
+            </div>
+        </div>
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item" *ngIf="mode == 'SELECT'">
+            <div class="add-category" (click)="addSubCategory(selectedCategory)">
+                <span>+</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row category-bloc" *ngIf="selectedSubCategory1">
+        <div class="col-12">
+            <h5 class="subcategory-name">
+                Sous-catégories de {{selectedSubCategory1?.name}}
+            </h5>
+        </div>
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item"
+            *ngFor="let item of selectedSubCategory1?.subCategories">
+            <div class="category-container" [ngClass]="{'selected':item?.id == selectedSubCategory2?.id}"
+                (click)="selectSubCategory2(item)">
+                <span class="categoriy-name">{{item?.name}}</span>
+            </div>
+        </div>
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item" *ngIf="mode == 'SELECT'">
+            <div class="add-category" (click)="addSubCategory(selectedSubCategory1)">
+                <span>+</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row category-bloc" *ngIf="selectedSubCategory2">
+        <div class="col-12">
+            <h5 class="subcategory-name">
+                Sous-catégories de {{selectedSubCategory2?.name}}
+            </h5>
+        </div>
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item"
+            *ngFor="let item of selectedSubCategory2?.subCategories">
+            <div class="category-container" [ngClass]="{'selected':item?.id == selectedSubCategory3?.id}"
+                (click)="selectSubCategory3(item)">
+                <span class="categoriy-name">{{item?.name}}</span>
+            </div>
+        </div>
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item" *ngIf="mode == 'SELECT'">
+            <div class="add-category" (click)="addSubCategory(selectedSubCategory2)">
+                <span>+</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row category-bloc" *ngIf="selectedSubCategory3">
+        <div class="col-12">
+            <h5 class="subcategory-name">
+                Sous-catégories de {{selectedSubCategory3?.name}}
+            </h5>
+        </div>
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item"
+            *ngFor="let item of selectedSubCategory3?.subCategories">
+            <div class="category-container" [ngClass]="{'selected':item?.id == selectedSubCategory4?.id}"
+                (click)="selectSubCategory4(item)">
+                <span class="categoriy-name">{{item?.name}}</span>
+            </div>
+        </div>
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item" *ngIf="mode == 'SELECT'">
+            <div class="add-category" (click)="addSubCategory(selectedSubCategory3)">
+                <span>+</span>
+            </div>
+        </div>
+    </div>
+
+
+</div>

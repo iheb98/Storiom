@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(Supplier, { foreignKey: 'store_id', as: 'suppliers' })
     }
     toJSON() {
-      return { ...this.get(), images: JSON.parse(this.images), userId: undefined, user_id: undefined, createdAt: undefined, updatedAt: undefined }
+      return { ...this.get(), images: this.images ? JSON.parse(this.images) : [], userId: undefined, user_id: undefined, createdAt: undefined, updatedAt: undefined }
     }
   }
   Store.init({
@@ -31,6 +31,9 @@ module.exports = (sequelize, DataTypes) => {
     userId: {
       type: DataTypes.INTEGER,
       field: 'user_id'
+    },
+    creatorUserId: {
+      type: DataTypes.INTEGER
     }
   }, {
     sequelize,

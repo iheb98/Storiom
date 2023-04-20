@@ -1,5 +1,5 @@
 .stores-list {
-    background-color: rgba(211, 211, 211, 0.162);
+    //background-color: rgba(211, 211, 211, 0.162);
     width: 100%;
     display: grid;
     grid-template: auto / 31% 31% 31%;
@@ -11,6 +11,8 @@
 .item {
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 10px !important;
+    border: 1px solid #ccc;
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.203);
     position: relative;
     font-size: 30px;
     transition: 0.3s;
@@ -19,41 +21,45 @@
 .item:hover {
     transform: translateY(-10px);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.203);
+    cursor: pointer;
 }
 
 .header {
     width: 100%;
     padding: 0px 10px 0 10px;
     position: relative;
+    display: flex;
+    justify-content: space-between;
 }
-.name{
-    width:80%;
-    height: 100%;
+.name {
+    width: 80%;
+    padding: 5px;
     display: inline-block;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
 }
-.actions{
+.actions {
+    display: flex;
+    justify-content: space-between;
     position: absolute;
-    right:0px;
+    right: 0px;
     top: 0;
     bottom: 0;
     display: inline-block;
     text-align: right;
 }
 
-.actions button{
+.actions button {
     font-size: 25px;
     position: relative;
-    padding:10px;
-    top: 5%;
     border-radius: 10px;
 }
 
 .image-container {
     position: relative;
     width: 100%;
+    height:80%;
 }
 
 .image {
@@ -61,12 +67,12 @@
     width: 100%;
     object-fit: cover;
 }
-.footer {
-}
 
 .select-button {
     width: 100%;
     background-color: rgba(102, 51, 153, 0.412);
+    position: absolute;
+    bottom:0;
 }
 
 .select-button:hover {
@@ -81,9 +87,9 @@
     font-size: 70px;
 }
 
-.add-button{
+.add-button {
     height: 100%;
-    width:100%;
+    width: 100%;
     font-size: 50px;
 }
 
@@ -96,15 +102,15 @@
         grid-gap: 60px;
         padding: 30px;
     }
-    
-    .header{
+
+    .header {
         font-size: 15px;
     }
 
-    .actions button{
+    .actions button {
         font-size: 15px;
         position: relative;
-        padding:7px;
+        padding:5px;
         top: 0;
     }
 }
@@ -118,19 +124,17 @@
         grid-gap: 30px;
         padding: 30px;
     }
-    
-    .header{
+
+    .header {
         font-size: 15px;
     }
 
-    .actions button{
+    .actions button {
         font-size: 15px;
         position: relative;
-        padding:7px;
-        top: 7%;
+        padding: 5px;
     }
 }
-
 
 @media screen and (max-width: 400px) {
     .stores-list {
@@ -141,15 +145,14 @@
         grid-gap: 30px;
         padding: 30px;
     }
-    
-    .header{
+
+    .header {
         font-size: 15px;
     }
 
-    .actions button{
+    .actions button {
         font-size: 10px;
         position: relative;
-        padding:7px;
-        top: 7%;
+        padding: 7px;
     }
 }

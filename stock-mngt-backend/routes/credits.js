@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { Credit } = require('../models');
+const utility = require('../utility');
 
-router.post('/create', (req, res) => {
+
+router.post('/create',utility.authenticate, (req, res) => {
     const { firstName, lastName, phone, email, comment, amount, givenDate, returnDate, storeId } = req.body
     Credit.create({ firstName, lastName, phone, email, comment, amount, givenDate, returnDate, storeId }).then(createdCredit => {
         res.json({
@@ -13,15 +15,7 @@ router.post('/create', (req, res) => {
     })
 })
 
-router.get('/', (req, res, next) => {
-    Credit.findAll().then(categories => {
-        res.json(categories)
-    }).catch(err => {
-        res.status(500).json(err)
-    })
-});
-
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id',utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Credit.destroy({
         where: {
@@ -37,7 +31,7 @@ router.delete('/:id', (req, res, next) => {
     })
 });
 
-router.get('/:id', (req, res, next) => {
+router.get('/:id',utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Credit.findOne({
         where: {

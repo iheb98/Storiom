@@ -41,6 +41,9 @@ module.exports = {
         type:DataTypes.INTEGER,
         field:'store_id'
       },
+      creatorUserId: {
+        type: DataTypes.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

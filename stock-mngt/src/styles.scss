@@ -10,6 +10,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     font-size: 50px;
 }
 
+.title-bloc{
+    padding:100px 50px 50px 50px;
+}
+
 .full-page{
     height: 100%;
     padding: 0 300px 150px 300px;
@@ -45,6 +49,39 @@ button:hover {
     background-color: rgba(0, 0, 0, 0.105);
 }
 
+.full-width{
+    width:100%;
+}
+
+
+
+//Paginator 
+
+
+.paginator{
+    background-color: transparent;
+}
+
+
+
+//Form section
+
+
+input.ng-touched.ng-invalid {
+    border: 1px solid red;
+  }
+
+  .form-error{
+    color:red
+  }
+
+  .invalid{
+    border: 1px solid red;
+  }
+
+
+// ---------------------------
+
 @media screen and (max-width: 1500px) {
     .full-page{
         padding: 0 50px 150px 50px;
@@ -61,7 +98,7 @@ button:hover {
 
 @media screen and (max-width: 600px) {
     .full-page{
-        padding: 0 50px 150px 50px;
+        padding:0;
         position: relative;
     }
     .title{

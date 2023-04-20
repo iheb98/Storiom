@@ -1,0 +1,87 @@
+<div class="container">
+    <form [formGroup]="form" (ngSubmit)="register()">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-12 col-md-12 col-lg-6 login-block">
+                <div class="mb-3 row">
+                    <label for="lastName" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Nom</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="text" [ngClass]="{'invalid':submitted && !form.get('lastName').value}"
+                            class="form-control" id="lastName" formControlName="lastName">
+                        <div *ngIf="submitted && !form.get('lastName').value" class="form-error">
+                            Le nom est obligatoire.
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="firstName" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Prénom</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="firstName" [ngClass]="{'invalid':submitted && !form.get('firstName').value}"
+                            class="form-control" id="firstName" formControlName="firstName">
+                        <div *ngIf="submitted && !form.get('firstName').value" class="form-error">
+                            Le prénom est obligatoire.
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="email" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Email</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="email" [ngClass]="{'invalid':submitted && !form.get('email').value || emailError}"
+                            class="form-control" id="email" formControlName="email" email="true">
+                        <div *ngIf="submitted && !form.get('email').value" class="form-error">
+                            L'email est obligatoire.
+                        </div>
+                        <div *ngIf="submitted && form.get('email').errors?.pattern" class="form-error">
+                            Mauvaise format d'email
+                        </div>
+                        <div *ngIf="submitted && emailFound" class="form-error">
+                            L'email entré est déja utilisé.
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="phone" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Téléphone</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="phone" class="form-control" id="phone" formControlName="phone">
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="inputPassword" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Mot de
+                        passe</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="password"
+                            [ngClass]="{'invalid':submitted && !form.get('password').value || passwordError}"
+                            class="form-control" id="inputPassword" formControlName="password">
+                        <div *ngIf="submitted && passwordError" class="form-error">
+                            Mot de passe trop faible.
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="confirmPassword" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Confirmer le
+                        mot de
+                        passe</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="password"
+                            [ngClass]="{'invalid':submitted && !form.get('confirmPassword').value || confirmPasswordError}"
+                            class="form-control" id="confirmPassword" formControlName="confirmPassword">
+                            <div *ngIf="form.get('confirmPassword').value && (form.get('confirmPassword').value != form.get('password').value)" class="form-error">
+                            Les deux mots de passe ne sont pas identiques.
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row justify-content-end">
+                    <div class="col-12 col-sm-12 col-lg-auto">
+                        <button type="submit" class="btn btn-primary full-width">S'inscrire</button>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <div class="col-auto col-sm-auto col-md-auto col-lg-auto p-2">
+                        <span>Déja inscrit ? <a [routerLink]="['/login']" routerLinkActive="router-link-active">Se
+                                connecter</a> </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -21,6 +21,9 @@ module.exports = (sequelize, DataTypes) => {
     storeId: {
       type: DataTypes.INTEGER,
       field: 'store_id'
+    },
+    creatorUserId: {
+      type: DataTypes.INTEGER
     }
   }, {
     sequelize,

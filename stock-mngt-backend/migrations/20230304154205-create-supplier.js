@@ -23,9 +23,16 @@ module.exports = {
       email: {
         type: DataTypes.STRING
       },
-      storeId:{
-        type:DataTypes.INTEGER,
-        field:'store_id'
+      credit: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+      },
+      creatorUserId: {
+        type: DataTypes.INTEGER
+      },
+      storeId: {
+        type: DataTypes.INTEGER,
+        field: 'store_id'
       },
       createdAt: {
         allowNull: false,

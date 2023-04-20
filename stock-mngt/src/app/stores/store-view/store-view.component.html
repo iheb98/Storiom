@@ -1,0 +1,16 @@
+<div class="container">
+    <div class="row">
+
+        <div class="col-12 -col-sm-12 col-md-4 col-lg-2">
+            <div class="image-container">
+                <img src="{{store?.logo ? 'http://localhost:3000/images/'+store?.logo  : 'assets/storeIcon.png'}}"
+                    class="image">
+            </div>
+        </div>
+        <div class="col-12 -col-sm-12 col-md-8 col-lg-10">
+            <span class="subtitle">Nom du boutique : </span> <span class="name">{{store?.name}}</span>
+            <br/>
+            <span class="subtitle">Description : </span> <span class="name">{{store?.description}}</span>
+        </div>
+    </div>
+</div>

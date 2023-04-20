@@ -1,0 +1,16 @@
+.login-block {
+    padding: 50px;
+    border: 1px solid #ccc;
+}
+
+@media screen and (min-width: 1000px) {
+    .login-block {
+        margin-top: 200px;
+    }
+}
+
+@media screen and (max-width: 999px) {
+    .login-block {
+        margin-top: 100px;
+    }
+}

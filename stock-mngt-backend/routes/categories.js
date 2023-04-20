@@ -1,29 +1,44 @@
 const express = require('express');
 const router = express.Router();
 const { Category } = require('../models');
+const utility = require('../utility');
 
-router.post('/create', (req, res) => {
+router.post('/create',utility.authenticate, (req, res) => {
     const { name, parentCategoryId, storeId } = req.body
     Category.create({ name, parentCategoryId, storeId }).then(createdCategory => {
-        res.json({
-            category: createdCategory
+        res.json(createdCategory)
+    }).catch(err => {
+        res.status(500).json(err)
+    })
+})
+
+router.put('/edit',utility.authenticate, (req, res) => {
+    const { id, name } = req.body;
+    Category.findOne(
+        {
+            where: {
+                id
+            }
+        }
+    ).then(category => {
+        category.name = name
+        category.save().then(
+            savedCategory => {
+                res.json({ message: 'Categorie modifié', success: true })
+            }
+        ).catch(err => {
+            res.status(500).json(err)
         })
     }).catch(err => {
         res.status(500).json(err)
     })
 })
 
-router.get('/', (req, res, next) => {
-    Category.findAll().then(categories => {
-        res.json(categories)
-    }).catch(err => {
-        res.status(500).json(err)
-    })
-});
 
-router.get('/store/:id', (req, res, next) => {
+router.get('/store/:id',utility.authenticate, (req, res, next) => {
     const storeId = req.params.id;
-    Category.findOne({
+
+    Category.findAll({
         where: {
             storeId
         },
@@ -44,12 +59,13 @@ router.get('/store/:id', (req, res, next) => {
         res.json(category)
 
     }).catch(err => {
+        console.log(err)
         res.status(500).json(err)
     })
 });
 
 
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id',utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Category.destroy({
         where: {
@@ -65,7 +81,7 @@ router.delete('/:id', (req, res, next) => {
     })
 });
 
-router.get('/:id', (req, res, next) => {
+router.get('/:id',utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Category.findOne({
         where: {
