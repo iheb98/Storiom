@@ -5,6 +5,7 @@ import { faArrowAltCircleRight, faChartBar } from '@fortawesome/free-regular-svg
 import { faPowerOff, faHome, faStore, faUser, faCodeBranch, faHandHoldingUsd, faCoins, faShuttleVan, faBox, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from './services/auth.service';
 import { ListenerService } from './services/listener.service';
+import { LoadingService } from './services/loading.service';
 
 @Component({
   selector: 'app-root',
@@ -24,7 +25,7 @@ export class AppComponent implements OnInit {
   connectedUser;
   menu;
 
-  constructor(private authService: AuthService, private router: Router, private listener: ListenerService) {
+  constructor(private authService: AuthService, private router: Router,public loadingService: LoadingService) {
   }
   ngOnInit() {
     this.connectedUser = this.authService.getConnectedUser()

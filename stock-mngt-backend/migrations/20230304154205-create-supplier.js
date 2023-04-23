@@ -24,7 +24,7 @@ module.exports = {
         type: DataTypes.STRING
       },
       credit: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
         defaultValue: 0
       },
       creatorUserId: {

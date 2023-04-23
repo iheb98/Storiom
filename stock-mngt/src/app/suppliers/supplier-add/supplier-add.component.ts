@@ -31,13 +31,14 @@ export class SupplierAddComponent implements OnInit {
     this.user = this.authService.getConnectedUser();
     this.route.paramMap.subscribe(paramMap => {
       this.supplierId = paramMap.get('id');
-      this.supplierService.getSupplier(this.supplierId).subscribe(response => {
-        this.form.get('firstName').setValue(response.firstName)
-        this.form.get('lastName').setValue(response.lastName)
-        this.form.get('phone').setValue(response.phone)
-        this.form.get('email').setValue(response.email)
-        this.form.get('credit').setValue(response.credit)
-      })
+      if (this.supplierId)
+        this.supplierService.getSupplier(this.supplierId).subscribe(response => {
+          this.form.get('firstName').setValue(response.firstName)
+          this.form.get('lastName').setValue(response.lastName)
+          this.form.get('phone').setValue(response.phone)
+          this.form.get('email').setValue(response.email)
+          this.form.get('credit').setValue(response.credit)
+        })
     })
   }
 

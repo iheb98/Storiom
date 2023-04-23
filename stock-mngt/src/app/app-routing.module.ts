@@ -11,6 +11,8 @@ import { StoresMngtComponent } from './stores/stores-mngt/stores-mngt.component'
 import { StoreViewComponent } from './stores/store-view/store-view.component';
 import { SuppliersMngtComponent } from './suppliers/suppliers-mngt/suppliers-mngt.component';
 import { SupplierAddComponent } from './suppliers/supplier-add/supplier-add.component';
+import { ProductsMngtComponent } from './products/products-mngt/products-mngt.component';
+import { ProductAddComponent } from './products/product-add/product-add.component';
 
 const routes: Routes = [
   // ------------ Store ------------
@@ -23,11 +25,15 @@ const routes: Routes = [
   { path: 'categories/add', component: CategoriesMngtComponent },
 
 
-  
-  // ------------ Fournisseurs ------------
+
+  // ------------ Suppliers ------------
   { path: 'suppliers', component: SuppliersMngtComponent },
   { path: 'suppliers/add', component: SupplierAddComponent },
   { path: 'suppliers/:id', component: SupplierAddComponent },
+
+  // ------------ Products ------------
+  { path: 'products', component: ProductsMngtComponent },
+  { path: 'products/add', component: ProductAddComponent },
 
 
   // ------------ General ------------

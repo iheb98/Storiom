@@ -72,6 +72,20 @@ router.get('/store/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
+router.get('/all/store/:id', utility.authenticate, (req, res, next) => {
+    const id = req.params.id;
+    Supplier.findAll({
+        where: {
+            store_id: id,
+            creatorUserId: req.user.id
+        }
+    }).then(suppliers => {
+        res.json(suppliers)
+    }).catch(err => {
+        res.status(500).json(err)
+    })
+});
+
 router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Supplier.count({

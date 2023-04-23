@@ -21,6 +21,10 @@ export class SupplierService {
     });
   }
 
+  getAllSuppliersByStoreId(id): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'all/store/' + id);
+  }
+
   countSuppliersByStoreId(id, query): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'count/store/' + id,
       {

@@ -29,6 +29,9 @@ import { AddCategoryComponent } from './categories/add-category/add-category.com
 import { NgxLoadingXModule } from 'ngx-loading-x';
 import { SuppliersMngtComponent } from './suppliers/suppliers-mngt/suppliers-mngt.component';
 import { SupplierAddComponent } from './suppliers/supplier-add/supplier-add.component';
+import { ProductsMngtComponent } from './products/products-mngt/products-mngt.component';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { ProductAddComponent } from './products/product-add/product-add.component';
 
 
 @NgModule({
@@ -44,7 +47,9 @@ import { SupplierAddComponent } from './suppliers/supplier-add/supplier-add.comp
     StoreViewComponent,
     AddCategoryComponent,
     SuppliersMngtComponent,
-    SupplierAddComponent
+    SupplierAddComponent,
+    ProductsMngtComponent,
+    ProductAddComponent
   ],
   imports: [
     BrowserModule,
@@ -59,6 +64,7 @@ import { SupplierAddComponent } from './suppliers/supplier-add/supplier-add.comp
     MatFormFieldModule,
     MatInputModule,
     MatPaginatorModule,
+    NgSelectModule,
     NgxLoadingXModule,
     FormsModule,
     ReactiveFormsModule,
