@@ -5,8 +5,8 @@ const utility = require('../utility');
 
 
 router.post('/create', utility.authenticate, (req, res) => {
-    const { firstName, lastName, phone, email, storeId, credit } = req.body
-    Supplier.create({ firstName, lastName, phone, email, storeId, credit, creatorUserId: req.user.id }).then(createdSupplier => {
+    const { firstName, lastName, phone, email, storeId, credit, description } = req.body
+    Supplier.create({ firstName, lastName, phone, email, storeId, credit, description, creatorUserId: req.user.id }).then(createdSupplier => {
         res.json({
             supplier: createdSupplier
         })
@@ -17,7 +17,7 @@ router.post('/create', utility.authenticate, (req, res) => {
 
 
 router.put('/edit', utility.authenticate, (req, res) => {
-    const { id, firstName, lastName, phone, email, credit } = req.body
+    const { id, firstName, lastName, phone, email, credit, description } = req.body
     Supplier.findOne(
         {
             where: {
@@ -30,17 +30,16 @@ router.put('/edit', utility.authenticate, (req, res) => {
         supplier.lastName = lastName
         supplier.email = email
         supplier.phone = phone
+        supplier.description = description
         supplier.credit = credit ? credit : 0
         supplier.save().then(
             savedSupplier => {
                 res.json({ message: 'Fournisseur modifié', success: true })
             }
         ).catch(err => {
-            console.log(err)
             res.status(500).json({ err: err })
         })
     }).catch(err => {
-        console.log(err)
         res.status(500).json({ err: err })
     })
 })

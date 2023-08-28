@@ -1,13 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const { Store, Brand, Expense } = require('../models');
+const { Store, Brand, Expense, Address } = require('../models');
 const utility = require('../utility');
 
 router.post('/create', utility.authenticate, (req, res) => {
-    const { name, logo, images, description, userId } = req.body
-    Store.create({ name, logo, images: JSON.stringify(images), active: true, description, userId }).then(createdStore => {
-        res.json({
-            store: createdStore
+    const { name, logo, images, description, country, street, city, state, postalCode, phone, email, site, userId } = req.body
+    Store.create({ name, logo, images: JSON.stringify(images), active: true, phone, email, site, description, userId, creatorUserId: req.user.id }).then(createdStore => {
+        Address.create({ storeId: createdStore.id, country, street, city, state, postalCode }).then(createdAdress => {
+            res.json({
+                store: createdStore
+            })
+        }).catch(err => {
+            res.status(500).json(err)
         })
     }).catch(err => {
         res.status(500).json(err)
@@ -100,7 +104,7 @@ router.get('/:id', utility.authenticate, (req, res, next) => {
     Store.findOne({
         where: {
             id
-        }
+        }, include: ['address']
     }).then(store => {
         res.json(store)
 

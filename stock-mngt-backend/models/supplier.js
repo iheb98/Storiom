@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     toJSON() {
-      return { ...this.get(), storeId: undefined, store_id: undefined, createdAt: undefined, updatedAt: undefined }
+      return { ...this.get(), storeId: undefined, store_id: undefined, creatorUserId: undefined, createdAt: undefined, updatedAt: undefined }
     }
   }
   Supplier.init({
@@ -33,6 +33,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     phone: DataTypes.STRING,
     email: DataTypes.STRING,
+    description: {
+      type: DataTypes.TEXT
+    },
     credit: {
       type: DataTypes.FLOAT,
       defaultValue: 0

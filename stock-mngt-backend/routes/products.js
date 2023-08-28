@@ -5,23 +5,88 @@ const utility = require('../utility');
 
 
 router.post('/create', utility.authenticate, (req, res) => {
-    const { name, code, buyingPrice, sellingPrice, currency, sizeType, color, size, images, quantity, storeId, supplierId, categoryId, brandId } = req.body
-    Product.create({ name, code, buyingPrice, sellingPrice, currency, sizeType, color, size, images: JSON.stringify(images), quantity, storeId, supplierId, categoryId, brandId }).then(createdProduct => {
+    const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, quantity, storeId, supplierId, categoryId, brandId } = req.body
+    Product.create({ name, code, buyingPrice, sellingPrice, currency, color, size, description, images: JSON.stringify(images), quantity, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id }).then(createdProduct => {
         res.json({
             product: createdProduct
         })
     }).catch(err => {
-        res.status(500).json(err)
+        console.log(err)
+        res.status(500).json({ err })
     })
 })
 
+router.put('/edit', utility.authenticate, (req, res) => {
+    const { id, name, color, quantity, images, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId } = req.body
+    Product.findOne(
+        {
+            where: {
+                id,
+                creatorUserId: req.user.id
+            }
+        }
+    ).then(product => {
+        product.name = name
+        product.color = color
+        product.images = JSON.stringify(images)
+        product.quantity = quantity
+        product.supplierId = supplierId
+        product.categoryId = categoryId
+        product.brandId = brandId
+        product.description = description
+        product.sellingPrice = sellingPrice
+        product.buyingPrice = buyingPrice
+        product.size = size
+        product.save().then(
+            savedProduct => {
+                res.json({ message: 'Produit modifié', success: true })
+            }
+        ).catch(err => {
+            res.status(500).json({ err: err })
+        })
+    }).catch(err => {
+        console.log(err)
+        res.status(500).json({ err: err })
+    })
+})
+
+router.get('/store/:id', utility.authenticate, (req, res, next) => {
+    const id = req.params.id;
+    Product.findAll(utility.paginate({
+        where: {
+            store_id: id,
+            ...utility.buildQuery(req.query.query),
+            creatorUserId: req.user.id
+        }, include: ['supplier', 'category']
+    }, { page: req.query.page, pageSize: req.query.size })).then(products => {
+        res.json(products)
+    }).catch(err => {
+        res.status(500).json(err)
+    })
+});
+
+router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
+    const id = req.params.id;
+    Product.count({
+        where: {
+            store_id: id,
+            ...utility.buildQuery(req.query.query),
+            creatorUserId: req.user.id
+        }
+    }).then(countProducts => {
+        res.json(countProducts)
+    }).catch(err => {
+        res.status(500).json(err)
+    })
+});
 
 
 router.delete('/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Product.destroy({
         where: {
-            id
+            id,
+            creatorUserId: req.user.id
         }
     }).then(deletedRows => {
         if (deletedRows > 0)
@@ -37,8 +102,9 @@ router.get('/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Product.findOne({
         where: {
-            id
-        }, include: ['brand', 'category']
+            id,
+            creatorUserId: req.user.id
+        }, include: ['brand', 'category', 'supplier']
     }).then(product => {
         res.json(product)
 

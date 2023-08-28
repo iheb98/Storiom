@@ -1,0 +1,78 @@
+.left {
+    text-align: left;
+}
+
+.image-container {
+    position: relative;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    height: 100%;
+  }
+
+.image-container img{
+    border-radius: 10px;
+
+}
+.delete-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.delete-button fa-icon {
+    font-size: 20px;
+}
+
+label {
+    font-weight: bold;
+    color: gray;
+}
+button{
+    font-size: 18px;
+}
+.product-name{
+    font-size: 26px;
+    font-weight: bold;
+    padding:20px 0 20px 12px
+}
+
+.actions-bloc{
+    padding-top:10px
+}
+
+.info-bloc {
+    margin-top: 20px;
+    font-size: 17px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 1px 1px 20px #ccc;
+}
+
+.info-title{
+    border-bottom: 1px solid #ccc;
+    padding: 20px 0 20px 12px;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.info-message{
+    background-color: #ae00ff32;
+    border: 1px solid #62028f8f;
+    padding: 10px 0px 10px 20px;
+    width: 100%;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.info-icon{
+    margin-right:20px;
+    font-size:20px
+}
+
+@media screen and (max-width: 480px) {
+    .info-bloc {
+        font-size: 16pt;
+    }
+}

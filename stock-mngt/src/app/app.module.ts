@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
+import { NgxMatFileInputModule } from '@angular-material-components/file-input';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -11,7 +12,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatPaginatorIntl, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { NavbarComponent } from './general/navbar/navbar.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -32,6 +33,18 @@ import { SupplierAddComponent } from './suppliers/supplier-add/supplier-add.comp
 import { ProductsMngtComponent } from './products/products-mngt/products-mngt.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ProductAddComponent } from './products/product-add/product-add.component';
+import { ProductViewComponent } from './products/product-view/product-view.component';
+import { BrandsMngtComponent } from './brands/brands-mngt/brands-mngt.component';
+import { BrandAddComponent } from './brands/brand-add/brand-add.component';
+import { ReceiptsMngtComponent } from './receipts/receipts-mngt/receipts-mngt.component';
+import { ReceiptAddComponent } from './receipts/receipt-add/receipt-add.component';
+import { ProductsSearchReceiptComponent } from './products/products-search-receipt/products-search-receipt.component';
+import { ReceiptViewComponent } from './receipts/receipt-view/receipt-view.component';
+import { NgxPrintModule } from 'ngx-print';
+import { WorkersMngtComponent } from './workers/workers-mngt/workers-mngt.component';
+import { WorkerAddComponent } from './workers/worker-add/worker-add.component';
+import { CreditsMngtComponent } from './credits/credits-mngt/credits-mngt.component';
+
 
 
 @NgModule({
@@ -49,7 +62,17 @@ import { ProductAddComponent } from './products/product-add/product-add.componen
     SuppliersMngtComponent,
     SupplierAddComponent,
     ProductsMngtComponent,
-    ProductAddComponent
+    ProductAddComponent,
+    ProductViewComponent,
+    BrandsMngtComponent,
+    BrandAddComponent,
+    ReceiptsMngtComponent,
+    ReceiptAddComponent,
+    ProductsSearchReceiptComponent,
+    ReceiptViewComponent,
+    WorkersMngtComponent,
+    WorkerAddComponent,
+    CreditsMngtComponent
   ],
   imports: [
     BrowserModule,
@@ -62,6 +85,8 @@ import { ProductAddComponent } from './products/product-add/product-add.componen
     MatListModule,
     MatDialogModule,
     MatFormFieldModule,
+    NgxMatFileInputModule,
+    NgxPrintModule,
     MatInputModule,
     MatPaginatorModule,
     NgSelectModule,

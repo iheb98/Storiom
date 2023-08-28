@@ -1,9 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { faEdit, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/services/auth.service';
+import { BrandService } from 'src/app/services/brand.service';
 import { CategoryService } from 'src/app/services/category.service';
+import { FileService } from 'src/app/services/file.service';
 import { LoadingService } from 'src/app/services/loading.service';
+import { ProductService } from 'src/app/services/product.service';
 import { SupplierService } from 'src/app/services/supplier.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
@@ -14,50 +18,78 @@ import Swal from 'sweetalert2';
   styleUrls: ['./product-add.component.scss']
 })
 export class ProductAddComponent implements OnInit {
-
-  form: FormGroup;
-  submitted: boolean;
-  emailError: boolean;
+  environment = environment
+  form: FormGroup
+  submitted: boolean
+  emailError: boolean
   user;
-  supplierId
+  productId
   loading;
   supplier;
   suppliers = []
-  couleurs = []
-  categories;
+  brands = []
+  colors = []
+  categories = []
   parentCategory
   subCategory
   subCategory2
   subCategory3
   subCategory4
+  images
+  selectedCategory = ''
+
+  editIcon = faEdit
+  timesIcon = faTimes
+
+
+  edit
+  editCategory
+  product
+  @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
+
 
   constructor(private router: Router,
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private supplierService: SupplierService,
     private categoryService: CategoryService,
+    private productService: ProductService,
     private route: ActivatedRoute,
-    private loadingService: LoadingService) { }
+    private loadingService: LoadingService,
+    private fileService: FileService,
+    private brandService:BrandService) { }
 
   ngOnInit(): void {
+    this.editCategory = false
     this.loading = false;
     this.initForm();
-    this.couleurs = environment.couleurs
+    this.colors = environment.couleurs
     this.user = this.authService.getConnectedUser();
     this.route.paramMap.subscribe(paramMap => {
-      this.supplierId = paramMap.get('id');
-      if (this.supplierId)
-        this.supplierService.getSupplier(this.supplierId).subscribe(
-          response => {
-            this.form.get('firstName').setValue(response.firstName)
-            this.form.get('lastName').setValue(response.lastName)
-            this.form.get('phone').setValue(response.phone)
-            this.form.get('email').setValue(response.email)
-            this.form.get('credit').setValue(response.credit)
-          })
+      this.productId = paramMap.get('id');
     })
     this.getSuppliers();
+    this.getBrands();
     this.getCategories();
+    if (this.productId) {
+      this.edit = true;
+      this.productService.getProduct(this.productId).subscribe(
+        response => {
+          this.product = response
+          this.form.get('name').setValue(response?.name)
+          this.form.get('description').setValue(response?.description)
+          this.form.get('buyingPrice').setValue(response?.buyingPrice)
+          this.form.get('sellingPrice').setValue(response?.sellingPrice)
+          this.form.get('quantity').setValue(response?.quantity)
+          this.form.get('color').setValue(response?.color)
+          this.form.get('supplierId').setValue(response?.supplier?.id)
+          this.form.get('size').setValue(response?.size)
+          this.findParentCategories(response?.category?.id)
+          
+          this.images = response?.images
+        })
+    }
+
   }
 
   getSuppliers() {
@@ -66,6 +98,17 @@ export class ProductAddComponent implements OnInit {
       response => {
         this.loadingService.screenLoaded()
         this.suppliers = response
+      }
+    )
+  }
+
+
+  getBrands() {
+    this.loadingService.screenLoading()
+    this.brandService.getBrandsByStoreId(this.authService.getConnectedUser()?.store).subscribe(
+      response => {
+        this.loadingService.screenLoaded()
+        this.brands = response
       }
     )
   }
@@ -82,33 +125,59 @@ export class ProductAddComponent implements OnInit {
 
   initForm() {
     this.form = this.formBuilder.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      email: ['', [Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
-      phone: [''],
-      supplier: [''],
-      color: [''],
-      credit: ['']
+      name: ['', Validators.required],
+      supplierId: [null],
+      brandId: [null],
+      quantity: [''],
+      size: [''],
+      color: [null],
+      description: [''],
+      buyingPrice: [''],
+      sellingPrice: [''],
+      images: [null]
     });
   }
 
   create() {
     this.submitted = true;
     this.emailError = false;
-    this.loading = true;
+    let fileName = null;
+    const images = [];
+    let counter = 1;
+    if (this.images?.length + this.fileInput.nativeElement.files.length > 3) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Vous pouvez selectionnez seulement 3 images',
+        showConfirmButton: false,
+        timer: 1500
+      })
+      return
+    }
+    if (this.fileInput.nativeElement.files)
+      for (let item of this.fileInput.nativeElement.files) {
+        fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + (counter++) + item?.name.substring(item.name.lastIndexOf('.'))
+        images.push(fileName)
+      }
+
     if (this.form.valid) {
-      this.supplierService.addSupplier({ ...this.form.getRawValue(), storeId: this.user?.store })
+      this.loadingService.screenLoading()
+      this.form.get('images').setValue(images)
+      this.productService.addProduct({ ...this.form.getRawValue(), categoryId: this.getLastCategory()?.id, storeId: this.user?.store })
         .subscribe(response => {
-          this.loading = false;
-          Swal.fire({
-            icon: 'success',
-            title: 'Fournisseur ajouté !',
-            showConfirmButton: false,
-            timer: 1500
-          })
-          this.router.navigate(['suppliers'])
+          this.uploadImages(this.fileInput.nativeElement.files, images).subscribe(
+            response => {
+              this.loadingService.screenLoaded()
+              Swal.fire({
+                icon: 'success',
+                title: 'Produit ajouté !',
+                showConfirmButton: false,
+                timer: 1500
+              })
+              this.router.navigate(['products'])
+            }
+          )
         }, error => {
-          this.loading = false;
+          this.loadingService.screenLoaded()
           Swal.fire({
             icon: 'error',
             title: 'Un erreur est survenue ! Merci de réessayer plus tard',
@@ -119,32 +188,96 @@ export class ProductAddComponent implements OnInit {
     }
   }
 
-  edit() {
+  update() {
     this.submitted = true;
     this.emailError = false;
-    this.loading = true;
-    if (this.form.valid) {
-      this.supplierService.updateSupplier({ ...this.form.getRawValue(), id: this.supplierId })
-        .subscribe(response => {
-          this.loading = false;
-          Swal.fire({
-            icon: 'success',
-            title: 'Fournisseur modifié !',
-            showConfirmButton: false,
-            timer: 1500
+    const images = []
+    for (let item of this.images){
+      images.push(item)
+    }
+    const newImages = []
+    let counter = 1;
+    let fileName = null;
+    if (this.images?.length + this.fileInput.nativeElement.files.length > 3) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Vous pouvez selectionnez seulement 3 images',
+        showConfirmButton: false,
+        timer: 1500
+      })
+      return
+    }
+    if (this.fileInput.nativeElement.files)
+      for (let item of this.fileInput.nativeElement.files) {
+        fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + (counter++) + item?.name.substring(item.name.lastIndexOf('.'))
+        images.push(fileName)
+        newImages.push(fileName)
+      }
+      if (this.form.valid) {
+        this.loadingService.screenLoading()
+        this.form.get('images').setValue(images)
+        this.productService.updateProduct({ ...this.form.getRawValue(),categoryId: (this.editCategory ?  this.getLastCategory()?.id : this.product?.category?.id), storeId: this.user?.store,id:this.product?.id })
+          .subscribe(response => {
+            this.uploadImages(this.fileInput.nativeElement.files, newImages).subscribe(
+              response => {
+                this.loadingService.screenLoaded()
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Produit modifié !',
+                  showConfirmButton: false,
+                  timer: 1500
+                })
+                this.router.navigate(['products'])
+              }
+            )
+          }, error => {
+            this.loadingService.screenLoaded()
+            Swal.fire({
+              icon: 'error',
+              title: 'Un erreur est survenue ! Merci de réessayer plus tard',
+              showConfirmButton: false,
+              timer: 1500
+            })
           })
-          this.router.navigate(['suppliers'])
-        }, error => {
-          this.loading = false;
-          Swal.fire({
-            icon: 'error',
-            title: 'Un erreur est survenue ! Merci de réessayer plus tard',
-            showConfirmButton: false,
-            timer: 1500
-          })
-        })
+      }
+  }
+
+  getLastCategory() {
+    if (this.subCategory4)
+      return this.subCategory4
+    if (this.subCategory3)
+      return this.subCategory3
+    if (this.subCategory2)
+      return this.subCategory2
+    if (this.subCategory)
+      return this.subCategory
+    if (this.parentCategory)
+      return this.parentCategory
+  }
+
+  findParentCategories(id) {
+    this.categoryService.getParentCategory(id).subscribe(response => {
+      this.getSelectedCategory(response)
+      return response
+    })
+  }
+
+  getSelectedCategory(category) {
+    this.selectedCategory = category?.name
+    if (category?.parentCategory) {
+      this.selectedCategory = category?.parentCategory?.name + ' > ' + this.selectedCategory
+      if (category?.parentCategory?.parentCategory) {
+        this.selectedCategory = category?.parentCategory?.parentCategory?.name + ' > ' + this.selectedCategory
+        if (category?.parentCategory?.parentCategory?.parentCategory) {
+          this.selectedCategory = category?.parentCategory?.parentCategory?.parentCategory?.name + ' > ' + this.selectedCategory
+          if (category?.parentCategory?.parentCategory?.parentCategory?.parentCategory) {
+            this.selectedCategory = category?.parentCategory?.parentCategory?.parentCategory?.parentCategory?.name + ' > ' + this.selectedCategory
+          }
+        }
+      }
     }
   }
+
 
   categoryChanged(categoryDepth) {
     if (categoryDepth == 0) {
@@ -165,4 +298,20 @@ export class ProductAddComponent implements OnInit {
 
   }
 
+
+  deleteImage(item){
+    this.images = this.images.filter(element => element != item)
+  }
+
+  uploadImages(FilesToUpload, images) {
+    const files = new FormData();
+    for (let i = 0; i < FilesToUpload?.length; i++) {
+      files.append('file', FilesToUpload[i], images[i])
+    }
+    return this.fileService.uploadMultiple(files)
+  }
+
+  navigateTo(link) {
+    this.router.navigate([link])
+  }
 }

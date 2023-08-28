@@ -25,8 +25,6 @@ export class SuppliersMngtComponent implements OnInit {
   suppliers
   count;
   loading;
-  suppliers$: Observable<any[]>;
-  count$: Observable<any>;
 
   currentPage = 0;
   currentSize = 5;

@@ -14,11 +14,11 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(Product, { foreignKey: 'product_id', as: 'product' })
     }
     toJSON() {
-      return { ...this.get(), receiptId: undefined, receipt_id: undefined, createdAt: undefined, updatedAt: undefined }
+      return { ...this.get(), receiptId: undefined, receipt_id: undefined, creatorUserId: undefined, createdAt: undefined, updatedAt: undefined }
     }
   }
   Operation.init({
-    type: DataTypes.ENUM('LOADED', 'SOLD', 'RETURNED'),
+    type: DataTypes.STRING,
     amount: DataTypes.INTEGER,
     price: DataTypes.FLOAT,
     date: DataTypes.DATE,

@@ -1,0 +1,133 @@
+<div class="container">
+    <div class="row title-bloc">
+        <h2 class="title">
+            Créer une facture
+        </h2>
+    </div>
+
+    <form [formGroup]="form">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-12 col-md-12 col-lg-6 login-block">
+                <div class="mb-3 row">
+                    <label for="date" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Date</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="datetime-local" class="form-control" formControlName="date" name="date" id="date">
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label for="tva" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">TVA</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="number" class="form-control" formControlName="tva" name="tva" id="tva">
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label for="type" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Type de facture <span
+                            class="form-error">*</span></label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <ng-select formControlName="type" name="type" id="type"
+                            [ngClass]="{'invalid':form.get('type').value == null && validated}">
+                            <ng-option *ngFor="let element of types"
+                                [value]="element?.value">{{element?.label}}</ng-option>
+                        </ng-select>
+                    </div>
+                </div>
+
+                <div class="mb-3 row" *ngIf="form.get('type').value == 'SOLD' || form.get('type').value == 'RETURNED'">
+                    <label for="name" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Le nom du client <span
+                            class="form-error">*</span></label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="text" class="form-control"
+                            [ngClass]="{'invalid':(form.get('type').value == 'SOLD' || form.get('type').value == 'RETURNED')  && form.get('name').value == null && validated}"
+                            id="name" formControlName="name">
+                    </div>
+                </div>
+
+                <div class="mb-3 row" *ngIf="form.get('type').value == 'LOADED'">
+                    <label for="supplier" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Fournisseur <span
+                            class="form-error">*</span></label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <ng-select formControlName="supplierId"
+                            [ngClass]="{'invalid': form.get('type').value == 'LOADED' && form.get('supplierId').value == null && validated}"
+                            name="supplier" id="supplier">
+                            <ng-option *ngFor="let element of suppliers" [value]="element?.id">{{element.firstName + ' '
+                                +
+                                element.lastName}}</ng-option>
+                        </ng-select>
+                    </div>
+                </div>
+
+                <div class="mb-3 row justify-content-end">
+                    <div class="col-12 col-sm-12 col-lg-auto">
+                        <button class="btn btn-primary full-width" (click)="addProducts()">Séléctionner des
+                            produits</button>
+                    </div>
+                    <div class="col-12 col-sm-12 col-lg-auto">
+                        <button class="btn btn-primary full-width" (click)="addNewProduct()">Ajouter un nouveau
+                            produit</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+    <div class="row">
+        <div class="col-12 table-bloc">
+            <table class="table table-responsive table-hover ">
+                <thead>
+                    <tr>
+                        <th scope="col">Nom du produit</th>
+                        <th scope="col">Prix par pièce</th>
+                        <th scope="col">Quantité sélectionnée</th>
+                        <th scope="col">Quantité disponible</th>
+                        <th scope="col">Supprimer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let product of selectedProducts">
+                        <td>{{product?.name}}</td>
+                        <td><input type="number" class="value-input" [(ngModel)]="product.price"
+                                (change)="calculateTotal()"></td>
+
+                        <td><input type="number" class="value-input" [(ngModel)]="product.amount"
+                                (change)="calculateTotal()">
+                        </td>
+
+                        <td>{{product?.quantity}}</td>
+                        <!-- <td>
+                            <button class="action-button" (click)="viewProduct(product)"><fa-icon
+                                    [icon]="faEdit"></fa-icon></button>
+                        </td> -->
+                        <td>
+                            <button class="action-button" (click)="deleteProduct(product)"> <fa-icon
+                                    [icon]="faTrash"></fa-icon></button>
+                        </td>
+                    </tr>
+                    <tr *ngIf="selectedProducts?.length == 0">
+                        <td colspan="7" class="not-found-message">Pas de produit sélectionné</td>
+                    </tr>
+                    <!-- <tr *ngIf="selectedProducts?.length != 0">
+                        <td class="total-text">Total : {{total}} DT</td>
+                        <td colspan="5"></td>
+                    </tr> -->
+                </tbody>
+            </table>
+
+
+            <!-- <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)"
+                [length]="selectedProducts?.length" [pageSize]="5" [disabled]="false" [showFirstLastButtons]="true"
+                [pageSizeOptions]="[5,10,20]" [hidePageSize]="false" [pageIndex]="0" aria-label="Select page">
+            </mat-paginator> -->
+        </div>
+
+    </div>
+    <div class="row total-row" *ngIf="selectedProducts?.length > 0">
+        <div class="col-12 col-md-8">
+            <h3 class="total-text">Total : {{total}} DT</h3>
+        </div>
+        <div class="col-12 col-md-4 align-right">
+            <button class="btn btn-primary" (click)="create()">Créer la facture</button>
+        </div>
+    </div>
+</div>

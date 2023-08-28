@@ -59,7 +59,6 @@ router.get('/store/:id',utility.authenticate, (req, res, next) => {
         res.json(category)
 
     }).catch(err => {
-        console.log(err)
         res.status(500).json(err)
     })
 });
@@ -103,6 +102,33 @@ router.get('/:id',utility.authenticate, (req, res, next) => {
         res.json(category)
 
     }).catch(err => {
+        res.status(500).json(err)
+    })
+});
+
+router.get('/parent/:id',utility.authenticate, (req, res, next) => {
+    const id = req.params.id;
+    Category.findOne({
+        where: {
+            id
+        },
+        include: {
+            model: Category, as: 'parentCategory', include: {
+                model: Category, as: 'parentCategory',
+                include: {
+                    model: Category, as: 'parentCategory',
+                    include: {
+                        model: Category, as: 'parentCategory',
+                        include: { model: Category, as: 'parentCategory' }
+                    }
+                }
+            }
+        }
+    }).then(category => {
+        res.json(category)
+
+    }).catch(err => {
+        console.log(err)
         res.status(500).json(err)
     })
 });

@@ -2,7 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { LoadingService } from 'src/app/services/loading.service';
+import { ProductService } from 'src/app/services/product.service';
+import { QueryService } from 'src/app/services/query.service';
 import { SupplierService } from 'src/app/services/supplier.service';
+import { environment } from 'src/environments/environment';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-products-mngt',
@@ -10,29 +14,67 @@ import { SupplierService } from 'src/app/services/supplier.service';
   styleUrls: ['./products-mngt.component.scss']
 })
 export class ProductsMngtComponent implements OnInit {
-  minBuyingPriceFilter;
-  maxBuyingPriceFilter;
+  environment = environment
+  minBuyingPriceFilter = null;
+  maxBuyingPriceFilter = null;
 
-  minSellingPriceFilter;
-  maxSellingPriceFilter;
+  minSellingPriceFilter = null;
+  maxSellingPriceFilter = null;
 
-  nameFilter;
-  quantityFilter
-  colorFilter;
+  minQuantityFilter = null;
+  maxQuantityFilter = null;
 
-  supplierFilter
-  suppliers = [{ firstName: "test", lastName: "test 2" }, { firstName: "test", lastName: "test 2" }, { firstName: "test", lastName: "test 2" }, { firstName: "test", lastName: "test 2" }]
+  nameFilter = '';
+  descriptionFilter = '';
+  colorFilter = '';
 
+  supplierFilter = null
+  suppliers = []
+  products = []
+  count;
+
+  currentPage = 0;
+  currentSize = 6;
 
   constructor(
+    private productService: ProductService,
     private supplierService: SupplierService,
     private authService: AuthService,
     private loadingService: LoadingService,
-    private router: Router
+    private router: Router,
+    private queryService: QueryService
   ) { }
 
   ngOnInit(): void {
     this.getSuppliers()
+    this.queryService.buildQuery(this.nameFilter, this.descriptionFilter, this.supplierFilter, this.minBuyingPriceFilter, this.maxBuyingPriceFilter)
+    this.getProducts(this.currentPage, this.currentSize)
+    this.countProducts();
+  }
+
+  buildQuery() {
+    let query = "";
+    if (this.nameFilter)
+      query += query ? ",name ~ '" + this.nameFilter + "'" : "name ~ '" + this.nameFilter + "'"
+    if (this.colorFilter)
+      query += query ? ",color ~ '" + this.colorFilter + "'" : "color ~ '" + this.colorFilter + "'"
+    if (this.descriptionFilter)
+      query += query ? ",description ~ '" + this.descriptionFilter + "'" : "description ~ '" + this.descriptionFilter + "'"
+    if (this.supplierFilter)
+      query += query ? ",supplierId = '" + this.supplierFilter + "'" : "supplierId = '" + this.supplierFilter + "'"
+    if (this.minQuantityFilter)
+      query += query ? ",quantityPrice > '" + this.minQuantityFilter + "'" : "quantityPrice > '" + this.minQuantityFilter + "'"
+    if (this.maxQuantityFilter)
+      query += query ? ",quantityPrice < '" + this.maxQuantityFilter + "'" : "quantityPrice < '" + this.maxQuantityFilter + "'"
+    if (this.minBuyingPriceFilter)
+      query += query ? ",buyingPrice > '" + this.minBuyingPriceFilter + "'" : "buyingPrice > '" + this.minBuyingPriceFilter + "'"
+    if (this.maxBuyingPriceFilter)
+      query += query ? ",buyingPrice < '" + this.maxBuyingPriceFilter + "'" : "buyingPrice < '" + this.maxBuyingPriceFilter + "'"
+    if (this.minSellingPriceFilter)
+      query += query ? ",sellingPrice > '" + this.minSellingPriceFilter + "'" : "sellingPrice > '" + this.minSellingPriceFilter + "'"
+    if (this.maxSellingPriceFilter)
+      query += query ? ",sellingPrice < '" + this.maxSellingPriceFilter + "'" : "sellingPrice < '" + this.maxSellingPriceFilter + "'"
+    return query
   }
 
   getSuppliers() {
@@ -40,8 +82,39 @@ export class ProductsMngtComponent implements OnInit {
     this.supplierService.getAllSuppliersByStoreId(this.authService.getConnectedUser()?.store).subscribe(
       response => {
         this.loadingService.screenLoaded()
+        this.suppliers = response
+      },
+      error => {
+        this.loadingService.screenLoaded()
       }
     )
+  }
+
+  getProducts(page, size) {
+    this.loadingService.screenLoading()
+    this.productService.getProductsByStoreId(this.authService.getConnectedUser()?.store, {
+      page,
+      size,
+      query: this.buildQuery(),
+    }).subscribe(
+      response => {
+        this.loadingService.screenLoaded()
+        this.products = response
+      },
+      error => {
+        this.loadingService.screenLoaded()
+      }
+    )
+  }
+
+  countProducts() {
+    this.loadingService.screenLoading()
+    this.productService.countProductsByStoreId(this.authService.getConnectedUser()?.store, {
+      query: this.buildQuery()
+    }).subscribe(response => {
+      this.loadingService.screenLoaded()
+      this.count = response;
+    })
   }
 
   create() {
@@ -50,10 +123,50 @@ export class ProductsMngtComponent implements OnInit {
 
   reset() {
     this.loadingService.screenLoaded()
-
   }
 
   filter() {
+    this.getProducts(this.currentPage, this.currentSize)
+    this.countProducts()
+    console.log(this.buildQuery())
+  }
+
+  handlePageEvent(event) {
+    this.currentPage = event.pageIndex;
+    this.currentSize = event.pageSize;
+    this.getProducts(this.currentPage, this.currentSize)
+  }
+
+  consulter(id) {
+    this.router.navigate(['/products/view/' + id])
+  }
+
+  navigateTo(link) {
+    this.router.navigate([link])
+  }
+
+  deleteProduct(product) {
+    Swal.fire({
+      title: 'Etes vous sûr de vouloir supprimer le produit ' + product.name + '?',
+      denyButtonText: `Annuler`,
+      showDenyButton: true,
+      confirmButtonText: 'Supprimer',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.loadingService.screenLoading()
+        this.productService.deleteProduct(product.id).subscribe(response => {
+          this.loadingService.screenLoaded()
+          Swal.fire({
+            icon: 'success',
+            title: 'Produit supprimé !',
+            showConfirmButton: false,
+            timer: 1500
+          })
+          this.getProducts(this.currentPage, this.currentSize)
+          this.countProducts()
+        })
+      }
+    })
 
   }
 

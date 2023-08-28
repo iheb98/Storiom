@@ -9,14 +9,15 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ Category, Brand, Supplier }) {
+    static associate({ Category, Brand, Supplier, Address }) {
       // define association here
       this.hasMany(Category, { foreignKey: 'store_id', as: 'categories' })
+      this.hasOne(Address, { foreignKey: 'store_id', as: 'address' })
       this.hasMany(Brand, { foreignKey: 'store_id', as: 'brands' })
       this.hasMany(Supplier, { foreignKey: 'store_id', as: 'suppliers' })
     }
     toJSON() {
-      return { ...this.get(), images: this.images ? JSON.parse(this.images) : [], userId: undefined, user_id: undefined, createdAt: undefined, updatedAt: undefined }
+      return { ...this.get(), images: this.images ? JSON.parse(this.images) : [], userId: undefined, user_id: undefined, creatorUserId: undefined, createdAt: undefined, updatedAt: undefined }
     }
   }
   Store.init({
@@ -24,6 +25,9 @@ module.exports = (sequelize, DataTypes) => {
     description: DataTypes.TEXT,
     logo: DataTypes.STRING,
     images: DataTypes.STRING,
+    phone: DataTypes.STRING,
+    email: DataTypes.STRING,
+    site: DataTypes.STRING,
     active: {
       type: DataTypes.BOOLEAN,
       defaultValue: true

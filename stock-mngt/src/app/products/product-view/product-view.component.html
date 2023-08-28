@@ -1,0 +1,95 @@
+<div class="container">
+    <div class="row actions-bloc d-flex justify-content-end">
+        <div class="col-auto">
+            <button class="btn btn-primary" (click)="navigateTo('/products')">Gestions des Produits</button>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-secondary" (click)="navigateTo('/products/edit/'+product?.id)">Modifier</button>
+        </div>
+    </div>
+    <div class="row product-name">
+        <h2 class="title left">
+            {{product?.name}}
+        </h2>
+    </div>
+    
+    <div class="row">
+        <div class="col-12" *ngIf="product?.images?.length == 0">
+            <div class="info-message">
+                <fa-icon [icon]="infoIcon" class="info-icon"></fa-icon>Pas d'images trouvées pour ce produit
+            </div>
+        </div>
+        <div class="col-4" *ngFor="let item of product?.images">
+            <div class="image-container">
+                <!--<button class="delete-button"><fa-icon [icon]="timesIcon"></fa-icon></button>-->
+            <img src="{{environment.backend+'/images/'+item}}" alt="" class="h-100 w-100">
+            </div>
+        </div>
+    </div>
+
+    <div class="row info-bloc">
+        <div class="col-12 info-title">
+            <fa-icon [icon]="textIcon"></fa-icon> Informations
+        </div>
+        <div class="col-6">
+            <label>Catégorie :</label>
+            <p>
+                {{product?.category?.name ? product?.category?.name : "--"}}
+            </p>
+        </div>
+        <div class="col-6">
+            <label>Couleur :</label>
+            <p>
+                {{product?.color ? product?.color : "--"}}
+            </p>
+        </div>
+        <div class="col-6">
+            <label>Taille :</label>
+            <p>
+                {{product?.size ? product?.size : "--"}}
+            </p>
+        </div>
+        <div class="col-6">
+            <label>Quantité disponible :</label>
+            <p>
+                {{product?.quantity ? product?.quantity : "--"}}
+            </p>
+        </div>
+        <div class="col-6">
+            <label>Prix d'achat :</label>
+            <p>
+                {{product?.buyingPrice ? (product?.buyingPrice + " " + (product?.currency ? product?.currency : "")) : ""}}
+            </p>
+        </div>
+        <div class="col-6">
+            <label>Prix de vente :</label>
+            <p>
+                {{product?.sellingPrice ? (product?.sellingPrice + " " + (product?.currency ? product?.currency : "")) : ""}}
+            </p>
+        </div>
+        <div class="col-6">
+            <label>Marque :</label>
+            <p>
+                {{product?.brand ? product?.brand?.name  : ""}}
+            </p>
+        </div>
+        <div class="col-12">
+            <label>Description :</label>
+            <pre>{{product?.description ? product?.description : "--"}}</pre>
+        </div>
+    </div>
+
+    <div class="row info-bloc">
+        <div class="col-12 info-title">
+            <fa-icon [icon]="chartIcon"></fa-icon> Statistiques
+        </div>
+        <div class="col-6">
+            <label>Catégorie :</label>
+            <p>
+                {{product?.category?.name}}
+            </p>
+        </div>
+
+    </div>
+
+</div>

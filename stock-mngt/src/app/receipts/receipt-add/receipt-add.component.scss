@@ -1,0 +1,47 @@
+.screen-title-bloc {
+  padding: 50px;
+}
+table {
+  margin-top: 50px;
+}
+td,
+th {
+  text-align: center;
+}
+
+.value-input {
+  border: 1px solid lightgray;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.not-found-message {
+  font-size: 20px;
+}
+
+.total-text {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.total-row {
+  margin-top: 100px;
+}
+
+.table-bloc {
+  overflow-x: auto;
+}
+
+@media screen and (max-width: 1000px) {
+  button {
+    width: 100%;
+  }
+
+  .total-row {
+    text-align: center;
+  }
+}
+
+.invalid {
+  border: 1px solid red;
+}

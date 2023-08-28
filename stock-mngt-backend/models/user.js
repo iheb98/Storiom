@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       this.hasOne(Store, { foreignKey: 'user_id', as: 'store' })
     }
     toJSON() {
-      return { ...this.get(), password: undefined }
+      return { ...this.get(), creatorUserId: undefined, password: undefined }
     }
   }
   User.init({
@@ -49,6 +49,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     superiorId: {
       type: DataTypes.INTEGER,
+    },
+    worksInStore: {
+      type: DataTypes.INTEGER,
+      field: 'works_in_store'
     },
     salary: DataTypes.FLOAT,
     entryDate: {

@@ -30,6 +30,14 @@ export class StoreAddComponent implements OnInit {
     this.form = this.formBuilder.group({
       name: ['', Validators.required],
       description: [''],
+      phone: [''],
+      email: [''],
+      site: [''],
+      country: [''],
+      state: [''],
+      city: [''],
+      street: [''],
+      postalCode:[''],
       logo: [null]
     });
   }

@@ -1,0 +1,144 @@
+<div class="container">
+    <div class="row">
+        <div class="col-9">
+            <button class="back-btn" (click)="back()"><fa-icon
+                [icon]="backIcon"></fa-icon> Back</button>
+        </div>
+        <div class="col-3 align-right">
+            <button class="print-btn" style="margin-right: 10px;" printSectionId="receiptSection" [useExistingCss]="true"  ngxPrint><fa-icon
+                [icon]="printIcon" style="color:gray"></fa-icon> Print</button>
+                <button class="pdf-btn" (click)="downloadAsPDF()"><fa-icon
+                    [icon]="pdfIcon" style="color:red"></fa-icon> PDF</button>
+        </div>
+    </div>
+    <div id="receiptSection" #receiptSection *ngIf="receipt">
+        <div class="row">
+            <div class="col-6 p-3">
+
+                <div class="row">
+                    <div class="col-12">
+                        {{receipt?.store?.name}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        {{receipt?.store?.address?.street}}
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        {{receipt?.store?.address?.state+' '+receipt?.store?.address?.city}}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-6 p-3">
+                <div class="row">
+                    <div class="col-12 col-md-3 store-info">
+                        Tel :
+                    </div>
+                    <div class="col-12 col-md-9 store-info">
+                        {{receipt?.store?.phone}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-md-3 store-info">
+                        E-mail :
+                    </div>
+                    <div class="col-12 col-md-9 store-info">
+                        {{receipt?.store?.email}}
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-md-3 store-info">
+                        Site :
+                    </div>
+                    <div class="col-12 col-md-9 store-info">
+                        {{receipt?.store?.site}}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6 p-3">
+                <table>
+                    <tr>
+                        <th>
+                            Date {{receipt?.date | date:'shortDate'}}
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            Facture {{receipt?.code}}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-6 p-3">
+                <table>
+                    <tr>
+                        <th class="align-center">
+                            {{receipt?.type == 'LOADED' ? 'Fournisseur' : 'Client'}}
+                        </th>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{receipt?.name ? receipt?.name : receipt?.supplier?.firstName +" "+
+                            receipt?.supplier?.lastName}}
+
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 p-3">
+                <table class="table table-responsive table-hover">
+                    <tr class="center">
+                        <th>Désignation</th>
+                        <th>Prix Unitaire</th>
+                        <th>Quantité</th>
+                        <th width="20%">Total</th>
+                    </tr>
+                    <tr *ngFor="let operation of receipt?.operations">
+                        <td>{{operation?.product?.name}}</td>
+                        <td>{{operation?.price}}</td>
+                        <td>{{operation?.amount}}</td>
+                        <td>{{operation?.price * operation?.amount}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 p-3">
+                <table>
+                    <tr>
+                        <th>Total HT</th>
+                        <th width="20%">{{receipt?.total - (receipt?.tva * receipt?.total / 100)}}</th>
+                    </tr>
+                    <tr>
+                        <td>TVA {{receipt?.tva}}</td>
+                        <td width="20%">{{receipt?.tva * receipt?.total / 100}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 p-3">
+                <table>
+                    <tr>
+                        <th>Total TTC</th>
+                        <th width="20%">{{receipt?.total}}</th>
+                    </tr>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

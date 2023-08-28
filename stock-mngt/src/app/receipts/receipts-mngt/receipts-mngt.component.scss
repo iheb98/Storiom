@@ -1,0 +1,45 @@
+.amount-input {
+    margin-bottom: 5px;
+}
+
+.align-filter-button {
+    text-align: right;
+}
+
+@media screen and (max-width: 1000px) {
+    button {
+        width: 100%;
+    }
+}
+
+td {
+    border-bottom: none;
+    border-left: none;
+    padding: 10px;
+    text-align: center;
+}
+td:last-child {
+    border-right: none;
+    padding: 10px;
+}
+th {
+    border-top: none;
+    border-bottom: none;
+    border-left: none;
+    padding: 10px;
+}
+th:last-child {
+    border-right: none;
+    padding: 10px;
+}
+
+
+.center th {
+    text-align: center;
+    font-weight: bold;
+}
+
+table {
+    width: 100%;
+    height: auto;
+}

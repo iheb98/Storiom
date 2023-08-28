@@ -21,6 +21,10 @@ export class CategoryService {
     return this.http.get<any>(this.baseUrl + id);
   }
 
+  getParentCategory(id): Observable<any> {
+    return this.http.get<any>(this.baseUrl +'parent/'+ id);
+  }
+
 
   addCategory(body): Observable<any> {
     return this.http.post<any>(this.baseUrl + 'create', body);

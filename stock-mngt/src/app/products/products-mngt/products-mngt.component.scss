@@ -1,0 +1,80 @@
+.amount-input {
+    margin-bottom: 5px;
+}
+
+.align-filter-button {
+    text-align: right;
+}
+// ===============
+
+.card {
+    margin: 20px 0;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.card-header {
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #e8e8e8;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 15px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.product-info{
+    margin-bottom:10px;
+}
+.product-info label{
+    color:gray;
+    font-weight: bold;
+    margin-right:10px;
+}
+
+.card-footer {
+    background-color: #f9f9f9;
+    border-top: 1px solid #e8e8e8;
+    padding: 15px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.card-footer .btn {
+    margin-right: 10px;
+}
+
+.card-body {
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-body img {
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+@media (max-width: 767px) {
+    .card-body {
+        height: 200px;
+    }
+}
+
+.button-container{
+    padding:5px
+}
+
+.button-container button{
+    width: 100%;
+}
+
+mat-paginator{
+    width: 100%;
+}
+
+@media screen and (max-width: 1000px) {
+    button{
+     width: 100%;
+    }
+ }

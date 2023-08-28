@@ -27,6 +27,9 @@ module.exports = {
         type: DataTypes.FLOAT,
         defaultValue: 0
       },
+      description: {
+        type: DataTypes.TEXT
+      },
       creatorUserId: {
         type: DataTypes.INTEGER
       },

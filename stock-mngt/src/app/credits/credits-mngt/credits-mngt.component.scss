@@ -1,0 +1,44 @@
+.amount-input {
+    margin-bottom: 5px;
+}
+
+.table-bloc {
+    overflow-x: auto;
+}
+
+.action-button{
+    width: 100%;
+}
+
+td,
+th {
+    text-align: center;
+}
+.align-filter-button {
+    text-align: right;
+}
+
+.align-add-button {
+    text-align: left;
+}
+
+.not-found-message {
+    text-align: center;
+    padding: 20px;
+}
+
+@media screen and (max-width: 700px) {
+    .align-filter-button {
+        text-align: center;
+    }
+
+    .align-add-button {
+        text-align: center;
+    }
+}
+
+@media screen and (max-width: 1000px) {
+   button{
+    width: 100%;
+   }
+}

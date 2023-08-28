@@ -10,7 +10,7 @@ module.exports = {
         type: DataTypes.INTEGER
       },
       type: {
-        type: DataTypes.ENUM('LOADED', 'SOLD', 'RETURNED')
+        type: DataTypes.STRING
       },
       amount: {
         type: DataTypes.INTEGER

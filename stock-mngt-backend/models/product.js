@@ -9,20 +9,25 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ Category,Brand,Store }) {
+    static associate({ Category, Brand, Store, Supplier }) {
       // define association here
       this.belongsTo(Category, { foreignKey: 'category_id', as: 'category' })
+      //this.belongsTo(Category, { foreignKey: 'sub_category_id', as: 'subcategory' })
+      this.belongsTo(Supplier, { foreignKey: 'supplier_id', as: 'supplier' })
       this.belongsTo(Brand, { foreignKey: 'brand_id', as: 'brand' })
       this.belongsTo(Store, { foreignKey: 'store_id', as: 'store' })
     }
 
     toJSON() {
-      return { ...this.get(), storeId: undefined, images: JSON.parse(this.images), brandId: undefined, brand_id: undefined, store_id: undefined, supplierId: undefined, supplier_id: undefined, categoryId: undefined, category_id: undefined, createdAt: undefined, updatedAt: undefined }
+      return { ...this.get(), storeId: undefined, images: this.images ? JSON.parse(this.images) : [], brandId: undefined, brand_id: undefined, store_id: undefined, supplierId: undefined, supplier_id: undefined, categoryId: undefined, category_id: undefined, creatorUserId: undefined, createdAt: undefined, updatedAt: undefined }
     }
   }
   Product.init({
     name: DataTypes.STRING,
-    code: DataTypes.STRING,
+    code: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4
+    },
     buyingPrice: {
       type: DataTypes.FLOAT,
       field: 'buying_price'
@@ -31,14 +36,16 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.FLOAT,
       field: 'selling_price'
     },
-    description: DataTypes.TEXT,
-    currency: DataTypes.STRING,
-    sizeType: {
-      type: DataTypes.ENUM('SHIRT', 'SHOES'),
-      field: 'size_type'
+    description: {
+      type: DataTypes.STRING(3000),
+      defaultValue: ''
     },
-    color: DataTypes.STRING,
-    size: DataTypes.ENUM('XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'),
+    currency: DataTypes.STRING,
+    color: {
+      type: DataTypes.STRING,
+      defaultValue: ''
+    },
+    size: DataTypes.STRING,
     images: DataTypes.STRING(5000),
     quantity: DataTypes.INTEGER,
     storeId: {

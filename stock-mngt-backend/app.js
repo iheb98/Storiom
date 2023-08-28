@@ -11,7 +11,7 @@ const storage = multer.diskStorage(
   {
     destination: './images',
     filename: function (req, file, cb) {
-      cb(null, file.originalname )
+      cb(null, file.originalname)
     }
   }
 )
@@ -53,9 +53,15 @@ app.use(bodyparser.json({ limit: '50mb' }));
 app.post('/api/uploadFile', upload.single('file', (req, res) => {
   let filePath = ''
 }))
+
+app.post('/api/uploadMultipleFiles', upload.array('file', (req, res) => {
+  console.log("The request = ", req)
+}))
+
 const usersRoute = require('./routes/users');
 const storesRoute = require('./routes/stores');
 const categoriesRoute = require('./routes/categories');
+const brandsRoute = require('./routes/brands');
 const productsRoute = require('./routes/products');
 const suppliersRoute = require('./routes/suppliers');
 const creditsRoute = require('./routes/credits');
@@ -66,6 +72,7 @@ app.use('/api/credits', creditsRoute)
 app.use('/api/suppliers', suppliersRoute)
 app.use('/api/products', productsRoute)
 app.use('/api/categories', categoriesRoute)
+app.use('/api/brands', brandsRoute)
 app.use('/api/stores', storesRoute)
 app.use('/api/users', usersRoute)
 

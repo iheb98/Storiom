@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     toJSON() {
-      return { ...this.get(), storeId: undefined, store_id: undefined, createdAt: undefined, updatedAt: undefined }
+      return { ...this.get(), storeId: undefined, store_id: undefined, creatorUserId: undefined, createdAt: undefined, updatedAt: undefined }
     }
   }
   Credit.init({

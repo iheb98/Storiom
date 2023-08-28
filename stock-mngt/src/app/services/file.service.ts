@@ -17,4 +17,8 @@ export class FileService {
     return this.http.post<any>(this.baseUrl + 'uploadFile', file);
   }
 
+  uploadMultiple(files): Observable<any> {
+    return this.http.post<any>(this.baseUrl + 'uploadMultipleFiles', files);
+  }
+
 }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
+import { LoadingService } from 'src/app/services/loading.service';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +14,11 @@ export class LoginComponent implements OnInit {
   submitted: boolean;
   emailError: boolean;
   passwordError: boolean;
-  constructor(private router:Router,private formBuilder: FormBuilder, private authService: AuthService) { }
+  constructor(
+    private router: Router,
+    private formBuilder: FormBuilder,
+    private authService: AuthService,
+    private loadingService: LoadingService) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -32,15 +37,16 @@ export class LoginComponent implements OnInit {
     this.emailError = false;
     this.passwordError = false;
     if (this.form.valid) {
+      this.loadingService.screenLoading()
       this.authService.login({ email: this.form.get('email').value, password: this.form.get('password').value })
         .subscribe(response => {
           if (response.errorType == "EMAIL_ERROR")
             this.emailError = true;
           else if (response.errorType == "PASSWORD_ERROR")
             this.passwordError = true;
-          else{
+          else {
             this.authService.registerTokens(response.accessToken, response.refreshToken)
-
+            this.loadingService.screenLoaded()
             this.router.navigate([''])
           }
         })

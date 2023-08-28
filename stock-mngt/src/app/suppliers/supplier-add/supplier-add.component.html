@@ -50,6 +50,11 @@
                         <input type="number" class="form-control" id="credit" formControlName="credit">
                     </div>
                 </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea maxlength="50000" rows="10" resize="none" class="form-control" formControlName="description" id="description">
+                    </textarea>
+                </div>
                 <div class="mb-3 row justify-content-end">
                     <div class="col-12 col-sm-12 col-lg-auto">
                         <button type="submit" class="btn btn-primary full-width" *ngIf="!supplierId">Ajouter</button>

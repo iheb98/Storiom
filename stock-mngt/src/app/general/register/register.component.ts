@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
+import { LoadingService } from 'src/app/services/loading.service';
 
 @Component({
   selector: 'app-register',
@@ -16,7 +17,11 @@ export class RegisterComponent implements OnInit {
   emailFound: boolean;
   passwordError: boolean;
   confirmPasswordError: boolean;
-  constructor(private router: Router, private formBuilder: FormBuilder, private authService: AuthService) { }
+  constructor(
+    private router: Router,
+    private formBuilder: FormBuilder,
+    private authService: AuthService,
+    private loadingService: LoadingService) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -37,22 +42,21 @@ export class RegisterComponent implements OnInit {
     this.submitted = true;
     this.emailError = false;
     this.passwordError = false;
-    console.log(this.form)
-    console.log(this.form.valid)
     if (this.form.valid) {
+      this.loadingService.screenLoading()
       this.authService.registerUser({ ...this.form.getRawValue(), confirmPassword: undefined })
         .subscribe(response => {
           if (response.errorType == "EMAIL_Found")
             this.emailFound = true;
           else if (response.success) {
             this.authService.registerTokens(response.accessToken, response.refreshToken)
-
+            this.loadingService.screenLoaded()
             this.router.navigate([''])
           }
         })
     }
   }
 
-  
+
 
 }

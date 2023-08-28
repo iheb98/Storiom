@@ -24,20 +24,18 @@ module.exports = {
         field: 'selling_price'
       },
       description: {
-        type: DataTypes.STRING(3000)
+        type: DataTypes.STRING(3000),
+        defaultValue: ''
       },
       currency: {
         type: DataTypes.STRING
       },
-      sizeType: {
-        type: DataTypes.ENUM('SHIRT', 'SHOES'),
-        field: 'size_type'
-      },
       color: {
-        type: DataTypes.STRING
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
       },
       size: {
-        type: DataTypes.ENUM('XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL')
+        type: DataTypes.STRING
       },
       images: {
         type: DataTypes.STRING(5000)

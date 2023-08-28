@@ -10,22 +10,26 @@ module.exports = {
         type: DataTypes.INTEGER
       },
       code: {
-        type: DataTypes.STRING
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
       },
       total: {
         type: DataTypes.FLOAT
       },
-      tax: {
+      tva: {
         type: DataTypes.FLOAT
       },
       name: {
         type: DataTypes.STRING
       },
       type: {
-        type: DataTypes.ENUM('SELL', 'LOAD')
+        type: DataTypes.STRING
       },
       date: {
         type: DataTypes.DATE
+      },
+      visible: {
+        type: DataTypes.BOOLEAN
       },
       storeId: {
         type: DataTypes.INTEGER,

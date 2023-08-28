@@ -12,11 +12,12 @@ module.exports = (sequelize, DataTypes) => {
     static associate({ Category, Store }) {
       // define association here
       this.hasMany(Category, { foreignKey: 'parent_categorie_id', as: 'subCategories' })
+      this.belongsTo(Category, { foreignKey: 'parent_categorie_id', as: 'parentCategory' })
       //this.belongsTo(Category, { foreignKey: 'parent_categorie_id', as: 'parentCategory' })
       //this.belongsTo(Store, { foreignKey: 'store_id', as: 'store' })
     }
     toJSON() {
-      return { ...this.get(), storeId: undefined, store_id: undefined, parentCategoryId: undefined, parent_categorie_id: undefined, createdAt: undefined, updatedAt: undefined }
+      return { ...this.get(), storeId: undefined, store_id: undefined, parentCategoryId: undefined, parent_categorie_id: undefined, creatorUserId: undefined, createdAt: undefined, updatedAt: undefined }
     }
   }
   Category.init({

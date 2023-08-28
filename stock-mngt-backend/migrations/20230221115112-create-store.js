@@ -21,6 +21,15 @@ module.exports = {
       images: {
         type: DataTypes.STRING
       },
+      phone: {
+        type: DataTypes.STRING
+      },
+      email: {
+        type: DataTypes.STRING
+      },
+      site: {
+        type: DataTypes.STRING
+      },
       active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true

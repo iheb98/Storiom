@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     toJSON() {
-      return { ...this.get(), userId: undefined, images: JSON.parse(this.images), user_id: undefined, createdAt: undefined, updatedAt: undefined }
+      return { ...this.get(), userId: undefined, images: JSON.parse(this.images), user_id: undefined, creatorUserId: undefined, createdAt: undefined, updatedAt: undefined }
     }
   }
   Note.init({

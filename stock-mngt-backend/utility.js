@@ -26,16 +26,49 @@ const paginate = (query, { page, pageSize }) => {
     const limit = Number(pageSize);
     return {
         ...query,
-        offset,
-        limit,
+        offset: offset ? offset : undefined,
+        limit: limit ? limit : undefined,
     };
+};
+const buildQuery = (sentQuery) => {
+    let query = sentQuery.split(',')
+    let finalQuery = {}
+    for (let item of query) {
+        let name = item.substring(0, item.indexOf(' '))
+        item = item.substring(item.indexOf(' ') + 1)
+        let operator = item.substring(0, item.indexOf(' '))
+        item = item.substring(item.indexOf(' ') + 1)
+        let value = item.substring(1, item.length - 1)
+
+        if (operator == '~') {
+            finalQuery[name] = {
+                [Op.like]: '%' + value + '%'
+            }
+        } else if (operator == '=') {
+            finalQuery[name] = {
+                [Op.eq]: value
+            }
+        } else if (operator == '>') {
+            finalQuery[name] = {
+                ...finalQuery[name],
+                [Op.gte]: value
+            }
+        }
+        else if (operator == '<') {
+            finalQuery[name] = {
+                ...finalQuery[name],
+                [Op.lte]: value
+            }
+        }
+    }
+    return finalQuery
 };
 
 const fromTo = (from, to) => {
     let query = {
         [Op.gte]: 0,
     }
-    if (!isNaN(from) && !isNaN(to)) 
+    if (!isNaN(from) && !isNaN(to))
         query = {
             [Op.gte]: from,
             [Op.lte]: to
@@ -55,7 +88,7 @@ const fromTo = (from, to) => {
 
 function generateAccessToken(user) {
     delete user.iat
-    let jwttoken = jwt.sign(user, process.env.SECRET, { expiresIn: '15s' })
+    let jwttoken = jwt.sign(user, process.env.SECRET, { expiresIn: '3600s' })
     return jwttoken
 }
 
@@ -65,9 +98,8 @@ async function generateRefreshToken(user) {
         return refreshToken.value;
 
     } catch (err) {
-        console.log("error ", err)
         return ""
     }
 }
 
-module.exports = { comparePassword, authenticate, generateAccessToken, generateRefreshToken, paginate, Op, fromTo }
+module.exports = { comparePassword, authenticate, generateAccessToken, generateRefreshToken, paginate, Op, fromTo, buildQuery }

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { faNode } from '@fortawesome/free-brands-svg-icons';
 import { faArrowAltCircleRight, faChartBar } from '@fortawesome/free-regular-svg-icons';
-import { faPowerOff, faHome, faStore, faUser, faCodeBranch, faHandHoldingUsd, faCoins, faShuttleVan, faBox, faReceipt } from '@fortawesome/free-solid-svg-icons';
+import { faPowerOff, faHome, faStore, faUser, faCodeBranch, faHandHoldingUsd, faCoins, faShuttleVan, faBox, faReceipt, faImage } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from './services/auth.service';
 import { ListenerService } from './services/listener.service';
 import { LoadingService } from './services/loading.service';
@@ -55,6 +55,11 @@ export class AppComponent implements OnInit {
       label: 'Fournisseurs',
       icon: faShuttleVan,
       link: 'suppliers',
+    },
+    {
+      label: 'Marques',
+      icon: faImage,
+      link: 'brands',
     },
     {
       label: 'Produits',

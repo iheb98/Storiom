@@ -1,3 +1,56 @@
+.actions-bloc{
+  padding-top:10px
+}
+
+.screen-title-bloc{
+  padding:50px;
+}
+
+
 .category-field{
-    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+label{
+  font-weight: bold;
+}
+textarea {
+    resize: none;
+  }
+
+  ngx-mat-file-input, mat-form-field{
+    width: 100%;
+  }
+
+  
+  .image-container {
+    position: relative;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    height: 100%;
+  }
+  .image-container img{
+    border-radius: 10px;
+  }
+
+  .delete-button {
+    position: absolute;
+    background-color: red;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    top: -1px;
+    right: -1px;
+  }
+
+  
+.delete-button:hover{
+  box-shadow: 0px 0px 20px red;
+}
+
+.delete-button fa-icon {
+  font-size: 20px;
+}
+
+.images-bloc{
+  margin-bottom:20px
 }

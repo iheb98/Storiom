@@ -11,8 +11,8 @@
         </div>
 
         <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-            <label for="quantity" class="form-label">Quantité</label>
-            <input type="text" class="form-control" id="quantity" [(ngModel)]="quantityFilter">
+            <label for="description" class="form-label">Description contient</label>
+            <input type="text" class="form-control" id="description" [(ngModel)]="descriptionFilter">
         </div>
 
         <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
@@ -23,28 +23,33 @@
         <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
             <label for="phone" class="form-label">Fournisseur</label>
             <ng-select [(ngModel)]="supplierFilter" name="supplier">
-                <ng-option *ngFor="let element of suppliers" [value]="element">{{element.firstName + ' ' +
+                <ng-option *ngFor="let element of suppliers" [value]="element?.id">{{element.firstName + ' ' +
                     element.lastName}}</ng-option>
             </ng-select>
         </div>
-
-       
     </div>
 
     <div class="row">
         <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+            <label for="minQuantityFilter" class="form-label">Quantité</label>
+            <input type="number" class="form-control amount-input" id="minQuantityFilter"
+                [(ngModel)]="minQuantityFilter" placeholder="De">
+            <input type="number" class="form-control amount-input" id="maxQuantityFilter"
+                [(ngModel)]="maxQuantityFilter" placeholder="Jusqu'à">
+        </div>
+        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
             <label for="minBuyingPriceFilter" class="form-label">Prix d'achat</label>
-            <input type="number" class="form-control amount-input" id="minBuyingPriceFilter" [(ngModel)]="minBuyingPriceFilter"
-                placeholder="De">
-            <input type="number" class="form-control amount-input" id="maxBuyingPriceFilter" [(ngModel)]="maxBuyingPriceFilter"
-                placeholder="Jusqu'à">
+            <input type="number" class="form-control amount-input" id="minBuyingPriceFilter"
+                [(ngModel)]="minBuyingPriceFilter" placeholder="De">
+            <input type="number" class="form-control amount-input" id="maxBuyingPriceFilter"
+                [(ngModel)]="maxBuyingPriceFilter" placeholder="Jusqu'à">
         </div>
         <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
             <label for="minSellingPriceFilter" class="form-label">Prix de vente</label>
-            <input type="number" class="form-control amount-input" id="minSellingPriceFilter" [(ngModel)]="minSellingPriceFilter"
-                placeholder="De">
-            <input type="number" class="form-control amount-input" id="maxSellingPriceFilter" [(ngModel)]="maxSellingPriceFilter"
-                placeholder="Jusqu'à">
+            <input type="number" class="form-control amount-input" id="minSellingPriceFilter"
+                [(ngModel)]="minSellingPriceFilter" placeholder="De">
+            <input type="number" class="form-control amount-input" id="maxSellingPriceFilter"
+                [(ngModel)]="maxSellingPriceFilter" placeholder="Jusqu'à">
         </div>
     </div>
 
@@ -57,6 +62,51 @@
         </div>
         <div class="col-6 col-sm-6 col-md-2 col-lg-1 mb-3 align-filter-button">
             <button class="btn btn-primary" (click)="filter()">Filtrer</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-md-6 col-lg-4" *ngFor="let item of products">
+            <div class="card d-flex flex-column">
+                <div class="card-header">
+                    {{item?.name}}
+                </div>
+                <div class="card-body flex-fill">
+                    <img src="{{item?.images[0] ? environment.backend+'/images/'+item?.images[0] : 'assets/default_product.png' }}"
+                        class="img-fluid w-100 h-100" alt="Image">
+                </div>
+                <div class="card-footer">
+                    <div class="row product-info">
+                        <div class="col-12 col-md-12">
+                            <div><label>Catégorie : </label><span>{{item?.category?.name ? item?.category?.name : "--"}}</span></div>
+                            <div><label>Prix de vente : </label><span>{{item?.sellingPrice ? (item?.sellingPrice + ' ' +
+                                    (item?.currency? item?.currency : '')) : '--'}}</span></div>
+                            <div><label>Couleur : </label><span>{{item?.color ? item?.color : "--"}}</span></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-12 button-container">
+                            <button type="button" class="btn btn-primary"
+                                (click)="consulter(item?.id)">Consulter</button>
+                        </div>
+                        <div class="col-6 col-md-6 button-container">
+                            <button type="button" class="btn btn-secondary"
+                                (click)="navigateTo('/products/edit/'+item?.id)">Modifier</button>
+                        </div>
+                        <div class="col-6 col-md-6 button-container">
+                            <button type="button" class="btn btn-danger"
+                                (click)="deleteProduct(item)">Supprimer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)" [length]="count" [pageSize]="6"
+                [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[6,12,24]" [hidePageSize]="false"
+                [pageIndex]="0" aria-label="Select page">
+            </mat-paginator>
         </div>
     </div>
 </div>

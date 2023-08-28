@@ -13,12 +13,22 @@ import { SuppliersMngtComponent } from './suppliers/suppliers-mngt/suppliers-mng
 import { SupplierAddComponent } from './suppliers/supplier-add/supplier-add.component';
 import { ProductsMngtComponent } from './products/products-mngt/products-mngt.component';
 import { ProductAddComponent } from './products/product-add/product-add.component';
+import { ProductViewComponent } from './products/product-view/product-view.component';
+import { BrandsMngtComponent } from './brands/brands-mngt/brands-mngt.component';
+import { ReceiptsMngtComponent } from './receipts/receipts-mngt/receipts-mngt.component';
+import { ReceiptAddComponent } from './receipts/receipt-add/receipt-add.component';
+import { ReceiptViewComponent } from './receipts/receipt-view/receipt-view.component';
+import { WorkersMngtComponent } from './workers/workers-mngt/workers-mngt.component';
+import { WorkerAddComponent } from './workers/worker-add/worker-add.component';
 
 const routes: Routes = [
   // ------------ Store ------------
   { path: 'stores', component: StoresMngtComponent, canActivate: [AuthGuard] },
   { path: 'stores/add', component: StoreAddComponent },
   { path: 'stores/view', component: StoreViewComponent },
+
+  // ------------ Brands ------------
+  { path: 'brands', component: BrandsMngtComponent },
 
   // ------------ Categories ------------
   { path: 'categories', component: CategoriesMngtComponent },
@@ -31,10 +41,30 @@ const routes: Routes = [
   { path: 'suppliers/add', component: SupplierAddComponent },
   { path: 'suppliers/:id', component: SupplierAddComponent },
 
+
+  // ------------ Credits ------------
+  { path: 'credits', component: WorkersMngtComponent },
+  { path: 'credits/add', component: WorkerAddComponent },
+  { path: 'credits/:id', component: WorkerAddComponent },
+
+
+  
+  // ------------ Workers ------------
+  { path: 'workers', component: WorkersMngtComponent },
+  { path: 'workers/add', component: WorkerAddComponent },
+  { path: 'workers/:id', component: WorkerAddComponent },
+
   // ------------ Products ------------
   { path: 'products', component: ProductsMngtComponent },
   { path: 'products/add', component: ProductAddComponent },
+  { path: 'products/edit/:id', component: ProductAddComponent },
+  { path: 'products/view/:id', component: ProductViewComponent },
 
+
+  // ------------ Receipts ------------
+  { path: 'receipts', component: ReceiptsMngtComponent },
+  { path: 'receipts/add', component: ReceiptAddComponent },
+  { path: 'receipts/view/:id', component: ReceiptViewComponent },
 
   // ------------ General ------------
   { path: 'login', component: LoginComponent, data: { loginPage: true }, canActivate: [AuthGuard] },

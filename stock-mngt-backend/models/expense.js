@@ -12,9 +12,9 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
-    
+
     toJSON() {
-      return { ...this.get(), storeId: undefined, store_id: undefined, createdAt: undefined, updatedAt: undefined }
+      return { ...this.get(), storeId: undefined, store_id: undefined, creatorUserId: undefined, createdAt: undefined, updatedAt: undefined }
     }
   }
   Expense.init({
@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     sequelize,
-    tableName:'expenses',
+    tableName: 'expenses',
     modelName: 'Expense',
   });
   return Expense;
