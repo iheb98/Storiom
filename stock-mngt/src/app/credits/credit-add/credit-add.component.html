@@ -1,0 +1,84 @@
+<ngx-loading-x [show]="loading" [spinnerColor]="'#683ab7'"></ngx-loading-x>
+<div class="container">
+    <div class="row title-bloc">
+        <h2 class="title">
+            {{ borrowerId ? 'Modifier' : 'Ajouter'}} un crédit
+        </h2>
+    </div>
+    <form [formGroup]="form" (ngSubmit)="borrowerId ? edit() : create() ">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-12 col-md-12 col-lg-6 login-block">
+                <div class="mb-3 row">
+                    <label for="lastName" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Nom</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="text" [ngClass]="{'invalid':submitted && !form.get('lastName').value}"
+                            class="form-control" id="lastName" formControlName="lastName">
+                        <div *ngIf="submitted && !form.get('lastName').value" class="form-error">
+                            Le nom est obligatoire.
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="firstName" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Prénom</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="firstName" [ngClass]="{'invalid':submitted && !form.get('firstName').value}"
+                            class="form-control" id="firstName" formControlName="firstName">
+                        <div *ngIf="submitted && !form.get('firstName').value" class="form-error">
+                            Le prénom est obligatoire.
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="email" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Email</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="email" [ngClass]="{'invalid':submitted && !form.get('email').value || emailError}"
+                            class="form-control" id="email" formControlName="email" email="true">
+                        <div *ngIf="submitted && form.get('email').errors?.pattern" class="form-error">
+                            Mauvaise format d'email
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="phone" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Téléphone</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="phone" class="form-control" id="phone" formControlName="phone">
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="amount" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Montant</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="number" class="form-control" id="amount" formControlName="amount">
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label for="givenDate" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Date de
+                        prête</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="date" class="form-control" formControlName="givenDate" name="givenDate"
+                            id="givenDate">
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="returnDate" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Date de
+                        retour</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="date" class="form-control" formControlName="returnDate" name="returnDate"
+                            id="returnDate">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="comment" class="form-label">Commentaire</label>
+                    <textarea maxlength="50000" rows="10" resize="none" class="form-control" formControlName="comment" id="comment">
+                    </textarea>
+                </div>
+                <div class="mb-3 row justify-content-end">
+                    <div class="col-12 col-sm-12 col-lg-auto">
+                        <button type="submit" class="btn btn-primary full-width" *ngIf="!borrowerId">Ajouter</button>
+                        <button type="submit" class="btn btn-primary full-width" *ngIf="borrowerId">Modifier</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,11 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { CategoriesMngtComponent } from './categories/categories-mngt/categories-mngt.component';
-import { HomeComponent } from './general/home/home.component';
 import { LoginComponent } from './general/login/login.component';
 import { RegisterComponent } from './general/register/register.component';
 import { AuthGuard } from './services/auth.guard';
-import { RoleGuard } from './services/role.guard';
 import { StoreAddComponent } from './stores/store-add/store-add.component';
 import { StoresMngtComponent } from './stores/stores-mngt/stores-mngt.component';
 import { StoreViewComponent } from './stores/store-view/store-view.component';
@@ -20,12 +18,17 @@ import { ReceiptAddComponent } from './receipts/receipt-add/receipt-add.componen
 import { ReceiptViewComponent } from './receipts/receipt-view/receipt-view.component';
 import { WorkersMngtComponent } from './workers/workers-mngt/workers-mngt.component';
 import { WorkerAddComponent } from './workers/worker-add/worker-add.component';
+import { CreditsMngtComponent } from './credits/credits-mngt/credits-mngt.component';
+import { CreditAddComponent } from './credits/credit-add/credit-add.component';
+import { ExpensesMngtComponent } from './expenses/expenses-mngt/expenses-mngt.component';
+import { ExpenseAddComponent } from './expenses/expense-add/expense-add.component';
 
 const routes: Routes = [
   // ------------ Store ------------
   { path: 'stores', component: StoresMngtComponent, canActivate: [AuthGuard] },
   { path: 'stores/add', component: StoreAddComponent },
   { path: 'stores/view', component: StoreViewComponent },
+  { path: 'stores/:id', component: StoreAddComponent },
 
   // ------------ Brands ------------
   { path: 'brands', component: BrandsMngtComponent },
@@ -43,9 +46,15 @@ const routes: Routes = [
 
 
   // ------------ Credits ------------
-  { path: 'credits', component: WorkersMngtComponent },
-  { path: 'credits/add', component: WorkerAddComponent },
-  { path: 'credits/:id', component: WorkerAddComponent },
+  { path: 'credits', component: CreditsMngtComponent },
+  { path: 'credits/add', component: CreditAddComponent },
+  { path: 'credits/:id', component: CreditAddComponent },
+
+  
+  // ------------ Expenses ------------
+  { path: 'expenses', component: ExpensesMngtComponent },
+  { path: 'expenses/add', component: ExpenseAddComponent },
+  { path: 'expenses/:id', component: ExpenseAddComponent },
 
 
   

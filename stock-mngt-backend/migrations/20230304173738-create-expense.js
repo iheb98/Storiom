@@ -9,6 +9,9 @@ module.exports = {
         primaryKey: true,
         type: DataTypes.INTEGER
       },
+      title: {
+        type: DataTypes.STRING
+      },
       amount: {
         type: DataTypes.FLOAT
       },

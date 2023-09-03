@@ -3,8 +3,8 @@ mat-sidenav-container {
 }
 
 mat-sidenav {
-    width: 400px;
-    padding-top:80px;
+    width: 300px;
+    padding-top: 80px;
     background-color: #eee;
 }
 
@@ -151,12 +151,14 @@ mat-list-item button {
 mat-list-item {
     margin-bottom: 20px;
 }
-
+.mat-focus-indicator.mat-button.mat-button-base {
+    text-align: left !important;
+}
 mat-toolbar {
     height: 64px;
-    position:fixed;
+    position: fixed;
     z-index: 100;
-    width: 100%  !important;
+    width: 100% !important;
 }
 
 @media screen and (max-width: 480px) {

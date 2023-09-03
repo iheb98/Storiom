@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/services/auth.service';
-import { WorkerService } from 'src/app/services/worker.service';
+import { CreditService } from 'src/app/services/credit.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 })
 export class CreditsMngtComponent implements OnInit {
 
- 
+
   faTrash = faTrash;
   faEdit = faEdit;
 
@@ -20,30 +20,34 @@ export class CreditsMngtComponent implements OnInit {
   lastNameFilter = ''
   emailFilter = ''
   phoneFilter = ''
-  fromEntryDateFilter = null
-  toEntryDateFilter = null
+  minAmountFilter = null
+  maxAmountFilter = null
+  fromGivenDateFilter = null
+  toGivenDateFilter = null
+  fromReturnDateFilter = null
+  toReturnDateFilter = null
   entryDateFilter = null
-  workers
+  borrowers
   count;
   loading;
 
   currentPage = 0;
   currentSize = 5;
   constructor(
-    private workerService: WorkerService,
+    private creditService: CreditService,
     private authService: AuthService,
     private router: Router
   ) { }
 
   ngOnInit(): void {
-    this.countWorkers();
-    this.getWorkers(0, 5);
+    this.countBorrowerss();
+    this.getBorrowerss(0, 5);
     this.loading = false;
   }
 
   filter() {
-    this.getWorkers(this.currentPage, this.currentSize)
-    this.countWorkers()
+    this.getBorrowerss(this.currentPage, this.currentSize)
+    this.countBorrowerss()
   }
 
   reset() {
@@ -51,8 +55,12 @@ export class CreditsMngtComponent implements OnInit {
     this.lastNameFilter = ''
     this.emailFilter = ''
     this.phoneFilter = ''
-    this.fromEntryDateFilter = null
-    this.toEntryDateFilter = null
+    this.minAmountFilter = ''
+    this.maxAmountFilter = ''
+    this.fromGivenDateFilter = null
+    this.toGivenDateFilter = null
+    this.fromReturnDateFilter = null
+    this.toReturnDateFilter = null
     this.filter()
   }
 
@@ -65,72 +73,80 @@ export class CreditsMngtComponent implements OnInit {
     if (this.emailFilter)
       query += query ? ",email ~ '" + this.emailFilter + "'" : "email ~ '" + this.emailFilter + "'"
     if (this.phoneFilter)
-      query += query ? ",phone = '" + this.phoneFilter + "'" : "phone = '" + this.phoneFilter + "'"
-      if (this.fromEntryDateFilter)
-      query += query ? ",entryDate > '" + this.fromEntryDateFilter + "'" : "entryDate > '" + this.fromEntryDateFilter + "'"
-    if (this.toEntryDateFilter)
-      query += query ? ",entryDate < '" + this.toEntryDateFilter + "'" : "entryDate < '" + this.toEntryDateFilter + "'"
+      query += query ? ",phone ~ '" + this.phoneFilter + "'" : "phone ~ '" + this.phoneFilter + "'"
+    if (this.minAmountFilter)
+      query += query ? ",amount > '" + this.minAmountFilter + "'" : "amount > '" + this.minAmountFilter + "'"
+    if (this.maxAmountFilter)
+      query += query ? ",amount < '" + this.maxAmountFilter + "'" : "amount < '" + this.maxAmountFilter + "'"
+    if (this.fromGivenDateFilter)
+      query += query ? ",givenDate > '" + this.fromGivenDateFilter + "'" : "givenDate > '" + this.fromGivenDateFilter + "'"
+    if (this.toGivenDateFilter)
+      query += query ? ",givenDate < '" + this.toGivenDateFilter + "'" : "givenDate < '" + this.toGivenDateFilter + "'"
+    if (this.fromReturnDateFilter)
+      query += query ? ",returnDate > '" + this.fromReturnDateFilter + "'" : "returnDate > '" + this.fromReturnDateFilter + "'"
+    if (this.toReturnDateFilter)
+      query += query ? ",returnDate < '" + this.toReturnDateFilter + "'" : "returnDate < '" + this.toReturnDateFilter + "'"
 
     return query
   }
 
   create() {
-    this.router.navigate(['/workers/add'])
+    this.router.navigate(['/credits/add'])
   }
 
-  getWorkers(page, size) {
+  getBorrowerss(page, size) {
     this.loading = true;
-    this.workerService.getWorkersByStoreId(this.authService.getConnectedUser()?.store, {
+    this.creditService.getBorrowersByStoreId(this.authService.getConnectedUser()?.store, {
       page,
       size,
       query: this.buildQuery()
     }).subscribe(response => {
       this.loading = false;
-      this.workers = response;
+      this.borrowers = response;
     });
   }
 
-  countWorkers() {
+  countBorrowerss() {
     this.loading = true;
-    this.workerService.countWorkersByStoreId(this.authService.getConnectedUser()?.store, {
-      query:this.buildQuery()
+    this.creditService.countBorrowersByStoreId(this.authService.getConnectedUser()?.store, {
+      query: this.buildQuery()
     }).subscribe(response => {
       this.loading = false;
       this.count = response;
     })
   }
 
-  deleteWorker(worker) {
+  deleteBorrower(borrower) {
     Swal.fire({
-      title: 'Etes vous sûr de vouloir supprimer le fournisseur ' + worker.firstName + ' ' + worker.lastName + ' ?',
+      title: 'Etes vous sûr de vouloir supprimer le crédit de ' + borrower.firstName + ' ' + borrower.lastName + ' ?',
       denyButtonText: `Annuler`,
       showDenyButton: true,
       confirmButtonText: 'Supprimer',
     }).then((result) => {
       if (result.isConfirmed) {
         this.loading = true;
-        this.workerService.deleteWorker(worker.id).subscribe(response => {
+        this.creditService.deleteBorrower(borrower.id).subscribe(response => {
           this.loading = false;
           Swal.fire({
             icon: 'success',
-            title: 'Fournisseur supprimé !',
+            title: 'Crédit supprimé !',
             showConfirmButton: false,
             timer: 1500
           })
-          this.getWorkers(this.currentPage, this.currentSize)
+          this.getBorrowerss(this.currentPage, this.currentSize)
         })
       }
     })
   }
 
-  editWorker(worker) {
-    this.router.navigate(['workers/' + worker.id])
+  editBorrower(borrower) {
+    this.router.navigate(['credits/' + borrower.id])
   }
 
   handlePageEvent(event) {
     this.currentPage = event.pageIndex;
     this.currentSize = event.pageSize;
-    this.getWorkers(this.currentPage, this.currentSize)
+    this.getBorrowerss(this.currentPage, this.currentSize)
   }
 
 }

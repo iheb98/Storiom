@@ -4,7 +4,8 @@
     "password": null,
     "database": "fides",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "timezone": "+00:00"
   },
   "test": {
     "username": "root",

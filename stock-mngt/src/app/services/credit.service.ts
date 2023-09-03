@@ -12,7 +12,7 @@ export class CreditService {
 
   constructor(private http: HttpClient) { }
 
-  getWorkersByStoreId(id, query): Observable<any> {
+  getBorrowersByStoreId(id, query): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'store/' + id, {
       params: {
         ...query
@@ -20,11 +20,11 @@ export class CreditService {
     });
   }
 
-  getAllWorkersByStoreId(id): Observable<any> {
+  getAllBorrowersByStoreId(id): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'all/store/' + id);
   }
 
-  countWorkersByStoreId(id, query): Observable<any> {
+  countBorrowersByStoreId(id, query): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'count/store/' + id,
       {
         params: {
@@ -33,22 +33,22 @@ export class CreditService {
       });
   }
 
-  getWorker(id): Observable<any> {
+  getBorrower(id): Observable<any> {
     return this.http.get<any>(this.baseUrl + id);
   }
 
 
 
 
-  addWorker(body): Observable<any> {
-    return this.http.post<any>(this.baseUrl + 'register', body);
+  addBorrower(body): Observable<any> {
+    return this.http.post<any>(this.baseUrl + 'create', body);
   }
 
-  updateWorker(body): Observable<any> {
+  updateBorrower(body): Observable<any> {
     return this.http.put<any>(this.baseUrl + 'edit', body);
   }
 
-  deleteWorker(id): Observable<any> {
+  deleteBorrower(id): Observable<any> {
     return this.http.delete<any>(this.baseUrl + "/" + id);
   }
 }

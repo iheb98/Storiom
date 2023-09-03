@@ -18,6 +18,45 @@ router.post('/create', utility.authenticate, (req, res) => {
     })
 })
 
+router.put('/edit', utility.authenticate, (req, res) => {
+    const { name, logo, images, description, country, street, city, state, postalCode, phone, email, site } = req.body
+    Store.findOne({
+        where: {
+            id: req.body.id
+        }, include: ['address']
+    }).then(store => {
+        store.name = name
+        store.images = JSON.stringify(images)
+        store.description = description
+        store.phone = phone
+        store.email = email
+        store.site = site
+        store.logo = logo ? logo : store.logo
+        store.save().then(savedStore => {
+            Address.findOne({
+                where: {
+                    id: store.address.id
+                }
+            }).then(address => {
+                address.country = country
+                address.street = street
+                address.city = city
+                address.state = state
+                address.postalCode = postalCode
+                address.save().then(savedAddress => {
+                    res.json({ message: 'Store updated successfully!', success: true })
+                })
+            }).catch(err => {
+                res.json(err)
+            })
+        }).catch(err => {
+            res.json(err)
+        })
+    }).catch(err => {
+        res.json(err)
+    })
+})
+
 router.post('/expenses/create', utility.authenticate, (req, res) => {
     const { amount, comment, date, storeId } = req.body
     Expense.create({ amount, comment, date, storeId }).then(createdExpense => {

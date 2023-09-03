@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
+import { LoadingService } from 'src/app/services/loading.service';
+import { StoreService } from 'src/app/services/store.service';
 
 @Component({
   selector: 'app-store-view',
@@ -8,10 +10,19 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class StoreViewComponent implements OnInit {
   store;
-  constructor(private authService: AuthService) { }
+  constructor(
+    private authService: AuthService,
+    private storeService: StoreService,
+    private loadingService:LoadingService) { }
 
   ngOnInit(): void {
-    this.store = this.authService.getConnectedUser()?.store;
+    this.loadingService.screenLoading()
+    this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
+      store => {
+        this.store = store
+        this.loadingService.screenLoaded()
+      }
+    )
   }
 
 }

@@ -1,0 +1,52 @@
+<ngx-loading-x [show]="loading" [spinnerColor]="'#683ab7'"></ngx-loading-x>
+<div class="container">
+    <div class="row title-bloc">
+        <h2 class="title">
+            {{ expenseId ? 'Modifier' : 'Ajouter'}} une dépense
+        </h2>
+    </div>
+    <form [formGroup]="form" (ngSubmit)="expenseId ? edit() : create() ">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-12 col-md-12 col-lg-6 login-block">
+                <div class="mb-3 row">
+                    <label for="title" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Titre</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="text" [ngClass]="{'invalid':submitted && !form.get('title').value}"
+                            class="form-control" id="title" formControlName="title">
+                        <div *ngIf="submitted && !form.get('title').value" class="form-error">
+                            Le titre est obligatoire.
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="amount" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Montant</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="number" [ngClass]="{'invalid':submitted && !form.get('amount').value}"
+                            class="form-control" id="amount" formControlName="amount">
+                        <div *ngIf="submitted && !form.get('amount').value" class="form-error">
+                            Le montant est obligatoire.
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="date" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Date </label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="date" class="form-control" formControlName="date" name="date" id="date">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="comment" class="form-label">Commentaire</label>
+                    <textarea maxlength="50000" rows="10" resize="none" class="form-control" formControlName="comment"
+                        id="comment">
+                    </textarea>
+                </div>
+                <div class="mb-3 row justify-content-end">
+                    <div class="col-12 col-sm-12 col-lg-auto">
+                        <button type="submit" class="btn btn-primary full-width" *ngIf="!expenseId">Ajouter</button>
+                        <button type="submit" class="btn btn-primary full-width" *ngIf="expenseId">Modifier</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

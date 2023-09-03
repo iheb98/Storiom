@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Form, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from 'src/app/models/store';
 import { AuthService } from 'src/app/services/auth.service';
 import { FileService } from 'src/app/services/file.service';
@@ -14,16 +14,38 @@ import { StoreService } from 'src/app/services/store.service';
 export class StoreAddComponent implements OnInit {
   store: Store;
   form: FormGroup;
+  storeId
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
   constructor(private formBuilder: FormBuilder,
     private service: StoreService,
     private fileService: FileService,
     private authService: AuthService,
-    private router: Router) {
+    private router: Router,
+    private route: ActivatedRoute) {
   }
 
   ngOnInit(): void {
     this.initForm();
+    this.route.paramMap.subscribe(paramMap => {
+      this.storeId = paramMap.get('id');
+    })
+    if (this.storeId) {
+      this.service.getStore(this.storeId).subscribe(
+        response => {
+          this.store = response
+          this.form.get('name').setValue(response?.name)
+          this.form.get('description').setValue(response?.description)
+          this.form.get('phone').setValue(response?.phone)
+          this.form.get('email').setValue(response?.email)
+          this.form.get('site').setValue(response?.site)
+          this.form.get('country').setValue(response?.address?.country)
+          this.form.get('state').setValue(response?.address?.state)
+          this.form.get('city').setValue(response?.address?.city)
+          this.form.get('street').setValue(response?.address?.street)
+          this.form.get('postalCode').setValue(response?.address?.postalCode)
+          this.form.get('logo').setValue(response?.logo)
+        })
+    }
   }
 
   initForm() {
@@ -37,7 +59,7 @@ export class StoreAddComponent implements OnInit {
       state: [''],
       city: [''],
       street: [''],
-      postalCode:[''],
+      postalCode: [''],
       logo: [null]
     });
   }
@@ -65,8 +87,26 @@ export class StoreAddComponent implements OnInit {
             })
         }
       )
-    } else {
+    }
+  }
 
+  edit() {
+    let fileName = null;
+    if (this.fileInput.nativeElement.files[0])
+      fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + this.fileInput.nativeElement.files[0]?.name.substring(this.fileInput.nativeElement.files[0].name.lastIndexOf('.'))
+    if (this.form.valid) {
+      this.service.updateStore({ ...this.form.getRawValue(), id: this.store.id, logo: fileName, userId: this.authService.getConnectedUser().id }).subscribe(
+        response => {
+          if (this.fileInput.nativeElement.files[0])
+            this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(
+              response => {
+                this.router.navigate([''])
+              }
+            )
+          else
+            this.router.navigate([''])
+        }
+      )
     }
   }
 

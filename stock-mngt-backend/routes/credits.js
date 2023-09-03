@@ -4,9 +4,9 @@ const { Credit } = require('../models');
 const utility = require('../utility');
 
 
-router.post('/create',utility.authenticate, (req, res) => {
+router.post('/create', utility.authenticate, (req, res) => {
     const { firstName, lastName, phone, email, comment, amount, givenDate, returnDate, storeId } = req.body
-    Credit.create({ firstName, lastName, phone, email, comment, amount, givenDate, returnDate, storeId }).then(createdCredit => {
+    Credit.create({ firstName, lastName, phone, email, comment, amount, givenDate, returnDate, storeId, creatorUserId: req.user.id }).then(createdCredit => {
         res.json({
             credit: createdCredit
         })
@@ -15,11 +15,12 @@ router.post('/create',utility.authenticate, (req, res) => {
     })
 })
 
-router.delete('/:id',utility.authenticate, (req, res, next) => {
+router.delete('/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Credit.destroy({
         where: {
-            id
+            id,            
+            creatorUserId: req.user.id
         }
     }).then(deletedRows => {
         if (deletedRows > 0)
@@ -31,11 +32,67 @@ router.delete('/:id',utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/:id',utility.authenticate, (req, res, next) => {
+router.put('/edit', utility.authenticate, (req, res, next) => {
+    Credit.findOne({
+        where: {
+            id: req.body.id,
+            creatorUserId: req.user.id
+        }
+    }).then(credit => {
+        credit.firstName = req.body.firstName
+        credit.lastName = req.body.lastName
+        credit.phone = req.body.phone
+        credit.email = req.body.email
+        credit.givenDate = req.body.givenDate
+        credit.returnDate = req.body.returnDate
+        credit.amount = req.body.amount
+        credit.comment = req.body.comment
+        credit.save().then(savedCredit => {
+            res.json({ message: "Credit updated", success: true })
+        })
+    }).catch(err => {
+        res.status(500).json(err)
+    })
+});
+
+router.get('/store/:id', utility.authenticate, (req, res, next) => {
+    const id = req.params.id;
+    Credit.findAll(utility.paginate({
+        where: {
+            storeId: id,
+            ...utility.buildQuery(req.query.query),
+            creatorUserId: req.user.id
+        }
+    }, { page: req.query.page, pageSize: req.query.size })).then(users => {
+        res.json(users)
+    }).catch(err => {
+        res.status(500).json(err)
+    })
+});
+
+
+
+router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
+    const id = req.params.id;
+    Credit.count({
+        where: {
+            storeId:id,
+            ...utility.buildQuery(req.query.query),
+            creatorUserId: req.user.id
+        }
+    }).then(countUsers => {
+        res.json(countUsers)
+    }).catch(err => {
+        res.status(500).json(err)
+    })
+});
+
+router.get('/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Credit.findOne({
         where: {
-            id
+            id,
+            creatorUserId: req.user.id
         }
     }).then(credit => {
         res.json(credit)

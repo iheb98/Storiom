@@ -61,6 +61,7 @@ const buildQuery = (sentQuery) => {
             }
         }
     }
+    console.log(finalQuery)
     return finalQuery
 };
 

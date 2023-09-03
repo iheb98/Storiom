@@ -65,10 +65,12 @@ const brandsRoute = require('./routes/brands');
 const productsRoute = require('./routes/products');
 const suppliersRoute = require('./routes/suppliers');
 const creditsRoute = require('./routes/credits');
+const expensesRoute = require('./routes/expenses');
 const receiptsRoute = require('./routes/receipts');
 
 app.use('/api/receipts', receiptsRoute)
 app.use('/api/credits', creditsRoute)
+app.use('/api/expenses', expensesRoute)
 app.use('/api/suppliers', suppliersRoute)
 app.use('/api/products', productsRoute)
 app.use('/api/categories', categoriesRoute)

@@ -62,10 +62,10 @@ export class ProductsMngtComponent implements OnInit {
       query += query ? ",description ~ '" + this.descriptionFilter + "'" : "description ~ '" + this.descriptionFilter + "'"
     if (this.supplierFilter)
       query += query ? ",supplierId = '" + this.supplierFilter + "'" : "supplierId = '" + this.supplierFilter + "'"
-    if (this.minQuantityFilter)
-      query += query ? ",quantityPrice > '" + this.minQuantityFilter + "'" : "quantityPrice > '" + this.minQuantityFilter + "'"
-    if (this.maxQuantityFilter)
-      query += query ? ",quantityPrice < '" + this.maxQuantityFilter + "'" : "quantityPrice < '" + this.maxQuantityFilter + "'"
+    if (this.minQuantityFilter || this.minQuantityFilter == 0)
+      query += query ? ",quantity > '" + this.minQuantityFilter + "'" : "quantity > '" + this.minQuantityFilter + "'"
+    if (this.maxQuantityFilter || this.minQuantityFilter == 0)
+      query += query ? ",quantity < '" + this.maxQuantityFilter + "'" : "quantity < '" + this.maxQuantityFilter + "'"
     if (this.minBuyingPriceFilter)
       query += query ? ",buyingPrice > '" + this.minBuyingPriceFilter + "'" : "buyingPrice > '" + this.minBuyingPriceFilter + "'"
     if (this.maxBuyingPriceFilter)

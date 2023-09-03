@@ -44,6 +44,9 @@ import { NgxPrintModule } from 'ngx-print';
 import { WorkersMngtComponent } from './workers/workers-mngt/workers-mngt.component';
 import { WorkerAddComponent } from './workers/worker-add/worker-add.component';
 import { CreditsMngtComponent } from './credits/credits-mngt/credits-mngt.component';
+import { CreditAddComponent } from './credits/credit-add/credit-add.component';
+import { ExpensesMngtComponent } from './expenses/expenses-mngt/expenses-mngt.component';
+import { ExpenseAddComponent } from './expenses/expense-add/expense-add.component';
 
 
 
@@ -72,7 +75,10 @@ import { CreditsMngtComponent } from './credits/credits-mngt/credits-mngt.compon
     ReceiptViewComponent,
     WorkersMngtComponent,
     WorkerAddComponent,
-    CreditsMngtComponent
+    CreditsMngtComponent,
+    CreditAddComponent,
+    ExpensesMngtComponent,
+    ExpenseAddComponent
   ],
   imports: [
     BrowserModule,

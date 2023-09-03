@@ -26,7 +26,7 @@ export class StoreService {
   }
 
   updateStore(body): Observable<any> {
-    return this.http.put<any>(this.baseUrl, body);
+    return this.http.put<any>(this.baseUrl + 'edit', body);
   }
 
   uploadFile(file): Observable<any> {

@@ -6,7 +6,7 @@
     overflow-x: auto;
 }
 
-.action-button{
+.action-button {
     width: 100%;
 }
 
@@ -27,6 +27,13 @@ th {
     padding: 20px;
 }
 
+.comment-column {
+    width: 50px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 @media screen and (max-width: 700px) {
     .align-filter-button {
         text-align: center;
@@ -38,7 +45,7 @@ th {
 }
 
 @media screen and (max-width: 1000px) {
-   button{
-    width: 100%;
-   }
+    button {
+        width: 100%;
+    }
 }
