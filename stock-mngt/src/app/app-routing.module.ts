@@ -22,8 +22,13 @@ import { CreditsMngtComponent } from './credits/credits-mngt/credits-mngt.compon
 import { CreditAddComponent } from './credits/credit-add/credit-add.component';
 import { ExpensesMngtComponent } from './expenses/expenses-mngt/expenses-mngt.component';
 import { ExpenseAddComponent } from './expenses/expense-add/expense-add.component';
+import { DashboardViewComponent } from './dashboard/dashboard-view/dashboard-view.component';
 
 const routes: Routes = [
+
+  // ------------ Dashboard -------------
+  { path: 'dashboard', component: DashboardViewComponent },
+
   // ------------ Store ------------
   { path: 'stores', component: StoresMngtComponent, canActivate: [AuthGuard] },
   { path: 'stores/add', component: StoreAddComponent },
@@ -50,14 +55,14 @@ const routes: Routes = [
   { path: 'credits/add', component: CreditAddComponent },
   { path: 'credits/:id', component: CreditAddComponent },
 
-  
+
   // ------------ Expenses ------------
   { path: 'expenses', component: ExpensesMngtComponent },
   { path: 'expenses/add', component: ExpenseAddComponent },
   { path: 'expenses/:id', component: ExpenseAddComponent },
 
 
-  
+
   // ------------ Workers ------------
   { path: 'workers', component: WorkersMngtComponent },
   { path: 'workers/add', component: WorkerAddComponent },

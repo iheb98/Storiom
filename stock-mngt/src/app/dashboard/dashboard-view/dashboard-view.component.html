@@ -1,0 +1,88 @@
+<div class="">
+    <div class="row">
+        <div class="col-12 title-bloc">
+            <h3 class="title">Dashboard</h3>
+        </div>
+    </div>
+    <div class="row widget-container">
+        <div class="col-sm-12 col-md-3 col-lg-3 widget">
+            <div class="row content">
+                <div class="col-3">
+                    <div class="icon-box stock-value">
+                        <fa-icon [icon]="faBoxOpen"></fa-icon>
+                    </div>
+                </div>
+                <div class="col-9 value-box">
+                    <div class="label">
+                        Valeur du stock
+                    </div>
+                    <div class="value">
+                        {{widgets?.totalValue+ ' DT' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3 widget">
+            <div class="row content">
+                <div class="col-3">
+                    <div class="icon-box critical-stock">
+                        <fa-icon [icon]="faArrowDown"></fa-icon>
+                    </div>
+                </div>
+                <div class="col-9 value-box">
+                    <div class="label">
+                        Stock Critique
+                    </div>
+                    <div class="value">
+                        {{widgets?.criticalStock }}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3 widget">
+            <div class="row content">
+                <div class="col-3">
+                    <div class="icon-box today-revenue">
+                        <fa-icon [icon]="faBill"></fa-icon>
+                    </div>
+                </div>
+                <div class="col-9 value-box">
+                    <div class="label">
+                        Ventes du Jour
+                    </div>
+                    <div class="value">
+                        {{widgets?.todayRevenue+ ' DT' }}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3 widget">
+            <div class="row content">
+                <div class="col-3">
+                    <div class="icon-box credit">
+                        <fa-icon [icon]="faHand"></fa-icon>
+                    </div>
+                </div>
+                <div class="col-9 value-box">
+                    <div class="label">
+                        Total des crédits </div>
+                    <div class="value">
+                        {{widgets?.totalCredits+ ' DT' }}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <app-receipt-result-table></app-receipt-result-table>
+        </div>
+
+        <div class="col-12 col-md-6">
+            <app-product-result-table></app-product-result-table>
+        </div>
+    </div>
+</div>

@@ -20,6 +20,9 @@ export class ProductService {
       }
     });
   }
+  getCriticalStockProducts(id): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'store/' + id + '/critical');
+  }
 
   getAllProductsByStoreId(id): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'all/store/' + id);

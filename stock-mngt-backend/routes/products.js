@@ -61,7 +61,30 @@ router.get('/store/:id', utility.authenticate, (req, res, next) => {
     }, { page: req.query.page, pageSize: req.query.size })).then(products => {
         res.json(products)
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+});
+
+router.get('/store/:id/critical', utility.authenticate, (req, res, next) => {
+    const id = req.params.id;
+    Product.findAll({
+        where: {
+            store_id: id,
+            creatorUserId: req.user.id,
+            quantity: {
+                [utility.Op.lte]: 10
+            }
+        }
+    }).then(products => {
+        res.json(products)
+    }).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
@@ -76,7 +99,10 @@ router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
     }).then(countProducts => {
         res.json(countProducts)
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
@@ -94,7 +120,10 @@ router.delete('/:id', utility.authenticate, (req, res, next) => {
         else
             res.status(500).json({ success: false, message: "Product not found" })
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
@@ -109,7 +138,10 @@ router.get('/:id', utility.authenticate, (req, res, next) => {
         res.json(product)
 
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
     })
 });
 

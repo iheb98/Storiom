@@ -2,11 +2,11 @@
     padding:15px;
 }
 .category-container{
-    background-color: #683ab775;
+    border:2px solid #683ab775;
     text-align: center;
     font-size: 15px;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 7px;
     transition: .3s;
     padding:10px;
 }
@@ -55,7 +55,7 @@
 }
 
 .selected-mode{
-    background-color: #0c00f2ce;
+    background-color: #683ab7ce;
 }
 
 .category-bloc{

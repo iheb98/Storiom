@@ -11,7 +11,10 @@ router.post('/create', utility.authenticate, (req, res) => {
             expense: createdExpense
         })
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 })
 
@@ -28,7 +31,10 @@ router.delete('/:id', utility.authenticate, (req, res, next) => {
         else
             res.status(500).json({ success: false, message: "Expense not found" })
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 
@@ -45,7 +51,10 @@ router.get('/store/:id', utility.authenticate, (req, res, next) => {
         res.json(users)
     }).catch(err => {
         console.log(err)
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 
@@ -64,7 +73,10 @@ router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
     }).then(countUsers => {
         res.json(countUsers)
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 
@@ -83,7 +95,10 @@ router.put('/edit', utility.authenticate, (req, res, next) => {
             res.json({ message: "Expense updated", success: true })
         })
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 
@@ -98,7 +113,10 @@ router.get('/:id', utility.authenticate, (req, res, next) => {
         res.json(expense)
 
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 

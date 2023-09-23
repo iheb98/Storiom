@@ -1,5 +1,5 @@
 <ngx-loading-x [show]="loading" [spinnerColor]="'#683ab7'"></ngx-loading-x>
-<div class="container">
+<div class="">
     <div class="row title-bloc">
         <h3 class="title">Gestion des fournisseurs</h3>
     </div>
@@ -82,10 +82,10 @@
                     </tr>
                 </tbody>
             </table>
-            <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
-                [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[5,10,20]" [hidePageSize]="false"
-                [pageIndex]="0" aria-label="Select page">
-            </mat-paginator>
         </div>
+        <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
+            [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[5,10,20]" [hidePageSize]="false"
+            [pageIndex]="0" aria-label="Select page">
+        </mat-paginator>
     </div>
 </div>

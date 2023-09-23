@@ -1,0 +1,41 @@
+<div class="row">
+    <div class="col-12 table-bloc">
+        <table class="table table-responsive table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        Nom
+                    </th>
+                    <th>
+                        Prix d'achat
+                    </th>
+                    <th>
+                        Prix de vente
+                    </th>
+                    <th>
+                        Quantité
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let product of products">
+                    <td>
+                        {{ product?.name }}
+                    </td>
+                    <td>
+                        {{ product?.buyingPrice + ' DT' }}
+                    </td>
+                    <td>
+                        {{ product?.sellingPrice + ' DT' }}
+                    </td>
+                    <td>
+                        {{ product?.quantity }}
+                    </td>
+
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+</div>

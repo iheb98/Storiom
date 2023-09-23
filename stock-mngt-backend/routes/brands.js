@@ -8,7 +8,10 @@ router.post('/create',utility.authenticate, (req, res) => {
     Brand.create({ name, parentBrandId, storeId }).then(createdBrand => {
         res.json(createdBrand)
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 })
 
@@ -27,10 +30,16 @@ router.put('/edit',utility.authenticate, (req, res) => {
                 res.json({ message: 'Marque modifié', success: true })
             }
         ).catch(err => {
-            res.status(500).json(err)
+            res.status(500).json({
+success:false,
+message:err.toString()
+})
         })
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 })
 
@@ -46,7 +55,10 @@ router.get('/store/:id',utility.authenticate, (req, res, next) => {
         res.json(brand)
 
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 
@@ -63,7 +75,10 @@ router.delete('/:id',utility.authenticate, (req, res, next) => {
         else
             res.status(500).json({ success: false, message: "Brand not found" })
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 
@@ -89,7 +104,10 @@ router.get('/:id',utility.authenticate, (req, res, next) => {
         res.json(brand)
 
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 
@@ -116,7 +134,10 @@ router.get('/parent/:id',utility.authenticate, (req, res, next) => {
 
     }).catch(err => {
         console.log(err)
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 

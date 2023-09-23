@@ -38,10 +38,16 @@ router.post('/create', utility.authenticate, async (req, res) => {
                 receipt: createdReceipt
             })
         }).catch(err => {
-            res.status(500).json(err)
+            res.status(500).json({
+                success: false,
+                message: err.toString()
+            })
         })
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
     })
 
 })
@@ -63,7 +69,10 @@ router.delete('/:id', utility.authenticate, (req, res, next) => {
         else
             res.status(500).json({ success: false, message: "Receipt not found" })
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
@@ -79,7 +88,31 @@ router.get('/store/:id', utility.authenticate, (req, res, next) => {
     }, { page: req.query.page, pageSize: req.query.size })).then(receipts => {
         res.json(receipts)
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+});
+
+router.get('/store/:id/last', utility.authenticate, (req, res, next) => {
+    const id = req.params.id;
+    Receipt.findAll({
+        where: {
+            store_id:id,
+            creatorUserId: req.user.id,
+        },
+        limit: 5,
+        order: [
+            ['date', 'DESC']
+        ]
+    }).then(operations => {
+        res.json(operations)
+    }).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
@@ -95,7 +128,10 @@ router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
     }).then(countReceipts => {
         res.json(countReceipts)
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
@@ -126,7 +162,10 @@ router.get('/:id', utility.authenticate, (req, res, next) => {
         res.json(receipt)
 
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
     })
 });
 

@@ -61,7 +61,6 @@ const buildQuery = (sentQuery) => {
             }
         }
     }
-    console.log(finalQuery)
     return finalQuery
 };
 
@@ -103,4 +102,8 @@ async function generateRefreshToken(user) {
     }
 }
 
-module.exports = { comparePassword, authenticate, generateAccessToken, generateRefreshToken, paginate, Op, fromTo, buildQuery }
+function getSimpleDate(date) {
+    return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate()
+}
+
+module.exports = { comparePassword, authenticate, generateAccessToken, generateRefreshToken, paginate, Sequelize, Op, fromTo, buildQuery, getSimpleDate }

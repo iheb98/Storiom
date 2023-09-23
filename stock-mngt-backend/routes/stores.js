@@ -11,10 +11,16 @@ router.post('/create', utility.authenticate, (req, res) => {
                 store: createdStore
             })
         }).catch(err => {
-            res.status(500).json(err)
+            res.status(500).json({
+success:false,
+message:err.toString()
+})
         })
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 })
 
@@ -64,7 +70,10 @@ router.post('/expenses/create', utility.authenticate, (req, res) => {
             expense: createdExpense
         })
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 })
 
@@ -78,7 +87,10 @@ router.get('/:id/expenses', utility.authenticate, (req, res) => {
         res.json(store)
 
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 })
 
@@ -87,7 +99,10 @@ router.post('/brands/create', utility.authenticate, (req, res) => {
     Brand.create({ name, storeId }).then(createdBrand => {
         res.json(createdBrand)
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 })
 
@@ -96,7 +111,10 @@ router.get('/:id/brands', utility.authenticate, (req, res) => {
     Brand.findAll({ where: { storeId } }).then(brands => {
         res.json(brands)
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 })
 
@@ -104,7 +122,10 @@ router.get('/', (req, res, next) => {
     Store.findAll().then(stores => {
         res.json(stores)
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 
@@ -118,7 +139,10 @@ router.get('/user/:id', utility.authenticate, (req, res, next) => {
     }).then(stores => {
         res.json(stores)
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 
@@ -134,7 +158,10 @@ router.delete('/:id', utility.authenticate, (req, res, next) => {
         else
             res.status(500).json({ success: false, message: "Store not found" })
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 
@@ -148,7 +175,10 @@ router.get('/:id', utility.authenticate, (req, res, next) => {
         res.json(store)
 
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 

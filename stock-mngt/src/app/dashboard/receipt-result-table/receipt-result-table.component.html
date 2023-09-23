@@ -1,0 +1,45 @@
+<div class="row">
+    <div class="col-12 table-bloc">
+        <table class="table table-responsive table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        Code
+                    </th>
+                    <th>
+                        Type
+                    </th>
+                    <th>
+                        Client / Fournisseur
+                    </th>
+                    <th>
+                        Total
+                    </th>
+                    <th>
+                        Date
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let receipt of receipts">
+                    <td>
+                        {{ receipt?.code }}
+                    </td>
+                    <td>
+                        {{ receipt?.type }}
+                    </td>
+                    <td>
+                        {{ receipt?.name }}
+                    </td>
+                    <td>
+                        {{ receipt?.total + ' DT' }}
+                    </td>
+                    <td>
+                        {{ receipt?.date | date:'short' }}
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+</div>

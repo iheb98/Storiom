@@ -50,13 +50,13 @@ app.use(bodyparser.json({ limit: '50mb' }));
 
 
 
-app.post('/api/uploadFile', upload.single('file', (req, res) => {
-  let filePath = ''
-}))
+app.post('/api/uploadFile', upload.single('file'), (req, res) => {
+  res.json({ success: true, message: "File uploaded" })
+})
 
-app.post('/api/uploadMultipleFiles', upload.array('file', (req, res) => {
-  console.log("The request = ", req)
-}))
+app.post('/api/uploadMultipleFiles', upload.array('file'), (req, res) => {
+  res.json({ success: true, message: "Files uploaded" })
+})
 
 const usersRoute = require('./routes/users');
 const storesRoute = require('./routes/stores');
@@ -67,6 +67,7 @@ const suppliersRoute = require('./routes/suppliers');
 const creditsRoute = require('./routes/credits');
 const expensesRoute = require('./routes/expenses');
 const receiptsRoute = require('./routes/receipts');
+const statsRoute = require('./routes/stats');
 
 app.use('/api/receipts', receiptsRoute)
 app.use('/api/credits', creditsRoute)
@@ -77,6 +78,7 @@ app.use('/api/categories', categoriesRoute)
 app.use('/api/brands', brandsRoute)
 app.use('/api/stores', storesRoute)
 app.use('/api/users', usersRoute)
+app.use('/api/stats', statsRoute)
 
 //require('./config/passport')(passport);
 

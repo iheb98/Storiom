@@ -81,7 +81,7 @@ export class AppComponent implements OnInit {
     {
       label: 'Statistiques',
       icon: this.statsIcon,
-      link: 'statistics',
+      link: 'dashboard',
     }
       ,
     {

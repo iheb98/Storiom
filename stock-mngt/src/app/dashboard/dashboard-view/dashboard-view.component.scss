@@ -1,0 +1,66 @@
+.widget {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.widget-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.icon-box {
+    border: 1px solid lightgray;
+    border-radius: 50%;
+    display: inline-block;
+    height: 50px;
+    font-weight: bold;
+    font-size: 1.2em;
+    width: 50px;
+    margin: 0 auto;
+}
+.icon-box fa-icon {
+    display: table-cell;
+    vertical-align: middle;
+    height: 50px;
+    width: 50px;
+    text-align: center;
+    //padding: 0 15px;
+}
+
+.stock-value {
+    background-color: rgba(0, 0, 255, 0.251);
+    color: rgb(2, 2, 167);
+}
+.critical-stock {
+    background-color: rgba(255, 0, 0, 0.251);
+    color: red;
+}
+.today-revenue {
+    background-color: rgba(0, 255, 0, 0.251);
+    color: green;
+}
+.credit {
+    background-color: rgba(255, 211, 0, 0.251);
+    color: rgb(255, 106, 0);
+}
+
+.value-box {
+    //padding-left: 30px;
+}
+
+.content {
+    box-shadow: 0 0 10px 0px rgba(128, 128, 128, 0.359);
+    padding: 30px;
+    padding-right: 0;
+    flex: 1;
+}
+
+.label {
+    color: gray;
+}
+
+.value {
+    font-size: larger;
+    font-weight: bold;
+}

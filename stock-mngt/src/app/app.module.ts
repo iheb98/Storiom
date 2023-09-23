@@ -47,6 +47,9 @@ import { CreditsMngtComponent } from './credits/credits-mngt/credits-mngt.compon
 import { CreditAddComponent } from './credits/credit-add/credit-add.component';
 import { ExpensesMngtComponent } from './expenses/expenses-mngt/expenses-mngt.component';
 import { ExpenseAddComponent } from './expenses/expense-add/expense-add.component';
+import { DashboardViewComponent } from './dashboard/dashboard-view/dashboard-view.component';
+import { ReceiptResultTableComponent } from './dashboard/receipt-result-table/receipt-result-table.component';
+import { ProductResultTableComponent } from './dashboard/product-result-table/product-result-table.component';
 
 
 
@@ -78,7 +81,10 @@ import { ExpenseAddComponent } from './expenses/expense-add/expense-add.componen
     CreditsMngtComponent,
     CreditAddComponent,
     ExpensesMngtComponent,
-    ExpenseAddComponent
+    ExpenseAddComponent,
+    DashboardViewComponent,
+    ReceiptResultTableComponent,
+    ProductResultTableComponent
   ],
   imports: [
     BrowserModule,

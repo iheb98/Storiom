@@ -21,6 +21,10 @@ export class ReceiptService {
     });
   }
 
+  getLastOperationsByStoreId(id): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'store/' + id + '/last');
+  }
+
   getAllReceiptsByStoreId(id): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'all/store/' + id);
   }

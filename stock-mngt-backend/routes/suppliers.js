@@ -11,7 +11,10 @@ router.post('/create', utility.authenticate, (req, res) => {
             supplier: createdSupplier
         })
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 })
 
@@ -67,7 +70,10 @@ router.get('/store/:id', utility.authenticate, (req, res, next) => {
     }, { page: req.query.page, pageSize: req.query.size })).then(suppliers => {
         res.json(suppliers)
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 
@@ -81,7 +87,10 @@ router.get('/all/store/:id', utility.authenticate, (req, res, next) => {
     }).then(suppliers => {
         res.json(suppliers)
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 
@@ -108,7 +117,10 @@ router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
     }).then(countSuppliers => {
         res.json(countSuppliers)
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 
@@ -125,7 +137,10 @@ router.delete('/:id', utility.authenticate, (req, res, next) => {
         else
             res.status(500).json({ success: false, message: "Supplier not found" })
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 
@@ -140,7 +155,10 @@ router.get('/:id', utility.authenticate, (req, res, next) => {
         res.json(supplier)
 
     }).catch(err => {
-        res.status(500).json(err)
+        res.status(500).json({
+success:false,
+message:err.toString()
+})
     })
 });
 
