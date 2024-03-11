@@ -21,7 +21,7 @@ router.get('/store/:id/widgets', utility.authenticate, async (req, res, next) =>
         const operations = await Operation.findAll({
             where: {
                 [utility.Op.and]: [
-                    utility.Sequelize.where(utility.Sequelize.fn('date', utility.Sequelize.col('createdAt')), '=', utility.getSimpleDate(new Date()))
+                    utility.Sequelize.where(utility.Sequelize.fn('date', utility.Sequelize.col('date')), '=', utility.getSimpleDate(new Date()))
                 ],
                 creatorUserId: req.user.id
             }
@@ -93,6 +93,26 @@ router.delete('/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
+router.get('/bestSelling', utility.authenticate, (req, res, next) => {
+    Operation.findAll({
+        where: {
+            type:"SOLD",
+            creatorUserId: req.user.id
+        }, include: ['product']
+    }).then(operations => {
+        const products = []
+        operations.forEach(operation=>{
+            
+        })
+        res.json(operations)
+    }).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+});
+
 router.get('/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Product.findOne({
@@ -110,5 +130,7 @@ router.get('/:id', utility.authenticate, (req, res, next) => {
         })
     })
 });
+
+
 
 module.exports = router;

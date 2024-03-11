@@ -12,9 +12,9 @@ router.post('/create', utility.authenticate, (req, res) => {
         })
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 })
 
@@ -71,9 +71,9 @@ router.get('/store/:id', utility.authenticate, (req, res, next) => {
         res.json(suppliers)
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
@@ -88,9 +88,9 @@ router.get('/all/store/:id', utility.authenticate, (req, res, next) => {
         res.json(suppliers)
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
@@ -118,9 +118,9 @@ router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
         res.json(countSuppliers)
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
@@ -138,9 +138,9 @@ router.delete('/:id', utility.authenticate, (req, res, next) => {
             res.status(500).json({ success: false, message: "Supplier not found" })
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
@@ -156,9 +156,9 @@ router.get('/:id', utility.authenticate, (req, res, next) => {
 
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 

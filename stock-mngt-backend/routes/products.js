@@ -77,9 +77,13 @@ router.get('/store/:id/critical', utility.authenticate, (req, res, next) => {
             quantity: {
                 [utility.Op.lte]: 10
             }
-        }
+        },
+        limit: req.query.limit ? Number(req.query.limit) : null,
+        order: [
+            ['quantity', 'ASC']
+        ]
     }).then(products => {
-        res.json(products)
+        res.json([...products])
     }).catch(err => {
         res.status(500).json({
             success: false,

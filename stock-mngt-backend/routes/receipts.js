@@ -99,10 +99,14 @@ router.get('/store/:id/last', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     Receipt.findAll({
         where: {
-            store_id:id,
+
+            store_id: id,
             creatorUserId: req.user.id,
+            [utility.Op.and]: [
+                utility.Sequelize.where(utility.Sequelize.fn('date', utility.Sequelize.col('date')), '=', utility.getSimpleDate(new Date()))
+            ]
         },
-        limit: 5,
+        limit: req.query.limit ? Number(req.query.limit) : null,
         order: [
             ['date', 'DESC']
         ]
