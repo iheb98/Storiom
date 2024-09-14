@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node server.js",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -29,12 +29,13 @@
     "@ng-bootstrap/ng-bootstrap": "^14.0.1",
     "@ng-select/ng-select": "^7.4.0",
     "bootstrap": "^5.2.3",
+    "chart.js": "^3.5.1",
     "html-to-pdfmake": "^2.4.22",
     "html2pdf.js": "^0.10.1",
     "jspdf": "^2.5.1",
     "ngx-loading-x": "^1.0.3",
-    "ngx-print": "^1.2.1",
     "pdfmake": "^0.2.7",
+    "primeng": "^12.2.2",
     "rxjs": "~6.6.0",
     "sweetalert2": "^11.7.3",
     "tslib": "^2.3.0",
@@ -53,5 +54,9 @@
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
     "typescript": "~4.3.5"
+  },
+  "engines": {
+    "node": "12.15.0",
+    "npm": "6.13.4"
   }
 }
