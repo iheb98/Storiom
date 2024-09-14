@@ -1,10 +1,10 @@
 {
   "development": {
     "username": "root",
-    "password": null,
+    "password": "T0xcHOiuqxIrgQQMr2DaQAYwjYQhJh6b",
     "database": "fides",
-    "host": "127.0.0.1",
-    "dialect": "mysql",
+    "host": "crirg868ii6s73f9336g-a",
+    "dialect": "postgres",
     "timezone": "+00:00"
   },
   "test": {
