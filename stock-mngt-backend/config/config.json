@@ -2,23 +2,46 @@
   "development": {
     "username": "root",
     "password": "T0xcHOiuqxIrgQQMr2DaQAYwjYQhJh6b",
-    "database": "fides",
-    "host": "crirg868ii6s73f9336g-a",
+    "database": "fides_tnvm",
+    "host": "crirg868ii6s73f9336g-a.frankfurt-postgres.render.com",
     "dialect": "postgres",
-    "timezone": "+00:00"
+    "port":5432,
+    "timezone": "+00:00",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false 
+      }
+    }
   },
   "test": {
-    "username": "root",
-    "password": null,
-    "database": "database_test",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+   "username": "root",
+    "password": "T0xcHOiuqxIrgQQMr2DaQAYwjYQhJh6b",
+    "database": "fides_tnvm",
+    "host": "crirg868ii6s73f9336g-a.frankfurt-postgres.render.com",
+    "dialect": "postgres",
+    "port":5432,
+    "timezone": "+00:00",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false 
+      }
+    }
   },
   "production": {
     "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "password": "T0xcHOiuqxIrgQQMr2DaQAYwjYQhJh6b",
+    "database": "fides_tnvm",
+    "host": "crirg868ii6s73f9336g-a.frankfurt-postgres.render.com",
+    "dialect": "postgres",
+    "port":5432,
+    "timezone": "+00:00",
+    "dialectOptions": {
+      "ssl": {
+        "require": true,
+        "rejectUnauthorized": false 
+      }
+    }
   }
 }
