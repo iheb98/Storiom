@@ -78,22 +78,32 @@
                 <tbody>
                     <tr *ngFor="let receipt of receipts">
                         <td>{{receipt?.code}}</td>
-                        <td>{{receipt?.name ? receipt?.name : receipt?.supplier?.firstName +" "+
-                            receipt?.supplier?.lastName}}</td>
+                        <td>{{
+                            receipt?.name ? (receipt?.name ? receipt?.name : "") :
+                            ((receipt?.supplier?.firstName || receipt?.supplier?.lastName) ?
+                            (receipt?.supplier?.firstName ? receipt?.supplier?.firstName : "")
+                            + " " +
+                            (receipt?.supplier?.lastName ? receipt?.supplier?.lastName : "" )
+                            : "")
+                            }}</td>
                         <td>{{receipt?.total + ' DT'}}</td>
                         <td>{{receipt?.date | date:'shortDate'}}</td>
                         <td>
-                            <button class="action-button" (click)="viewReceipt(receipt)"><fa-icon
-                                    [icon]="faEye"></fa-icon></button>
+                            <button class="action-button" (click)="viewReceipt(receipt)">
+                                <fa-icon [icon]="faEye" style="color: #004F9F;"></fa-icon>
+                            </button>
                         </td>
                         <td>
-                            <button class="action-button" (click)="downloadAsPDF(receipt?.id)"><fa-icon
-                                    [icon]="pdfIcon"></fa-icon></button>
+                            <button class="action-button" (click)="downloadAsPDF(receipt?.id)">
+                                <fa-icon [icon]="pdfIcon" style="color: #871926;"></fa-icon>
+                            </button>
                         </td>
                         <td>
-                            <button class="action-button" (click)="deleteReceipt(receipt)"> <fa-icon
-                                    [icon]="faTrash"></fa-icon></button>
+                            <button class="action-button" (click)="deleteReceipt(receipt)">
+                                <fa-icon [icon]="faTrash" style="color: #DC3545;"></fa-icon>
+                            </button>
                         </td>
+
                     </tr>
                     <tr *ngIf="count == 0">
                         <td colspan="7" class="not-found-message">Pas de facture trouvé</td>

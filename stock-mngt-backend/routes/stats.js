@@ -3,6 +3,9 @@ const router = express.Router();
 const { Product, Operation, Credit } = require('../models');
 const utility = require('../utility');
 
+const sequelize = require('sequelize');
+const { Op } = require('sequelize');
+
 router.get('/store/:id/widgets', utility.authenticate, async (req, res, next) => {
     const id = req.params.id;
     try {
@@ -26,8 +29,6 @@ router.get('/store/:id/widgets', utility.authenticate, async (req, res, next) =>
                 creatorUserId: req.user.id
             }
         })
-        console.log(utility.getSimpleDate(new Date()))
-
         let totalValue = 0;
         let criticalStock = 0;
         let todayRevenue = 0;
@@ -93,17 +94,20 @@ router.delete('/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/bestSelling', utility.authenticate, (req, res, next) => {
+router.get('/store/:id/bestSelling', utility.authenticate, (req, res, next) => {
     Operation.findAll({
         where: {
-            type:"SOLD",
+            type: "SOLD",
             creatorUserId: req.user.id
-        }, include: ['product']
+        }, include: ['product'],
+        attributes: [
+            'product_id',
+            [sequelize.fn('SUM', sequelize.col('amount')), 'total_amount']
+        ],
+        group: ['product_id'],
+        order: [[sequelize.literal('total_amount'), 'DESC']],
     }).then(operations => {
-        const products = []
-        operations.forEach(operation=>{
-            
-        })
+
         res.json(operations)
     }).catch(err => {
         res.status(500).json({
@@ -111,6 +115,126 @@ router.get('/bestSelling', utility.authenticate, (req, res, next) => {
             message: err.toString()
         })
     })
+});
+
+router.get('/store/:id/mostProfitable', utility.authenticate, (req, res, next) => {
+    Operation.findAll({
+        where: {
+            type: "SOLD",
+            creatorUserId: req.user.id
+        }, include: ['product'],
+        attributes: [
+            'product_id',
+            [
+                sequelize.literal('(SUM((selling_price - buying_price) * amount))'),
+                'total_profit'
+            ]
+        ],
+        group: ['product_id'],
+        order: [[sequelize.literal('total_profit'), 'DESC']]
+    }).then(operations => {
+        res.json(operations)
+    }).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+});
+
+router.get('/store/:id/operationStats', utility.authenticate, (req, res, next) => {
+    const { type, value } = req.query;
+
+    let dateCondition = [];
+
+    if (type && value) {
+        switch (type) {
+            case 'ANNUALLY':
+                dateCondition.push(sequelize.where(sequelize.fn('YEAR', sequelize.col('date')), value));
+                break;
+            case 'MONTHLY':
+                const [year, month] = value.split('-');
+                dateCondition.push(sequelize.where(sequelize.fn('YEAR', sequelize.col('date')), year));
+                dateCondition.push(sequelize.where(sequelize.fn('MONTH', sequelize.col('date')), month));
+                break;
+            case 'DAILY':
+                const [y, m, d] = value.split('-');
+                dateCondition.push(sequelize.where(sequelize.fn('YEAR', sequelize.col('date')), y));
+                dateCondition.push(sequelize.where(sequelize.fn('MONTH', sequelize.col('date')), m));
+                dateCondition.push(sequelize.where(sequelize.fn('DAY', sequelize.col('date')), d));
+                break;
+            default:
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid type. Use "year", "month", or "day".'
+                });
+        }
+    }
+    Operation.findAll({
+        where: {
+            type: ["SOLD", "LOADED"],
+            creatorUserId: req.user.id,
+            ...(dateCondition.length > 0 && { [Op.and]: dateCondition })
+        },
+        include: ['product']
+    })
+        .then(operations => {
+            res.json(operations);
+        })
+        .catch(err => {
+            res.status(500).json({
+                success: false,
+                message: err.toString()
+            });
+        });
+});
+
+
+router.get('/store/:id/operationStats/product', utility.authenticate, (req, res, next) => {
+    const { type, value, product } = req.query;
+
+    let dateCondition = [];
+
+    if (type && value) {
+        switch (type) {
+            case 'ANNUALLY':
+                dateCondition.push(sequelize.where(sequelize.fn('YEAR', sequelize.col('date')), value));
+                break;
+            case 'MONTHLY':
+                const [year, month] = value.split('-');
+                dateCondition.push(sequelize.where(sequelize.fn('YEAR', sequelize.col('date')), year));
+                dateCondition.push(sequelize.where(sequelize.fn('MONTH', sequelize.col('date')), month));
+                break;
+            case 'DAILY':
+                const [y, m, d] = value.split('-');
+                dateCondition.push(sequelize.where(sequelize.fn('YEAR', sequelize.col('date')), y));
+                dateCondition.push(sequelize.where(sequelize.fn('MONTH', sequelize.col('date')), m));
+                dateCondition.push(sequelize.where(sequelize.fn('DAY', sequelize.col('date')), d));
+                break;
+            default:
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid type. Use "year", "month", or "day".'
+                });
+        }
+    }
+    Operation.findAll({
+        where: {
+            type: ["SOLD", "LOADED"],
+            creatorUserId: req.user.id,
+            product_id: product,
+            ...(dateCondition.length > 0 && { [Op.and]: dateCondition })
+        },
+    })
+        .then(operations => {
+            res.json(operations);
+        })
+        .catch(err => {
+            res.status(500).json({
+                success: false,
+                message: err.toString()
+            });
+        });
 });
 
 router.get('/:id', utility.authenticate, (req, res, next) => {

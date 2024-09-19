@@ -10,6 +10,8 @@ import * as pdfMake from "pdfmake/build/pdfmake";
 import * as pdfFonts from "pdfmake/build/vfs_fonts";
 import { faAngleDoubleLeft, faBackward, faFilePdf, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { LoadingService } from 'src/app/services/loading.service';
+import { AuthService } from 'src/app/services/auth.service';
+import { StoreService } from 'src/app/services/store.service';
 const htmlToPdfmake = require("html-to-pdfmake");
 (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
@@ -24,22 +26,34 @@ export class ReceiptViewComponent implements OnInit {
   pdfIcon = faFilePdf
   printIcon = faPrint
   backIcon = faAngleDoubleLeft
-
+  store;
   receiptId;
   receipt;
   constructor(
     private route: ActivatedRoute,
     private receiptService: ReceiptService,
+    private storeService: StoreService,
     private router: Router,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private authService: AuthService
   ) { }
 
 
   ngOnInit(): void {
     this.receiptId = this.route.snapshot.paramMap.get('id');
+    this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
+      response => {
+        this.store = response
+        console.log(this.store)
+
+      }
+    );
+
+
     this.loadingService.screenLoading()
     this.receiptService.getReceipt(this.receiptId).subscribe(response => {
       this.receipt = response
+      console.log(this.receipt)
       this.loadingService.screenLoaded()
     })
   }

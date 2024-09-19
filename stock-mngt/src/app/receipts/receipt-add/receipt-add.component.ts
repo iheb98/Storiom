@@ -102,7 +102,7 @@ export class ReceiptAddComponent implements OnInit {
   }
 
   create() {
-    if (this.form.valid && (this.form.get('name').value || this.form.get('supplierId').value)) {
+    if (this.form.valid) {
       if (this.form.get('type').value == 'SOLD')
         Swal.fire({
           title: 'Certains produits ont dépassé la quantité disponible, êtes vous sûr de continuer malgré ça ?',

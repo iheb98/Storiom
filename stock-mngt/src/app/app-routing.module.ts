@@ -23,6 +23,7 @@ import { CreditAddComponent } from './credits/credit-add/credit-add.component';
 import { ExpensesMngtComponent } from './expenses/expenses-mngt/expenses-mngt.component';
 import { ExpenseAddComponent } from './expenses/expense-add/expense-add.component';
 import { DashboardViewComponent } from './dashboard/dashboard-view/dashboard-view.component';
+import { MainComponent } from './market/main/main.component';
 
 const routes: Routes = [
 
@@ -79,6 +80,8 @@ const routes: Routes = [
   { path: 'receipts', component: ReceiptsMngtComponent },
   { path: 'receipts/add', component: ReceiptAddComponent },
   { path: 'receipts/view/:id', component: ReceiptViewComponent },
+
+  { path: 'market', component: MainComponent },
 
   // ------------ General ------------
   { path: 'login', component: LoginComponent, data: { loginPage: true }, canActivate: [AuthGuard] },

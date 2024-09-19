@@ -14,6 +14,7 @@ import * as html2pdf from 'html2pdf.js';
 
 import * as pdfMake from "pdfmake/build/pdfmake";
 import * as pdfFonts from "pdfmake/build/vfs_fonts";
+import { StoreService } from 'src/app/services/store.service';
 const htmlToPdfmake = require("html-to-pdfmake");
 (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
@@ -52,12 +53,17 @@ export class ReceiptsMngtComponent implements OnInit {
     private loadingService: LoadingService,
     private authService: AuthService,
     private receiptService: ReceiptService,
+    private storeService: StoreService,
     private router: Router,
     private http: HttpClient
   ) { }
 
   ngOnInit(): void {
-    this.store = this.authService.getConnectedUser()?.store
+    this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
+      response => {
+        this.store = response
+      }
+    )
     this.getSuppliers()
     this.getReceipts(0, 5);
     this.countReceipts();
@@ -196,165 +202,171 @@ export class ReceiptsMngtComponent implements OnInit {
       const content = `
       <head>
       <style>
-      td {
-        border-bottom: 2px solid #bbb;
-        border-left: 2px solid #bbb;
-        padding: 10px;
-    }
-    td:last-child {
-        border-right: 2px solid #bbb;
-        padding: 10px;
-    }
-    th {
-        border-top: 2px solid #bbb;
-        border-bottom: 2px solid #bbb;
-        border-left: 2px solid #bbb;
-        padding: 10px;
-    }
-    th:last-child {
-        border-right: 2px solid #bbb;
-        padding: 10px;
-    }
-    
-    th {
-        font-weight: normal;
-    }
-    
-    .center th {
-        text-align: center;
-        font-weight: bold;
-    }
-    
-    table {
-        width: 100%;
-        height: 100%;
-    }
+      body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.invoice-container {
+    max-width: 800px;
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #8b4caf8c;
+    padding-bottom: 20px;
+}
+
+.invoice-header img {
+    max-width: 150px;
+}
+
+.invoice-header h1 {
+    font-size: 24px;
+    color: #8b4caf8c;
+}
+
+.invoice-details {
+    margin: 20px 0;
+}
+
+.invoice-details div {
+    margin-bottom: 10px;
+}
+
+.invoice-details .details-label {
+    font-weight: bold;
+}
+
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.invoice-table th,
+.invoice-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.invoice-table th {
+    background-color: #8b4caf8c;
+    color: #fff;
+}
+
+.invoice-total {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.invoice-total div {
+    width: 200px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.invoice-footer {
+    text-align: center;
+    color: #888;
+    font-size: 12px;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+}
+
+.invoice-info {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.invoice-details {
+    width: 48%;
+}
+
+.store-contact {
+    width: 48%;
+    text-align: right;
+}
+
+.store-contact p {
+    margin: 2px 0;
+    font-size: 14px;
+    color: #555;
+}
+
       </style>
       </head>
       <div id="receiptSection" #receiptSection>
-      <div class="row">
-          <div class="col-6 p-3">
-  
-              <div class="row">
-                  <div class="col-12">
-                      ${receipt?.store?.name}
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="col-12">
-                      ${receipt?.store?.address?.street}
-  
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="col-12">
-                      ${receipt?.store?.address?.state + ' ' + receipt?.store?.address?.city}
-                  </div>
-  
-              </div>
-  
-          </div>
-  
-  
-          <div class="col-6 p-3">
-              <div class="row">
-                  <div class="col-12 col-md-3 store-info">
-                      Tel :
-                  </div>
-                  <div class="col-12 col-md-9 store-info">
-                      ${receipt?.store?.phone}
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="col-12 col-md-3 store-info">
-                      E-mail :
-                  </div>
-                  <div class="col-12 col-md-9 store-info">
-                      ${receipt?.store?.email}
-  
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="col-12 col-md-3 store-info">
-                      Site :
-                  </div>
-                  <div class="col-12 col-md-9 store-info">
-                      ${receipt?.store?.site}
-  
-                  </div>
-              </div>
-          </div>
-      </div>
-      <div class="row">
-          <div class="col-6 p-3">
-              <table>
-                  <tr>
-                      <th>
-                          Date ${receipt?.date}
-                      </th>
-                  </tr>
-                  <tr>
-                      <td>
-                          Facture ${receipt?.code}
-                      </td>
-                  </tr>
-              </table>
-          </div>
-          <div class="col-6 p-3">
-              <table>
-                  <tr>
-                      <th class="align-center">
-                          ${receipt?.type == 'LOADED' ? 'Fournisseur' : 'Client'}
-                      </th>
-                  </tr>
-                  <tr>
-                      <td>
-                          ${receipt?.name ? receipt?.name : receipt?.supplier?.firstName + " " +
-          receipt?.supplier?.lastName}
-  
-                      </td>
-                  </tr>
-              </table>
-          </div>
-      </div>
-      <div class="row">
-          <div class="col-12 p-3">
-              <table class="table table-responsive table-hover">
-                  <tr class="center">
-                      <th>Désignation</th>
-                      <th>Prix Unitaire</th>
-                      <th>Quantité</th>
-                      <th width="20%">Total</th>
-                  </tr>
-                  ${operations}
-              </table>
-          </div>
-      </div>
-      <div class="row">
-          <div class="col-12 p-3">
-              <table>
-                  <tr>
-                      <th>Total HT</th>
-                      <th width="20%">${receipt?.total - (receipt?.tva * receipt?.total / 100)}</th>
-                  </tr>
-                  <tr>
-                      <td>TVA ${receipt?.tva}</td>
-                      <td width="20%">${receipt?.tva * receipt?.total / 100}</td>
-                  </tr>
-              </table>
-          </div>
-      </div>
-      <div class="row">
-          <div class="col-12 p-3">
-              <table>
-                  <tr>
-                      <th>Total TTC</th>
-                      <th width="20%">${receipt?.total}</th>
-                  </tr>
-  
-              </table>
-          </div>
-      </div>
+      <div class="invoice-container">
+    <div class="invoice-header">
+        <div class="company-details">
+            <img src="https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
+                alt="Logo de la boutique">
+        </div>
+        <div class="invoice-title">
+            <h1>Facture</h1>
+        </div>
+    </div>
+
+    <div class="invoice-info">
+        <div class="invoice-details">
+            <div><span class="details-label">Numéro de la facture:</span> ${receipt?.code}</div>
+            <div><span class="details-label">Date:</span> ${receipt?.date}</div>
+            <div><span class="details-label">Nom du client:</span>
+                ${receipt?.name ? receipt?.name : receipt?.supplier?.firstName + " " + receipt?.supplier?.lastName}
+            </div>
+        </div>
+
+        <div class="store-contact">
+            <p><strong>${this.store?.name}</strong></p>
+            <p> Addresse: ${receipt?.store?.address?.state + ' ' + receipt?.store?.address?.city} </p>
+            <p>Email: ${this.store?.email}</p>
+            <p>téléphone: ${this.store?.phone}</p>
+        </div>
+    </div>
+
+    <table class="invoice-table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Quantité</th>
+                <th>Prix Unité</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${operations}
+        </tbody>
+    </table>
+
+    <div class="invoice-total">
+        <div>
+            <div>Subtotal:</div>
+            <div>${receipt?.total - (receipt?.tva * receipt?.total / 100) + " DT"}</div>
+        </div>
+        <div>
+            <div>Tax ${receipt?.tva}%:</div>
+            <div>${receipt?.tva * receipt?.total / 100 + " DT"}</div>
+        </div>
+        <div>
+            <div>Total:</div>
+            <div>${receipt?.total + " DT"}</div>
+        </div>
+    </div>
+</div>
   </div>`;
       const options = {
         margin: [10, 20, 10, 20],

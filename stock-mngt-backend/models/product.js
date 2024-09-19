@@ -47,7 +47,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     size: DataTypes.STRING,
     images: DataTypes.STRING(5000),
-    quantity: DataTypes.INTEGER,
+    quantity: DataTypes.FLOAT,
+    unit: {
+      type: DataTypes.STRING,
+      defaultValue: 'PIECE'
+    },
     storeId: {
       type: DataTypes.INTEGER,
       field: 'store_id'
@@ -66,6 +70,12 @@ module.exports = (sequelize, DataTypes) => {
     },
     creatorUserId: {
       type: DataTypes.INTEGER
+    },
+    isVisible: {
+      type: DataTypes.BOOLEAN
+    },
+    toDisplay: {
+      type: DataTypes.BOOLEAN
     },
   }, {
     sequelize,

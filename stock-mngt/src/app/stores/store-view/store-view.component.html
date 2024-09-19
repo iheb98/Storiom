@@ -1,73 +1,75 @@
-<div class="" *ngIf="store">
+<div *ngIf="store" class="store-details">
+    <!-- Modifier Button -->
     <div class="row">
-
-        <div class="col-12 -col-sm-12 col-md-12 col-lg-12 align-right">
-            <button class="btn btn-primary" [routerLink]="['/stores/'+store?.id]" routerLinkActive="router-link-active" >Modifier</button>
+        <div class="col-12 text-right">
+            <button class="btn btn-primary" [routerLink]="['/stores/'+store?.id]" routerLinkActive="router-link-active">
+                Modifier
+            </button>
         </div>
-
     </div>
-    <div class="row">
 
-        <div class="col-12 -col-sm-12 col-md-12 col-lg-12 align-center">
+    <!-- Store Logo -->
+    <div class="row justify-content-center">
+        <div class="col-6 col-md-4 text-center">
             <div class="image-container">
-                <img src="{{store?.logo ? 'http://localhost:3000/images/'+store?.logo  : 'assets/storeIcon.png'}}"
-                    class="image" style="width: 20%;">
+                <img [src]="store?.logo ? 'http://localhost:3000/images/'+store?.logo : 'assets/storeIcon.png'" class="image">
             </div>
         </div>
-
     </div>
-    <div class="row info-bloc" >
-        <div class="col-12 -col-sm-12 col-md-12 col-lg-12">
+
+    <!-- General Information -->
+    <div class="row info-bloc">
+        <div class="col-12">
             <span class="info-bloc-title">Informations générales :</span>
         </div>
-        <div class="col-12 -col-sm-12 col-md-12 col-lg-12">
-            <span class="subtitle">Nom du boutique : </span> <span class="name">{{store?.name}}</span>
+        <div class="col-12">
+            <span class="subtitle">Nom du boutique : </span>
+            <span class="name">{{store?.name || 'N/A'}}</span>
         </div>
-
-        <div class="col-12 -col-sm-12 col-md-12 col-lg-12">
-            <span class="subtitle">Téléphone : </span> <span class="name">{{store?.phone}}</span>
+        <div class="col-12">
+            <span class="subtitle">Téléphone : </span>
+            <span class="name">{{store?.phone || 'N/A'}}</span>
         </div>
-
-        <div class="col-12 -col-sm-12 col-md-12 col-lg-12">
-            <span class="subtitle">Email : </span> <span class="name">{{store?.email}}</span>
+        <div class="col-12">
+            <span class="subtitle">Email : </span>
+            <span class="name">{{store?.email || 'N/A'}}</span>
         </div>
-
-        <div class="col-12 -col-sm-12 col-md-12 col-lg-12">
-            <span class="subtitle">Site web : </span> <span class="name">{{store?.site}}</span>
+        <div class="col-12">
+            <span class="subtitle">Site web : </span>
+            <span class="name"><a [href]="store?.site" target="_blank">{{store?.site || 'N/A'}}</a></span>
         </div>
     </div>
+
+    <!-- Store Address -->
     <div class="row info-bloc">
-        <div class="col-12 -col-sm-12 col-md-12 col-lg-12">
+        <div class="col-12">
             <span class="info-bloc-title">Adresse de la boutique :</span>
         </div>
-        <div class="col-12 -col-sm-12 col-md-12 col-lg-12">
-            <span class="subtitle">Rue : </span> <span class="name">{{store?.address?.street}}</span>
+        <div class="col-12">
+            <span class="subtitle">Rue : </span>
+            <span class="name">{{store?.address?.street || 'N/A'}}</span>
         </div>
-
-        <div class="col-12 -col-sm-12 col-md-12 col-lg-12">
-            <span class="subtitle">Cité : </span> <span class="name">{{store?.address?.city}}</span>
+        <div class="col-12">
+            <span class="subtitle">Cité : </span>
+            <span class="name">{{store?.address?.city || 'N/A'}}</span>
         </div>
-
-
-        <div class="col-12 -col-sm-12 col-md-12 col-lg-12">
-            <span class="subtitle">Code Postale : </span> <span class="name">{{store?.address?.postalCode}}</span>
+        <div class="col-12">
+            <span class="subtitle">Code Postale : </span>
+            <span class="name">{{store?.address?.postalCode || 'N/A'}}</span>
         </div>
-
-        <div class="col-12 -col-sm-12 col-md-12 col-lg-12">
-            <span class="subtitle">Etat : </span> <span class="name">{{store?.address?.state}}</span>
+        <div class="col-12">
+            <span class="subtitle">Etat : </span>
+            <span class="name">{{store?.address?.state || 'N/A'}}</span>
         </div>
-
-
-
-
-
     </div>
+
+    <!-- Store Description -->
     <div class="row info-bloc">
-        <div class="col-12 -col-sm-12 col-md-12 col-lg-12">
-            <span class="info-bloc-title">Description : </span>
+        <div class="col-12">
+            <span class="info-bloc-title">Description :</span>
         </div>
-        <div class="col-12 -col-sm-12 col-md-12 col-lg-12">
-            <span class="name">{{store?.description}}</span>
+        <div class="col-12">
+            <span class="name">{{store?.description || 'Aucune description disponible'}}</span>
         </div>
     </div>
 </div>

@@ -40,7 +40,6 @@ import { ReceiptsMngtComponent } from './receipts/receipts-mngt/receipts-mngt.co
 import { ReceiptAddComponent } from './receipts/receipt-add/receipt-add.component';
 import { ProductsSearchReceiptComponent } from './products/products-search-receipt/products-search-receipt.component';
 import { ReceiptViewComponent } from './receipts/receipt-view/receipt-view.component';
-import { NgxPrintModule } from 'ngx-print';
 import { WorkersMngtComponent } from './workers/workers-mngt/workers-mngt.component';
 import { WorkerAddComponent } from './workers/worker-add/worker-add.component';
 import { CreditsMngtComponent } from './credits/credits-mngt/credits-mngt.component';
@@ -50,7 +49,16 @@ import { ExpenseAddComponent } from './expenses/expense-add/expense-add.componen
 import { DashboardViewComponent } from './dashboard/dashboard-view/dashboard-view.component';
 import { ReceiptResultTableComponent } from './dashboard/receipt-result-table/receipt-result-table.component';
 import { ProductResultTableComponent } from './dashboard/product-result-table/product-result-table.component';
-
+import { MostSoldProductsComponent } from './dashboard/most-sold-products/most-sold-products.component';
+import { MostProfitableProductsComponent } from './dashboard/most-profitable-products/most-profitable-products.component';
+import { ChartModule } from 'primeng/chart';
+import { OperationStatsComponent } from './dashboard/operation-stats/operation-stats.component';
+import { HeaderComponent } from './market/header/header.component';
+import { FooterComponent } from './market/footer/footer.component';
+import { SidenavComponent } from './market/sidenav/sidenav.component';
+import { ProductListComponent } from './market/product-list/product-list.component';
+import { ProductCardComponent } from './market/product-card/product-card.component';
+import { MainComponent } from './market/main/main.component';
 
 
 @NgModule({
@@ -84,7 +92,16 @@ import { ProductResultTableComponent } from './dashboard/product-result-table/pr
     ExpenseAddComponent,
     DashboardViewComponent,
     ReceiptResultTableComponent,
-    ProductResultTableComponent
+    ProductResultTableComponent,
+    MostSoldProductsComponent,
+    MostProfitableProductsComponent,
+    OperationStatsComponent,
+    HeaderComponent,
+    FooterComponent,
+    SidenavComponent,
+    ProductListComponent,
+    ProductCardComponent,
+    MainComponent
   ],
   imports: [
     BrowserModule,
@@ -98,7 +115,6 @@ import { ProductResultTableComponent } from './dashboard/product-result-table/pr
     MatDialogModule,
     MatFormFieldModule,
     NgxMatFileInputModule,
-    NgxPrintModule,
     MatInputModule,
     MatPaginatorModule,
     NgSelectModule,
@@ -106,6 +122,7 @@ import { ProductResultTableComponent } from './dashboard/product-result-table/pr
     FormsModule,
     ReactiveFormsModule,
     FontAwesomeModule,
+    ChartModule,
     HttpClientModule
   ],
   providers: [{

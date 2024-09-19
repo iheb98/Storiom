@@ -34,7 +34,7 @@
                     </div>
                 </div>
 
-                <div class="mb-3 row" *ngIf="form.get('type').value == 'SOLD' || form.get('type').value == 'RETURNED'">
+                <!--<div class="mb-3 row" *ngIf="form.get('type').value == 'SOLD' || form.get('type').value == 'RETURNED'">
                     <label for="name" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Le nom du client <span
                             class="form-error">*</span></label>
                     <div class="col-12 col-sm-12 col-md-9 col-lg-9">
@@ -42,14 +42,32 @@
                             [ngClass]="{'invalid':(form.get('type').value == 'SOLD' || form.get('type').value == 'RETURNED')  && form.get('name').value == null && validated}"
                             id="name" formControlName="name">
                     </div>
+                </div>-->
+                <div class="mb-3 row" *ngIf="form.get('type').value == 'SOLD' || form.get('type').value == 'RETURNED'">
+                    <label for="name" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Le nom du client</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <input type="text" class="form-control" id="name" formControlName="name">
+                    </div>
                 </div>
 
-                <div class="mb-3 row" *ngIf="form.get('type').value == 'LOADED'">
+                <!--<div class="mb-3 row" *ngIf="form.get('type').value == 'LOADED'">
                     <label for="supplier" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Fournisseur <span
                             class="form-error">*</span></label>
                     <div class="col-12 col-sm-12 col-md-9 col-lg-9">
                         <ng-select formControlName="supplierId"
                             [ngClass]="{'invalid': form.get('type').value == 'LOADED' && form.get('supplierId').value == null && validated}"
+                            name="supplier" id="supplier">
+                            <ng-option *ngFor="let element of suppliers" [value]="element?.id">{{element.firstName + ' '
+                                +
+                                element.lastName}}</ng-option>
+                        </ng-select>
+                    </div>
+                </div>-->
+
+                <div class="mb-3 row" *ngIf="form.get('type').value == 'LOADED'">
+                    <label for="supplier" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Fournisseur</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <ng-select formControlName="supplierId"
                             name="supplier" id="supplier">
                             <ng-option *ngFor="let element of suppliers" [value]="element?.id">{{element.firstName + ' '
                                 +

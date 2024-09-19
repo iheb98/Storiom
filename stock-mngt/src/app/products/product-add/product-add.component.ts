@@ -129,6 +129,7 @@ export class ProductAddComponent implements OnInit {
       supplierId: [null],
       brandId: [null],
       quantity: [''],
+      unit:[''],
       size: [''],
       color: [null],
       description: [''],

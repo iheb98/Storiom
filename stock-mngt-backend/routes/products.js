@@ -5,8 +5,8 @@ const utility = require('../utility');
 
 
 router.post('/create', utility.authenticate, (req, res) => {
-    const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, quantity, storeId, supplierId, categoryId, brandId } = req.body
-    Product.create({ name, code, buyingPrice, sellingPrice, currency, color, size, description, images: JSON.stringify(images), quantity, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id }).then(createdProduct => {
+    const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, quantity, unit, storeId, supplierId, categoryId, brandId } = req.body
+    Product.create({ name, code, buyingPrice, sellingPrice, currency, color, size, description, images: JSON.stringify(images), quantity, unit, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id }).then(createdProduct => {
         res.json({
             product: createdProduct
         })
@@ -17,7 +17,7 @@ router.post('/create', utility.authenticate, (req, res) => {
 })
 
 router.put('/edit', utility.authenticate, (req, res) => {
-    const { id, name, color, quantity, images, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId } = req.body
+    const { id, name, color, quantity, unit, images, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId } = req.body
     Product.findOne(
         {
             where: {
@@ -30,6 +30,7 @@ router.put('/edit', utility.authenticate, (req, res) => {
         product.color = color
         product.images = JSON.stringify(images)
         product.quantity = quantity
+        product.unit = unit
         product.supplierId = supplierId
         product.categoryId = categoryId
         product.brandId = brandId

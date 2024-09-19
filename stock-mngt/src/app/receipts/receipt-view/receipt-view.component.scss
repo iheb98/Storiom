@@ -1,37 +1,104 @@
-td {
-    border-bottom: 2px solid #bbb;
-    border-left: 2px solid #bbb;
-    padding: 10px;
-}
-td:last-child {
-    border-right: 2px solid #bbb;
-    padding: 10px;
-}
-th {
-    border-top: 2px solid #bbb;
-    border-bottom: 2px solid #bbb;
-    border-left: 2px solid #bbb;
-    padding: 10px;
-}
-th:last-child {
-    border-right: 2px solid #bbb;
-    padding: 10px;
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
 }
 
-th{
-    font-weight: normal;
+.invoice-container {
+    max-width: 800px;
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.center th {
-    text-align: center;
+.invoice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #8b4caf8c;
+    padding-bottom: 20px;
+}
+
+.invoice-header img {
+    max-width: 150px;
+}
+
+.invoice-header h1 {
+    font-size: 24px;
+    color: #8b4caf8c;
+}
+
+.invoice-details {
+    margin: 20px 0;
+}
+
+.invoice-details div {
+    margin-bottom: 10px;
+}
+
+.invoice-details .details-label {
     font-weight: bold;
 }
 
-table {
+.invoice-table {
     width: 100%;
-    height: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
 }
 
-.store-info {
-    //font-size: 15px !important;
+.invoice-table th,
+.invoice-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.invoice-table th {
+    background-color: #8b4caf8c;
+    color: #fff;
+}
+
+.invoice-total {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.invoice-total div {
+    width: 200px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.invoice-footer {
+    text-align: center;
+    color: #888;
+    font-size: 12px;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+}
+
+.invoice-info {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.invoice-details {
+    width: 48%;
+}
+
+.store-contact {
+    width: 48%;
+    text-align: right;
+}
+
+.store-contact p {
+    margin: 2px 0;
+    font-size: 14px;
+    color: #555;
 }

@@ -145,16 +145,22 @@ mat-sidenav {
 mat-list-item a,
 mat-list-item button {
     width: 100%;
-    font-size: 25px;
+    font-size: 1.2rem;
 }
 
 mat-list-item {
-    margin-bottom: 20px;
+    //margin-bottom: 20px;
 }
 .mat-focus-indicator.mat-button.mat-button-base {
     text-align: left !important;
     color: #3b3b3b;
 }
+
+.custom-toolbar {
+    background-color: #004F9F;
+    color: white; /* Optional: Set text color for contrast */
+  }
+  
 
 
 mat-toolbar {

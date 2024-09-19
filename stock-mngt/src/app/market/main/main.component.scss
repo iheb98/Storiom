@@ -1,0 +1,73 @@
+.top-bar {
+    background-color: #1c1c1c;
+    color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+  }
+  
+  .contact-info span,
+  .account-info span {
+    margin-right: 20px;
+  }
+  
+  .navbar {
+    background-color: #111;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+  }
+  
+  .logo a {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .search-bar {
+    display: flex;
+    align-items: center;
+    width: 50%;
+  }
+  
+  .category-dropdown {
+    padding: 10px;
+    margin-right: 10px;
+  }
+  
+  .search-bar input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    outline: none;
+  }
+  
+  .search-bar button {
+    background-color: red;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .nav-icons a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-icons span {
+    margin-right: 5px;
+  }
+  
+  .nav-icons a:hover {
+    text-decoration: underline;
+  }
+  

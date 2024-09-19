@@ -1,0 +1,27 @@
+<div class="row">
+    <div class="col-12 col-md-3">
+        <select class="form-control" [(ngModel)]="selectedDateType" (change)="getOperationStats()">
+            <option *ngFor="let type of typesOfDate" [value]="type">{{type}}</option>
+        </select>
+    </div>
+    <div class="col-12 col-md-9">
+        <input *ngIf="selectedDateType=='DAILY'" class="form-control" type="date" id="day" name="day"
+            [(ngModel)]="dayFilter" (change)="getOperationStats()">
+
+        <input *ngIf="selectedDateType=='WEEKLY'" class="form-control" type="week" id="week" name="week"
+            [(ngModel)]="weekFilter" (change)="getOperationStats()">
+
+        <input *ngIf="selectedDateType=='MONTHLY'" class="form-control" type="month" id="month" name="month"
+            [(ngModel)]="monthFilter" (change)="getOperationStats()">
+
+        <select class="form-control" *ngIf="selectedDateType=='ANNUALLY'" [(ngModel)]="yearFilter"
+            (change)="getOperationStats()">
+            <option *ngFor="let year of years" [value]="year">{{year}}</option>
+        </select>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 col-md-12">
+        <p-chart type="bar" [data]="operationsData" [options]="operationsOptions"></p-chart>
+    </div>
+</div>
