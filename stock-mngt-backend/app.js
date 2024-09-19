@@ -21,7 +21,7 @@ const upload = multer({ storage })
 require('dotenv/config');
 
 // **************************************** CORS ****************************************
-var allowedDomains = ['http://localhost:4200'];
+var allowedDomains = ['http://localhost:4200','https://stock-management-backend-1fl0.onrender.com'];
 
 /*
 var corsOptions = {
