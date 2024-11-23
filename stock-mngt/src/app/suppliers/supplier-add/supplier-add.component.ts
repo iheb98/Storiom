@@ -38,14 +38,15 @@ export class SupplierAddComponent implements OnInit {
           this.form.get('phone').setValue(response.phone)
           this.form.get('email').setValue(response.email)
           this.form.get('credit').setValue(response.credit)
+          this.form.get('description').setValue(response.description)
         })
     })
   }
 
   initForm() {
     this.form = this.formBuilder.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
+      firstName: [''],
+      lastName: [''],
       email: ['', [Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
       phone: [''],
       credit: [''],
@@ -56,8 +57,8 @@ export class SupplierAddComponent implements OnInit {
   create() {
     this.submitted = true;
     this.emailError = false;
-    this.loading = true;
     if (this.form.valid) {
+      this.loading = true;
       this.supplierService.addSupplier({ ...this.form.getRawValue(), storeId: this.user?.store })
         .subscribe(response => {
           this.loading = false;
@@ -72,7 +73,7 @@ export class SupplierAddComponent implements OnInit {
           this.loading = false;
           Swal.fire({
             icon: 'error',
-            title: 'Un erreur est survenue ! Merci de réessayer plus tard',
+            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
             showConfirmButton: false,
             timer: 1500
           })
@@ -83,8 +84,8 @@ export class SupplierAddComponent implements OnInit {
   edit() {
     this.submitted = true;
     this.emailError = false;
-    this.loading = true;
     if (this.form.valid) {
+      this.loading = true;
       this.supplierService.updateSupplier({ ...this.form.getRawValue(), id: this.supplierId })
         .subscribe(response => {
           this.loading = false;
@@ -99,7 +100,7 @@ export class SupplierAddComponent implements OnInit {
           this.loading = false;
           Swal.fire({
             icon: 'error',
-            title: 'Un erreur est survenue ! Merci de réessayer plus tard',
+            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
             showConfirmButton: false,
             timer: 1500
           })

@@ -8,37 +8,42 @@
         </div>
     </div>
 
-    <!-- Store Logo -->
-    <div class="row justify-content-center">
-        <div class="col-6 col-md-4 text-center">
-            <div class="image-container">
-                <img [src]="store?.logo ? 'http://localhost:3000/images/'+store?.logo : 'assets/storeIcon.png'" class="image">
-            </div>
-        </div>
-    </div>
 
     <!-- General Information -->
     <div class="row info-bloc">
-        <div class="col-12">
-            <span class="info-bloc-title">Informations générales :</span>
+        <div class="col-12 col-md-10">
+            <div class="row">
+                <div class="col-12">
+                    <span class="info-bloc-title">Informations générales :</span>
+                </div>
+                <div class="col-12">
+                    <span class="subtitle">Nom du boutique : </span>
+                    <span class="name">{{store?.name || 'N/A'}}</span>
+                </div>
+                <div class="col-12">
+                    <span class="subtitle">Téléphone : </span>
+                    <span class="name">{{store?.phone || 'N/A'}}</span>
+                </div>
+                <div class="col-12">
+                    <span class="subtitle">Email : </span>
+                    <span class="name">{{store?.email || 'N/A'}}</span>
+                </div>
+                <div class="col-12">
+                    <span class="subtitle">Site web : </span>
+                    <span class="name"><a [href]="'http://www.google.com'" target="_blank">{{store?.site || 'N/A'}}</a></span>
+                </div>
+            </div>
         </div>
-        <div class="col-12">
-            <span class="subtitle">Nom du boutique : </span>
-            <span class="name">{{store?.name || 'N/A'}}</span>
-        </div>
-        <div class="col-12">
-            <span class="subtitle">Téléphone : </span>
-            <span class="name">{{store?.phone || 'N/A'}}</span>
-        </div>
-        <div class="col-12">
-            <span class="subtitle">Email : </span>
-            <span class="name">{{store?.email || 'N/A'}}</span>
-        </div>
-        <div class="col-12">
-            <span class="subtitle">Site web : </span>
-            <span class="name"><a [href]="store?.site" target="_blank">{{store?.site || 'N/A'}}</a></span>
+        <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
+            <div class="image-container">
+                <img [src]="store?.logo ? 'http://localhost:3000/images/' + store?.logo : 'assets/storeIcon.png'" 
+                     alt="Store Logo" class="image img-fluid rounded-circle" 
+                     style="border: 1px solid lightgray; max-width: 100%; height: auto;">
+            </div>
         </div>
     </div>
+    
+    
 
     <!-- Store Address -->
     <div class="row info-bloc">

@@ -17,7 +17,7 @@ export class OperationStatsComponent implements OnInit {
   operationsLabels: any = [];
   operationsOptions: any;
 
-  operations: any;
+  operations: any = [];
   typesOfDate = ["DAILY", "WEEKLY", "MONTHLY", "ANNUALLY"]
   selectedDateType = 'MONTHLY'
 
@@ -210,6 +210,7 @@ export class OperationStatsComponent implements OnInit {
     this.statService.getOperationStats(this.user.id, this.selectedDateType, filterValue).subscribe(
       response => {
         this.operations = response;
+        console.log(this.operations)
         if (this.selectedDateType == "DAILY") {
           this.getDaily();
         } else if (this.selectedDateType == "ANNUALLY") {

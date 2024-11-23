@@ -59,6 +59,7 @@ import { SidenavComponent } from './market/sidenav/sidenav.component';
 import { ProductListComponent } from './market/product-list/product-list.component';
 import { ProductCardComponent } from './market/product-card/product-card.component';
 import { MainComponent } from './market/main/main.component';
+import { CategoryStatsComponent } from './dashboard/category-stats/category-stats.component';
 
 
 @NgModule({
@@ -101,7 +102,8 @@ import { MainComponent } from './market/main/main.component';
     SidenavComponent,
     ProductListComponent,
     ProductCardComponent,
-    MainComponent
+    MainComponent,
+    CategoryStatsComponent
   ],
   imports: [
     BrowserModule,

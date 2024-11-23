@@ -1,18 +1,11 @@
 {
   "development": {
     "username": "root",
-    "password": "T0xcHOiuqxIrgQQMr2DaQAYwjYQhJh6b",
-    "database": "fides_tnvm",
-    "host": "crirg868ii6s73f9336g-a.frankfurt-postgres.render.com",
-    "dialect": "postgres",
-    "port":5432,
-    "timezone": "+00:00",
-    "dialectOptions": {
-      "ssl": {
-        "require": true,
-        "rejectUnauthorized": false 
-      }
-    }
+    "password": "",
+    "database": "fides",
+    "host": "localhost",
+    "dialect": "mysql",
+    "timezone": "+00:00"
   },
   "test": {
    "username": "root",

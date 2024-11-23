@@ -10,7 +10,7 @@ import { ReceiptService } from 'src/app/services/receipt.service';
 })
 export class ReceiptResultTableComponent implements OnInit {
   user;
-  receipts
+  receipts = []
   constructor(
     private receiptService: ReceiptService,
     private productService: ProductService,

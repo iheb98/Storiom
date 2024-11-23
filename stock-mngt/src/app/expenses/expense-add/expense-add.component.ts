@@ -34,13 +34,24 @@ export class ExpenseAddComponent implements OnInit {
     this.user = this.authService.getConnectedUser();
     this.route.paramMap.subscribe(paramMap => {
       this.expenseId = paramMap.get('id');
-      if (this.expenseId)
+      if (this.expenseId) {
+        this.loading = true;
         this.expenseService.getExpense(this.expenseId).subscribe(response => {
+          this.loading = false;
           this.form.get('title').setValue(response.title)
           this.form.get('amount').setValue(response.amount)
           this.form.get('comment').setValue(response.comment)
           this.form.get('date').setValue(response.date.substring(0, 10))
+        }, error => {
+          this.loading = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+            showConfirmButton: false,
+            timer: 1500
+          })
         })
+      }
     })
   }
 
@@ -72,7 +83,7 @@ export class ExpenseAddComponent implements OnInit {
           this.loading = false;
           Swal.fire({
             icon: 'error',
-            title: 'Un erreur est survenue ! Merci de réessayer plus tard',
+            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
             showConfirmButton: false,
             timer: 1500
           })
@@ -99,7 +110,7 @@ export class ExpenseAddComponent implements OnInit {
           this.loading = false;
           Swal.fire({
             icon: 'error',
-            title: 'Un erreur est survenue ! Merci de réessayer plus tard',
+            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
             showConfirmButton: false,
             timer: 1500
           })

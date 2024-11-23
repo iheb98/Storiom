@@ -25,8 +25,7 @@ module.exports = (sequelize, DataTypes) => {
   Product.init({
     name: DataTypes.STRING,
     code: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4
+      type: DataTypes.STRING
     },
     buyingPrice: {
       type: DataTypes.FLOAT,

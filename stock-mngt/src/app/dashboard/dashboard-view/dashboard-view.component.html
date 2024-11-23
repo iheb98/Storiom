@@ -17,7 +17,7 @@
                         Valeur du stock
                     </div>
                     <div class="value">
-                        {{widgets?.totalValue+ ' DT' }}
+                        {{widgets?.totalValue ? widgets?.totalValue + ' DT': '--'  }}
                     </div>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                         Stock Critique
                     </div>
                     <div class="value">
-                        {{widgets?.criticalStock }}
+                        {{widgets?.criticalStock ? widgets?.criticalStock : '--' }}
 
                     </div>
                 </div>
@@ -52,7 +52,7 @@
                         Ventes du Jour
                     </div>
                     <div class="value">
-                        {{widgets?.todayRevenue+ ' DT' }}
+                        {{widgets?.todayRevenue ? widgets?.todayRevenue + ' DT' : '--' }}
 
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                     <div class="label">
                         Total des crédits </div>
                     <div class="value">
-                        {{widgets?.totalCredits+ ' DT' }}
+                        {{widgets?.totalCredits ? widgets?.totalCredits + ' DT' : '--' }}
 
                     </div>
                 </div>
@@ -77,7 +77,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-6 fixed-height">
             <div class="row">
                 <div class="col-12">
                     <span class="subtitle">Dernieres Factures</span>
@@ -88,7 +88,7 @@
             </div>
         </div>
 
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-6 fixed-height">
             <div class="row">
                 <div class="col-12">
                     <span class="subtitle">Produits avec stock ciritque</span>
@@ -100,7 +100,7 @@
         </div>
 
         <div class="row">
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-6 fixed-height">
                 <div class="row">
                     <div class="col-12">
                         <span class="subtitle">Produits les plus vendues</span>
@@ -108,7 +108,7 @@
                     <app-most-sold-products></app-most-sold-products>
                 </div>
             </div>
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-6 fixed-height">
                 <div class="row">
                     <div class="col-12">
                         <span class="subtitle">Produits les plus profitable</span>
@@ -118,9 +118,20 @@
             </div>
         </div>
 
-        <div class="row">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3>Statistiques sur les operations</h3>
+            </div>
             <div class="col-12 col-md-12">
                 <app-operation-stats></app-operation-stats>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3>Statistiques sur les catégories</h3>
+            </div>
+            <div class="col-12 col-md-12">
+                <app-category-stats></app-category-stats>
             </div>
         </div>
     </div>

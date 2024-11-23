@@ -91,6 +91,14 @@ export class ExpensesMngtComponent implements OnInit {
     }).subscribe(response => {
       this.loading = false;
       this.expenses = response;
+    }, error => {
+      this.loading = false;
+      Swal.fire({
+        icon: 'error',
+        title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+        showConfirmButton: false,
+        timer: 1500
+      })
     });
   }
 
@@ -101,6 +109,14 @@ export class ExpensesMngtComponent implements OnInit {
     }).subscribe(response => {
       this.loading = false;
       this.count = response;
+    }, error => {
+      this.loading = false;
+      Swal.fire({
+        icon: 'error',
+        title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+        showConfirmButton: false,
+        timer: 1500
+      })
     })
   }
 
@@ -122,6 +138,14 @@ export class ExpensesMngtComponent implements OnInit {
             timer: 1500
           })
           this.getExpenses(this.currentPage, this.currentSize)
+        }, error => {
+          this.loading = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+            showConfirmButton: false,
+            timer: 1500
+          })
         })
       }
     })

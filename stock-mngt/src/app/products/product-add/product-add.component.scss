@@ -44,7 +44,7 @@ textarea {
 
   
 .delete-button:hover{
-  box-shadow: 0px 0px 20px red;
+  box-shadow: 0px 0px 10px red;
 }
 
 .delete-button fa-icon {
@@ -53,4 +53,46 @@ textarea {
 
 .images-bloc{
   margin-bottom:20px
+}
+
+.screen-title {
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.link-primary, .link-secondary {
+  padding: 5px 10px;
+  border-radius: 4px;
+  background-color: #007bff; /* for primary link */
+  color: white;
+}
+
+.link-secondary {
+  background-color: #6c757d; /* for secondary link */
+}
+
+.link-primary:hover, .link-secondary:hover {
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.link-no-background {
+  color: #007bff; /* Blue text color for the links */
+  padding: 0;
+  background-color: transparent; /* No background */
+  font-size: 16px;
+  font-weight: 500; /* Optional: to make the text look a bit bold */
+  cursor: pointer; /* Hand cursor */
+}
+
+.link-no-background:hover {
+  text-decoration: underline; /* Underline on hover to indicate a clickable link */
+  opacity: 0.8; /* Slightly dim the link on hover */
+  cursor: pointer; /* Hand cursor on hover */
+}
+
+.link-no-background .fa-icon {
+  margin-right: 5px;
 }

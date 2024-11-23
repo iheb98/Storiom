@@ -4,7 +4,9 @@
             <button class="btn btn-primary" (click)="navigateTo('/products')">Gestions des Produits</button>
         </div>
         <div class="col-auto">
-            <button class="btn btn-secondary" (click)="navigateTo('/products/edit/'+product?.id)">Modifier</button>
+            <button class="btn btn-secondary" (click)="navigateTo('/products/edit/'+product?.id)">
+                <fa-icon [icon]="faEdit"></fa-icon>
+                Modifier</button>
         </div>
     </div>
     <div class="row product-name">
@@ -38,18 +40,6 @@
             </p>
         </div>
         <div class="col-6">
-            <label>Couleur :</label>
-            <p>
-                {{product?.color ? product?.color : "--"}}
-            </p>
-        </div>
-        <div class="col-6">
-            <label>Taille :</label>
-            <p>
-                {{product?.size ? product?.size : "--"}}
-            </p>
-        </div>
-        <div class="col-6">
             <label>Quantité disponible :</label>
             <p>
                 {{product?.quantity ? product?.quantity : "--"}}
@@ -58,13 +48,13 @@
         <div class="col-6">
             <label>Prix d'achat :</label>
             <p>
-                {{product?.buyingPrice ? (product?.buyingPrice + " " + (product?.currency ? product?.currency : "")) : ""}}
+                {{product?.buyingPrice ? (product?.buyingPrice + " " + (product?.currency ? product?.currency : " DT")) : ""}}
             </p>
         </div>
         <div class="col-6">
             <label>Prix de vente :</label>
             <p>
-                {{product?.sellingPrice ? (product?.sellingPrice + " " + (product?.currency ? product?.currency : "")) : ""}}
+                {{product?.sellingPrice ? (product?.sellingPrice + " " + (product?.currency ? product?.currency : " DT")) : ""}}
             </p>
         </div>
         <div class="col-6">

@@ -103,6 +103,14 @@ export class CreditsMngtComponent implements OnInit {
     }).subscribe(response => {
       this.loading = false;
       this.borrowers = response;
+    }, error => {
+      this.loading = false;
+      Swal.fire({
+        icon: 'error',
+        title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+        showConfirmButton: false,
+        timer: 1500
+      })
     });
   }
 
@@ -113,6 +121,14 @@ export class CreditsMngtComponent implements OnInit {
     }).subscribe(response => {
       this.loading = false;
       this.count = response;
+    }, error => {
+      this.loading = false;
+      Swal.fire({
+        icon: 'error',
+        title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+        showConfirmButton: false,
+        timer: 1500
+      })
     })
   }
 
@@ -134,6 +150,14 @@ export class CreditsMngtComponent implements OnInit {
             timer: 1500
           })
           this.getBorrowerss(this.currentPage, this.currentSize)
+        }, error => {
+          this.loading = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+            showConfirmButton: false,
+            timer: 1500
+          })
         })
       }
     })

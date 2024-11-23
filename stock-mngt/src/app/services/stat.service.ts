@@ -44,4 +44,22 @@ export class StatService {
     });
   }
 
+  getOperationStatsByCategory(id, type, value): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'store/' + id + '/operationStats/categories', {
+      params: {
+        type,
+        value
+      }
+    });
+  }
+
+  getOperationStatsByCategoryItems(id, type, value): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'store/' + id + '/operationStats/categories/items', {
+      params: {
+        type,
+        value
+      }
+    });
+  }
+
 }

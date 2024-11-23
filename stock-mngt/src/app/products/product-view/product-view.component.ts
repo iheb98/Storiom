@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faPagelines } from '@fortawesome/free-brands-svg-icons';
 import { faChartBar } from '@fortawesome/free-regular-svg-icons';
-import { faFile, faGripLines, faInfo, faInfoCircle, faTextWidth, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faFile, faGripLines, faInfo, faInfoCircle, faTextWidth, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/services/auth.service';
+import { LoadingService } from 'src/app/services/loading.service';
 import { ProductService } from 'src/app/services/product.service';
 import { StatService } from 'src/app/services/stat.service';
 import { environment } from 'src/environments/environment';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-product-view',
@@ -14,6 +16,9 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./product-view.component.scss']
 })
 export class ProductViewComponent implements OnInit {
+
+  // ----------- ICONS 
+  faEdit = faEdit
   environment = environment
   years = [];
   operationsData;
@@ -46,6 +51,7 @@ export class ProductViewComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private statService: StatService,
+    private loadingService:LoadingService,
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
@@ -244,8 +250,10 @@ export class ProductViewComponent implements OnInit {
         filterValue = year + '-' + month
         break;
     }
+    this.loadingService.screenLoading();
     this.statService.getOperationStatsPerProduct(this.user.id, this.selectedDateType, filterValue, this.id).subscribe(
       response => {
+        this.loadingService.screenLoaded()
         this.operations = response;
         if (this.selectedDateType == "DAILY") {
           this.getDaily();
@@ -254,6 +262,14 @@ export class ProductViewComponent implements OnInit {
         } else {
           this.getMonthly();
         }
+      }, error => {
+        this.loadingService.screenLoaded()
+        Swal.fire({
+          icon: 'error',
+          title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+          showConfirmButton: false,
+          timer: 1500
+        })
       }
     )
   }

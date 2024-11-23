@@ -50,7 +50,7 @@
     </div>
 
     <div class="row d-flex justify-content-end">
-        <div class="col-12 col-sm-12 col-md-10 col-lg-10 mb-3 align-add-button">
+        <div class="col-12 col-sm-12 col-md-10 col-lg-10 mb-3 align-filter-button">
             <button class="btn btn-secondary add-button" (click)="create()">Ajouter</button>
         </div>
         <div class="col-6 col-sm-6 col-md-2 col-lg-1 mb-3 align-filter-button">
@@ -67,6 +67,7 @@
                 <thead>
                     <tr class="center">
                         <th scope="col">Code</th>
+                        <th scope="col">Type</th>
                         <th scope="col">Client ou Fournisseur</th>
                         <th scope="col">Total</th>
                         <th scope="col">Date</th>
@@ -78,6 +79,7 @@
                 <tbody>
                     <tr *ngFor="let receipt of receipts">
                         <td>{{receipt?.code}}</td>
+                        <td>{{receipt?.type == "SOLD" ? "Vente" : (receipt?.type == "LOADED" ? "Chargement" : "")}}</td>
                         <td>{{
                             receipt?.name ? (receipt?.name ? receipt?.name : "") :
                             ((receipt?.supplier?.firstName || receipt?.supplier?.lastName) ?

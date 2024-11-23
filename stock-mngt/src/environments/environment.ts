@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  BASE_PATH : 'https://stock-management-fsh5.onrender.com/api',
+  BASE_PATH : 'http://localhost:3000/api',
   couleurs : ['Blanc','Noir','Rouge','Bleu'],
   backend:'http://localhost:3000'
 };

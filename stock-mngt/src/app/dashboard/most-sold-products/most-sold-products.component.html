@@ -34,6 +34,9 @@
                     </td>
 
                 </tr>
+                <tr *ngIf="operations?.length == 0">
+                    <td colspan="4">Pas de resultat trouvé</td>
+                </tr>
             </tbody>
 
         </table>

@@ -5,19 +5,15 @@
 
 .image-container {
     position: relative;
-    width: 100%;
-    padding-top: 75%; /* Maintain aspect ratio */
+    text-align: right;
 }
 
-.image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    max-height: 300px;
-    object-fit: cover;
+
+
+.align-right{
+    text-align: right;
 }
+
 
 .subtitle {
     font-size: 18px;
@@ -32,7 +28,7 @@
 .info-bloc {
     margin: 20px 0;
     padding: 15px;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     border-radius: 5px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }

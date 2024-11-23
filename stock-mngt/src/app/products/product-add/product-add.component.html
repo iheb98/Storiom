@@ -1,16 +1,26 @@
 <div class="">
-    <div class="row actions-bloc d-flex justify-content-end">
+    <div class="row actions-bloc d-flex justify-content-start mb-3">
+        <!-- Link to Product Management -->
         <div class="col-auto">
-            <button class="btn btn-primary" (click)="navigateTo('/products')">Gestions des Produits</button>
+            <a (click)="navigateTo('/products')" class="link-no-background text-decoration-none d-flex align-items-center">
+                <fa-icon [icon]="arrowLeftIcon" class="me-1"></fa-icon> <!-- Back Arrow -->
+                Gestions des Produits
+            </a>
         </div>
+    
+        <!-- Link to View Product if productId exists -->
         <div class="col-auto" *ngIf="productId">
-            <button class="btn btn-secondary" (click)="navigateTo('/products/view/'+product?.id)">Consulter</button>
+            <a (click)="navigateTo('/products/view/' + product?.id)" class="link-no-background text-decoration-none d-flex align-items-center">
+                <fa-icon [icon]="arrowLeftIcon" class="me-1"></fa-icon> <!-- Back Arrow -->
+                Consulter
+            </a>
         </div>
     </div>
-    <div class="row screen-title-bloc">
-        <h2 class="screen-title">
-            {{ productId ? 'Modifier' : 'Ajouter'}} un produit
-        </h2>
+    
+    <div class="row screen-title-bloc mb-4">
+        <div class="col text-center">
+            <h2 class="screen-title">{{ productId ? 'Modifier' : 'Ajouter' }} un produit</h2>
+        </div>
     </div>
     <form [formGroup]="form" (ngSubmit)="productId ? update() : create() ">
         <div class="row justify-content-center">
@@ -25,14 +35,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <!--<div class="mb-3 row">
                     <label for="color" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Couleur</label>
                     <div class="col-12 col-sm-12 col-md-9 col-lg-9">
                         <ng-select formControlName="color" name="color" id="color">
                             <ng-option *ngFor="let element of colors" [value]="element">{{element}}</ng-option>
                         </ng-select>
                     </div>
-                </div>
+                </div>-->
 
                 <div class="mb-3 row">
                     <label for="supplier" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Fournisseur</label>
@@ -98,12 +108,12 @@
                         </ng-select>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <!--<div class="mb-3 row">
                     <label for="size" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Taille</label>
                     <div class="col-12 col-sm-12 col-md-9 col-lg-9">
                         <input type="text" class="form-control" id="size" formControlName="size">
                     </div>
-                </div>
+                </div>-->
                 <div class="mb-3 row">
                     <label for="quantity" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Quantité</label>
                     <div class="col-12 col-sm-12 col-md-9 col-lg-9">

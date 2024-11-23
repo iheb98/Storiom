@@ -31,8 +31,7 @@ module.exports = {
         type: DataTypes.STRING
       },
       color: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4
+        type: DataTypes.STRING
       },
       size: {
         type: DataTypes.STRING
@@ -41,7 +40,11 @@ module.exports = {
         type: DataTypes.STRING(5000)
       },
       quantity: {
-        type: DataTypes.INTEGER
+        type: DataTypes.FLOAT
+      },
+      unit: {
+        type: DataTypes.STRING,
+        defaultValue: 'PIECE'
       },
       storeId: {
         type: DataTypes.INTEGER,
@@ -58,6 +61,14 @@ module.exports = {
       categoryId: {
         type: DataTypes.INTEGER,
         field: 'category_id'
+      },
+      isVisible: {
+        type: DataTypes.BOOLEAN,
+        defaultValue : true
+      },
+      toDisplay: {
+        type: DataTypes.BOOLEAN,
+        defaultValue : true
       },
       creatorUserId: {
         type: DataTypes.INTEGER

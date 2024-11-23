@@ -48,7 +48,7 @@
     </div>
 
     <div class="row d-flex justify-content-end">
-        <div class="col-12 col-sm-12 col-md-10 col-lg-10 mb-3 align-add-button">
+        <div class="col-12 col-sm-12 col-md-10 col-lg-10 mb-3 align-filter-button">
             <button class="btn btn-secondary add-button" (click)="create()">Ajouter</button>
         </div>
         <div class="col-6 col-sm-6 col-md-2 col-lg-1 mb-3 align-filter-button">
@@ -66,7 +66,6 @@
                         <th scope="col">Nom et Prénom</th>
                         <th scope="col">Téléphone</th>
                         <th scope="col">Montant</th>
-                        <th scope="col">Commentaire</th>
                         <th scope="col">Date de prête</th>
                         <th scope="col">Date de retour</th>
                         <th scope="col">Modifier</th>
@@ -78,7 +77,6 @@
                         <td>{{borrower?.firstName + ' ' + borrower?.lastName}}</td>
                         <td>{{borrower?.phone}}</td>
                         <td>{{borrower?.amount + ' DT'}}</td>
-                        <td style="position: relative;"><span class="comment-column">{{borrower?.comment}}</span></td>
                         <td>{{borrower?.givenDate | date:'shortDate'}}</td>
                         <td>{{borrower?.returnDate | date:'shortDate'}}</td>
                         <td>

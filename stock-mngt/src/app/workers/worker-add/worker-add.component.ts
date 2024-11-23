@@ -63,9 +63,9 @@ export class WorkerAddComponent implements OnInit {
   create() {
     this.submitted = true;
     this.emailError = false;
-    this.loading = true;
     if (this.form.valid) {
-      this.workerService.addWorker({ ...this.form.getRawValue(), storeId: this.user?.store })
+      this.loading = true;
+      this.workerService.addWorker({ ...this.form.getRawValue(), worksInStore: this.user?.store })
         .subscribe(response => {
           this.loading = false;
           Swal.fire({
@@ -79,7 +79,7 @@ export class WorkerAddComponent implements OnInit {
           this.loading = false;
           Swal.fire({
             icon: 'error',
-            title: 'Un erreur est survenue ! Merci de réessayer plus tard',
+            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
             showConfirmButton: false,
             timer: 1500
           })
@@ -90,8 +90,8 @@ export class WorkerAddComponent implements OnInit {
   edit() {
     this.submitted = true;
     this.emailError = false;
-    this.loading = true;
     if (this.form.valid) {
+      this.loading = true;
       this.workerService.updateWorker({ ...this.form.getRawValue(), id: this.workerId })
         .subscribe(response => {
           this.loading = false;
@@ -106,7 +106,7 @@ export class WorkerAddComponent implements OnInit {
           this.loading = false;
           Swal.fire({
             icon: 'error',
-            title: 'Un erreur est survenue ! Merci de réessayer plus tard',
+            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
             showConfirmButton: false,
             timer: 1500
           })

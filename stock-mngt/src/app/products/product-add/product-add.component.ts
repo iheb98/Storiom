@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { faEdit, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faEdit, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/services/auth.service';
 import { BrandService } from 'src/app/services/brand.service';
 import { CategoryService } from 'src/app/services/category.service';
@@ -37,6 +37,7 @@ export class ProductAddComponent implements OnInit {
   subCategory4
   images
   selectedCategory = ''
+  arrowLeftIcon = faArrowLeft;
 
   editIcon = faEdit
   timesIcon = faTimes
@@ -181,7 +182,7 @@ export class ProductAddComponent implements OnInit {
           this.loadingService.screenLoaded()
           Swal.fire({
             icon: 'error',
-            title: 'Un erreur est survenue ! Merci de réessayer plus tard',
+            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
             showConfirmButton: false,
             timer: 1500
           })
@@ -235,7 +236,7 @@ export class ProductAddComponent implements OnInit {
             this.loadingService.screenLoaded()
             Swal.fire({
               icon: 'error',
-              title: 'Un erreur est survenue ! Merci de réessayer plus tard',
+              title: 'Une erreur est survenue ! Merci de réessayer plus tard',
               showConfirmButton: false,
               timer: 1500
             })

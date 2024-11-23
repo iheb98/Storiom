@@ -69,6 +69,14 @@ export class CategoriesMngtComponent implements OnInit {
           response => {
             this.loading = false;
             this.getCategories()
+          }, error => {
+            this.loading = false;
+            Swal.fire({
+              icon: 'error',
+              title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+              showConfirmButton: false,
+              timer: 1500
+            })
           }
         )
       }
@@ -92,6 +100,14 @@ export class CategoriesMngtComponent implements OnInit {
             parentCategory.subCategories.push({ ...response, subCategories: [] })
             this.loading = false;
             this.getCategories()
+          },error => {
+            this.loading = false;
+            Swal.fire({
+              icon: 'error',
+              title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+              showConfirmButton: false,
+              timer: 1500
+            })
           }
         )
       }

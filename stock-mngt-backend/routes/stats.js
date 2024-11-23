@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Product, Operation, Credit } = require('../models');
+const { Product, Operation, Credit, Category } = require('../models');
 const utility = require('../utility');
 
 const sequelize = require('sequelize');
@@ -104,7 +104,7 @@ router.get('/store/:id/bestSelling', utility.authenticate, (req, res, next) => {
             'product_id',
             [sequelize.fn('SUM', sequelize.col('amount')), 'total_amount']
         ],
-        group: ['product_id'],
+        group: ['product_id','product.id'],
         order: [[sequelize.literal('total_amount'), 'DESC']],
     }).then(operations => {
 
@@ -130,7 +130,7 @@ router.get('/store/:id/mostProfitable', utility.authenticate, (req, res, next) =
                 'total_profit'
             ]
         ],
-        group: ['product_id'],
+        group: ['product_id','product.id'],
         order: [[sequelize.literal('total_profit'), 'DESC']]
     }).then(operations => {
         res.json(operations)
@@ -143,6 +143,53 @@ router.get('/store/:id/mostProfitable', utility.authenticate, (req, res, next) =
 });
 
 router.get('/store/:id/operationStats', utility.authenticate, (req, res, next) => {
+    const { type, value } = req.query;
+
+    let dateCondition = [];
+
+    if (type && value) {
+        switch (type) {
+            case 'ANNUALLY':
+                dateCondition.push(sequelize.where(sequelize.fn('YEAR', sequelize.col('date')), value));
+                break;
+                        case 'MONTHLY':
+                const [year, month] = value.split('-');
+                                dateCondition.push(sequelize.where(sequelize.fn('YEAR', sequelize.col('date')), year));
+                dateCondition.push(sequelize.where(sequelize.fn('MONTH', sequelize.col('date')), month));
+                break;
+                        case 'DAILY':
+                const [y, m, d] = value.split('-');
+                dateCondition.push(sequelize.where(sequelize.fn('YEAR', sequelize.col('date')), y));
+                dateCondition.push(sequelize.where(sequelize.fn('MONTH', sequelize.col('date')), m));
+                dateCondition.push(sequelize.where(sequelize.fn('DAY', sequelize.col('date')), d));
+                break;
+                        default:
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid type. Use "year", "month", or "day".'
+                });
+        }
+    }
+    Operation.findAll({
+        where: {
+            type: ["SOLD", "LOADED"],
+            creatorUserId: req.user.id,
+            ...(dateCondition.length > 0 && { [Op.and]: dateCondition })
+        },
+        include: ['product']
+    })
+    .then(operations => {
+        res.json(operations);
+    })
+    .catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        });
+    });
+});
+
+router.get('/store/:id/operationStats/categories/items', utility.authenticate, (req, res, next) => {
     const { type, value } = req.query;
 
     let dateCondition = [];
@@ -166,28 +213,167 @@ router.get('/store/:id/operationStats', utility.authenticate, (req, res, next) =
             default:
                 return res.status(400).json({
                     success: false,
-                    message: 'Invalid type. Use "year", "month", or "day".'
+                    message: 'Invalid type. Use "ANNUALLY", "MONTHLY", or "DAILY".'
                 });
         }
     }
+
     Operation.findAll({
         where: {
-            type: ["SOLD", "LOADED"],
+            type: ["SOLD"],
             creatorUserId: req.user.id,
             ...(dateCondition.length > 0 && { [Op.and]: dateCondition })
         },
-        include: ['product']
+        include: [{
+            model: Product,
+            as: 'product',
+            include: [{
+                model: Category,
+                as: 'category'
+            }]
+        }]
     })
-        .then(operations => {
-            res.json(operations);
-        })
-        .catch(err => {
-            res.status(500).json({
-                success: false,
-                message: err.toString()
-            });
+    .then(operations => {
+        // Group by category and calculate total number of items sold per category
+        const categoryData = operations.reduce((acc, operation) => {
+            const category = operation.product.category.name;
+            const amountSold = operation.amount;
+
+            if (!acc[category]) {
+                acc[category] = { totalAmount: 0 };
+            }
+            acc[category].totalAmount += amountSold;
+
+            return acc;
+        }, {});
+
+        // Convert to array and sort by number of items sold in descending order
+        const sortedCategories = Object.entries(categoryData)
+            .sort(([, a], [, b]) => b.totalAmount - a.totalAmount)
+            .slice(0, 5);  // Limit to top 5
+
+        // Prepare data for the chart
+        const labels = sortedCategories.map(([category]) => category);
+        const totalSold = sortedCategories.map(([, data]) => data.totalAmount);
+
+        // Define different background colors for each category
+        const backgroundColors = ['#42A5F5', '#66BB6A', '#FFA726', '#FF6384', '#AB47BC'];  // You can add more or generate dynamically
+
+        const chartData = {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Produits Vendues',
+                    backgroundColor: backgroundColors.slice(0, labels.length), // Assign colors to each category
+                    data: totalSold
+                }
+            ]
+        };
+
+        res.json(chartData);
+    })
+    .catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
         });
+    });
 });
+
+
+router.get('/store/:id/operationStats/categories', utility.authenticate, (req, res, next) => {
+    const { type, value } = req.query;
+
+    let dateCondition = [];
+
+    if (type && value) {
+        switch (type) {
+            case 'ANNUALLY':
+                dateCondition.push(sequelize.where(sequelize.fn('YEAR', sequelize.col('date')), value));
+                break;
+            case 'MONTHLY':
+                const [year, month] = value.split('-');
+                dateCondition.push(sequelize.where(sequelize.fn('YEAR', sequelize.col('date')), year));
+                dateCondition.push(sequelize.where(sequelize.fn('MONTH', sequelize.col('date')), month));
+                break;
+            case 'DAILY':
+                const [y, m, d] = value.split('-');
+                dateCondition.push(sequelize.where(sequelize.fn('YEAR', sequelize.col('date')), y));
+                dateCondition.push(sequelize.where(sequelize.fn('MONTH', sequelize.col('date')), m));
+                dateCondition.push(sequelize.where(sequelize.fn('DAY', sequelize.col('date')), d));
+                break;
+            default:
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid type. Use "ANNUALLY", "MONTHLY", or "DAILY".'
+                });
+        }
+    }
+
+    Operation.findAll({
+        where: {
+            type: ["SOLD"],
+            creatorUserId: req.user.id,
+            ...(dateCondition.length > 0 && { [Op.and]: dateCondition })
+        },
+        include: [{
+            model: Product,
+            as: 'product',
+            include: [{
+                model: Category,
+                as: 'category'
+            }]
+        }]
+    })
+    .then(operations => {
+        // Group by category
+        const categoryData = operations.reduce((acc, operation) => {
+            const category = operation.product.category.name;
+            const profit = operation.price * operation.amount;
+
+            if (!acc[category]) {
+                acc[category] = { totalProfit: 0 };
+            }
+            acc[category].totalProfit += profit;
+
+            return acc;
+        }, {});
+
+        // Convert to array and sort by profit in descending order
+        const sortedCategories = Object.entries(categoryData)
+            .sort(([, a], [, b]) => b.totalProfit - a.totalProfit)
+            .slice(0, 5);  // Limit to top 5
+
+        // Prepare data for the chart
+        const labels = sortedCategories.map(([category]) => category);
+        const mostProfitable = sortedCategories.map(([, data]) => data.totalProfit);
+
+        // Define different background colors for each category
+        const backgroundColors = ['#42A5F5', '#66BB6A', '#FFA726', '#FF6384', '#AB47BC'];  // You can add more or generate dynamically
+
+        const chartData = {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Profit',
+                    backgroundColor: backgroundColors.slice(0, labels.length), // Assign colors to each category
+                    data: mostProfitable
+                }
+            ]
+        };
+
+        res.json(chartData);
+    })
+    .catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        });
+    });
+});
+
+
+
 
 
 router.get('/store/:id/operationStats/product', utility.authenticate, (req, res, next) => {

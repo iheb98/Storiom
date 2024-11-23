@@ -103,7 +103,9 @@ export class ReceiptAddComponent implements OnInit {
 
   create() {
     if (this.form.valid) {
-      if (this.form.get('type').value == 'SOLD')
+      this.checkQuantity()
+
+      if (this.form.get('type').value == 'SOLD' && this.checkQuantity())
         Swal.fire({
           title: 'Certains produits ont dépassé la quantité disponible, êtes vous sûr de continuer malgré ça ?',
           denyButtonText: `Annuler`,
@@ -134,6 +136,29 @@ export class ReceiptAddComponent implements OnInit {
             })
           }
         })
+      else if (this.form.get('type').value == 'SOLD') {
+        this.loadingService.screenLoading()
+        let form = this.form.getRawValue();
+        let newReceipt = {
+          type: form.type,
+          name: form.name,
+          supplierId: form.supplierId,
+          date: form.date,
+          tva: form.tva,
+          operations: this.selectedProducts,
+          storeId: this.authService.getConnectedUser()?.store
+        }
+        this.receiptService.addReceipt(newReceipt).subscribe(response => {
+          this.loadingService.screenLoaded()
+          Swal.fire({
+            icon: 'success',
+            title: 'Facture créée !',
+            showConfirmButton: false,
+            timer: 1500
+          })
+          this.router.navigate(['receipts'])
+        })
+      }
       else {
         this.loadingService.screenLoading()
         let form = this.form.getRawValue();
@@ -179,6 +204,15 @@ export class ReceiptAddComponent implements OnInit {
   }
   viewProduct(id) {
 
+  }
+
+  checkQuantity() {
+    let test = false
+    this.selectedProducts.forEach(item => {
+      if (item.amount > item.quantity)
+        test = true
+    })
+    return test
   }
 
 }

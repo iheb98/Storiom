@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class WorkerService {
   BASE_PATH = environment.BASE_PATH;
-  baseUrl: string = this.BASE_PATH + '/users/';
+  baseUrl: string = this.BASE_PATH + '/workers/';
 
   constructor(private http: HttpClient) { }
 
@@ -41,7 +41,7 @@ export class WorkerService {
 
 
   addWorker(body): Observable<any> {
-    return this.http.post<any>(this.baseUrl + 'register', body);
+    return this.http.post<any>(this.baseUrl + 'create', body);
   }
 
   updateWorker(body): Observable<any> {

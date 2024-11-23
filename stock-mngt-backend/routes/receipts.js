@@ -84,7 +84,11 @@ router.get('/store/:id', utility.authenticate, (req, res, next) => {
             visible: true,
             ...utility.buildQuery(req.query.query),
             creatorUserId: req.user.id
-        }, include: ['supplier']
+        },
+        include: ['supplier'],
+        order: [
+            ['date', 'DESC']
+        ]
     }, { page: req.query.page, pageSize: req.query.size })).then(receipts => {
         res.json(receipts)
     }).catch(err => {

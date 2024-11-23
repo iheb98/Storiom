@@ -25,6 +25,7 @@ export class RequestInterceptor implements HttpInterceptor {
     }
 
     return next.handle(authReq).pipe(catchError(error => {
+      console.log("tes")
       if (error instanceof HttpErrorResponse && !authReq.url.includes('login') && error.status === 403) {
         return this.handle401Error(authReq, next);
       }
@@ -34,7 +35,10 @@ export class RequestInterceptor implements HttpInterceptor {
   }
 
   private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
+    console.log("1")
     if (!this.isRefreshing) {
+      console.log("2")
+
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
 
@@ -44,6 +48,7 @@ export class RequestInterceptor implements HttpInterceptor {
         return this.authService.refreshToken().pipe(
           switchMap((token: any) => {
             this.isRefreshing = false;
+            console.log("3")
 
             localStorage.setItem('accessToken', token.accessToken);
             this.refreshTokenSubject.next(token.accessToken);
@@ -52,7 +57,7 @@ export class RequestInterceptor implements HttpInterceptor {
           }),
           catchError((err) => {
             this.isRefreshing = false;
-
+            console.log("tee")
             //this.tokenService.signOut();
             return throwError(err);
           })

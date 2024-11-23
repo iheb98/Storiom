@@ -11,7 +11,7 @@ import { StatService } from 'src/app/services/stat.service';
 export class MostSoldProductsComponent implements OnInit {
   user;
   products;
-  operations
+  operations = []
   constructor(
     private statService: StatService,
     private authService: AuthService

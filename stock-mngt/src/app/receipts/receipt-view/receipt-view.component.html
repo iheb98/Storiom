@@ -1,8 +1,7 @@
 <div class="invoice-container">
     <div class="invoice-header">
         <div class="company-details">
-            <img src="https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
-                alt="Logo de la boutique">
+            <h4><strong>{{store?.name}}</strong></h4>
         </div>
         <div class="invoice-title">
             <h1>Facture</h1>
@@ -25,9 +24,8 @@
             </div>
         </div>
 
-        <div class="store-contact">
-            <p><strong>{{store?.name}}</strong></p>
-            <p> Addresse: {{receipt?.store?.address?.state+' '+receipt?.store?.address?.city}} </p>
+        <div class="store-contact" style="text-align: left;">
+            <p> <span class="store-details-label">Addresse</span>: {{receipt?.store?.address?.state+' '+receipt?.store?.address?.city}} </p>
             <p>Email: {{store?.email}}</p>
             <p>téléphone: {{store?.phone}}</p>
         </div>

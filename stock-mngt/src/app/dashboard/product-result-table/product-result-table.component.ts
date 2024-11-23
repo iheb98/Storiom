@@ -10,7 +10,7 @@ import { ProductService } from 'src/app/services/product.service';
 export class ProductResultTableComponent implements OnInit {
 
   user;
-  products
+  products = []
   constructor(
     private productService: ProductService,
     private authService: AuthService

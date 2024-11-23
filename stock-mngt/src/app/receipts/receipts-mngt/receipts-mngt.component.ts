@@ -15,13 +15,15 @@ import * as html2pdf from 'html2pdf.js';
 import * as pdfMake from "pdfmake/build/pdfmake";
 import * as pdfFonts from "pdfmake/build/vfs_fonts";
 import { StoreService } from 'src/app/services/store.service';
+import { DatePipe } from '@angular/common';
 const htmlToPdfmake = require("html-to-pdfmake");
 (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-receipts-mngt',
   templateUrl: './receipts-mngt.component.html',
-  styleUrls: ['./receipts-mngt.component.scss']
+  styleUrls: ['./receipts-mngt.component.scss'],
+  providers: [DatePipe],
 })
 export class ReceiptsMngtComponent implements OnInit {
 
@@ -55,6 +57,7 @@ export class ReceiptsMngtComponent implements OnInit {
     private receiptService: ReceiptService,
     private storeService: StoreService,
     private router: Router,
+    private datePipe: DatePipe,
     private http: HttpClient
   ) { }
 
@@ -313,8 +316,7 @@ export class ReceiptsMngtComponent implements OnInit {
       <div class="invoice-container">
     <div class="invoice-header">
         <div class="company-details">
-            <img src="https://www.simplilearn.com/ice9/free_resources_article_thumb/what_is_image_Processing.jpg"
-                alt="Logo de la boutique">
+          <h4><strong>${this.store?.name}</strong></h4>
         </div>
         <div class="invoice-title">
             <h1>Facture</h1>
@@ -324,14 +326,15 @@ export class ReceiptsMngtComponent implements OnInit {
     <div class="invoice-info">
         <div class="invoice-details">
             <div><span class="details-label">Numéro de la facture:</span> ${receipt?.code}</div>
-            <div><span class="details-label">Date:</span> ${receipt?.date}</div>
+            <div><span class="details-label">Date:</span> ${this.datePipe.transform(receipt?.date, 'shortDate')}</div>
             <div><span class="details-label">Nom du client:</span>
-                ${receipt?.name ? receipt?.name : receipt?.supplier?.firstName + " " + receipt?.supplier?.lastName}
+                ${receipt?.name ? receipt?.name :
+          (receipt?.supplier?.firstName ? receipt?.supplier?.firstName : "") + " " +
+          (receipt?.supplier?.lastName ? receipt?.supplier?.lastName : "")}
             </div>
         </div>
 
-        <div class="store-contact">
-            <p><strong>${this.store?.name}</strong></p>
+        <div class="invoice-info" style="text-align:left">
             <p> Addresse: ${receipt?.store?.address?.state + ' ' + receipt?.store?.address?.city} </p>
             <p>Email: ${this.store?.email}</p>
             <p>téléphone: ${this.store?.phone}</p>

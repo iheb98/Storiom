@@ -3,6 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { LoadingService } from 'src/app/services/loading.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-register',
@@ -53,6 +54,14 @@ export class RegisterComponent implements OnInit {
             this.loadingService.screenLoaded()
             this.router.navigate([''])
           }
+        }, error => {
+          this.loadingService.screenLoaded()
+          Swal.fire({
+            icon: 'error',
+            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+            showConfirmButton: false,
+            timer: 1500
+          })
         })
     }
   }

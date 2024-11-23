@@ -1,42 +1,45 @@
 const express = require('express');
 const router = express.Router();
-const { Supplier } = require('../models');
+const { User, Worker, Address } = require('../models');
 const utility = require('../utility');
 
 
-router.post('/create', utility.authenticate, (req, res) => {
-    const { firstName, lastName, phone, email, storeId, credit, description } = req.body
-    Supplier.create({ firstName, lastName, phone, email, storeId, credit, description, creatorUserId: req.user.id }).then(createdSupplier => {
+router.post('/create', utility.authenticate, async (req, res) => {
+    const { firstName, lastName, email, password, phone, country, street, city, state, postalCode, language, entryDate, salary, functionInStore, worksInStore, superiorId, role } = req.body
+    try {
+        const createdWorker = await Worker.create({ firstName, lastName, email, password, phone, language, password: password, entryDate, salary, function: functionInStore, storeId: worksInStore, superiorId, role, creatorUserId: req.user.id })
+        const createdAddress = await Address.create({ userId: createdWorker.id, country, street, city, state, postalCode })
         res.json({
-            supplier: createdSupplier
+            success: true,
+            message: "Worker created successfully"
         })
-    }).catch(err => {
+    } catch (err) {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
-    })
+            success: false,
+            message: err.toString()
+        })
+    }
 })
 
 
 router.put('/edit', utility.authenticate, (req, res) => {
     const { id, firstName, lastName, phone, email, credit, description } = req.body
-    Supplier.findOne(
+    Worker.findOne(
         {
             where: {
                 id,
                 creatorUserId: req.user.id
             }
         }
-    ).then(supplier => {
-        supplier.firstName = firstName
-        supplier.lastName = lastName
-        supplier.email = email
-        supplier.phone = phone
-        supplier.description = description
-        supplier.credit = credit ? credit : 0
-        supplier.save().then(
-            savedSupplier => {
+    ).then(worker => {
+        worker.firstName = firstName
+        worker.lastName = lastName
+        worker.email = email
+        worker.phone = phone
+        worker.description = description
+        worker.credit = credit ? credit : 0
+        worker.save().then(
+            savedWorker => {
                 res.json({ message: 'Fournisseur modifié', success: true })
             }
         ).catch(err => {
@@ -49,7 +52,7 @@ router.put('/edit', utility.authenticate, (req, res) => {
 
 router.get('/store/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
-    Supplier.findAll(utility.paginate({
+    Worker.findAll(utility.paginate({
         where: {
             store_id: id,
             firstName: {
@@ -64,39 +67,39 @@ router.get('/store/:id', utility.authenticate, (req, res, next) => {
             phone: {
                 [utility.Op.like]: req.query.phone ? '%' + req.query.phone + '%' : '%'
             },
-            credit: utility.fromTo(req.query.creditFrom, req.query.creditTo),
+            role: 'Worker',
             creatorUserId: req.user.id
         }
-    }, { page: req.query.page, pageSize: req.query.size })).then(suppliers => {
-        res.json(suppliers)
+    }, { page: req.query.page, pageSize: req.query.size })).then(workers => {
+        res.json(workers)
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
 router.get('/all/store/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
-    Supplier.findAll({
+    Worker.findAll({
         where: {
             store_id: id,
             creatorUserId: req.user.id
         }
-    }).then(suppliers => {
-        res.json(suppliers)
+    }).then(workers => {
+        res.json(workers)
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
 router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
-    Supplier.count({
+    Worker.count({
         where: {
             store_id: id,
             firstName: {
@@ -111,54 +114,54 @@ router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
             phone: {
                 [utility.Op.like]: req.query.phone ? '%' + req.query.phone + '%' : '%'
             },
-            credit: utility.fromTo(req.query.creditFrom, req.query.creditTo),
+            role: 'Worker',
             creatorUserId: req.user.id
         }
-    }).then(countSuppliers => {
-        res.json(countSuppliers)
+    }).then(countWorkers => {
+        res.json(countWorkers)
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
 router.delete('/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
-    Supplier.destroy({
+    Worker.destroy({
         where: {
             id,
             creatorUserId: req.user.id
         }
     }).then(deletedRows => {
         if (deletedRows > 0)
-            res.json({ success: true, message: "Supplier deleted" })
+            res.json({ success: true, message: "Worker deleted" })
         else
-            res.status(500).json({ success: false, message: "Supplier not found" })
+            res.status(500).json({ success: false, message: "Worker not found" })
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
 router.get('/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
-    Supplier.findOne({
+    Worker.findOne({
         where: {
             id,
             creatorUserId: req.user.id
         }, include: ['receipts']
-    }).then(supplier => {
-        res.json(supplier)
+    }).then(worker => {
+        res.json(worker)
 
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 

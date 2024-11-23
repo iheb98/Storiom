@@ -86,6 +86,14 @@ export class WorkersMngtComponent implements OnInit {
     }).subscribe(response => {
       this.loading = false;
       this.workers = response;
+    }, error => {
+      this.loading = false;
+      Swal.fire({
+        icon: 'error',
+        title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+        showConfirmButton: false,
+        timer: 1500
+      })
     });
   }
 
@@ -96,6 +104,14 @@ export class WorkersMngtComponent implements OnInit {
     }).subscribe(response => {
       this.loading = false;
       this.count = response;
+    }, error => {
+      this.loading = false;
+      Swal.fire({
+        icon: 'error',
+        title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+        showConfirmButton: false,
+        timer: 1500
+      })
     })
   }
 
@@ -117,6 +133,14 @@ export class WorkersMngtComponent implements OnInit {
             timer: 1500
           })
           this.getWorkers(this.currentPage, this.currentSize)
+        }, error => {
+          this.loading = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+            showConfirmButton: false,
+            timer: 1500
+          })
         })
       }
     })

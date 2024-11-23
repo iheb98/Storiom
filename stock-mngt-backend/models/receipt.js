@@ -23,8 +23,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Receipt.init({
     code: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4
+      type: DataTypes.STRING
     },
     total: DataTypes.FLOAT,
     tva: DataTypes.FLOAT,

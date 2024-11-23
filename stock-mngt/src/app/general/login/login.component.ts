@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { LoadingService } from 'src/app/services/loading.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -40,16 +41,25 @@ export class LoginComponent implements OnInit {
       this.loadingService.screenLoading()
       this.authService.login({ email: this.form.get('email').value, password: this.form.get('password').value })
         .subscribe(response => {
+          this.loadingService.screenLoaded()
           if (response.errorType == "EMAIL_ERROR")
             this.emailError = true;
           else if (response.errorType == "PASSWORD_ERROR")
             this.passwordError = true;
           else {
             this.authService.registerTokens(response.accessToken, response.refreshToken)
-            this.loadingService.screenLoaded()
             this.router.navigate([''])
           }
-        })
+        },
+          error => {
+            this.loadingService.screenLoaded()
+            Swal.fire({
+              icon: 'error',
+              title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+              showConfirmButton: false,
+              timer: 1500
+            })
+          })
     }
   }
 }

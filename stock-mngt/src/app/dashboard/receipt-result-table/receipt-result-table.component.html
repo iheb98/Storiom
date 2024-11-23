@@ -38,6 +38,9 @@
                         {{ receipt?.date | date:'short' }}
                     </td>
                 </tr>
+                <tr *ngIf="receipts?.length == 0">
+                    <td colspan="5">Pas de resultat trouvé</td>
+                </tr>
             </tbody>
 
         </table>
