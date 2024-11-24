@@ -13,6 +13,11 @@ module.exports = {
         type: DataTypes.DATE,
         field: 'payment_date'
       },
+      activationDate: {
+        type: DataTypes.DATE,
+        defaultValue:DataTypes.NOW,
+        field: 'activation_date'
+      },
       duration: {
         type: DataTypes.ENUM('TRIAL', '1M', '3M', '6M', '12M', 'INFINITE'),
         defaultValue: 'TRIAL'
