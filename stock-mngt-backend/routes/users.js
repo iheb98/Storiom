@@ -22,16 +22,25 @@ router.post('/register', async (req, res) => {
                 if (err) res.json(err);
                 bcrypt.hash(password, salt, async (err, hash) => {
                     if (err) res.json(err);
-                    const createdUser = await User.create({ firstName, lastName, email, password, phone, language, password: hash, entryDate, salary, functionInStore, worksInStore, superiorId, role })
-                    const createdAddress = await Address.create({ userId: createdUser.id, country, street, city, state, postalCode })
-                    const createdSubscription = await Subscription.create({ userId: createdUser.id, duration: 'TRIAL' })
-                    const token = utility.generateAccessToken(createdUser.toJSON());
-                    const refreshToken = await utility.generateRefreshToken(createdUser.toJSON())
-                    res.json({
-                        success: true,
-                        accessToken: token,
-                        refreshToken
-                    })
+                    try {
+                        const createdUser = await User.create({ firstName, lastName, email, password, phone, language, password: hash, entryDate, salary, functionInStore, worksInStore, superiorId, role })
+                        const createdAddress = await Address.create({ userId: createdUser.id, country, street, city, state, postalCode })
+                        const createdSubscription = await Subscription.create({ userId: createdUser.id, duration: 'TRIAL' })
+                        console.log(createdSubscription)
+                        console.log(createdUser.id)
+                        const token = utility.generateAccessToken(createdUser.toJSON());
+                        const refreshToken = await utility.generateRefreshToken(createdUser.toJSON())
+                        res.json({
+                            success: true,
+                            accessToken: token,
+                            refreshToken
+                        })
+                    } catch (err) {
+                        res.status(500).json({
+                            success: false,
+                            message: err.toString()
+                        })
+                    }
                 })
             })
         }
