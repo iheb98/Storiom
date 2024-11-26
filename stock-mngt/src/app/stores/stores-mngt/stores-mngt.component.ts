@@ -5,6 +5,7 @@ import { faEdit, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/services/auth.service';
 import { ListenerService } from 'src/app/services/listener.service';
 import { StoreService } from 'src/app/services/store.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-stores-mngt',
@@ -17,6 +18,7 @@ export class StoresMngtComponent implements OnInit {
   faEdit = faEdit;
   faPlus = faPlus
   stores$;
+  backend_URL = environment.backend
   constructor(private storeService: StoreService, private authService: AuthService, private listener: ListenerService) { }
 
   ngOnInit(): void {

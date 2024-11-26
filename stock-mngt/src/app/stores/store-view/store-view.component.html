@@ -36,7 +36,7 @@
         </div>
         <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
             <div class="image-container">
-                <img [src]="store?.logo ? 'http://localhost:3000/images/' + store?.logo : 'assets/storeIcon.png'" 
+                <img [src]="store?.logo ? backend_URL +'/images/' + store?.logo : 'assets/storeIcon.png'" 
                      alt="Store Logo" class="image img-fluid rounded-circle" 
                      style="border: 1px solid lightgray; max-width: 100%; height: auto;">
             </div>

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { StoreService } from 'src/app/services/store.service';
+import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -11,6 +12,7 @@ import Swal from 'sweetalert2';
 })
 export class StoreViewComponent implements OnInit {
   store;
+  backend_URL = environment.backend
   constructor(
     private authService: AuthService,
     private storeService: StoreService,
