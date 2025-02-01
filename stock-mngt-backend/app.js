@@ -88,7 +88,7 @@ app.use('/', (req, res) => {
   res.json({ message: "Welcome to the stock management application's backend!" });
 })
 
-app.listen(port, async () => {
+app.listen(port, '0.0.0.0', async () => {
   try {
     await sequelize.authenticate()
     console.log('Connected To Database')
