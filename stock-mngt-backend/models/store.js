@@ -36,6 +36,8 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       field: 'user_id'
     },
+    type: DataTypes.STRING,
+    selectedCategories: DataTypes.STRING,
     creatorUserId: {
       type: DataTypes.INTEGER
     }

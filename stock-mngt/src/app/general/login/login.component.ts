@@ -48,6 +48,7 @@ export class LoginComponent implements OnInit {
             this.passwordError = true;
           else {
             this.authService.registerTokens(response.accessToken, response.refreshToken)
+            this.authService.loggedIn.next();
             this.router.navigate([''])
           }
         },

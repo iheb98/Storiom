@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+
+  loggedIn = new Subject();
 
   BASE_PATH = environment.BASE_PATH;
   baseUrl: string = this.BASE_PATH + '/users/';
@@ -44,7 +46,7 @@ export class AuthService {
   }
 
   isLoggedIn() {
-    return !!localStorage.getItem('accessToken')
+    return !!localStorage.getItem('accessToken') && localStorage.getItem('accessToken') != 'undefined'
   }
 
   getUserRole() {

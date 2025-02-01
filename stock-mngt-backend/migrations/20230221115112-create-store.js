@@ -38,6 +38,12 @@ module.exports = {
         type: DataTypes.INTEGER,
         field: 'user_id'
       },
+      type: {
+        type: DataTypes.STRING
+      },
+      selectedCategories: {
+        type: DataTypes.STRING
+      },
       creatorUserId: {
         type: DataTypes.INTEGER
       },

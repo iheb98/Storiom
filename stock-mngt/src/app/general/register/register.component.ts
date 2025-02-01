@@ -51,6 +51,7 @@ export class RegisterComponent implements OnInit {
             this.emailFound = true;
           else if (response.success) {
             this.authService.registerTokens(response.accessToken, response.refreshToken)
+            this.authService.loggedIn.next();
             this.loadingService.screenLoaded()
             this.router.navigate([''])
           }

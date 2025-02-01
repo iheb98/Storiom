@@ -30,10 +30,16 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.connectedUser = this.authService.getConnectedUser()
     this.setMenu()
+    this.authService.loggedIn.subscribe(response=>{
+      this.connectedUser = this.authService.getConnectedUser()
+      console.log(this.connectedUser)
+    })
   }
   logout() {
     this.authService.logout().subscribe(response => {
-      this.connectedUser = this.authService.getConnectedUser()
+      this.connectedUser = null
+      this.opened = false
+      console.log(this.connectedUser)
       localStorage.removeItem("refreshToken")
       localStorage.removeItem("accessToken")
       this.router.navigate(['login'])

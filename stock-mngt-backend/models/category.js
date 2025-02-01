@@ -32,6 +32,9 @@ module.exports = (sequelize, DataTypes) => {
     },
     creatorUserId: {
       type: DataTypes.INTEGER
+    },
+    static :{
+      type: DataTypes.BOOLEAN
     }
   }, {
     sequelize,

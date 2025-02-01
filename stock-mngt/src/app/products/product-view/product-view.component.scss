@@ -25,6 +25,7 @@
 
 label {
     font-weight: bold;
+    font-size: 1rem;
     color: gray;
 }
 button{
@@ -47,6 +48,10 @@ button{
     border-radius: 10px;
     box-shadow: 1px 1px 20px #ccc;
     background-color: white;
+}
+
+.info-bloc p, .info-bloc pre{
+    font-size: 0.9rem;
 }
 
 .info-title{

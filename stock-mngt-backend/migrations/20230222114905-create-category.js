@@ -23,6 +23,9 @@ module.exports = {
       creatorUserId: {
         type: DataTypes.INTEGER
       },
+      static: {
+        type: DataTypes.BOOLEAN
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

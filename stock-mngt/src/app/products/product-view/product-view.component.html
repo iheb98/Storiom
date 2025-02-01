@@ -74,12 +74,12 @@
             <fa-icon [icon]="chartIcon"></fa-icon> Statistiques
         </div>
         <div class="row">
-            <div class="col-12 col-md-3">
+            <div class="col-6 col-md-3">
                 <select class="form-control" [(ngModel)]="selectedDateType" (change)="getOperationStats()">
                     <option *ngFor="let type of typesOfDate" [value]="type">{{type}}</option>
                 </select>
             </div>
-            <div class="col-12 col-md-9">
+            <div class="col-6 col-md-9">
                 <input *ngIf="selectedDateType=='DAILY'" class="form-control" type="date" id="day" name="day"
                     [(ngModel)]="dayFilter" (change)="getOperationStats()">
     

@@ -1,7 +1,7 @@
 <ngx-loading-x [show]="loadingService.isScreenLoading()" [spinnerColor]="'#683ab7'"></ngx-loading-x>
 <mat-toolbar class="custom-toolbar" fixedInViewport="true">
     <mat-toolbar-row>
-        <button mat-button (click)="opened = !opened" style="color:white"><mat-icon>menu</mat-icon></button>
+        <button mat-button (click)="opened = !opened" style="color:white" *ngIf="connectedUser"><mat-icon>menu</mat-icon></button>
         <span class="navbar-fill-remaining-space"></span>
         <span class="connected-user" title="{{connectedUser?.firstName}}" *ngIf="connectedUser">
             <span class="user-icon">
