@@ -23,7 +23,7 @@ export class MostProfitableProductsComponent implements OnInit {
 
 
   getMostProfitableProducts() {
-    this.statService.getMostProfitableProducts(this.user.id).subscribe(
+    this.statService.getMostProfitableProducts(this.user?.store).subscribe(
       response => {
         this.operations = response
       }

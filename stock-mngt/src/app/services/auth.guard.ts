@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
+import { ActivatedRouteSnapshot, CanActivate, Router } from '@angular/router';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -17,10 +16,11 @@ export class AuthGuard implements CanActivate {
       if (this.auth.getConnectedUser()?.store)
       return true;
       else{
+        if (route.routeConfig.path == 'stores/add')
+          return true;
         this.router.navigate(['stores/add']);
         return false
       }
-
     }
     this.router.navigate(['login']);
     return false;

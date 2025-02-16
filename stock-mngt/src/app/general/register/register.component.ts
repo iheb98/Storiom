@@ -47,13 +47,20 @@ export class RegisterComponent implements OnInit {
       this.loadingService.screenLoading()
       this.authService.registerUser({ ...this.form.getRawValue(), confirmPassword: undefined })
         .subscribe(response => {
-          if (response.errorType == "EMAIL_Found")
+          this.loadingService.screenLoaded()
+          if (response.errorType == "EMAIL_FOUND"){
             this.emailFound = true;
+            Swal.fire({
+              icon: 'error',
+              title: `Cette adresse e-mail est déjà utilisée. Veuillez en choisir une autre ou vous connecter à votre compte existant.`,
+              showConfirmButton: false,
+              timer: 3000
+            })
+          }
           else if (response.success) {
             this.authService.registerTokens(response.accessToken, response.refreshToken)
             this.authService.loggedIn.next();
-            this.loadingService.screenLoaded()
-            this.router.navigate([''])
+            this.router.navigate(['stores/view'])
           }
         }, error => {
           this.loadingService.screenLoaded()

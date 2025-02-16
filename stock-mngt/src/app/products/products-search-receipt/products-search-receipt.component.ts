@@ -43,6 +43,13 @@ export class ProductsSearchReceiptComponent implements OnInit {
 
   selectedProducts = this.data;
 
+  filtersCollapsed = true;
+
+  toggleFilters() {
+      this.filtersCollapsed = !this.filtersCollapsed;
+  }
+  
+
   constructor(
     private productService: ProductService,
     private supplierService: SupplierService,

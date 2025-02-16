@@ -1,52 +1,59 @@
 <ngx-loading-x [show]="loading" [spinnerColor]="'#683ab7'"></ngx-loading-x>
-<div class="">
+<div class="padding-page">
     <div class="row title-bloc">
         <h3 class="title">Gestion des fournisseurs</h3>
     </div>
 
-    <div class="row">
-        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-            <label for="firstName" class="form-label">Prénom</label>
-            <input type="text" class="form-control" id="firstName" [(ngModel)]="firstNameFilter">
-        </div>
+    <div class="row d-flex">
 
-        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-            <label for="lastName" class="form-label">Nom</label>
-            <input type="text" class="form-control" id="lastName" [(ngModel)]="lastNameFilter">
+        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
+            <button class="btn btn-secondary toggle-filters" (click)="toggleFilters()">
+                Afficher / Masquer les Filtres
+            </button>
         </div>
-
-        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-            <label for="phone" class="form-label">Téléphone</label>
-            <input type="phone" class="form-control" id="phone" [(ngModel)]="phoneFilter">
-        </div>
-
-        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" [(ngModel)]="emailFilter">
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-            <label for="minCreditFilter" class="form-label">Crédit</label>
-            <input type="number" class="form-control amount-input" id="minCreditFilter" [(ngModel)]="minCreditFilter"
-                placeholder="De">
-            <input type="number" class="form-control amount-input" id="maxCreditFilter" [(ngModel)]="maxCreditFilter"
-                placeholder="Jusqu'à">
-        </div>
-    </div>
-
-    <div class="row d-flex justify-content-end">
-        <div class="col-12 col-sm-12 col-md-10 col-lg-10 mb-3 align-filter-button">
+        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
             <button class="btn btn-secondary add-button" (click)="create()">Ajouter</button>
         </div>
-        <div class="col-6 col-sm-6 col-md-2 col-lg-1 mb-3 align-filter-button">
+        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
             <button class="btn btn-secondary" (click)="reset()">Réinitialiser</button>
         </div>
-        <div class="col-6 col-sm-6 col-md-2 col-lg-1 mb-3 align-filter-button">
+        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
             <button class="btn btn-primary" (click)="filter()">Filtrer</button>
         </div>
     </div>
+
+
+    <div class="filter-section" [ngClass]="{'collapsed': filtersCollapsed}">
+        <div class="row">
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="firstName" class="form-label">Prénom</label>
+                <input type="text" class="form-control" id="firstName" [(ngModel)]="firstNameFilter">
+            </div>
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="lastName" class="form-label">Nom</label>
+                <input type="text" class="form-control" id="lastName" [(ngModel)]="lastNameFilter">
+            </div>
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="phone" class="form-label">Téléphone</label>
+                <input type="phone" class="form-control" id="phone" [(ngModel)]="phoneFilter">
+            </div>
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" [(ngModel)]="emailFilter">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="minCreditFilter" class="form-label">Crédit</label>
+                <input type="number" class="form-control amount-input" id="minCreditFilter"
+                    [(ngModel)]="minCreditFilter" placeholder="De">
+                <input type="number" class="form-control amount-input" id="maxCreditFilter"
+                    [(ngModel)]="maxCreditFilter" placeholder="Jusqu'à">
+            </div>
+        </div>
+    </div>
+
+
     <div class="row">
         <div class="col-12 table-bloc">
             <table class="table table-responsive table-hover ">
@@ -67,7 +74,7 @@
                         <td>{{supplier?.lastName}}</td>
                         <td>{{supplier?.email}}</td>
                         <td>{{supplier?.phone}}</td>
-                        <td>{{supplier?.credit}}</td>
+                        <td>{{supplier?.credit ? supplier?.credit + " DT" : ""}}</td>
                         <td>
                             <button class="action-button" (click)="editSupplier(supplier)"><fa-icon
                                     [icon]="faEdit"></fa-icon></button>

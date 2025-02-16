@@ -1,63 +1,72 @@
-<div class="">
+<div class="padding-page">
     <div class="row title-bloc">
         <h2 class="title">
             Factures
         </h2>
     </div>
-    <div class="row">
-        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-            <label for="supplier" class="form-label">Fournisseur</label>
-            <ng-select [(ngModel)]="supplierFilter" name="supplier">
-                <ng-option *ngFor="let element of suppliers" [value]="element?.id">{{element.firstName + ' ' +
-                    element.lastName}}</ng-option>
-            </ng-select>
-        </div>
 
-        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-            <label for="code" class="form-label">Code</label>
-            <input type="text" class="form-control" id="code" [(ngModel)]="codeFilter">
-        </div>
+    <div class="row d-flex">
 
-        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-            <label for="name" class="form-label">Nom du client</label>
-            <input type="text" class="form-control" id="name" [(ngModel)]="nameFilter">
+        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
+            <button class="btn btn-secondary toggle-filters" (click)="toggleFilters()">
+                Afficher / Masquer les Filtres
+            </button>
         </div>
-
-        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-            <label for="type" class="form-label">Type</label>
-            <ng-select [(ngModel)]="typeFilter" name="type" id="type">
-                <ng-option *ngFor="let element of types" [value]="element?.value">{{element?.label}}</ng-option>
-            </ng-select>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-            <label for="fromDateFilter" class="form-label">Date</label>
-            <input type="date" class="form-control amount-input" id="fromDateFilter" [(ngModel)]="fromDateFilter"
-                placeholder="De">
-            <input type="date" class="form-control amount-input" id="toDateFilter" [(ngModel)]="toDateFilter"
-                placeholder="Jusqu'à">
-        </div>
-        <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-            <label for="minTotalFilter" class="form-label">Total</label>
-            <input type="number" class="form-control amount-input" id="minTotalFilter" [(ngModel)]="minTotalFilter"
-                placeholder="De">
-            <input type="number" class="form-control amount-input" id="maxTotalFilter" [(ngModel)]="maxTotalFilter"
-                placeholder="Jusqu'à">
-        </div>
-
-    </div>
-
-    <div class="row d-flex justify-content-end">
-        <div class="col-12 col-sm-12 col-md-10 col-lg-10 mb-3 align-filter-button">
+        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
             <button class="btn btn-secondary add-button" (click)="create()">Ajouter</button>
         </div>
-        <div class="col-6 col-sm-6 col-md-2 col-lg-1 mb-3 align-filter-button">
+        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
             <button class="btn btn-secondary" (click)="reset()">Réinitialiser</button>
         </div>
-        <div class="col-6 col-sm-6 col-md-2 col-lg-1 mb-3 align-filter-button">
+        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
             <button class="btn btn-primary" (click)="filter()">Filtrer</button>
+        </div>
+    </div>
+
+    <div class="filter-section" [ngClass]="{'collapsed': filtersCollapsed}">
+
+        <div class="row">
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="supplier" class="form-label">Fournisseur</label>
+                <ng-select [(ngModel)]="supplierFilter" name="supplier">
+                    <ng-option *ngFor="let element of suppliers" [value]="element?.id">{{element.firstName + ' ' +
+                        element.lastName}}</ng-option>
+                </ng-select>
+            </div>
+
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="code" class="form-label">Code</label>
+                <input type="text" class="form-control" id="code" [(ngModel)]="codeFilter">
+            </div>
+
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="name" class="form-label">Nom du client</label>
+                <input type="text" class="form-control" id="name" [(ngModel)]="nameFilter">
+            </div>
+
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="type" class="form-label">Type</label>
+                <ng-select [(ngModel)]="typeFilter" name="type" id="type">
+                    <ng-option *ngFor="let element of types" [value]="element?.value">{{element?.label}}</ng-option>
+                </ng-select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="fromDateFilter" class="form-label">Date</label>
+                <input type="date" class="form-control amount-input" id="fromDateFilter" [(ngModel)]="fromDateFilter"
+                    placeholder="De">
+                <input type="date" class="form-control amount-input" id="toDateFilter" [(ngModel)]="toDateFilter"
+                    placeholder="Jusqu'à">
+            </div>
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="minTotalFilter" class="form-label">Total</label>
+                <input type="number" class="form-control amount-input" id="minTotalFilter" [(ngModel)]="minTotalFilter"
+                    placeholder="De">
+                <input type="number" class="form-control amount-input" id="maxTotalFilter" [(ngModel)]="maxTotalFilter"
+                    placeholder="Jusqu'à">
+            </div>
         </div>
     </div>
 
@@ -108,15 +117,15 @@
 
                     </tr>
                     <tr *ngIf="count == 0">
-                        <td colspan="7" class="not-found-message">Pas de facture trouvé</td>
+                        <td colspan="8" class="not-found-message">Pas de facture trouvé</td>
                     </tr>
                 </tbody>
             </table>
-            <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
-                [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[5,10,20]" [hidePageSize]="false"
-                [pageIndex]="0" aria-label="Select page">
-            </mat-paginator>
         </div>
+        <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
+            [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[5,10,20]" [hidePageSize]="false"
+            [pageIndex]="0" aria-label="Select page">
+        </mat-paginator>
     </div>
 
 </div>

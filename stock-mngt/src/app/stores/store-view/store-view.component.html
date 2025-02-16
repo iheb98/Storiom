@@ -1,80 +1,85 @@
-<div *ngIf="store" class="store-details">
-    <!-- Modifier Button -->
-    <div class="row">
-        <div class="col-12 text-right">
-            <button class="btn btn-primary" [routerLink]="['/stores/'+store?.id]" routerLinkActive="router-link-active">
-                Modifier
-            </button>
+<div class="padding-page">
+    <div *ngIf="store" class="store-details">
+        <!-- Modifier Button -->
+        <div class="row">
+            <div class="col-12 text-right">
+                <button class="btn btn-primary" [routerLink]="['/stores/'+store?.id]"
+                    routerLinkActive="router-link-active">
+                    <fa-icon [icon]="editIcon"></fa-icon>
+                    Modifier
+                </button>
+            </div>
         </div>
-    </div>
 
 
-    <!-- General Information -->
-    <div class="row info-bloc">
-        <div class="col-12 col-md-10">
-            <div class="row">
-                <div class="col-12">
-                    <span class="info-bloc-title">Informations générales :</span>
+        <!-- General Information -->
+        <div class="row info-bloc">
+            <div class="col-12 col-md-10">
+                <div class="row">
+                    <div class="col-12">
+                        <span class="info-bloc-title">Informations générales :</span>
+                    </div>
+                    <div class="col-12">
+                        <span class="subtitle">Nom du boutique : </span>
+                        <span class="name">{{store?.name || 'N/A'}}</span>
+                    </div>
+                    <div class="col-12">
+                        <span class="subtitle">Téléphone : </span>
+                        <span class="name">{{store?.phone || 'N/A'}}</span>
+                    </div>
+                    <div class="col-12">
+                        <span class="subtitle">Email : </span>
+                        <span class="name">{{store?.email || 'N/A'}}</span>
+                    </div>
+                    <div class="col-12">
+                        <span class="subtitle">Site web : </span>
+                        <span class="name"><a [href]="fillLink(store?.site)" target="_blank">{{store?.site ||
+                                'N/A'}}</a></span>
+                    </div>
                 </div>
-                <div class="col-12">
-                    <span class="subtitle">Nom du boutique : </span>
-                    <span class="name">{{store?.name || 'N/A'}}</span>
-                </div>
-                <div class="col-12">
-                    <span class="subtitle">Téléphone : </span>
-                    <span class="name">{{store?.phone || 'N/A'}}</span>
-                </div>
-                <div class="col-12">
-                    <span class="subtitle">Email : </span>
-                    <span class="name">{{store?.email || 'N/A'}}</span>
-                </div>
-                <div class="col-12">
-                    <span class="subtitle">Site web : </span>
-                    <span class="name"><a [href]="'http://www.google.com'" target="_blank">{{store?.site || 'N/A'}}</a></span>
+            </div>
+            <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
+                <div class="image-container">
+                    <img [src]="store?.logo ? backend_URL +'/images/' + store?.logo : 'assets/store.jpg'"
+                        alt="Store Logo" class="image img-fluid rounded-circle"
+                        style="border: 1px solid lightgray; max-width: 100%; height: auto;">
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
-            <div class="image-container">
-                <img [src]="store?.logo ? backend_URL +'/images/' + store?.logo : 'assets/storeIcon.png'" 
-                     alt="Store Logo" class="image img-fluid rounded-circle" 
-                     style="border: 1px solid lightgray; max-width: 100%; height: auto;">
+
+
+
+        <!-- Store Address -->
+        <div class="row info-bloc">
+            <div class="col-12">
+                <span class="info-bloc-title">Adresse de la boutique :</span>
+            </div>
+            <div class="col-12">
+                <span class="subtitle">Rue : </span>
+                <span class="name">{{store?.address?.street || 'N/A'}}</span>
+            </div>
+            <div class="col-12">
+                <span class="subtitle">Cité : </span>
+                <span class="name">{{store?.address?.city || 'N/A'}}</span>
+            </div>
+            <div class="col-12">
+                <span class="subtitle">Code Postale : </span>
+                <span class="name">{{store?.address?.postalCode || 'N/A'}}</span>
+            </div>
+            <div class="col-12">
+                <span class="subtitle">Etat : </span>
+                <span class="name">{{store?.address?.state || 'N/A'}}</span>
             </div>
         </div>
-    </div>
-    
-    
 
-    <!-- Store Address -->
-    <div class="row info-bloc">
-        <div class="col-12">
-            <span class="info-bloc-title">Adresse de la boutique :</span>
-        </div>
-        <div class="col-12">
-            <span class="subtitle">Rue : </span>
-            <span class="name">{{store?.address?.street || 'N/A'}}</span>
-        </div>
-        <div class="col-12">
-            <span class="subtitle">Cité : </span>
-            <span class="name">{{store?.address?.city || 'N/A'}}</span>
-        </div>
-        <div class="col-12">
-            <span class="subtitle">Code Postale : </span>
-            <span class="name">{{store?.address?.postalCode || 'N/A'}}</span>
-        </div>
-        <div class="col-12">
-            <span class="subtitle">Etat : </span>
-            <span class="name">{{store?.address?.state || 'N/A'}}</span>
-        </div>
-    </div>
-
-    <!-- Store Description -->
-    <div class="row info-bloc">
-        <div class="col-12">
-            <span class="info-bloc-title">Description :</span>
-        </div>
-        <div class="col-12">
-            <span class="name">{{store?.description || 'Aucune description disponible'}}</span>
+        <!-- Store Description -->
+        <div class="row info-bloc">
+            <div class="col-12">
+                <span class="info-bloc-title">Description :</span>
+            </div>
+            <div class="col-12">
+                <span class="name">{{store?.description || 'Aucune description disponible'}}</span>
+            </div>
         </div>
     </div>
 </div>

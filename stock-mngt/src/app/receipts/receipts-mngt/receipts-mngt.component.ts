@@ -50,6 +50,12 @@ export class ReceiptsMngtComponent implements OnInit {
 
   currentPage = 0;
   currentSize = 5;
+  filtersCollapsed = true;
+
+  toggleFilters() {
+    this.filtersCollapsed = !this.filtersCollapsed;
+  }
+
   constructor(
     private supplierService: SupplierService,
     private loadingService: LoadingService,
@@ -226,7 +232,7 @@ export class ReceiptsMngtComponent implements OnInit {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #8b4caf8c;
+    border-bottom: 2px solid #343a40 ;
     padding-bottom: 20px;
 }
 
@@ -236,7 +242,7 @@ export class ReceiptsMngtComponent implements OnInit {
 
 .invoice-header h1 {
     font-size: 24px;
-    color: #8b4caf8c;
+    color: #343a40 ;
 }
 
 .invoice-details {
@@ -265,7 +271,7 @@ export class ReceiptsMngtComponent implements OnInit {
 }
 
 .invoice-table th {
-    background-color: #8b4caf8c;
+    background-color: #343a40 ;
     color: #fff;
 }
 
@@ -334,10 +340,10 @@ export class ReceiptsMngtComponent implements OnInit {
             </div>
         </div>
 
-        <div class="invoice-info" style="text-align:left">
-            <p> Addresse: ${receipt?.store?.address?.state + ' ' + receipt?.store?.address?.city} </p>
-            <p>Email: ${this.store?.email}</p>
-            <p>téléphone: ${this.store?.phone}</p>
+        <div class="invoice-details" style="text-align:left">
+            <div> <span class="details-label">Addresse: </span> ${receipt?.store?.address?.state + ' ' + receipt?.store?.address?.city} </div>
+            <div><span class="details-label">Email: </span> ${this.store?.email}</div>
+            <div><span class="details-label">téléphone:</span> ${this.store?.phone}</div>
         </div>
     </div>
 

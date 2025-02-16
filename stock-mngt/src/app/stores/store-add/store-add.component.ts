@@ -15,6 +15,7 @@ export class StoreAddComponent implements OnInit {
   store: Store;
   form: FormGroup;
   storeId
+  storeTypes = ['Boutique', 'Quincaillerie']
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
   constructor(private formBuilder: FormBuilder,
     private service: StoreService,
@@ -51,6 +52,7 @@ export class StoreAddComponent implements OnInit {
   initForm() {
     this.form = this.formBuilder.group({
       name: ['', Validators.required],
+      storeType: ['Boutique', Validators.required],
       description: [''],
       phone: [''],
       email: [''],
@@ -76,14 +78,15 @@ export class StoreAddComponent implements OnInit {
               response => {
                 this.authService.refreshToken().subscribe(response => {
                   localStorage.setItem('accessToken', response.accessToken);
-                  this.router.navigate([''])
+                  this.authService.loggedIn.next();
+                  this.router.navigate(['stores/view'])
                 })
               }
             )
           else
             this.authService.refreshToken().subscribe(response => {
               localStorage.setItem('accessToken', response.accessToken);
-              this.router.navigate([''])
+              this.router.navigate(['stores/view'])
             })
         }
       )
@@ -100,11 +103,11 @@ export class StoreAddComponent implements OnInit {
           if (this.fileInput.nativeElement.files[0])
             this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(
               response => {
-                this.router.navigate([''])
+                this.router.navigate(['stores/view'])
               }
             )
           else
-            this.router.navigate([''])
+            this.router.navigate(['stores/view'])
         }
       )
     }

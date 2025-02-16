@@ -18,8 +18,8 @@ export class OperationStatsComponent implements OnInit {
   operationsOptions: any;
 
   operations: any = [];
-  typesOfDate = ["DAILY", "WEEKLY", "MONTHLY", "ANNUALLY"]
-  selectedDateType = 'MONTHLY'
+  typesOfDate = ["Quotidien", "Mensuel", "Annuel"]
+  selectedDateType = 'Mensuel'
 
   dayFilter;
   weekFilter;
@@ -45,15 +45,17 @@ export class OperationStatsComponent implements OnInit {
 
     this.monthFilter = new Date().getFullYear() + "-" +
       ((new Date().getMonth() + 1) < 10 ? "0" + (new Date().getMonth() + 1) : (new Date().getMonth() + 1));
-
     this.yearFilter = new Date().getFullYear();
+    console.log(this.yearFilter)
 
 
     /// ------------ Chart init ------------------
     const documentStyle = getComputedStyle(document.documentElement);
     const textColor = documentStyle.getPropertyValue('--text-color');
     const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+   // const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+    const surfaceBorder = 'lightgray'
+
     this.operationsOptions = {
       plugins: {
         legend: {
@@ -87,7 +89,7 @@ export class OperationStatsComponent implements OnInit {
     this.getOperationStats()
   }
 
-  getMonthly() {
+  getMensuel() {
     let days = [];
     this.soldOperationsData = [];
     this.loadedOperationsData = [];
@@ -112,7 +114,7 @@ export class OperationStatsComponent implements OnInit {
     }
     this.updateChart();
   }
-  getDaily() {
+  getQuotidien() {
     this.soldOperationsData = [];
     this.loadedOperationsData = [];
     this.operationsLabels = this.hoursLabels
@@ -136,7 +138,7 @@ export class OperationStatsComponent implements OnInit {
     }
     this.updateChart();
   }
-  getAnnually() {
+  getAnnuel() {
     let months = [];
     this.soldOperationsData = [];
     this.loadedOperationsData = [];
@@ -170,15 +172,13 @@ export class OperationStatsComponent implements OnInit {
         {
           label: 'Vendu',
           data: this.soldOperationsData,
-          backgroundColor: ['rgba(75, 192, 192, 0.2)'],
-          borderColor: ['rgb(75, 192, 192)'],
+          backgroundColor: ['#42A5F5'],
           borderWidth: 1
         },
         {
           label: 'Chargé',
           data: this.loadedOperationsData,
-          backgroundColor: ['rgba(255, 159, 64, 0.2)'],
-          borderColor: ['rgb(255, 159, 64)'],
+          backgroundColor: ['#ff9f40'],
           borderWidth: 1
         }
       ]
@@ -190,15 +190,19 @@ export class OperationStatsComponent implements OnInit {
     let month;
     let year;
     let day;
+    console.log(this.yearFilter)
+        console.log(new Date(this.yearFilter).getFullYear())
     switch (this.selectedDateType) {
-      case 'DAILY':
+      case 'Quotidien':
         day = new Date(this.dayFilter).getDate();
         month = new Date(this.dayFilter).getMonth() + 1;
         year = new Date(this.dayFilter).getFullYear();
         filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day
         break;
-      case 'ANNUALLY':
-        year = new Date(this.dayFilter).getFullYear();
+      case 'Annuel':
+        console.log(this.yearFilter)
+        console.log(new Date(this.yearFilter).getFullYear())
+        year = this.yearFilter
         filterValue = year
         break;
       default:
@@ -207,16 +211,16 @@ export class OperationStatsComponent implements OnInit {
         filterValue = year + '-' + month
         break;
     }
-    this.statService.getOperationStats(this.user.id, this.selectedDateType, filterValue).subscribe(
+    this.statService.getOperationStats(this.user?.store, this.selectedDateType, filterValue).subscribe(
       response => {
         this.operations = response;
         console.log(this.operations)
-        if (this.selectedDateType == "DAILY") {
-          this.getDaily();
-        } else if (this.selectedDateType == "ANNUALLY") {
-          this.getAnnually();
+        if (this.selectedDateType == "Quotidien") {
+          this.getQuotidien();
+        } else if (this.selectedDateType == "Annuel") {
+          this.getAnnuel();
         } else {
-          this.getMonthly();
+          this.getMensuel();
         }
       }
     )

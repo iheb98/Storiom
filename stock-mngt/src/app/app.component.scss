@@ -157,7 +157,7 @@ mat-list-item {
 }
 
 .custom-toolbar {
-    background-color: #004F9F;
+    background-color: #343a40 ;
     color: white; /* Optional: Set text color for contrast */
   }
   
@@ -169,6 +169,37 @@ mat-toolbar {
     z-index: 100;
     width: 100% !important;
 }
+
+/* Ensure the toolbar row uses flexbox for alignment */
+.toolbar-row {
+    display: flex;
+    align-items: center; /* Vertically center all items in the row */
+}
+
+/* Logo Styles */
+.navbar-logo {
+    height: 50px; /* Adjust the size as needed */
+    width: 50px; /* Ensure height and width are equal for a perfect circle */
+    border-radius: 50%; /* Makes the image circular */
+    object-fit: cover; /* Ensures the image fits within the circle */
+    margin-right: 10px; /* Adds spacing between the logo and the name */
+}
+
+/* Name Styles */
+.navbar-name {
+    font-size: 1.2em; /* Adjust font size */
+    font-weight: bold;
+    margin-left: 10px; /* Add spacing between logo and text */
+    display: flex;
+    align-items: center;
+}
+
+/* Spacer Styles */
+.navbar-fill-remaining-space {
+    flex: 1 1 auto; /* Fills remaining space */
+}
+
+
 
 @media screen and (max-width: 480px) {
     mat-sidenav {

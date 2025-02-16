@@ -1,0 +1,128 @@
+.actions-bloc{
+    padding-top:10px
+  }
+  
+  .screen-title-bloc{
+    padding:50px;
+  }
+  
+  
+  .category-field{
+      margin-top: 10px;
+  }
+  
+  label{
+    font-weight: bold;
+  }
+  textarea {
+      resize: none;
+    }
+  
+    ngx-mat-file-input, mat-form-field{
+      width: 100%;
+    }
+  
+    
+    .image-container {
+      position: relative;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      height: 100%;
+    }
+    .image-container img{
+      border-radius: 10px;
+    }
+  
+    .delete-button {
+      position: absolute;
+      background-color: red;
+      border-top-right-radius: 10px;
+      border-bottom-left-radius: 10px;
+      top: -1px;
+      right: -1px;
+    }
+  
+    
+  .delete-button:hover{
+    box-shadow: 0px 0px 10px red;
+  }
+  
+  .delete-button fa-icon {
+    font-size: 20px;
+  }
+  
+  .images-bloc{
+    margin-bottom:20px
+  }
+  
+  .screen-title {
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  
+  .link-primary, .link-secondary {
+    padding: 5px 10px;
+    border-radius: 4px;
+    background-color: #007bff; /* for primary link */
+    color: white;
+  }
+  
+  .link-secondary {
+    background-color: #6c757d; /* for secondary link */
+  }
+  
+  .link-primary:hover, .link-secondary:hover {
+    text-decoration: none;
+    cursor: pointer;
+    opacity: 0.9;
+  }
+  
+  .link-no-background {
+    color: #007bff; /* Blue text color for the links */
+    padding: 0;
+    background-color: transparent; /* No background */
+    font-size: 16px;
+    font-weight: 500; /* Optional: to make the text look a bit bold */
+    cursor: pointer; /* Hand cursor */
+  }
+  
+  .link-no-background:hover {
+    text-decoration: underline; /* Underline on hover to indicate a clickable link */
+    opacity: 0.8; /* Slightly dim the link on hover */
+    cursor: pointer; /* Hand cursor on hover */
+  }
+  
+  .link-no-background .fa-icon {
+    margin-right: 5px;
+  }
+  
+  
+  
+  
+  @media screen and (max-width: 1500px) {
+    .padding-page {
+       // padding: 0 50px 150px 50px;
+    }
+  
+    .title {
+        width: 100%;
+        text-align: center;
+        padding: 20px 0 0 0;
+        font-size: 30px;
+    }
+  }
+  
+  @media screen and (max-width: 600px) {
+    .padding-page {
+       // padding: 80px 20px 0 20px;
+       // padding-top: 80px;
+    }
+  
+    .title {
+        width: 100%;
+        text-align: center;
+        padding: 20px 0 0 0;
+        font-size: 30px;
+    }
+  }

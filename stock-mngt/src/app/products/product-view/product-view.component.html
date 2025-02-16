@@ -1,10 +1,10 @@
-<div class="">
+<div class="padding-page">
     <div class="row actions-bloc d-flex justify-content-end">
-        <div class="col-auto">
-            <button class="btn btn-primary" (click)="navigateTo('/products')">Gestions des Produits</button>
+        <div class="col-12 col-md-auto mb-3">
+            <button class="btn btn-primary action-button" (click)="navigateTo('/products')">Gestions des Produits</button>
         </div>
-        <div class="col-auto">
-            <button class="btn btn-secondary" (click)="navigateTo('/products/edit/'+product?.id)">
+        <div class="col-12 col-md-auto">
+            <button class="btn btn-secondary action-button" (click)="navigateTo('/products/edit/'+product?.id)">
                 <fa-icon [icon]="faEdit"></fa-icon>
                 Modifier</button>
         </div>
@@ -21,7 +21,7 @@
                 <fa-icon [icon]="infoIcon" class="info-icon"></fa-icon>Pas d'images trouvées pour ce produit
             </div>
         </div>
-        <div class="col-4" *ngFor="let item of product?.images">
+        <div class="col-6 col-md-4" *ngFor="let item of product?.images">
             <div class="image-container">
                 <!--<button class="delete-button"><fa-icon [icon]="timesIcon"></fa-icon></button>-->
             <img src="{{environment.backend+'/images/'+item}}" alt="" class="h-100 w-100">
@@ -80,16 +80,16 @@
                 </select>
             </div>
             <div class="col-6 col-md-9">
-                <input *ngIf="selectedDateType=='DAILY'" class="form-control" type="date" id="day" name="day"
+                <input *ngIf="selectedDateType=='Quotidien'" class="form-control" type="date" id="day" name="day"
                     [(ngModel)]="dayFilter" (change)="getOperationStats()">
     
                 <input *ngIf="selectedDateType=='WEEKLY'" class="form-control" type="week" id="week" name="week"
                     [(ngModel)]="weekFilter" (change)="getOperationStats()">
     
-                <input *ngIf="selectedDateType=='MONTHLY'" class="form-control" type="month" id="month" name="month"
+                <input *ngIf="selectedDateType=='Mensuel'" class="form-control" type="month" id="month" name="month"
                     [(ngModel)]="monthFilter" (change)="getOperationStats()">
     
-                <select class="form-control" *ngIf="selectedDateType=='ANNUALLY'" [(ngModel)]="yearFilter"
+                <select class="form-control" *ngIf="selectedDateType=='Annuel'" [(ngModel)]="yearFilter"
                     (change)="getOperationStats()">
                     <option *ngFor="let year of years" [value]="year">{{year}}</option>
                 </select>

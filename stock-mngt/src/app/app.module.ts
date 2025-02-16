@@ -60,6 +60,9 @@ import { ProductListComponent } from './market/product-list/product-list.compone
 import { ProductCardComponent } from './market/product-card/product-card.component';
 import { MainComponent } from './market/main/main.component';
 import { CategoryStatsComponent } from './dashboard/category-stats/category-stats.component';
+import { LandingPageComponent } from './general/landing-page/landing-page.component';
+import { AddProductFromReceiptComponent } from './products/add-product-from-receipt/add-product-from-receipt.component';
+import { GenerateReportComponent } from './reports/generate-report/generate-report.component';
 
 
 @NgModule({
@@ -103,7 +106,10 @@ import { CategoryStatsComponent } from './dashboard/category-stats/category-stat
     ProductListComponent,
     ProductCardComponent,
     MainComponent,
-    CategoryStatsComponent
+    CategoryStatsComponent,
+    LandingPageComponent,
+    AddProductFromReceiptComponent,
+    GenerateReportComponent
   ],
   imports: [
     BrowserModule,

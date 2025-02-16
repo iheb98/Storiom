@@ -53,6 +53,15 @@ export class StatService {
     });
   }
 
+  generateReport(id, from, to): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'store/' + id + '/generate-report', {
+      params: {
+        from,
+        to
+      }
+    });
+  }
+
   getOperationStatsByCategoryItems(id, type, value): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'store/' + id + '/operationStats/categories/items', {
       params: {

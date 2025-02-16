@@ -77,8 +77,43 @@ button{
     font-size:20px
 }
 
+.action-button{
+    width: 100%;
+}
+
 @media screen and (max-width: 480px) {
     .info-bloc {
         font-size: 16pt;
+    }
+}
+
+.padding-page {
+    padding: 5rem 15rem 2rem 15rem;
+}
+
+@media screen and (max-width: 1500px) {
+    .padding-page {
+        padding: 0 50px 150px 50px;
+    }
+
+    .title {
+        width: 100%;
+        text-align: center;
+        padding: 20px 0 0 0;
+        font-size: 30px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .padding-page {
+        padding: 80px 20px 0 20px;
+        padding-top: 80px;
+    }
+
+    .title {
+        width: 100%;
+        text-align: center;
+        padding: 20px 0 0 0;
+        font-size: 30px;
     }
 }

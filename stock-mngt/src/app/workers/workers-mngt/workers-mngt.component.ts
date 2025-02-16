@@ -28,6 +28,13 @@ export class WorkersMngtComponent implements OnInit {
 
   currentPage = 0;
   currentSize = 5;
+
+  filtersCollapsed = true;
+
+  toggleFilters() {
+      this.filtersCollapsed = !this.filtersCollapsed;
+  }
+  
   constructor(
     private workerService: WorkerService,
     private authService: AuthService,

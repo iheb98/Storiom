@@ -24,7 +24,7 @@ export class ReceiptResultTableComponent implements OnInit {
 
 
   getLastOperations() {
-    this.receiptService.getLastOperationsByStoreId(this.user.id).subscribe(
+    this.receiptService.getLastOperationsByStoreId(this.user?.store).subscribe(
       response => {
         this.receipts = response
       }

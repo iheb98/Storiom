@@ -24,7 +24,7 @@ export class MostSoldProductsComponent implements OnInit {
 
 
   getMostSoldProducts() {
-    this.statService.getMostSoldProducts(this.user.id).subscribe(
+    this.statService.getMostSoldProducts(this.user?.store).subscribe(
       response => {
         this.operations = response
       }

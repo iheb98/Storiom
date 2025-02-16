@@ -2,10 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { faNode } from '@fortawesome/free-brands-svg-icons';
 import { faArrowAltCircleRight, faChartBar } from '@fortawesome/free-regular-svg-icons';
-import { faPowerOff, faHome, faStore, faUser, faCodeBranch, faHandHoldingUsd, faCoins, faShuttleVan, faBox, faReceipt, faImage } from '@fortawesome/free-solid-svg-icons';
+import { faPowerOff, faHome, faStore, faUser, faCodeBranch, faHandHoldingUsd, faCoins, faShuttleVan, faBox, faReceipt, faImage, faFile } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from './services/auth.service';
 import { ListenerService } from './services/listener.service';
 import { LoadingService } from './services/loading.service';
+import { StoreService } from './services/store.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +15,7 @@ import { LoadingService } from './services/loading.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-
+  backend_URL = environment.backend
   storeIcon = faStore
   homeIcon = faHome
   powerIcon = faPowerOff
@@ -23,17 +25,33 @@ export class AppComponent implements OnInit {
   title = 'stock-mngt';
   opened = false;
   connectedUser;
+  store;
   menu;
 
-  constructor(private authService: AuthService, private router: Router,public loadingService: LoadingService) {
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    public loadingService: LoadingService,
+    public storeService: StoreService
+  ) {
   }
   ngOnInit() {
     this.connectedUser = this.authService.getConnectedUser()
+    console.log(this.connectedUser?.store)
     this.setMenu()
-    this.authService.loggedIn.subscribe(response=>{
+    console.log(this.connectedUser)
+    this.authService.loggedIn.subscribe(response => {
       this.connectedUser = this.authService.getConnectedUser()
       console.log(this.connectedUser)
     })
+    this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
+      store => {
+        this.store = store
+        this.loadingService.screenLoaded()
+      }, error => {
+        this.loadingService.screenLoaded()
+      }
+    )
   }
   logout() {
     this.authService.logout().subscribe(response => {
@@ -50,7 +68,7 @@ export class AppComponent implements OnInit {
     this.menu = [{
       label: 'Accueil',
       icon: this.homeIcon,
-      link: '',
+      link: 'stores/view',
     },
     {
       label: 'Catégories',
@@ -99,7 +117,13 @@ export class AppComponent implements OnInit {
       label: 'Crédits',
       icon: faHandHoldingUsd,
       link: 'credits',
-    }]
+    },
+    {
+      label: 'Rapport',
+      icon: faFile,
+      link: 'reports/generate',
+    }
+    ]
   }
 
 }

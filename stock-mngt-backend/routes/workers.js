@@ -153,7 +153,7 @@ router.get('/:id', utility.authenticate, (req, res, next) => {
         where: {
             id,
             creatorUserId: req.user.id
-        }, include: ['receipts']
+        }, include: []
     }).then(worker => {
         res.json(worker)
 

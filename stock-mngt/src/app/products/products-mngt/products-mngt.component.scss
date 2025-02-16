@@ -78,3 +78,50 @@ mat-paginator{
      width: 100%;
     }
  }
+
+ .padding-page {
+    padding: 5rem 15rem 2rem 15rem;
+}
+
+@media screen and (max-width: 1500px) {
+    .padding-page {
+        padding: 0 50px 150px 50px;
+    }
+
+    .title {
+        width: 100%;
+        text-align: center;
+        padding: 20px 0 0 0;
+        font-size: 30px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .padding-page {
+        padding: 80px 20px 0 20px;
+        padding-top: 80px;
+    }
+
+    .title {
+        width: 100%;
+        text-align: center;
+        padding: 20px 0 0 0;
+        font-size: 30px;
+    }
+}
+
+
+
+.filter-section {
+    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    overflow: hidden;
+    max-height: 500px; /* Adjust based on content */
+    opacity: 1;
+}
+
+.filter-section.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding: 0;
+    margin: 0;
+}

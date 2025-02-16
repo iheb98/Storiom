@@ -49,7 +49,7 @@ export class LoginComponent implements OnInit {
           else {
             this.authService.registerTokens(response.accessToken, response.refreshToken)
             this.authService.loggedIn.next();
-            this.router.navigate([''])
+            this.router.navigate(['stores/view'])
           }
         },
           error => {

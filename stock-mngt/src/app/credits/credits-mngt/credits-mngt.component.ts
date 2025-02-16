@@ -33,6 +33,11 @@ export class CreditsMngtComponent implements OnInit {
 
   currentPage = 0;
   currentSize = 5;
+  filtersCollapsed = true;
+
+  toggleFilters() {
+    this.filtersCollapsed = !this.filtersCollapsed;
+  }
   constructor(
     private creditService: CreditService,
     private authService: AuthService,
@@ -65,6 +70,7 @@ export class CreditsMngtComponent implements OnInit {
   }
 
   buildQuery() {
+    console.log(this.minAmountFilter)
     let query = "";
     if (this.firstNameFilter)
       query += query ? ",firstName ~ '" + this.firstNameFilter + "'" : "firstName ~ '" + this.firstNameFilter + "'"
@@ -74,9 +80,9 @@ export class CreditsMngtComponent implements OnInit {
       query += query ? ",email ~ '" + this.emailFilter + "'" : "email ~ '" + this.emailFilter + "'"
     if (this.phoneFilter)
       query += query ? ",phone ~ '" + this.phoneFilter + "'" : "phone ~ '" + this.phoneFilter + "'"
-    if (this.minAmountFilter)
+    if (this.minAmountFilter != null)
       query += query ? ",amount > '" + this.minAmountFilter + "'" : "amount > '" + this.minAmountFilter + "'"
-    if (this.maxAmountFilter)
+    if (this.maxAmountFilter  != null)
       query += query ? ",amount < '" + this.maxAmountFilter + "'" : "amount < '" + this.maxAmountFilter + "'"
     if (this.fromGivenDateFilter)
       query += query ? ",givenDate > '" + this.fromGivenDateFilter + "'" : "givenDate > '" + this.fromGivenDateFilter + "'"

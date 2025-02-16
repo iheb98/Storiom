@@ -23,11 +23,11 @@ body {
     padding: 50px 50px 50px 50px;
 }
 
-.full-page {
-    height: 100%;
-    padding: 100px 100px 150px 100px;
-    position: relative;
-}
+// .full-page {
+//     height: 100%;
+//     padding: 100px 100px 150px 100px;
+//     position: relative;
+// }
 
 .page {
     height: 100%;
@@ -139,10 +139,10 @@ table{
 }
 
 @media screen and (max-width: 1500px) {
-    .full-page {
-        padding: 0 50px 150px 50px;
-        position: relative;
-    }
+    // .full-page {
+    //     padding: 0 50px 150px 50px;
+    //     position: relative;
+    // }
 
     .title {
         width: 100%;
@@ -153,11 +153,11 @@ table{
 }
 
 @media screen and (max-width: 600px) {
-    .full-page {
-        padding: 80px 20px 0 20px;
-        position: relative;
-        //padding-top:80px;
-    }
+    // .full-page {
+    //     padding: 80px 20px 0 20px;
+    //     position: relative;
+    //     //padding-top:80px;
+    // }
     .title {
         width: 100%;
         text-align: center;
@@ -167,9 +167,9 @@ table{
 }
 
 
-.container {
-    display: flex;
-  }
+// .container {
+//     display: flex;
+//   }
   
   .sidenav {
     width: 250px;

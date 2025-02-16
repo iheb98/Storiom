@@ -129,7 +129,7 @@ export class ProductAddComponent implements OnInit {
       name: ['', Validators.required],
       supplierId: [null],
       brandId: [null],
-      quantity: [''],
+      quantity: [0],
       unit:[''],
       size: [''],
       color: [null],

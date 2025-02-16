@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { faEdit } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/services/auth.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { StoreService } from 'src/app/services/store.service';
@@ -13,6 +14,7 @@ import Swal from 'sweetalert2';
 export class StoreViewComponent implements OnInit {
   store;
   backend_URL = environment.backend
+  editIcon = faEdit
   constructor(
     private authService: AuthService,
     private storeService: StoreService,
@@ -20,14 +22,11 @@ export class StoreViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadingService.screenLoading()
-    console.log("tessssssssssssss")
     this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
       store => {
-        console.log("tessstttt")
         this.store = store
         this.loadingService.screenLoaded()
       }, error => {
-        console.log("test");
         this.loadingService.screenLoaded()
         Swal.fire({
           icon: 'error',
@@ -37,6 +36,17 @@ export class StoreViewComponent implements OnInit {
         })
       }
     )
+  }
+
+  fillLink(link) {
+    console.log(link)
+    if (link != null) {
+      if (link.indexOf('http://') == -1 && link.indexOf('https://') == -1) {
+        return 'http://' + link
+      }
+      return link
+    }
+    return null
   }
 
 }

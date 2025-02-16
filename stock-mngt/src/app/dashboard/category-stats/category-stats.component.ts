@@ -19,8 +19,8 @@ export class CategoryStatsComponent implements OnInit {
   operationsOptions: any;
 
   operations: any = [];
-  typesOfDate = ["DAILY", "WEEKLY", "MONTHLY", "ANNUALLY"]
-  selectedDateType = 'MONTHLY'
+  typesOfDate = ["Quotidien", "Mensuel", "Annuel"]
+  selectedDateType = 'Mensuel'
 
   dayFilter;
   weekFilter;
@@ -54,13 +54,12 @@ export class CategoryStatsComponent implements OnInit {
     const documentStyle = getComputedStyle(document.documentElement);
     const textColor = documentStyle.getPropertyValue('--text-color');
     const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+    const surfaceBorder = 'lightgray'
     this.operationsOptions = {
       plugins: {
         legend: {
-          labels: {
-            color: textColor
-          }
+          display: false
+
         }
       },
       scales: {
@@ -71,7 +70,7 @@ export class CategoryStatsComponent implements OnInit {
           },
           grid: {
             color: surfaceBorder,
-            drawBorder: true
+            drawBorder: true,
           }
         },
         x: {
@@ -89,81 +88,7 @@ export class CategoryStatsComponent implements OnInit {
     this.updateOperationStats()
   }
 
-  getMonthly() {
-    let days = [];
-    this.soldOperationsData = [];
-    this.loadedOperationsData = [];
-    for (let i = 0; i < this.lastDay(new Date(this.monthFilter).getFullYear(), new Date(this.monthFilter).getMonth()); i++) {
-      this.soldOperationsData.push(0);
-      this.loadedOperationsData.push(0);
-      days.push(i + 1);
-    }
-    this.operationsLabels = days
-    if (this.operations) {
-      for (let operation of this.operations) {
-        if (operation.type == "SOLD") {
-          this.soldOperationsData[new Date(operation.date).getDate() - 1] +=
-            (operation?.price && operation?.amount) ?
-              operation?.price * operation?.amount : 0
-        } else if (operation.type == "LOADED") {
-          this.loadedOperationsData[new Date(operation.date).getDate() - 1] +=
-            (operation?.price && operation?.amount) ?
-              operation?.price * operation?.amount : 0
-        }
-      }
-    }
-    this.updateChart();
-  }
-  getDaily() {
-    this.soldOperationsData = [];
-    this.loadedOperationsData = [];
-    this.operationsLabels = this.hoursLabels
-    for (let i = 0; i < 24; i++) {
-      this.soldOperationsData.push(0);
-      this.loadedOperationsData.push(0);
-    }
-    if (this.operations) {
-      for (let operation of this.operations) {
-        if (operation.type == "SOLD") {
-          this.soldOperationsData[new Date(operation.date).getHours()] +=
-            (operation?.price && operation?.amount) ?
-              operation?.price * operation?.amount : 0
-        } else if (operation.type == "LOADED") {
-          this.loadedOperationsData[new Date(operation.date).getHours()] +=
-            (operation?.price && operation?.amount) ?
-              operation?.price * operation?.amount : 0
-        }
 
-      }
-    }
-    this.updateChart();
-  }
-  getAnnually() {
-    let months = [];
-    this.soldOperationsData = [];
-    this.loadedOperationsData = [];
-    for (let i = 1; i <= 12; i++) {
-      this.soldOperationsData.push(0);
-      this.loadedOperationsData.push(0);
-      months.push(i + 1);
-    }
-    this.operationsLabels = months
-    if (this.operations) {
-      for (let operation of this.operations) {
-        if (operation.type == "SOLD") {
-          this.soldOperationsData[new Date(operation.date).getMonth() - 1] +=
-            (operation?.price && operation?.amount) ?
-              operation?.price * operation?.amount : 0
-        } else if (operation.type == "LOADED") {
-          this.loadedOperationsData[new Date(operation.date).getMonth() - 1] +=
-            (operation?.price && operation?.amount) ?
-              operation?.price * operation?.amount : 0
-        }
-
-      }
-    }
-    this.updateChart();
-  }
 
   updateChart() {
     this.operationsData = {
@@ -193,14 +118,14 @@ export class CategoryStatsComponent implements OnInit {
     let year;
     let day;
     switch (this.selectedDateType) {
-      case 'DAILY':
+      case 'Quotidien':
         day = new Date(this.dayFilter).getDate();
         month = new Date(this.dayFilter).getMonth() + 1;
         year = new Date(this.dayFilter).getFullYear();
         filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day
         break;
-      case 'ANNUALLY':
-        year = new Date(this.dayFilter).getFullYear();
+      case 'Annuel':
+        year = this.yearFilter
         filterValue = year
         break;
       default:
@@ -212,14 +137,6 @@ export class CategoryStatsComponent implements OnInit {
     this.statService.getOperationStatsByCategory(this.user.id, this.selectedDateType, filterValue).subscribe(
       response => {
         this.operationsData = response
-        this.operations = response;
-        if (this.selectedDateType == "DAILY") {
-          this.getDaily();
-        } else if (this.selectedDateType == "ANNUALLY") {
-          this.getAnnually();
-        } else {
-          this.getMonthly();
-        }
       }
     )
   }
@@ -230,14 +147,14 @@ export class CategoryStatsComponent implements OnInit {
     let year;
     let day;
     switch (this.selectedDateType) {
-      case 'DAILY':
+      case 'Quotidien':
         day = new Date(this.dayFilter).getDate();
         month = new Date(this.dayFilter).getMonth() + 1;
         year = new Date(this.dayFilter).getFullYear();
         filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day
         break;
-      case 'ANNUALLY':
-        year = new Date(this.dayFilter).getFullYear();
+      case 'Annuel':
+        year = this.yearFilter;
         filterValue = year
         break;
       default:
@@ -249,14 +166,7 @@ export class CategoryStatsComponent implements OnInit {
     this.statService.getOperationStatsByCategoryItems(this.user.id, this.selectedDateType, filterValue).subscribe(
       response => {
         this.operationsItemsData = response
-        this.operations = response;
-        if (this.selectedDateType == "DAILY") {
-          this.getDaily();
-        } else if (this.selectedDateType == "ANNUALLY") {
-          this.getAnnually();
-        } else {
-          this.getMonthly();
-        }
+
       }
     )
   }

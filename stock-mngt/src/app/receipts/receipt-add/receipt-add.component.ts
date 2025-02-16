@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faEdit, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { AddProductFromReceiptComponent } from 'src/app/products/add-product-from-receipt/add-product-from-receipt.component';
+import { ProductAddComponent } from 'src/app/products/product-add/product-add.component';
 import { ProductsSearchReceiptComponent } from 'src/app/products/products-search-receipt/products-search-receipt.component';
 import { AuthService } from 'src/app/services/auth.service';
 import { BrandService } from 'src/app/services/brand.service';
@@ -56,7 +58,7 @@ export class ReceiptAddComponent implements OnInit {
 
 
   addProducts() {
-    const dialogRef = this.dialog.open(ProductsSearchReceiptComponent, { width: '70%', data: { selectedProducts: this.selectedProducts, receiptType: this.form.get('type').value } });
+    const dialogRef = this.dialog.open(ProductsSearchReceiptComponent, { width: '80%', data: { selectedProducts: this.selectedProducts, receiptType: this.form.get('type').value } });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
@@ -76,7 +78,15 @@ export class ReceiptAddComponent implements OnInit {
   }
 
   addNewProduct() {
+    const dialogRef = this.dialog.open(AddProductFromReceiptComponent, { width: '80%', data: { selectedProducts: this.selectedProducts, receiptType: this.form.get('type').value } });
 
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.selectedProducts = result?.selectedProducts
+        this.calculateTotal()
+        //this.loadingService.screenLoading()
+      }
+    });
   }
 
   initForm() {

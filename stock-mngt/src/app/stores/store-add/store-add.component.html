@@ -1,4 +1,4 @@
-<div class="">
+<div class="padding-page">
     <div class="row title-bloc">
         <h2 class="title">
             {{ storeId ? 'Modifier la boutique' : 'Créer votre boutique' }}
@@ -16,6 +16,18 @@
                         *ngIf="form.controls['name'].invalid && (form.controls['name'].dirty || form.controls['name'].touched)">
                         <div *ngIf="form.controls['name'].errors.required" class="form-error">
                             Le nom est obligatoire.
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Type <span class="form-error">*</span></label>
+                    <ng-select formControlName="storeType" name="storeType" id="storeType">
+                        <ng-option *ngFor="let element of storeTypes" [value]="element">{{element}}</ng-option>
+                    </ng-select>
+                    <div
+                        *ngIf="form.controls['storeType'].invalid && (form.controls['storeType'].dirty || form.controls['storeType'].touched)">
+                        <div *ngIf="form.controls['storeType'].errors.required" class="form-error">
+                            Le type est obligatoire.
                         </div>
                     </div>
                 </div>

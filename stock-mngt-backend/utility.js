@@ -66,7 +66,7 @@ const buildQuery = (sentQuery) => {
 
 const fromTo = (from, to) => {
     let query = {
-        [Op.gte]: 0,
+        [Op.ne]: Number.MIN_VALUE,
     }
     if (!isNaN(from) && !isNaN(to))
         query = {

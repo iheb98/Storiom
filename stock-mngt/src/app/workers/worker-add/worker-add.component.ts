@@ -40,7 +40,7 @@ export class WorkerAddComponent implements OnInit {
           this.form.get('email').setValue(response.email)
           this.form.get('entryDate').setValue(response.entryDate.substring(0,10))
           this.form.get('salary').setValue(response.salary)
-          this.form.get('functionInStore').setValue(response.functionInStore)
+          this.form.get('functionInStore').setValue(response.function)
         })
     })
   }

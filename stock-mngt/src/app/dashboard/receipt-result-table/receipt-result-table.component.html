@@ -26,7 +26,7 @@
                         {{ receipt?.code }}
                     </td>
                     <td>
-                        {{ receipt?.type }}
+                        {{ receipt?.type == "LOADED" ? "Chargement" : "Vente" }}
                     </td>
                     <td>
                         {{ receipt?.name }}

@@ -17,6 +17,10 @@ export class CategoryService {
     return this.http.get<any>(this.baseUrl + 'store/' + id);
   }
 
+  getFlatCategoriesByStoreId(id): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'store/' + id + '/flat');
+  }
+
   getCategory(id): Observable<any> {
     return this.http.get<any>(this.baseUrl + id);
   }

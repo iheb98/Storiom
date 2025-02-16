@@ -23,7 +23,7 @@ export class ProductResultTableComponent implements OnInit {
 
 
   getLastOperations() {
-    this.productService.getCriticalStockProducts(this.user.id).subscribe(
+    this.productService.getCriticalStockProducts(this.user?.store).subscribe(
       response => {
         this.products = response
       }

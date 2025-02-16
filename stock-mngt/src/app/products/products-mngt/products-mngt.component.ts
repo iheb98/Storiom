@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
+import { CategoryService } from 'src/app/services/category.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { ProductService } from 'src/app/services/product.service';
 import { QueryService } from 'src/app/services/query.service';
@@ -29,16 +30,25 @@ export class ProductsMngtComponent implements OnInit {
   colorFilter = '';
 
   supplierFilter = null
+  categoryFilter = null
   suppliers = []
   products = []
+  categories = [];
   count;
 
   currentPage = 0;
   currentSize = 6;
 
+  filtersCollapsed = true;
+
+  toggleFilters() {
+      this.filtersCollapsed = !this.filtersCollapsed;
+  }
+
   constructor(
     private productService: ProductService,
     private supplierService: SupplierService,
+    private categoryService: CategoryService,
     private authService: AuthService,
     private loadingService: LoadingService,
     private router: Router,
@@ -46,7 +56,8 @@ export class ProductsMngtComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.getSuppliers()
+    this.getSuppliers();
+    this.getCategories();
     this.queryService.buildQuery(this.nameFilter, this.descriptionFilter, this.supplierFilter, this.minBuyingPriceFilter, this.maxBuyingPriceFilter)
     this.getProducts(this.currentPage, this.currentSize)
     this.countProducts();
@@ -56,23 +67,25 @@ export class ProductsMngtComponent implements OnInit {
     let query = "";
     if (this.nameFilter)
       query += query ? ",name ~ '" + this.nameFilter + "'" : "name ~ '" + this.nameFilter + "'"
-    if (this.colorFilter)
-      query += query ? ",color ~ '" + this.colorFilter + "'" : "color ~ '" + this.colorFilter + "'"
+    // if (this.colorFilter)
+    //   query += query ? ",color ~ '" + this.colorFilter + "'" : "color ~ '" + this.colorFilter + "'"
     if (this.descriptionFilter)
       query += query ? ",description ~ '" + this.descriptionFilter + "'" : "description ~ '" + this.descriptionFilter + "'"
     if (this.supplierFilter)
       query += query ? ",supplierId = '" + this.supplierFilter + "'" : "supplierId = '" + this.supplierFilter + "'"
-    if (this.minQuantityFilter || this.minQuantityFilter == 0)
+    if (this.categoryFilter)
+      query += query ? ",categoryId = '" + this.categoryFilter + "'" : "categoryId = '" + this.categoryFilter + "'"
+    if (this.minQuantityFilter != null)
       query += query ? ",quantity > '" + this.minQuantityFilter + "'" : "quantity > '" + this.minQuantityFilter + "'"
-    if (this.maxQuantityFilter || this.minQuantityFilter == 0)
+    if (this.maxQuantityFilter != null)
       query += query ? ",quantity < '" + this.maxQuantityFilter + "'" : "quantity < '" + this.maxQuantityFilter + "'"
-    if (this.minBuyingPriceFilter)
+    if (this.minBuyingPriceFilter != null)
       query += query ? ",buyingPrice > '" + this.minBuyingPriceFilter + "'" : "buyingPrice > '" + this.minBuyingPriceFilter + "'"
-    if (this.maxBuyingPriceFilter)
+    if (this.maxBuyingPriceFilter  != null)
       query += query ? ",buyingPrice < '" + this.maxBuyingPriceFilter + "'" : "buyingPrice < '" + this.maxBuyingPriceFilter + "'"
-    if (this.minSellingPriceFilter)
+    if (this.minSellingPriceFilter  != null)
       query += query ? ",sellingPrice > '" + this.minSellingPriceFilter + "'" : "sellingPrice > '" + this.minSellingPriceFilter + "'"
-    if (this.maxSellingPriceFilter)
+    if (this.maxSellingPriceFilter  != null)
       query += query ? ",sellingPrice < '" + this.maxSellingPriceFilter + "'" : "sellingPrice < '" + this.maxSellingPriceFilter + "'"
     return query
   }
@@ -83,6 +96,19 @@ export class ProductsMngtComponent implements OnInit {
       response => {
         this.loadingService.screenLoaded()
         this.suppliers = response
+      },
+      error => {
+        this.loadingService.screenLoaded()
+      }
+    )
+  }
+
+  getCategories() {
+    this.loadingService.screenLoading()
+    this.categoryService.getFlatCategoriesByStoreId(this.authService.getConnectedUser()?.store).subscribe(
+      response => {
+        this.loadingService.screenLoaded()
+        this.categories = response
       },
       error => {
         this.loadingService.screenLoaded()

@@ -28,8 +28,8 @@ export class ProductViewComponent implements OnInit {
   operationsOptions: any;
 
   operations: any;
-  typesOfDate = ["DAILY", "WEEKLY", "MONTHLY", "ANNUALLY"]
-  selectedDateType = 'MONTHLY'
+  typesOfDate = ["Quotidien", "WEEKLY", "Mensuel", "Annuel"]
+  selectedDateType = 'Mensuel'
 
   dayFilter;
   weekFilter;
@@ -80,7 +80,8 @@ export class ProductViewComponent implements OnInit {
     const documentStyle = getComputedStyle(document.documentElement);
     const textColor = documentStyle.getPropertyValue('--text-color');
     const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+    // const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+    const surfaceBorder = 'lightgray'
 
     this.operationsOptions = {
       plugins: {
@@ -130,7 +131,7 @@ export class ProductViewComponent implements OnInit {
     this.router.navigate([link])
   }
 
-  getMonthly() {
+  getMensuel() {
     let days = [];
     this.soldOperationsData = [];
     this.loadedOperationsData = [];
@@ -155,7 +156,7 @@ export class ProductViewComponent implements OnInit {
     }
     this.updateChart();
   }
-  getDaily() {
+  getQuotidien() {
     this.soldOperationsData = [];
     this.loadedOperationsData = [];
     this.operationsLabels = this.hoursLabels
@@ -179,7 +180,7 @@ export class ProductViewComponent implements OnInit {
     }
     this.updateChart();
   }
-  getAnnually() {
+  getAnnuel() {
     let months = [];
     this.soldOperationsData = [];
     this.loadedOperationsData = [];
@@ -213,15 +214,13 @@ export class ProductViewComponent implements OnInit {
         {
           label: 'Vendu',
           data: this.soldOperationsData,
-          backgroundColor: ['rgba(75, 192, 192, 0.2)'],
-          borderColor: ['rgb(75, 192, 192)'],
+          backgroundColor: ['#42A5F5'],
           borderWidth: 1
         },
         {
           label: 'Chargé',
           data: this.loadedOperationsData,
-          backgroundColor: ['rgba(255, 159, 64, 0.2)'],
-          borderColor: ['rgb(255, 159, 64)'],
+          backgroundColor: ['#ff9f40'],
           borderWidth: 1
         }
       ]
@@ -234,14 +233,14 @@ export class ProductViewComponent implements OnInit {
     let year;
     let day;
     switch (this.selectedDateType) {
-      case 'DAILY':
+      case 'Quotidien':
         day = new Date(this.dayFilter).getDate();
         month = new Date(this.dayFilter).getMonth() + 1;
         year = new Date(this.dayFilter).getFullYear();
         filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day
         break;
-      case 'ANNUALLY':
-        year = new Date(this.dayFilter).getFullYear();
+      case 'Annuel':
+        year = this.yearFilter;
         filterValue = year
         break;
       default:
@@ -251,16 +250,16 @@ export class ProductViewComponent implements OnInit {
         break;
     }
     this.loadingService.screenLoading();
-    this.statService.getOperationStatsPerProduct(this.user.id, this.selectedDateType, filterValue, this.id).subscribe(
+    this.statService.getOperationStatsPerProduct(this.user?.store, this.selectedDateType, filterValue, this.id).subscribe(
       response => {
         this.loadingService.screenLoaded()
         this.operations = response;
-        if (this.selectedDateType == "DAILY") {
-          this.getDaily();
-        } else if (this.selectedDateType == "ANNUALLY") {
-          this.getAnnually();
+        if (this.selectedDateType == "Quotidien") {
+          this.getQuotidien();
+        } else if (this.selectedDateType == "Annuel") {
+          this.getAnnuel();
         } else {
-          this.getMonthly();
+          this.getMensuel();
         }
       }, error => {
         this.loadingService.screenLoaded()

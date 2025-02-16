@@ -24,6 +24,8 @@ import { ExpensesMngtComponent } from './expenses/expenses-mngt/expenses-mngt.co
 import { ExpenseAddComponent } from './expenses/expense-add/expense-add.component';
 import { DashboardViewComponent } from './dashboard/dashboard-view/dashboard-view.component';
 import { MainComponent } from './market/main/main.component';
+import { LandingPageComponent } from './general/landing-page/landing-page.component';
+import { GenerateReportComponent } from './reports/generate-report/generate-report.component';
 
 const routes: Routes = [
 
@@ -32,61 +34,66 @@ const routes: Routes = [
 
   // ------------ Store ------------
   { path: 'stores', component: StoresMngtComponent, canActivate: [AuthGuard] },
-  { path: 'stores/add', component: StoreAddComponent },
-  { path: 'stores/view', component: StoreViewComponent },
-  { path: 'stores/:id', component: StoreAddComponent },
+  { path: 'stores/add', component: StoreAddComponent, canActivate: [AuthGuard] },
+  { path: 'stores/view', component: StoreViewComponent, canActivate: [AuthGuard] },
+  { path: 'stores/:id', component: StoreAddComponent, canActivate: [AuthGuard] },
 
   // ------------ Brands ------------
-  { path: 'brands', component: BrandsMngtComponent },
+  { path: 'brands', component: BrandsMngtComponent, canActivate: [AuthGuard] },
 
   // ------------ Categories ------------
-  { path: 'categories', component: CategoriesMngtComponent },
-  { path: 'categories/add', component: CategoriesMngtComponent },
+  { path: 'categories', component: CategoriesMngtComponent, canActivate: [AuthGuard] },
+  { path: 'categories/add', component: CategoriesMngtComponent, canActivate: [AuthGuard] },
 
 
 
   // ------------ Suppliers ------------
-  { path: 'suppliers', component: SuppliersMngtComponent },
-  { path: 'suppliers/add', component: SupplierAddComponent },
-  { path: 'suppliers/:id', component: SupplierAddComponent },
+  { path: 'suppliers', component: SuppliersMngtComponent, canActivate: [AuthGuard] },
+  { path: 'suppliers/add', component: SupplierAddComponent, canActivate: [AuthGuard] },
+  { path: 'suppliers/:id', component: SupplierAddComponent, canActivate: [AuthGuard] },
 
 
   // ------------ Credits ------------
-  { path: 'credits', component: CreditsMngtComponent },
-  { path: 'credits/add', component: CreditAddComponent },
-  { path: 'credits/:id', component: CreditAddComponent },
+  { path: 'credits', component: CreditsMngtComponent, canActivate: [AuthGuard] },
+  { path: 'credits/add', component: CreditAddComponent, canActivate: [AuthGuard] },
+  { path: 'credits/:id', component: CreditAddComponent, canActivate: [AuthGuard] },
 
 
   // ------------ Expenses ------------
-  { path: 'expenses', component: ExpensesMngtComponent },
-  { path: 'expenses/add', component: ExpenseAddComponent },
-  { path: 'expenses/:id', component: ExpenseAddComponent },
+  { path: 'expenses', component: ExpensesMngtComponent, canActivate: [AuthGuard] },
+  { path: 'expenses/add', component: ExpenseAddComponent, canActivate: [AuthGuard] },
+  { path: 'expenses/:id', component: ExpenseAddComponent, canActivate: [AuthGuard] },
 
 
 
   // ------------ Workers ------------
-  { path: 'workers', component: WorkersMngtComponent },
-  { path: 'workers/add', component: WorkerAddComponent },
-  { path: 'workers/:id', component: WorkerAddComponent },
+  { path: 'workers', component: WorkersMngtComponent, canActivate: [AuthGuard] },
+  { path: 'workers/add', component: WorkerAddComponent, canActivate: [AuthGuard] },
+  { path: 'workers/:id', component: WorkerAddComponent, canActivate: [AuthGuard] },
 
   // ------------ Products ------------
-  { path: 'products', component: ProductsMngtComponent },
-  { path: 'products/add', component: ProductAddComponent },
-  { path: 'products/edit/:id', component: ProductAddComponent },
-  { path: 'products/view/:id', component: ProductViewComponent },
+  { path: 'products', component: ProductsMngtComponent, canActivate: [AuthGuard] },
+  { path: 'products/add', component: ProductAddComponent, canActivate: [AuthGuard] },
+  { path: 'products/edit/:id', component: ProductAddComponent, canActivate: [AuthGuard] },
+  { path: 'products/view/:id', component: ProductViewComponent, canActivate: [AuthGuard] },
 
 
   // ------------ Receipts ------------
-  { path: 'receipts', component: ReceiptsMngtComponent },
-  { path: 'receipts/add', component: ReceiptAddComponent },
-  { path: 'receipts/view/:id', component: ReceiptViewComponent },
+  { path: 'receipts', component: ReceiptsMngtComponent, canActivate: [AuthGuard] },
+  { path: 'receipts/add', component: ReceiptAddComponent, canActivate: [AuthGuard] },
+  { path: 'receipts/view/:id', component: ReceiptViewComponent, canActivate: [AuthGuard] },
 
+  // ------------ Receipts ------------
+  { path: 'reports/generate', component: GenerateReportComponent, canActivate: [AuthGuard] },
+ 
+  // ------------ Market -------------
   { path: 'market', component: MainComponent },
 
   // ------------ General ------------
   { path: 'login', component: LoginComponent, data: { loginPage: true }, canActivate: [AuthGuard] },
   { path: 'register', component: RegisterComponent, data: { loginPage: true }, canActivate: [AuthGuard] },
-  { path: '', component: StoreViewComponent, canActivate: [AuthGuard] }
+  { path: '', component: LandingPageComponent, data: { loginPage: true }, canActivate: [AuthGuard] },
+  //{ path: '', component: StoreViewComponent, canActivate: [AuthGuard] }
 ];
 
 @NgModule({
