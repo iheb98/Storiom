@@ -145,57 +145,82 @@ router.get('/store/:id/mostProfitable', utility.authenticate, (req, res, next) =
 });
 
 router.get('/store/:id/operationStats', utility.authenticate, (req, res, next) => {
-    const { type, value } = req.query;
+    let { type, value } = req.query;
 
     let dateCondition = [];
 
     if (type && value) {
-    switch (type) {
-        case 'Annuel':
-            if (!/^\d{4}$/.test(value)) {
-                return res.status(400).json({ success: false, message: 'Invalid year format.' });
-            }
-            dateCondition.push(
-                sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), parseInt(value))
-            );
-            break;
+        switch (type) {
+            case 'Annuel':
+                if (!/^\d{4}$/.test(value)) {
+                    return res.status(400).json({ success: false, message: 'Invalid year format.' });
+                }
+                dateCondition.push(
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), parseInt(value))
+                );
+                break;
 
-        case 'Mensuel':
-            if (!/^\d{4}-\d{2}$/.test(value)) {
-                return res.status(400).json({ success: false, message: 'Invalid month format. Use "YYYY-MM".' });
-            }
-            const [year, month] = value.split('-').map(Number);
-            dateCondition.push(
-                sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), year)
-            );
-            dateCondition.push(
-                sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), month)
-            );
-            break;
+            case 'Mensuel':
+                console.log("Received Mensuel value:", value); // Debugging log
 
-        case 'Quotidien':
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-                return res.status(400).json({ success: false, message: 'Invalid date format. Use "YYYY-MM-DD".' });
-            }
-            const [y, m, d] = value.split('-').map(Number);
-            dateCondition.push(
-                sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), y)
-            );
-            dateCondition.push(
-                sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), m)
-            );
-            dateCondition.push(
-                sequelize.where(sequelize.literal(`EXTRACT(DAY FROM "date")`), d)
-            );
-            break;
+                if (typeof value !== 'string') {
+                    return res.status(400).json({ success: false, message: 'Invalid month format. Expected a string in "YYYY-MM" format.' });
+                }
 
-        default:
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid type. Use "Annuel", "Mensuel", or "Quotidien".'
-            });
+                value = value.trim(); // Remove extra spaces
+
+                // Ensure the month is always two digits (e.g., "2025-02" instead of "2025-2")
+                let [year, month] = value.split('-');
+
+                if (!year || !month) {
+                    return res.status(400).json({ success: false, message: `Invalid month format. Received "${value}". Use "YYYY-MM".` });
+                }
+
+                month = month.padStart(2, '0'); // Convert "2" to "02" if needed
+
+                if (!/^\d{4}-\d{2}$/.test(`${year}-${month}`)) {
+                    return res.status(400).json({ success: false, message: `Invalid month format. Expected "YYYY-MM", but received "${year}-${month}".` });
+                }
+
+                year = parseInt(year);
+                month = parseInt(month);
+
+                if (month < 1 || month > 12) {
+                    return res.status(400).json({ success: false, message: `Invalid month "${month}". Must be between 01 and 12.` });
+                }
+
+                dateCondition.push(
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), year)
+                );
+                dateCondition.push(
+                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), month)
+                );
+                break;
+
+
+            case 'Quotidien':
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                    return res.status(400).json({ success: false, message: 'Invalid date format. Use "YYYY-MM-DD".' });
+                }
+                const [y, m, d] = value.split('-').map(Number);
+                dateCondition.push(
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), y)
+                );
+                dateCondition.push(
+                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), m)
+                );
+                dateCondition.push(
+                    sequelize.where(sequelize.literal(`EXTRACT(DAY FROM "date")`), d)
+                );
+                break;
+
+            default:
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid type. Use "Annuel", "Mensuel", or "Quotidien".'
+                });
+        }
     }
-}
 
     Operation.findAll({
         where: {
@@ -217,7 +242,7 @@ router.get('/store/:id/operationStats', utility.authenticate, (req, res, next) =
 });
 
 router.get('/store/:id/operationStats/categories/items', utility.authenticate, (req, res, next) => {
-    const { type, value } = req.query;
+    let { type, value } = req.query;
 
     let dateCondition = [];
 
@@ -231,12 +256,36 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, (
                     sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), parseInt(value))
                 );
                 break;
-    
+
             case 'Mensuel':
-                if (!/^\d{4}-\d{2}$/.test(value)) {
-                    return res.status(400).json({ success: false, message: 'Invalid month format. Use "YYYY-MM".' });
+                console.log("Received Mensuel value:", value); // Debugging log
+
+                if (typeof value !== 'string') {
+                    return res.status(400).json({ success: false, message: 'Invalid month format. Expected a string in "YYYY-MM" format.' });
                 }
-                const [year, month] = value.split('-').map(Number);
+
+                value = value.trim(); // Remove extra spaces
+
+                // Ensure the month is always two digits (e.g., "2025-02" instead of "2025-2")
+                let [year, month] = value.split('-');
+
+                if (!year || !month) {
+                    return res.status(400).json({ success: false, message: `Invalid month format. Received "${value}". Use "YYYY-MM".` });
+                }
+
+                month = month.padStart(2, '0'); // Convert "2" to "02" if needed
+
+                if (!/^\d{4}-\d{2}$/.test(`${year}-${month}`)) {
+                    return res.status(400).json({ success: false, message: `Invalid month format. Expected "YYYY-MM", but received "${year}-${month}".` });
+                }
+
+                year = parseInt(year);
+                month = parseInt(month);
+
+                if (month < 1 || month > 12) {
+                    return res.status(400).json({ success: false, message: `Invalid month "${month}". Must be between 01 and 12.` });
+                }
+
                 dateCondition.push(
                     sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), year)
                 );
@@ -244,7 +293,8 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, (
                     sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), month)
                 );
                 break;
-    
+
+
             case 'Quotidien':
                 if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
                     return res.status(400).json({ success: false, message: 'Invalid date format. Use "YYYY-MM-DD".' });
@@ -260,7 +310,7 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, (
                     sequelize.where(sequelize.literal(`EXTRACT(DAY FROM "date")`), d)
                 );
                 break;
-    
+
             default:
                 return res.status(400).json({
                     success: false,
@@ -268,7 +318,7 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, (
                 });
         }
     }
-    
+
 
     Operation.findAll({
         where: {
@@ -334,7 +384,7 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, (
 
 
 router.get('/store/:id/operationStats/categories', utility.authenticate, (req, res, next) => {
-    const { type, value } = req.query;
+    let { type, value } = req.query;
 
     let dateCondition = [];
 
@@ -348,12 +398,36 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, (req, r
                     sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), parseInt(value))
                 );
                 break;
-    
+
             case 'Mensuel':
-                if (!/^\d{4}-\d{2}$/.test(value)) {
-                    return res.status(400).json({ success: false, message: 'Invalid month format. Use "YYYY-MM".' });
+                console.log("Received Mensuel value:", value); // Debugging log
+
+                if (typeof value !== 'string') {
+                    return res.status(400).json({ success: false, message: 'Invalid month format. Expected a string in "YYYY-MM" format.' });
                 }
-                const [year, month] = value.split('-').map(Number);
+
+                value = value.trim(); // Remove extra spaces
+
+                // Ensure the month is always two digits (e.g., "2025-02" instead of "2025-2")
+                let [year, month] = value.split('-');
+
+                if (!year || !month) {
+                    return res.status(400).json({ success: false, message: `Invalid month format. Received "${value}". Use "YYYY-MM".` });
+                }
+
+                month = month.padStart(2, '0'); // Convert "2" to "02" if needed
+
+                if (!/^\d{4}-\d{2}$/.test(`${year}-${month}`)) {
+                    return res.status(400).json({ success: false, message: `Invalid month format. Expected "YYYY-MM", but received "${year}-${month}".` });
+                }
+
+                year = parseInt(year);
+                month = parseInt(month);
+
+                if (month < 1 || month > 12) {
+                    return res.status(400).json({ success: false, message: `Invalid month "${month}". Must be between 01 and 12.` });
+                }
+
                 dateCondition.push(
                     sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), year)
                 );
@@ -361,7 +435,8 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, (req, r
                     sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), month)
                 );
                 break;
-    
+
+
             case 'Quotidien':
                 if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
                     return res.status(400).json({ success: false, message: 'Invalid date format. Use "YYYY-MM-DD".' });
@@ -377,7 +452,7 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, (req, r
                     sequelize.where(sequelize.literal(`EXTRACT(DAY FROM "date")`), d)
                 );
                 break;
-    
+
             default:
                 return res.status(400).json({
                     success: false,
@@ -385,7 +460,7 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, (req, r
                 });
         }
     }
-    
+
 
     Operation.findAll({
         where: {
@@ -459,52 +534,76 @@ router.get('/store/:id/operationStats/product', utility.authenticate, (req, res,
     let dateCondition = [];
 
     if (type && value) {
-    switch (type) {
-        case 'Annuel':
-            if (!/^\d{4}$/.test(value)) {
-                return res.status(400).json({ success: false, message: 'Invalid year format.' });
-            }
-            dateCondition.push(
-                sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), parseInt(value))
-            );
-            break;
+        switch (type) {
+            case 'Annuel':
+                if (!/^\d{4}$/.test(value)) {
+                    return res.status(400).json({ success: false, message: 'Invalid year format.' });
+                }
+                dateCondition.push(
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), parseInt(value))
+                );
+                break;
 
-        case 'Mensuel':
-            if (!/^\d{4}-\d{2}$/.test(value)) {
-                return res.status(400).json({ success: false, message: 'Invalid month format. Use "YYYY-MM".' });
-            }
-            const [year, month] = value.split('-').map(Number);
-            dateCondition.push(
-                sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), year)
-            );
-            dateCondition.push(
-                sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), month)
-            );
-            break;
+            case 'Mensuel':
+                console.log("Received Mensuel value:", value); // Debugging log
 
-        case 'Quotidien':
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-                return res.status(400).json({ success: false, message: 'Invalid date format. Use "YYYY-MM-DD".' });
-            }
-            const [y, m, d] = value.split('-').map(Number);
-            dateCondition.push(
-                sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), y)
-            );
-            dateCondition.push(
-                sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), m)
-            );
-            dateCondition.push(
-                sequelize.where(sequelize.literal(`EXTRACT(DAY FROM "date")`), d)
-            );
-            break;
+                if (typeof value !== 'string') {
+                    return res.status(400).json({ success: false, message: 'Invalid month format. Expected a string in "YYYY-MM" format.' });
+                }
 
-        default:
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid type. Use "Annuel", "Mensuel", or "Quotidien".'
-            });
+                value = value.trim(); // Remove extra spaces
+
+                // Ensure the month is always two digits (e.g., "2025-02" instead of "2025-2")
+                let [year, month] = value.split('-');
+
+                if (!year || !month) {
+                    return res.status(400).json({ success: false, message: `Invalid month format. Received "${value}". Use "YYYY-MM".` });
+                }
+
+                month = month.padStart(2, '0'); // Convert "2" to "02" if needed
+
+                if (!/^\d{4}-\d{2}$/.test(`${year}-${month}`)) {
+                    return res.status(400).json({ success: false, message: `Invalid month format. Expected "YYYY-MM", but received "${year}-${month}".` });
+                }
+
+                year = parseInt(year);
+                month = parseInt(month);
+
+                if (month < 1 || month > 12) {
+                    return res.status(400).json({ success: false, message: `Invalid month "${month}". Must be between 01 and 12.` });
+                }
+
+                dateCondition.push(
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), year)
+                );
+                dateCondition.push(
+                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), month)
+                );
+                break;
+
+            case 'Quotidien':
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                    return res.status(400).json({ success: false, message: 'Invalid date format. Use "YYYY-MM-DD".' });
+                }
+                const [y, m, d] = value.split('-').map(Number);
+                dateCondition.push(
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), y)
+                );
+                dateCondition.push(
+                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), m)
+                );
+                dateCondition.push(
+                    sequelize.where(sequelize.literal(`EXTRACT(DAY FROM "date")`), d)
+                );
+                break;
+
+            default:
+                return res.status(400).json({
+                    success: false,
+                    message: 'Invalid type. Use "Annuel", "Mensuel", or "Quotidien".'
+                });
+        }
     }
-}
 
     Operation.findAll({
         where: {
