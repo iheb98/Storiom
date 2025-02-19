@@ -203,9 +203,9 @@ export class ReceiptsMngtComponent implements OnInit {
       receipt?.operations?.forEach(operation => {
         operations += `<tr>
          <td>${operation?.product?.name}</td>
-         <td>${operation?.price}</td>
          <td>${operation?.amount}</td>
-         <td>${operation?.price * operation?.amount}</td>
+         <td>${operation?.price ? operation?.price + " DT" : ""}</td>
+         <td>${(operation?.price * operation?.amount) + " DT"}</td>
      </tr>`
       });
       const content = `
@@ -316,6 +316,10 @@ export class ReceiptsMngtComponent implements OnInit {
     color: #555;
 }
 
+.bold-text{
+font-weight: bold;
+}
+
       </style>
       </head>
       <div id="receiptSection" #receiptSection>
@@ -363,15 +367,15 @@ export class ReceiptsMngtComponent implements OnInit {
 
     <div class="invoice-total">
         <div>
-            <div>Subtotal:</div>
+            <div class="bold-text">Subtotal:</div>
             <div>${receipt?.total - (receipt?.tva * receipt?.total / 100) + " DT"}</div>
         </div>
         <div>
-            <div>Tax ${receipt?.tva}%:</div>
+            <div class="bold-text">Tax ${receipt?.tva}%:</div>
             <div>${receipt?.tva * receipt?.total / 100 + " DT"}</div>
         </div>
         <div>
-            <div>Total:</div>
+            <div class="bold-text">Total:</div>
             <div>${receipt?.total + " DT"}</div>
         </div>
     </div>

@@ -1,16 +1,16 @@
 <div class="padding-page">
-    <div class="invoice-container">
-        <div class="invoice-header">
-            <div class="company-details">
-                <h4><strong>{{store?.name}}</strong></h4>
+    <div class="invoice-container container">
+        <div class="invoice-header row">
+            <div class="col-12 text-center">
+                <h4 class="fw-bold">{{store?.name}}</h4>
             </div>
-            <div class="invoice-title">
-                <h1>Facture</h1>
+            <div class="col-12 text-center">
+                <h1 class="invoice-title">Facture</h1>
             </div>
         </div>
-
-        <div class="invoice-info">
-            <div class="invoice-details">
+    
+        <div class="invoice-info row">
+            <div class="col-md-6 col-12">
                 <div><span class="details-label">Numéro de la facture:</span> {{receipt?.code}}</div>
                 <div><span class="details-label">Date:</span> {{receipt?.date | date:'shortDate'}}</div>
                 <div><span class="details-label">Nom du client:</span>
@@ -24,47 +24,40 @@
                     }}
                 </div>
             </div>
-
-            <div class="invoice-details" >
-                <p> <span class="details-label">Addresse</span>: {{receipt?.store?.address?.state+'
-                    '+receipt?.store?.address?.city}} </p>
-                <p><span class="details-label">Email: </span> {{store?.email}}</p>
-                <p><span class="details-label">Téléphone: </span>{{store?.phone}}</p>
+    
+            <div class="col-md-6 col-12 mt-3 mt-md-0">
+                <p><span class="details-label">Adresse:</span> {{receipt?.store?.address?.state + ' ' + receipt?.store?.address?.city}} </p>
+                <p><span class="details-label">Email:</span> {{store?.email}}</p>
+                <p><span class="details-label">Téléphone:</span> {{store?.phone}}</p>
             </div>
         </div>
-
-        <table class="invoice-table">
-            <thead>
-                <tr>
-                    <th>Description</th>
-                    <th>Quantité</th>
-                    <th>Prix Unité</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let operation of receipt?.operations">
-                    <td>{{operation?.product?.name}}</td>
-                    <td>{{operation?.amount}}</td>
-                    <td>{{operation?.price + " DT"}}</td>
-                    <td>{{operation?.price * operation?.amount + " DT"}}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div class="invoice-total">
-            <div>
-                <div>Subtotal:</div>
-                <div>{{receipt?.total - (receipt?.tva * receipt?.total / 100) + " DT"}}</div>
-            </div>
-            <div>
-                <div>Tax {{receipt?.tva}}%:</div>
-                <div>{{receipt?.tva * receipt?.total / 100 + " DT"}}</div>
-            </div>
-            <div>
-                <div>Total:</div>
-                <div>{{receipt?.total + " DT"}}</div>
-            </div>
+    
+        <div class="table-responsive">
+            <table class="invoice-table table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Description</th>
+                        <th>Quantité</th>
+                        <th>Prix Unité</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let operation of receipt?.operations">
+                        <td>{{operation?.product?.name}}</td>
+                        <td>{{operation?.amount}}</td>
+                        <td>{{operation?.price}} DT</td>
+                        <td>{{operation?.price * operation?.amount}} DT</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    
+        <div class="invoice-total text-end">
+            <div><span>Subtotal:</span> {{receipt?.total - (receipt?.tva * receipt?.total / 100)}} DT</div>
+            <div><span>Tax {{receipt?.tva}}%:</span> {{receipt?.tva * receipt?.total / 100}} DT</div>
+            <div class="fw-bold"><span>Total:</span> {{receipt?.total}} DT</div>
         </div>
     </div>
+    
 </div>

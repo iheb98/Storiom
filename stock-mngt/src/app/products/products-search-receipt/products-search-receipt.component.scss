@@ -91,7 +91,8 @@ mat-paginator{
 
 @media screen and (max-width: 1500px) {
     .padding-page {
-        padding: 0 50px 150px 50px;
+        padding: 150px 50px 150px 50px;
+
     }
 
     .title {
@@ -106,6 +107,7 @@ mat-paginator{
     .padding-page {
         padding: 80px 20px 0 20px;
         padding-top: 80px;
+        font-size: small !important;
     }
 
     .title {

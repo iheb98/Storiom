@@ -28,7 +28,7 @@ export class ProductViewComponent implements OnInit {
   operationsOptions: any;
 
   operations: any;
-  typesOfDate = ["Quotidien", "WEEKLY", "Mensuel", "Annuel"]
+  typesOfDate = ["Quotidien", "Mensuel", "Annuel"]
   selectedDateType = 'Mensuel'
 
   dayFilter;

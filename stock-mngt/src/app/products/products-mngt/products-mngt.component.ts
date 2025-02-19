@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/services/auth.service';
 import { CategoryService } from 'src/app/services/category.service';
 import { LoadingService } from 'src/app/services/loading.service';
@@ -40,6 +41,9 @@ export class ProductsMngtComponent implements OnInit {
   currentSize = 6;
 
   filtersCollapsed = true;
+
+  editIcon = faEdit
+  deleteIcon = faTrash
 
   toggleFilters() {
       this.filtersCollapsed = !this.filtersCollapsed;
