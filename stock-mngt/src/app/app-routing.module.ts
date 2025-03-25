@@ -39,11 +39,11 @@ const routes: Routes = [
   { path: 'stores/:id', component: StoreAddComponent, canActivate: [AuthGuard] },
 
   // ------------ Brands ------------
-  { path: 'brands', component: BrandsMngtComponent, canActivate: [AuthGuard] },
+  { path: 'brands', component: BrandsMngtComponent, data: { roles: ["Admin"] }, canActivate: [AuthGuard] },
 
   // ------------ Categories ------------
-  { path: 'categories', component: CategoriesMngtComponent, canActivate: [AuthGuard] },
-  { path: 'categories/add', component: CategoriesMngtComponent, canActivate: [AuthGuard] },
+  { path: 'categories', component: CategoriesMngtComponent, data: { roles: ["Admin"] }, canActivate: [AuthGuard] },
+  { path: 'categories/add', component: CategoriesMngtComponent, data: { roles: ["Admin"] }, canActivate: [AuthGuard] },
 
 
 
@@ -85,7 +85,7 @@ const routes: Routes = [
 
   // ------------ Receipts ------------
   { path: 'reports/generate', component: GenerateReportComponent, canActivate: [AuthGuard] },
- 
+
   // ------------ Market -------------
   { path: 'market', component: MainComponent },
 

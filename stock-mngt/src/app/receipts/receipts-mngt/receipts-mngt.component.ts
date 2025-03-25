@@ -116,6 +116,9 @@ export class ReceiptsMngtComponent implements OnInit {
     }).subscribe(response => {
       this.loadingService.screenLoaded()
       this.count = response;
+    },
+    error => {
+      this.loadingService.screenLoaded()
     })
   }
 

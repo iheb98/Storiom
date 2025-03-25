@@ -73,7 +73,6 @@ export class AuthService {
   }
 
   logout() {
-
     const options = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -82,4 +81,9 @@ export class AuthService {
     };
     return this.http.delete<any>(this.baseUrl + 'logout', options);
   }
+ 
+  checkSubscription(id) {
+    return this.http.get<any>(this.baseUrl + 'checkSubscription/' + id);
+  }
 }
+

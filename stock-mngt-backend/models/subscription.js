@@ -28,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue:DataTypes.NOW,
       field: 'activation_date'
     },
+    expirationDate: {
+      type: DataTypes.DATE,
+      field: 'expiration_date'
+    },
     duration: {
       type: DataTypes.ENUM('TRIAL', '1M', '3M', '6M', '12M', 'PERMANENT'),
       defaultValue: 'TRIAL'

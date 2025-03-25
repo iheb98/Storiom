@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { Store, Brand, Expense, Address } = require('../models');
 const utility = require('../utility');
+const checkSubscription = require('../checkSubscription');
 
-router.post('/create', utility.authenticate, (req, res) => {
+router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
     const { name, logo, images, description, country, street, city, state, postalCode, phone, email, site, userId } = req.body
     Store.create({ name, logo, images: JSON.stringify(images), active: true, phone, email, site, description, userId, creatorUserId: req.user.id }).then(createdStore => {
         Address.create({ storeId: createdStore.id, country, street, city, state, postalCode }).then(createdAdress => {
@@ -24,7 +25,7 @@ router.post('/create', utility.authenticate, (req, res) => {
     })
 })
 
-router.put('/edit', utility.authenticate, (req, res) => {
+router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
     const { name, logo, images, description, country, street, city, state, postalCode, phone, email, site } = req.body
     Store.findOne({
         where: {
@@ -63,7 +64,7 @@ router.put('/edit', utility.authenticate, (req, res) => {
     })
 })
 
-router.post('/expenses/create', utility.authenticate, (req, res) => {
+router.post('/expenses/create', utility.authenticate, checkSubscription, (req, res) => {
     const { amount, comment, date, storeId } = req.body
     Expense.create({ amount, comment, date, storeId }).then(createdExpense => {
         res.json({
@@ -77,7 +78,7 @@ router.post('/expenses/create', utility.authenticate, (req, res) => {
     })
 })
 
-router.get('/:id/expenses', utility.authenticate, (req, res) => {
+router.get('/:id/expenses', utility.authenticate, checkSubscription, (req, res) => {
     const storeId = req.params.id;
     Expense.findAll({
         where: {
@@ -94,7 +95,7 @@ router.get('/:id/expenses', utility.authenticate, (req, res) => {
     })
 })
 
-router.post('/brands/create', utility.authenticate, (req, res) => {
+router.post('/brands/create', utility.authenticate, checkSubscription, (req, res) => {
     const { name, storeId } = req.body
     Brand.create({ name, storeId }).then(createdBrand => {
         res.json(createdBrand)
@@ -106,7 +107,7 @@ router.post('/brands/create', utility.authenticate, (req, res) => {
     })
 })
 
-router.get('/:id/brands', utility.authenticate, (req, res) => {
+router.get('/:id/brands', utility.authenticate, checkSubscription, (req, res) => {
     const storeId = req.params.id
     Brand.findAll({ where: { storeId } }).then(brands => {
         res.json(brands)
@@ -130,7 +131,7 @@ router.get('/', (req, res, next) => {
 });
 
 // Get the stores of a user by its id
-router.get('/user/:id', utility.authenticate, (req, res, next) => {
+router.get('/user/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const userId = req.params.id;
     Store.findAll({
         where: {
@@ -146,7 +147,7 @@ router.get('/user/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.delete('/:id', utility.authenticate, (req, res, next) => {
+router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Store.destroy({
         where: {
@@ -165,7 +166,7 @@ router.delete('/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/:id', utility.authenticate, (req, res, next) => {
+router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Store.findOne({
         where: {

@@ -1,5 +1,5 @@
 <ngx-loading-x [show]="loadingService.isScreenLoading()" [spinnerColor]="'#683ab7'"></ngx-loading-x>
-<mat-toolbar class="custom-toolbar" fixedInViewport="true" *ngIf="connectedUser">
+<mat-toolbar class="custom-toolbar" fixedInViewport="true">
     <mat-toolbar-row class="toolbar-row">
         <!-- Menu Button -->
         <button mat-button (click)="opened = !opened" style="color:white" *ngIf="connectedUser">
@@ -16,9 +16,15 @@
         </span>
         -->
         <img [src]="store?.logo ? backend_URL +'/images/' + store?.logo : 'assets/store.jpg'" alt="Logo"
-            class="navbar-logo" *ngIf="connectedUser?.store" />
-        <span class="navbar-name" *ngIf="connectedUser?.store">
+            class="navbar-logo" *ngIf="store" />
+        <span class="navbar-name" *ngIf="store">
             {{store?.name}}
+        </span>
+
+        <img src="assets/logo.png" alt="Logo"
+            class="navbar-logo" *ngIf="!store" />
+        <span class="navbar-name" *ngIf="!store">
+            Storiom
         </span>
     </mat-toolbar-row>
 </mat-toolbar>

@@ -8,6 +8,8 @@ import { ListenerService } from './services/listener.service';
 import { LoadingService } from './services/loading.service';
 import { StoreService } from './services/store.service';
 import { environment } from 'src/environments/environment';
+import { MatDialog } from '@angular/material/dialog';
+import { SubscriptionComponent } from './general/subscription/subscription.component';
 
 @Component({
   selector: 'app-root',
@@ -32,17 +34,36 @@ export class AppComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     public loadingService: LoadingService,
-    public storeService: StoreService
+    public storeService: StoreService,
+    private dialog: MatDialog
   ) {
   }
   ngOnInit() {
     this.connectedUser = this.authService.getConnectedUser()
+    this.authService.checkSubscription(this.authService.getConnectedUser()?.id).subscribe(isExpired => {
+      console.log(isExpired)
+      if (isExpired) {
+        this.dialog.open(SubscriptionComponent, {
+          width: '400px'
+        });
+      }
+    }, error => {
+
+    })
     console.log(this.connectedUser?.store)
     this.setMenu()
     console.log(this.connectedUser)
     this.authService.loggedIn.subscribe(response => {
       this.connectedUser = this.authService.getConnectedUser()
       console.log(this.connectedUser)
+      this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
+        store => {
+          this.store = store
+          this.loadingService.screenLoaded()
+        }, error => {
+          this.loadingService.screenLoaded()
+        }
+      )
     })
     this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
       store => {

@@ -1,6 +1,8 @@
 mat-sidenav-container {
     height: 100%;
+    padding-top: 64px; /* Ensure content starts after navbar */
 }
+
 
 mat-sidenav {
     width: 300px;
@@ -54,6 +56,7 @@ mat-sidenav {
     height: 530px;
     padding: 10px;
 }
+
 .list-item-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.203);
@@ -72,6 +75,7 @@ mat-sidenav {
     white-space: nowrap;
     font-size: 18px;
 }
+
 .list-item-actions {
     text-align: left;
     padding: 0;
@@ -151,52 +155,66 @@ mat-list-item button {
 mat-list-item {
     //margin-bottom: 20px;
 }
+
 .mat-focus-indicator.mat-button.mat-button-base {
     text-align: left !important;
     color: #3b3b3b;
 }
 
 .custom-toolbar {
-    background-color: #343a40 ;
-    color: white; /* Optional: Set text color for contrast */
-  }
-  
+    background-color: #343a40;
+    color: white;
+    /* Optional: Set text color for contrast */
+}
+
 
 
 mat-toolbar {
     height: 64px;
     position: fixed;
+    top: 0;
+    /* Ensure it's fixed at the top */
+    left: 0;
+    width: 100%;
     z-index: 100;
-    width: 100% !important;
 }
 
 /* Ensure the toolbar row uses flexbox for alignment */
 .toolbar-row {
     display: flex;
-    align-items: center; /* Vertically center all items in the row */
+    align-items: center;
+    /* Vertically center all items in the row */
 }
 
 /* Logo Styles */
 .navbar-logo {
-    height: 50px; /* Adjust the size as needed */
-    width: 50px; /* Ensure height and width are equal for a perfect circle */
-    border-radius: 50%; /* Makes the image circular */
-    object-fit: cover; /* Ensures the image fits within the circle */
-    margin-right: 10px; /* Adds spacing between the logo and the name */
+    height: 50px;
+    /* Adjust the size as needed */
+    width: 50px;
+    /* Ensure height and width are equal for a perfect circle */
+    border-radius: 50%;
+    /* Makes the image circular */
+    object-fit: cover;
+    /* Ensures the image fits within the circle */
+    margin-right: 10px;
+    /* Adds spacing between the logo and the name */
 }
 
 /* Name Styles */
 .navbar-name {
-    font-size: 1.2em; /* Adjust font size */
+    font-size: 1.2em;
+    /* Adjust font size */
     font-weight: bold;
-    margin-left: 10px; /* Add spacing between logo and text */
+    margin-left: 10px;
+    /* Add spacing between logo and text */
     display: flex;
     align-items: center;
 }
 
 /* Spacer Styles */
 .navbar-fill-remaining-space {
-    flex: 1 1 auto; /* Fills remaining space */
+    flex: 1 1 auto;
+    /* Fills remaining space */
 }
 
 
@@ -210,6 +228,7 @@ mat-toolbar {
         min-height: 450px;
         height: 100%;
     }
+
     mat-list-item a,
     mat-list-item button {
         width: 100%;

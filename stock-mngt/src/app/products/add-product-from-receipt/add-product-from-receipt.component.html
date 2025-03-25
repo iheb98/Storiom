@@ -142,7 +142,8 @@
                                 </div>
                             </div>
                         </div>
-                        <input #fileInput type="file" class="form-control" multiple>
+                        <input #fileInput type="file" class="form-control" (change)="process($event)"
+                            accept="image/x-png,image/gif,image/jpeg" multiple>
                     </div>
 
                     <div class="mb-3 row justify-content-end">

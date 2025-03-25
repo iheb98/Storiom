@@ -57,7 +57,7 @@ export class StoreAddComponent implements OnInit {
       phone: [''],
       email: [''],
       site: [''],
-      country: [''],
+      country: ['Tunisie'],
       state: [''],
       city: [''],
       street: [''],

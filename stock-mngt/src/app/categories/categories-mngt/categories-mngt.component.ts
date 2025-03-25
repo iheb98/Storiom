@@ -100,7 +100,7 @@ export class CategoriesMngtComponent implements OnInit {
             parentCategory.subCategories.push({ ...response, subCategories: [] })
             this.loading = false;
             this.getCategories()
-          },error => {
+          }, error => {
             this.loading = false;
             Swal.fire({
               icon: 'error',
@@ -207,6 +207,14 @@ export class CategoriesMngtComponent implements OnInit {
             timer: 1500
           })
           this.getCategories()
+        }, error => {
+          this.loading = false;
+          Swal.fire({
+            icon: 'error',
+            title: error.error.message,
+            showConfirmButton: false,
+            timer: 1500
+          })
         })
       }
     })
@@ -226,6 +234,14 @@ export class CategoriesMngtComponent implements OnInit {
             timer: 1500
           })
           this.getCategories()
+        }, error => {
+          this.loading = false;
+          Swal.fire({
+            icon: 'error',
+            title: error.error.message,
+            showConfirmButton: false,
+            timer: 1500
+          })
         })
       }
     });

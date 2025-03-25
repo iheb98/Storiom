@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { User, Worker, Address } = require('../models');
 const utility = require('../utility');
+const checkSubscription = require('../checkSubscription');
 
-
-router.post('/create', utility.authenticate, async (req, res) => {
+router.post('/create', utility.authenticate, checkSubscription, async (req, res) => {
     const { firstName, lastName, email, password, phone, country, street, city, state, postalCode, language, entryDate, salary, functionInStore, worksInStore, superiorId, role } = req.body
     try {
         const createdWorker = await Worker.create({ firstName, lastName, email, password, phone, language, password: password, entryDate, salary, function: functionInStore, storeId: worksInStore, superiorId, role, creatorUserId: req.user.id })
@@ -22,7 +22,7 @@ router.post('/create', utility.authenticate, async (req, res) => {
 })
 
 
-router.put('/edit', utility.authenticate, (req, res) => {
+router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
     const { id, firstName, lastName, phone, email, credit, description } = req.body
     Worker.findOne(
         {
@@ -50,7 +50,7 @@ router.put('/edit', utility.authenticate, (req, res) => {
     })
 })
 
-router.get('/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Worker.findAll(utility.paginate({
         where: {
@@ -80,7 +80,7 @@ router.get('/store/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/all/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/all/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Worker.findAll({
         where: {
@@ -97,7 +97,7 @@ router.get('/all/store/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Worker.count({
         where: {
@@ -127,7 +127,7 @@ router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.delete('/:id', utility.authenticate, (req, res, next) => {
+router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Worker.destroy({
         where: {
@@ -147,7 +147,7 @@ router.delete('/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/:id', utility.authenticate, (req, res, next) => {
+router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Worker.findOne({
         where: {

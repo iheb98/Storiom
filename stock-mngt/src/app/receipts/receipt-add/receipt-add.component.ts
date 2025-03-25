@@ -95,7 +95,7 @@ export class ReceiptAddComponent implements OnInit {
       type: [null, Validators.required],
       supplierId: [null],
       name: [null],
-      tva: [13],
+      tva: [19],
       date: [(new Date()).toISOString().substring(0, 16)]
 
     });

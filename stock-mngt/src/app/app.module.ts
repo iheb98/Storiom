@@ -63,6 +63,7 @@ import { CategoryStatsComponent } from './dashboard/category-stats/category-stat
 import { LandingPageComponent } from './general/landing-page/landing-page.component';
 import { AddProductFromReceiptComponent } from './products/add-product-from-receipt/add-product-from-receipt.component';
 import { GenerateReportComponent } from './reports/generate-report/generate-report.component';
+import { SubscriptionComponent } from './general/subscription/subscription.component';
 
 
 @NgModule({
@@ -109,7 +110,8 @@ import { GenerateReportComponent } from './reports/generate-report/generate-repo
     CategoryStatsComponent,
     LandingPageComponent,
     AddProductFromReceiptComponent,
-    GenerateReportComponent
+    GenerateReportComponent,
+    SubscriptionComponent
   ],
   imports: [
     BrowserModule,

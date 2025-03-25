@@ -14,10 +14,11 @@
 
         <!-- General Information -->
         <div class="row info-bloc">
-            <div class="col-12 col-md-10">
+            <div class="col-12 col-sm-9 col-md-10">
                 <div class="row">
                     <div class="col-12">
-                        <span class="info-bloc-title">Informations générales :</span>
+                        <span class="info-bloc-title"><mat-icon class="circle-icon">info</mat-icon> 
+                            Informations générales :</span>
                     </div>
                     <div class="col-12">
                         <span class="subtitle">Nom du boutique : </span>
@@ -33,12 +34,13 @@
                     </div>
                     <div class="col-12">
                         <span class="subtitle">Site web : </span>
-                        <span class="name"><a [href]="fillLink(store?.site)" target="_blank">{{store?.site ||
-                                'N/A'}}</a></span>
+                        <span class="name" *ngIf="store?.site"><a [href]="storeWebsite" target="_blank">{{store?.site}}</a></span>
+                        <span class="name" *ngIf="!store?.site">{{"N/A"}}</span>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-md-2 d-flex align-items-center justify-content-center">
+            <div class="col-12 horizontal-line"><hr/></div> 
+            <div class="col-12 col-sm-3 col-md-2 d-flex align-items-center justify-content-center">
                 <div class="image-container">
                     <img [src]="store?.logo ? backend_URL +'/images/' + store?.logo : 'assets/store.jpg'"
                         alt="Store Logo" class="image img-fluid rounded-circle"
@@ -52,7 +54,7 @@
         <!-- Store Address -->
         <div class="row info-bloc">
             <div class="col-12">
-                <span class="info-bloc-title">Adresse de la boutique :</span>
+                <span class="info-bloc-title"><mat-icon class="circle-icon">location_on</mat-icon> Adresse de la boutique :</span>
             </div>
             <div class="col-12">
                 <span class="subtitle">Rue : </span>
@@ -62,10 +64,10 @@
                 <span class="subtitle">Cité : </span>
                 <span class="name">{{store?.address?.city || 'N/A'}}</span>
             </div>
-            <div class="col-12">
+            <!--<div class="col-12">
                 <span class="subtitle">Code Postale : </span>
                 <span class="name">{{store?.address?.postalCode || 'N/A'}}</span>
-            </div>
+            </div>-->
             <div class="col-12">
                 <span class="subtitle">Etat : </span>
                 <span class="name">{{store?.address?.state || 'N/A'}}</span>
@@ -75,7 +77,7 @@
         <!-- Store Description -->
         <div class="row info-bloc">
             <div class="col-12">
-                <span class="info-bloc-title">Description :</span>
+                <span class="info-bloc-title"><mat-icon class="circle-icon">description</mat-icon> Description :</span>
             </div>
             <div class="col-12">
                 <span class="name">{{store?.description || 'Aucune description disponible'}}</span>

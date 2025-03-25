@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { Product } = require('../models');
 const utility = require('../utility');
+const checkSubscription = require('../checkSubscription');
 
-
-router.post('/create', utility.authenticate, (req, res) => {
+router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
     const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, quantity, unit, storeId, supplierId, categoryId, brandId } = req.body
     Product.create({ name, code, buyingPrice, sellingPrice, currency, color, size, description, images: JSON.stringify(images), quantity, unit, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id }).then(createdProduct => {
         res.json({
@@ -16,7 +16,7 @@ router.post('/create', utility.authenticate, (req, res) => {
     })
 })
 
-router.put('/edit', utility.authenticate, (req, res) => {
+router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
     const { id, name, color, quantity, unit, images, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId } = req.body
     Product.findOne(
         {
@@ -51,7 +51,7 @@ router.put('/edit', utility.authenticate, (req, res) => {
     })
 })
 
-router.get('/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Product.findAll(utility.paginate({
         where: {
@@ -69,7 +69,7 @@ router.get('/store/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/store/:id/critical', utility.authenticate, (req, res, next) => {
+router.get('/store/:id/critical', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Product.findAll({
         where: {
@@ -93,7 +93,7 @@ router.get('/store/:id/critical', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Product.count({
         where: {
@@ -112,7 +112,7 @@ router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
 });
 
 
-router.delete('/:id', utility.authenticate, (req, res, next) => {
+router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Product.destroy({
         where: {
@@ -132,7 +132,7 @@ router.delete('/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/:id', utility.authenticate, (req, res, next) => {
+router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Product.findOne({
         where: {

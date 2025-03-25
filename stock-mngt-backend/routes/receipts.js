@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { Receipt, Operation, Product, Store, Address } = require('../models');
 const utility = require('../utility');
-
-router.post('/create', utility.authenticate, async (req, res) => {
+const checkSubscription = require('../checkSubscription');
+router.post('/create', utility.authenticate, checkSubscription, async (req, res) => {
     const { code, tva, type, name, date, userId, storeId, supplierId, operations } = req.body
     let total = 0;
     operations.forEach(item => {
@@ -52,7 +52,7 @@ router.post('/create', utility.authenticate, async (req, res) => {
 
 })
 
-router.delete('/:id', utility.authenticate, (req, res, next) => {
+router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Receipt.findOne({
         where: {
@@ -76,7 +76,7 @@ router.delete('/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Receipt.findAll(utility.paginate({
         where: {
@@ -99,8 +99,9 @@ router.get('/store/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/store/:id/last', utility.authenticate, (req, res, next) => {
+router.get('/store/:id/last', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
+    console.log(id)
     Receipt.findAll({
         where: {
 
@@ -124,7 +125,7 @@ router.get('/store/:id/last', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Receipt.count({
         where: {
@@ -143,7 +144,7 @@ router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/:id', utility.authenticate, (req, res, next) => {
+router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Receipt.findOne({
         where: {

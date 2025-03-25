@@ -5,20 +5,25 @@
     </div>
 
     <div class="row d-flex">
-
         <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary toggle-filters" (click)="toggleFilters()">
-                Afficher / Masquer les Filtres
+            <button class="btn btn-secondary toggle-filters d-flex align-items-center" (click)="toggleFilters()">
+                <mat-icon class="me-2">more_vert</mat-icon> Afficher / Masquer les Filtres
             </button>
         </div>
         <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary add-button" (click)="create()">Ajouter</button>
+            <button class="btn btn-secondary add-button d-flex align-items-center" (click)="create()">
+                <mat-icon class="me-2">add</mat-icon> Ajouter
+            </button>
         </div>
         <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary" (click)="reset()">Réinitialiser</button>
+            <button class="btn btn-secondary d-flex align-items-center" (click)="reset()">
+                <mat-icon class="me-2">restart_alt</mat-icon> Réinitialiser
+            </button>
         </div>
         <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-primary" (click)="filter()">Filtrer</button>
+            <button class="btn btn-primary d-flex align-items-center" (click)="filter()">
+                <mat-icon class="me-2">search</mat-icon> Filtrer
+            </button>
         </div>
     </div>
 

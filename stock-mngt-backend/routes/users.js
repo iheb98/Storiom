@@ -4,7 +4,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { User, Subscription, Address, RefreshToken, Note } = require('../models');
 const utility = require('../utility');
+const checkSubscription = require('../checkSubscription');
 const Sequelize = require('sequelize');
+const subscription = require('../models/subscription');
 const Op = Sequelize.Op;
 
 //Register
@@ -23,11 +25,9 @@ router.post('/register', async (req, res) => {
                 bcrypt.hash(password, salt, async (err, hash) => {
                     if (err) res.json(err);
                     try {
-                        const createdUser = await User.create({ firstName, lastName, email, password, phone, language, password: hash, entryDate, salary, functionInStore, worksInStore, superiorId, role })
+                        const createdUser = await User.create({ firstName, lastName, email, password, phone, language, password: hash, entryDate, salary, functionInStore, worksInStore, superiorId, role: "Admin" })
                         const createdAddress = await Address.create({ userId: createdUser.id, country, street, city, state, postalCode })
                         const createdSubscription = await Subscription.create({ userId: createdUser.id, duration: 'TRIAL' })
-                        console.log(createdSubscription)
-                        console.log(createdUser.id)
                         const token = utility.generateAccessToken(createdUser.toJSON());
                         const refreshToken = await utility.generateRefreshToken(createdUser.toJSON())
                         res.json({
@@ -59,7 +59,7 @@ router.post('/authenticate', async (req, res, next) => {
         const user = await User.findOne({
             where: {
                 email
-            }, include: ['store']
+            }, include: ['store', 'subscription']
         });
         if (!user) {
             return res.json({ success: false, errorType: "EMAIL_ERROR", error: "Utilisateur non trouvé" });
@@ -68,8 +68,8 @@ router.post('/authenticate', async (req, res, next) => {
         comparePassword(password, user.password, async (err, isMatch) => {
             if (err) res.json(err);
             if (isMatch) {
-                const token = utility.generateAccessToken({ id: user.id, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null });
-                const refreshToken = await utility.generateRefreshToken({ id: user.id, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null })
+                const token = utility.generateAccessToken({ id: user.id, role: user.role, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null, subscription: user.subscription });
+                const refreshToken = await utility.generateRefreshToken({ id: user.id, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null, subscription: user.subscription })
                 // **************************************** LOCAL STORAGE **********************************
                 res.json({
                     success: true,
@@ -86,7 +86,7 @@ router.post('/authenticate', async (req, res, next) => {
     }
 });
 
-router.post('/notes/create', utility.authenticate, (req, res) => {
+router.post('/notes/create', utility.authenticate, checkSubscription, (req, res) => {
     const { comment, images, userId } = req.body
     Note.create({ comment, images: JSON.stringify(images), userId }).then(createdNote => {
         res.json({
@@ -100,7 +100,7 @@ router.post('/notes/create', utility.authenticate, (req, res) => {
     })
 })
 
-router.get('/:id/notes', utility.authenticate, (req, res, next) => {
+router.get('/:id/notes', utility.authenticate, checkSubscription, (req, res, next) => {
     const userId = req.params.id;
     Note.findAll({
         where: {
@@ -117,7 +117,7 @@ router.get('/:id/notes', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     User.findAll(utility.paginate({
         where: {
@@ -137,7 +137,7 @@ router.get('/store/:id', utility.authenticate, (req, res, next) => {
 
 
 
-router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     User.count({
         where: {
@@ -155,7 +155,7 @@ router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/:id', utility.authenticate, (req, res, next) => {
+router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     User.findOne({
         where: {
@@ -172,13 +172,15 @@ router.get('/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.put('/edit', utility.authenticate, (req, res, next) => {
+router.put('/edit', utility.authenticate, checkSubscription, (req, res, next) => {
     User.findOne({
         where: {
-            id: req.body.id,
+            [Op.and]: {
+                id: req.body.id,
+                id: req.user.id,
+            }
         }
     }).then(user => {
-        console.log(user)
         user.firstName = req.body.firstName
         user.lastName = req.body.lastName
         user.phone = req.body.phone
@@ -212,9 +214,9 @@ router.post('/token', async (req, res, next) => {
             const user = await User.findOne({
                 where: {
                     id: tokenData.id
-                }, include: ['store']
+                }, include: ['store','subscription']
             });
-            const accessToken = utility.generateAccessToken({ id: user.id, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null })
+            const accessToken = utility.generateAccessToken({ id: user.id, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null, role: user.role, subscription: user.subscription })
             return res.json({ accessToken })
         })
     } catch (err) {
@@ -243,7 +245,7 @@ router.delete('/logout', async (req, res, next) => {
 
 
 
-router.get('/profile/:id', utility.authenticate, async (req, res, next) => {
+router.get('/profile/:id', utility.authenticate, checkSubscription, async (req, res, next) => {
     const id = req.params.id;
     try {
         const user = await User.findOne({
@@ -255,6 +257,47 @@ router.get('/profile/:id', utility.authenticate, async (req, res, next) => {
     } catch (err) {
         res.json(err)
     }
+});
+
+
+router.get('/checkSubscription/:id', utility.authenticate, checkSubscription, (req, res, next) => {
+    const id = req.params.id;
+    User.findOne({
+        where: {
+            id
+        }, include: ['subscription']
+    }).then(user => {
+        let { activationDate, expirationDate, duration } = user.subscription;
+
+        let isExpired = false;
+        let calculatedExpirationDate = expirationDate;
+
+        if (!expirationDate) {
+            const durationMapping = {
+                "TRIAL": 30,
+                "1M": 30,
+                "3M": 90,
+                "6M": 180,
+                "12M": 365
+            };
+
+            if (durationMapping[duration]) {
+                calculatedExpirationDate = new Date(activationDate);
+                calculatedExpirationDate.setDate(calculatedExpirationDate.getDate() + durationMapping[duration]);
+            }
+        }
+
+        if (calculatedExpirationDate && new Date() > new Date(calculatedExpirationDate)) {
+            isExpired = true;
+        }
+
+        res.json(isExpired)
+    }).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
 });
 
 function comparePassword(candidatePassword, hash, callback) {

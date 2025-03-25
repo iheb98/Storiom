@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { Brand } = require('../models');
 const utility = require('../utility');
-
-router.post('/create',utility.authenticate, (req, res) => {
+const checkSubscription = require('../checkSubscription');
+router.post('/create',utility.authenticate, checkSubscription, (req, res) => {
     const { name, parentBrandId, storeId } = req.body
     Brand.create({ name, parentBrandId, storeId }).then(createdBrand => {
         res.json(createdBrand)
@@ -15,7 +15,7 @@ message:err.toString()
     })
 })
 
-router.put('/edit',utility.authenticate, (req, res) => {
+router.put('/edit',utility.authenticate, checkSubscription, (req, res) => {
     const { id, name } = req.body;
     Brand.findOne(
         {
@@ -44,7 +44,7 @@ message:err.toString()
 })
 
 
-router.get('/store/:id',utility.authenticate, (req, res, next) => {
+router.get('/store/:id',utility.authenticate, checkSubscription, (req, res, next) => {
     const storeId = req.params.id;
 
     Brand.findAll({
@@ -63,7 +63,7 @@ message:err.toString()
 });
 
 
-router.delete('/:id',utility.authenticate, (req, res, next) => {
+router.delete('/:id',utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Brand.destroy({
         where: {
@@ -82,7 +82,7 @@ message:err.toString()
     })
 });
 
-router.get('/:id',utility.authenticate, (req, res, next) => {
+router.get('/:id',utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Brand.findOne({
         where: {
@@ -111,7 +111,7 @@ message:err.toString()
     })
 });
 
-router.get('/parent/:id',utility.authenticate, (req, res, next) => {
+router.get('/parent/:id',utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Brand.findOne({
         where: {

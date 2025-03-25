@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { Supplier } = require('../models');
 const utility = require('../utility');
+const checkSubscription = require('../checkSubscription');
 
-
-router.post('/create', utility.authenticate, (req, res) => {
+router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
     const { firstName, lastName, phone, email, storeId, credit, description } = req.body
     Supplier.create({ firstName, lastName, phone, email, storeId, credit, description, creatorUserId: req.user.id }).then(createdSupplier => {
         res.json({
@@ -19,7 +19,7 @@ router.post('/create', utility.authenticate, (req, res) => {
 })
 
 
-router.put('/edit', utility.authenticate, (req, res) => {
+router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
     const { id, firstName, lastName, phone, email, credit, description } = req.body
     Supplier.findOne(
         {
@@ -47,7 +47,8 @@ router.put('/edit', utility.authenticate, (req, res) => {
     })
 })
 
-router.get('/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
+    console.log("------", (req.query.creditFrom != 'null' || req.query.creditTo != 'null'))
     const id = req.params.id;
     Supplier.findAll(utility.paginate({
         where: {
@@ -77,7 +78,7 @@ router.get('/store/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/all/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/all/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Supplier.findAll({
         where: {
@@ -94,7 +95,7 @@ router.get('/all/store/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Supplier.count({
         where: {
@@ -124,7 +125,7 @@ router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.delete('/:id', utility.authenticate, (req, res, next) => {
+router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Supplier.destroy({
         where: {
@@ -144,7 +145,7 @@ router.delete('/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/:id', utility.authenticate, (req, res, next) => {
+router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Supplier.findOne({
         where: {

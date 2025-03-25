@@ -2,7 +2,7 @@
     padding:15px;
 }
 .brand-container{
-    border:2px solid #683ab775;
+    border:2px solid #343a4052;
     text-align: center;
     font-size: 15px;
     cursor: pointer;
@@ -19,16 +19,35 @@
 
 .brand-container:hover{
     transform: translateY(-10px);
-    background-color: #683ab74d;
+    background-color: #343a4041;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.203);
 }
 
 .brand-container:active{
-    background-color: #683ab7ce;
+    background-color: #343a40c3;
+}
+
+
+.add-brand:hover{
+    transform: translateY(-10px);
+    background-color: #343a4041;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.203);
+}
+
+.add-brand:active{
+    background-color: #343a40c3;
+}
+
+.selected{
+    background-color: #343a40c3;
+}
+
+.selected-mode{
+    background-color: #343a40c3;
 }
 
 .add-brand{
-    background-color: #683ab775;
+    background-color: #343a406b;
     text-align: center;
     font-size: 15px;
     cursor: pointer;
@@ -37,23 +56,6 @@
     padding:10px;
 }
 
-.add-brand:hover{
-    transform: translateY(-10px);
-    background-color: #683ab74d;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.203);
-}
-
-.add-brand:active{
-    background-color: #683ab7ce;
-}
-
-.selected{
-    background-color: #683ab7ce;
-}
-
-.selected-mode{
-    background-color: #683ab7ce;
-}
 
 .brand-bloc{
     margin-top:50px;

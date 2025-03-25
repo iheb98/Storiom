@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { Credit } = require('../models');
 const utility = require('../utility');
+const checkSubscription = require('../checkSubscription');
 
-
-router.post('/create', utility.authenticate, (req, res) => {
+router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
     const { firstName, lastName, phone, email, comment, amount, givenDate, returnDate, storeId } = req.body
     Credit.create({ firstName, lastName, phone, email, comment, amount, givenDate, returnDate, storeId, creatorUserId: req.user.id }).then(createdCredit => {
         res.json({
@@ -18,7 +18,7 @@ message:err.toString()
     })
 })
 
-router.delete('/:id', utility.authenticate, (req, res, next) => {
+router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Credit.destroy({
         where: {
@@ -38,7 +38,7 @@ message:err.toString()
     })
 });
 
-router.put('/edit', utility.authenticate, (req, res, next) => {
+router.put('/edit', utility.authenticate, checkSubscription, (req, res, next) => {
     Credit.findOne({
         where: {
             id: req.body.id,
@@ -64,7 +64,7 @@ message:err.toString()
     })
 });
 
-router.get('/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Credit.findAll(utility.paginate({
         where: {
@@ -84,7 +84,7 @@ message:err.toString()
 
 
 
-router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Credit.count({
         where: {
@@ -102,7 +102,7 @@ message:err.toString()
     })
 });
 
-router.get('/:id', utility.authenticate, (req, res, next) => {
+router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Credit.findOne({
         where: {

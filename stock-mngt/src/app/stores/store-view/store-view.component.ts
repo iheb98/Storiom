@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faInfo } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/services/auth.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { StoreService } from 'src/app/services/store.service';
@@ -13,8 +13,10 @@ import Swal from 'sweetalert2';
 })
 export class StoreViewComponent implements OnInit {
   store;
+  storeWebsite;
   backend_URL = environment.backend
   editIcon = faEdit
+  infoIcon = faInfo
   constructor(
     private authService: AuthService,
     private storeService: StoreService,
@@ -25,12 +27,13 @@ export class StoreViewComponent implements OnInit {
     this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
       store => {
         this.store = store
+        this.storeWebsite = this.fillLink(this.store?.site)
         this.loadingService.screenLoaded()
       }, error => {
         this.loadingService.screenLoaded()
         Swal.fire({
           icon: 'error',
-          title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+          title: error?.error?.message ? error?.error?.message : 'Une erreur est survenue ! Merci de réessayer plus tard',
           showConfirmButton: false,
           timer: 1500
         })

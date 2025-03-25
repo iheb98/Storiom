@@ -3,9 +3,12 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faArrowLeft, faEdit, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { EMPTY } from 'rxjs';
+import { expand, map } from 'rxjs/operators';
 import { AuthService } from 'src/app/services/auth.service';
 import { BrandService } from 'src/app/services/brand.service';
 import { CategoryService } from 'src/app/services/category.service';
+import { CompressorService } from 'src/app/services/compressor.service';
 import { FileService } from 'src/app/services/file.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { ProductService } from 'src/app/services/product.service';
@@ -35,7 +38,9 @@ export class AddProductFromReceiptComponent implements OnInit {
   subCategory2
   subCategory3
   subCategory4
-  images
+  images;
+  compressedImages;
+  data;
   selectedCategory = ''
   arrowLeftIcon = faArrowLeft;
 
@@ -60,6 +65,7 @@ export class AddProductFromReceiptComponent implements OnInit {
     private fileService: FileService,
     private brandService: BrandService,
     public dialogRef: MatDialogRef<AddProductFromReceiptComponent>,
+    public compressor: CompressorService
   ) { }
 
   ngOnInit(): void {
@@ -168,7 +174,7 @@ export class AddProductFromReceiptComponent implements OnInit {
       this.form.get('images').setValue(images)
       this.productService.addProduct({ ...this.form.getRawValue(), categoryId: this.getLastCategory()?.id, storeId: this.user?.store })
         .subscribe(response => {
-          this.uploadImages(this.fileInput.nativeElement.files, images).subscribe(
+          this.uploadImages(this.compressedImages, images).subscribe(
             response => {
               this.loadingService.screenLoaded()
               Swal.fire({
@@ -223,7 +229,7 @@ export class AddProductFromReceiptComponent implements OnInit {
       this.form.get('images').setValue(images)
       this.productService.updateProduct({ ...this.form.getRawValue(), categoryId: (this.editCategory ? this.getLastCategory()?.id : this.product?.category?.id), storeId: this.user?.store, id: this.product?.id })
         .subscribe(response => {
-          this.uploadImages(this.fileInput.nativeElement.files, newImages).subscribe(
+          this.uploadImages(this.compressedImages, newImages).subscribe(
             response => {
               this.loadingService.screenLoaded()
               Swal.fire({
@@ -245,6 +251,41 @@ export class AddProductFromReceiptComponent implements OnInit {
           })
         })
     }
+  }
+
+  recursiveCompress = (image: File, index, array) => {
+    return this.compressor.compress(image).pipe(
+      map(response => {
+        console.log('compressed ' + index + image.name);
+        this.compressedImages.push(response);
+        return {
+          data: response,
+          index: index + 1,
+          array: array,
+        };
+      }),
+    );
+  }
+
+  public process (event) {
+    this.data = event.target.files;
+    this.compressedImages=[];
+    console.log('input: '  + this.data);
+    const compress = this.recursiveCompress( this.data[0], 0, this.data ).pipe(
+      expand(res => {
+        return res.index > res.array.length - 1
+          ? EMPTY
+          : this.recursiveCompress( this.data[res.index], res.index, this.data );
+      }),
+    );
+    compress.subscribe(res => {
+      if (res.index > res.array.length - 1) {
+  
+  
+      //Code block after completing all compression
+        console.log('Compression successful ' + this.compressedImages);
+      }
+    });
   }
 
   getLastCategory() {

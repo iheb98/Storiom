@@ -1,3 +1,6 @@
+.horizontal-line{
+    display: none;
+}
 .store-details {
     margin-top: 20px;
     margin-bottom: 50px;
@@ -35,7 +38,7 @@
 
 .info-bloc-title {
     font-weight: bold;
-    text-decoration: underline;
+    //text-decoration: underline;
     font-size: 1.2rem;
     margin-bottom: 10px;
     display: block;
@@ -53,9 +56,22 @@
     padding: 5rem 15rem 2rem 15rem;
 }
 
+.circle-icon {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px; /* Adjust size */
+    height: 30px; /* Adjust size */
+    border-radius: 50%;
+    background-color: #0000009b; /* Material Blue */
+    color: white; /* Icon color */
+    font-size: 20px;
+}
+
+
 @media screen and (max-width: 1500px) {
     .padding-page {
-        padding: 150px 50px 150px 50px;
+        padding: 20px 50px 150px 50px;
 
     }
 
@@ -69,8 +85,8 @@
 
 @media screen and (max-width: 600px) {
     .padding-page {
-        padding: 80px 20px 0 20px;
-        padding-top: 80px;
+        padding: 20px 20px 0 20px;
+        
         font-size: small !important;
     }
 
@@ -79,5 +95,9 @@
         text-align: center;
         padding: 20px 0 0 0;
         font-size: 30px;
+    }
+
+    .horizontal-line{
+        display: block;
     }
 }

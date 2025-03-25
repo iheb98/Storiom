@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const { Product, Operation, Credit, Category } = require('../models');
 const utility = require('../utility');
-
+const checkSubscription = require('../checkSubscription');
 const sequelize = require('sequelize');
 const { Op } = require('sequelize');
 
-router.get('/store/:id/widgets', utility.authenticate, async (req, res, next) => {
+router.get('/store/:id/widgets', utility.authenticate, checkSubscription, async (req, res, next) => {
     const id = req.params.id;
     try {
         const products = await Product.findAll({
@@ -57,7 +57,7 @@ router.get('/store/:id/widgets', utility.authenticate, async (req, res, next) =>
     }
 });
 
-router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Product.count({
         where: {
@@ -76,7 +76,7 @@ router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
 });
 
 
-router.delete('/:id', utility.authenticate, (req, res, next) => {
+router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Product.destroy({
         where: {
@@ -96,7 +96,7 @@ router.delete('/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/store/:id/bestSelling', utility.authenticate, (req, res, next) => {
+router.get('/store/:id/bestSelling', utility.authenticate, checkSubscription, (req, res, next) => {
     Operation.findAll({
         where: {
             type: "SOLD",
@@ -119,7 +119,7 @@ router.get('/store/:id/bestSelling', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/store/:id/mostProfitable', utility.authenticate, (req, res, next) => {
+router.get('/store/:id/mostProfitable', utility.authenticate, checkSubscription, (req, res, next) => {
     Operation.findAll({
         where: {
             type: "SOLD",
@@ -144,7 +144,7 @@ router.get('/store/:id/mostProfitable', utility.authenticate, (req, res, next) =
     })
 });
 
-router.get('/store/:id/operationStats', utility.authenticate, (req, res, next) => {
+router.get('/store/:id/operationStats', utility.authenticate, checkSubscription, (req, res, next) => {
     let { type, value } = req.query;
 
     let dateCondition = [];
@@ -241,7 +241,7 @@ router.get('/store/:id/operationStats', utility.authenticate, (req, res, next) =
         });
 });
 
-router.get('/store/:id/operationStats/categories/items', utility.authenticate, (req, res, next) => {
+router.get('/store/:id/operationStats/categories/items', utility.authenticate, checkSubscription, (req, res, next) => {
     let { type, value } = req.query;
 
     let dateCondition = [];
@@ -383,7 +383,7 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, (
 });
 
 
-router.get('/store/:id/operationStats/categories', utility.authenticate, (req, res, next) => {
+router.get('/store/:id/operationStats/categories', utility.authenticate, checkSubscription, (req, res, next) => {
     let { type, value } = req.query;
 
     let dateCondition = [];
@@ -528,8 +528,8 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, (req, r
 
 
 
-router.get('/store/:id/operationStats/product', utility.authenticate, (req, res, next) => {
-    const { type, value, product } = req.query;
+router.get('/store/:id/operationStats/product', utility.authenticate, checkSubscription, (req, res, next) => {
+    let { type, value, product } = req.query;
 
     let dateCondition = [];
 
@@ -624,7 +624,7 @@ router.get('/store/:id/operationStats/product', utility.authenticate, (req, res,
         });
 });
 
-router.get('/:id', utility.authenticate, (req, res, next) => {
+router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Product.findOne({
         where: {
@@ -642,7 +642,7 @@ router.get('/:id', utility.authenticate, (req, res, next) => {
     })
 });
 
-router.get('/store/:id/generate-report', utility.authenticate, async (req, res) => {
+router.get('/store/:id/generate-report', utility.authenticate, checkSubscription, async (req, res) => {
     try {
         const { from, to } = req.query;
 

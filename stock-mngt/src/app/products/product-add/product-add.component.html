@@ -2,21 +2,23 @@
     <div class="row actions-bloc d-flex justify-content-start mb-3">
         <!-- Link to Product Management -->
         <div class="col-auto">
-            <a (click)="navigateTo('/products')" class="link-no-background text-decoration-none d-flex align-items-center">
+            <a (click)="navigateTo('/products')"
+                class="link-no-background text-decoration-none d-flex align-items-center">
                 <fa-icon [icon]="arrowLeftIcon" class="me-1"></fa-icon> <!-- Back Arrow -->
                 Gestions des Produits
             </a>
         </div>
-    
+
         <!-- Link to View Product if productId exists -->
         <div class="col-auto" *ngIf="productId">
-            <a (click)="navigateTo('/products/view/' + product?.id)" class="link-no-background text-decoration-none d-flex align-items-center">
+            <a (click)="navigateTo('/products/view/' + product?.id)"
+                class="link-no-background text-decoration-none d-flex align-items-center">
                 <fa-icon [icon]="arrowLeftIcon" class="me-1"></fa-icon> <!-- Back Arrow -->
                 Consulter
             </a>
         </div>
     </div>
-    
+
     <div class="row screen-title-bloc mb-4">
         <div class="col text-center">
             <h2 class="screen-title">{{ productId ? 'Modifier' : 'Ajouter' }} un produit</h2>
@@ -59,12 +61,21 @@
                     <label for="brand" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Marque</label>
                     <div class="col-12 col-sm-12 col-md-9 col-lg-9">
                         <ng-select formControlName="brandId" name="brand" id="brand">
-                            <ng-option *ngFor="let element of brands" [value]="element?.id">{{element.name}}</ng-option>
+                            <ng-option *ngFor="let element of brands" [value]="element?.id">{{element?.name}}</ng-option>
                         </ng-select>
                     </div>
                 </div>
 
                 <div class="mb-3 row">
+                    <label for="category" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Catégorie</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <ng-select formControlName="categoryId" name="category" id="category">
+                            <ng-option *ngFor="let element of categories" [value]="element?.id">{{element?.name}}</ng-option>
+                        </ng-select>
+                    </div>
+                </div>
+
+                <!--<div class="mb-3 row">
                     <label for="category" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Catégorie</label>
                     <div class="col-11 col-sm-11 col-md-8 col-lg-8" *ngIf="edit && !editCategory">
                         <input type="text" class="form-control" [(ngModel)]="selectedCategory"
@@ -107,7 +118,7 @@
                                 [value]="element">{{element.name}}</ng-option>
                         </ng-select>
                     </div>
-                </div>
+                </div>-->
                 <!--<div class="mb-3 row">
                     <label for="size" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Taille</label>
                     <div class="col-12 col-sm-12 col-md-9 col-lg-9">
@@ -151,12 +162,14 @@
                     <div class="row images-bloc">
                         <div class="col-6 col-md-4" *ngFor="let item of images">
                             <div class="image-container">
-                            <button class="delete-button" (click)="deleteImage(item)"><fa-icon [icon]="timesIcon"></fa-icon></button>
-                            <img src="{{environment.backend+'/images/'+item}}" alt="" class="h-100 w-100">
+                                <button class="delete-button" (click)="deleteImage(item)"><fa-icon
+                                        [icon]="timesIcon"></fa-icon></button>
+                                <img src="{{environment.backend+'/images/'+item}}" alt="" class="h-100 w-100">
                             </div>
                         </div>
                     </div>
-                    <input #fileInput type="file" class="form-control" multiple>
+                    <input #fileInput type="file" class="form-control" (change)="process($event)"
+                        accept="image/x-png,image/gif,image/jpeg" multiple>
                 </div>
 
                 <div class="mb-3 row justify-content-end">

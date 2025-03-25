@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { Expense } = require('../models');
 const utility = require('../utility');
+const checkSubscription = require('../checkSubscription');
 
-
-router.post('/create', utility.authenticate, (req, res) => {
+router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
     const { title, amount, comment, date, storeId } = req.body
     Expense.create({ title, amount, comment, date, storeId, creatorUserId: req.user.id }).then(createdExpense => {
         res.json({
@@ -18,7 +18,7 @@ message:err.toString()
     })
 })
 
-router.delete('/:id', utility.authenticate, (req, res, next) => {
+router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Expense.destroy({
         where: {
@@ -38,7 +38,7 @@ message:err.toString()
     })
 });
 
-router.get('/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
 
     const id = req.params.id;
     Expense.findAll(utility.paginate({
@@ -62,7 +62,7 @@ message:err.toString()
 
 
 
-router.get('/count/store/:id', utility.authenticate, (req, res, next) => {
+router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Expense.count({
         where: {
@@ -80,7 +80,7 @@ message:err.toString()
     })
 });
 
-router.put('/edit', utility.authenticate, (req, res, next) => {
+router.put('/edit', utility.authenticate, checkSubscription, (req, res, next) => {
     Expense.findOne({
         where: {
             id: req.body.id,
@@ -102,7 +102,7 @@ message:err.toString()
     })
 });
 
-router.get('/:id', utility.authenticate, (req, res, next) => {
+router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Expense.findOne({
         where: {
