@@ -3,16 +3,9 @@
     "username": "iheb",
     "password": "1234",
     "database": "storiom",
-    "host": "145.223.103.252",
+    "host": "localhost",
     "dialect": "postgres",
-    "timezone": "+00:00",
-    "port":5432,
-    "dialectOptions": {
-      "ssl": {
-        "require": true,
-        "rejectUnauthorized": false
-      }
-    }
+    "timezone": "+00:00"
   },
   "test": {
    "username": "root",
