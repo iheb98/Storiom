@@ -2,7 +2,7 @@
   "development": {
     "username": "iheb",
     "password": "1234",
-    "database": "fides",
+    "database": "storiom",
     "host": "145.223.103.252",
     "dialect": "postgres",
     "timezone": "+00:00",
