@@ -246,3 +246,39 @@ mat-toolbar {
         height: 100%;
     }
 }
+
+.subscription-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.subscription-status.expired {
+    color: red;
+}
+
+.custom-tooltip {
+    background: #333;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+}
+
+.custom-tooltip p {
+    margin: 4px 0;
+}
+.custom-tooltip {
+    white-space: pre-line !important; /* Enables new lines */
+    font-size: 14px;
+    background: #333;
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+    max-width: 200px;
+}

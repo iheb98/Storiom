@@ -3,19 +3,19 @@ const router = express.Router();
 const { Brand } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
-router.post('/create',utility.authenticate, checkSubscription, (req, res) => {
+router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
     const { name, parentBrandId, storeId } = req.body
     Brand.create({ name, parentBrandId, storeId }).then(createdBrand => {
         res.json(createdBrand)
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 })
 
-router.put('/edit',utility.authenticate, checkSubscription, (req, res) => {
+router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
     const { id, name } = req.body;
     Brand.findOne(
         {
@@ -31,20 +31,20 @@ router.put('/edit',utility.authenticate, checkSubscription, (req, res) => {
             }
         ).catch(err => {
             res.status(500).json({
-success:false,
-message:err.toString()
-})
+                success: false,
+                message: err.toString()
+            })
         })
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 })
 
 
-router.get('/store/:id',utility.authenticate, checkSubscription, (req, res, next) => {
+router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const storeId = req.params.id;
 
     Brand.findAll({
@@ -56,14 +56,14 @@ router.get('/store/:id',utility.authenticate, checkSubscription, (req, res, next
 
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
 
-router.delete('/:id',utility.authenticate, checkSubscription, (req, res, next) => {
+router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Brand.destroy({
         where: {
@@ -76,13 +76,13 @@ router.delete('/:id',utility.authenticate, checkSubscription, (req, res, next) =
             res.status(500).json({ success: false, message: "Brand not found" })
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
-router.get('/:id',utility.authenticate, checkSubscription, (req, res, next) => {
+router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Brand.findOne({
         where: {
@@ -105,13 +105,13 @@ router.get('/:id',utility.authenticate, checkSubscription, (req, res, next) => {
 
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
-router.get('/parent/:id',utility.authenticate, checkSubscription, (req, res, next) => {
+router.get('/parent/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Brand.findOne({
         where: {
@@ -135,9 +135,9 @@ router.get('/parent/:id',utility.authenticate, checkSubscription, (req, res, nex
     }).catch(err => {
         console.log(err)
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 

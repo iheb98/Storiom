@@ -29,6 +29,10 @@ export class AppComponent implements OnInit {
   connectedUser;
   store;
   menu;
+  subscriptionStatus: string | null = null;
+  subscriptionDetails: any = null;
+  showTooltip = false; // Controls tooltip visibility
+
 
   constructor(
     private authService: AuthService,
@@ -41,7 +45,6 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.connectedUser = this.authService.getConnectedUser()
     this.authService.checkSubscription(this.authService.getConnectedUser()?.id).subscribe(isExpired => {
-      console.log(isExpired)
       if (isExpired) {
         this.dialog.open(SubscriptionComponent, {
           width: '400px'
@@ -50,9 +53,7 @@ export class AppComponent implements OnInit {
     }, error => {
 
     })
-    console.log(this.connectedUser?.store)
     this.setMenu()
-    console.log(this.connectedUser)
     this.authService.loggedIn.subscribe(response => {
       this.connectedUser = this.authService.getConnectedUser()
       console.log(this.connectedUser)
@@ -73,10 +74,14 @@ export class AppComponent implements OnInit {
         this.loadingService.screenLoaded()
       }
     )
+
+    this.subscriptionDetails = this.authService.getConnectedUser()?.subscription;
+    this.checkSubscriptionStatus(this.authService.getConnectedUser()?.subscription)
   }
   logout() {
     this.authService.logout().subscribe(response => {
       this.connectedUser = null
+      this.store = null
       this.opened = false
       console.log(this.connectedUser)
       localStorage.removeItem("refreshToken")
@@ -84,6 +89,36 @@ export class AppComponent implements OnInit {
       this.router.navigate(['login'])
     })
   }
+
+  checkSubscriptionStatus(subscription: any) {
+    const { activationDate, expirationDate, duration } = subscription;
+    let calculatedExpirationDate = expirationDate ? new Date(expirationDate) : new Date(activationDate);
+
+    if (!expirationDate) {
+      const durationMapping: { [key: string]: number } = {
+        "TRIAL": 30,
+        "1M": 30,
+        "3M": 90,
+        "6M": 180,
+        "12M": 365
+      };
+      calculatedExpirationDate.setDate(calculatedExpirationDate.getDate() + (durationMapping[duration] || 0));
+    }
+
+    this.subscriptionStatus = new Date() > calculatedExpirationDate ? 'Expired' : 'Active';
+    this.subscriptionDetails.expirationDate = calculatedExpirationDate.toISOString();
+  }
+
+  getSubscriptionTooltip(): string {
+    if (!this.subscriptionDetails) return "No subscription details available.";
+
+    const { activationDate, expirationDate, duration, paymentDate } = this.subscriptionDetails;
+
+    return `Abonnement valide du ${new Date(activationDate).toLocaleDateString()} au ${new Date(expirationDate).toLocaleDateString()}`;
+    //Payment: ${paymentDate ? new Date(paymentDate).toLocaleDateString() : "Not paid"}`;
+  }
+
+
 
   setMenu() {
     this.menu = [{

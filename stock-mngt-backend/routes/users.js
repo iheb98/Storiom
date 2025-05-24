@@ -25,7 +25,7 @@ router.post('/register', async (req, res) => {
                 bcrypt.hash(password, salt, async (err, hash) => {
                     if (err) res.json(err);
                     try {
-                        const createdUser = await User.create({ firstName, lastName, email, password, phone, language, password: hash, entryDate, salary, functionInStore, worksInStore, superiorId, role: "Admin" })
+                        const createdUser = await User.create({ firstName, lastName, email, password, phone, language, password: hash, entryDate, salary, functionInStore, worksInStore, superiorId, role: "Owner" })
                         const createdAddress = await Address.create({ userId: createdUser.id, country, street, city, state, postalCode })
                         const createdSubscription = await Subscription.create({ userId: createdUser.id, duration: 'TRIAL' })
                         const token = utility.generateAccessToken(createdUser.toJSON());

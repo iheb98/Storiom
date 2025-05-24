@@ -64,6 +64,8 @@ import { LandingPageComponent } from './general/landing-page/landing-page.compon
 import { AddProductFromReceiptComponent } from './products/add-product-from-receipt/add-product-from-receipt.component';
 import { GenerateReportComponent } from './reports/generate-report/generate-report.component';
 import { SubscriptionComponent } from './general/subscription/subscription.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 
 @NgModule({
@@ -133,7 +135,9 @@ import { SubscriptionComponent } from './general/subscription/subscription.compo
     ReactiveFormsModule,
     FontAwesomeModule,
     ChartModule,
-    HttpClientModule
+    HttpClientModule,
+    MatTooltipModule,
+    OverlayModule
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS,

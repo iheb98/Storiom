@@ -7,6 +7,8 @@ const path = require('path');
 const port = process.env.PORT || 3000;
 const cors = require('cors');
 const multer = require('multer');
+const sendMail = require('./mailService');
+
 const storage = multer.diskStorage(
   {
     destination: './images',
@@ -21,7 +23,7 @@ const upload = multer({ storage })
 require('dotenv/config');
 
 // **************************************** CORS ****************************************
-var allowedDomains = ['http://localhost:4200','https://stock-management-backend-1fl0.onrender.com','http://145.223.103.252'];
+var allowedDomains = ['http://localhost:4200', 'http://145.223.103.252', 'https://storiom.com'];
 
 /*
 var corsOptions = {
@@ -52,6 +54,19 @@ app.use(bodyparser.json({ limit: '50mb' }));
 
 app.post('/api/uploadFile', upload.single('file'), (req, res) => {
   res.json({ success: true, message: "File uploaded" })
+})
+
+app.post('/api/sendMail', async (req, res) => {
+  try {
+    await sendMail(
+      'ihebferjani04@gmail.com',
+      'New user message',
+      `<p>Message: ${req.body.message}</p>`
+    );
+    res.send('Email sent');
+  } catch (err) {
+    res.status(500).send('Email failed');
+  }
 })
 
 app.post('/api/uploadMultipleFiles', upload.array('file'), (req, res) => {
