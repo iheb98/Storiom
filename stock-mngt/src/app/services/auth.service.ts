@@ -81,9 +81,17 @@ export class AuthService {
     };
     return this.http.delete<any>(this.baseUrl + 'logout', options);
   }
- 
+
   checkSubscription(id) {
     return this.http.get<any>(this.baseUrl + 'checkSubscription/' + id);
+  }
+
+  forgotPassword(body) {
+    return this.http.post(this.baseUrl + 'forgot-password', body);
+  }
+  
+  resetPassword(body) {
+    return this.http.post(this.baseUrl + 'reset-password', body);
   }
 }
 

@@ -3,6 +3,8 @@ const { sequelize } = require('./models')
 const app = express();
 const bodyparser = require("body-parser");
 const path = require('path');
+const { User } = require('./models');
+const crypto = require('crypto');
 //const passport = require('passport');
 const port = process.env.PORT || 3000;
 const cors = require('cors');
@@ -68,6 +70,49 @@ app.post('/api/sendMail', async (req, res) => {
     res.status(500).send('Email failed');
   }
 })
+
+app.get('/confirm', async (req, res) => {
+  const { token } = req.query;
+
+  const user = await User.findOne({
+    where: {
+      confirmationToken: token
+    }
+  });
+
+  if (!user) {
+    return res.status(400).send("Lien invalide.");
+  }
+
+  if (user.isConfirmed) {
+    return res.status(200).send("Votre compte est déjà confirmé.");
+  }
+
+  if (user.tokenExpiresAt > new Date()) {
+    user.isConfirmed = true;
+    user.confirmationToken = null;
+    user.tokenExpiresAt = null;
+    await user.save();
+    return res.send("Votre compte a été confirmé avec succès. Vous pouvez maintenant vous connecter.");
+  }
+
+  const newToken = crypto.randomBytes(32).toString('hex');
+  const newExpiry = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24h
+
+  user.confirmationToken = newToken;
+  user.tokenExpiresAt = newExpiry;
+  await user.save();
+
+  const confirmUrl = `https://storiom.com/confirm?token=${newToken}`;
+  await sendMail(user.email, 'Nouveau lien de confirmation', `
+    <h2>Votre lien a expiré</h2>
+    <p>Voici un nouveau lien pour confirmer votre compte :</p>
+    <a href="${confirmUrl}">Confirmer mon compte</a>
+    <p>Ce lien est valable pendant 24 heures.</p>
+  `);
+
+  return res.status(200).send("Le lien a expiré. Un nouveau lien de confirmation vous a été envoyé par e-mail.");
+});
 
 app.post('/api/uploadMultipleFiles', upload.array('file'), (req, res) => {
   res.json({ success: true, message: "Files uploaded" })

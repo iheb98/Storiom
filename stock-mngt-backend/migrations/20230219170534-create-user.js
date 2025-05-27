@@ -41,7 +41,7 @@ module.exports = {
         type: DataTypes.STRING,
         field: 'function_in_store'
       },
-      superiorId:{
+      superiorId: {
         type: DataTypes.INTEGER,
       },
       worksInStore: {
@@ -57,6 +57,38 @@ module.exports = {
       leaveDate: {
         type: DataTypes.DATE,
         field: 'leave_date'
+      },
+      isConfirmed: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        field: 'is_confirmed'
+      },
+      tokenExpiresAt: {
+        type: DataTypes.DATE,
+        field: 'token_expires_at'
+      },
+      confirmationToken: {
+        type: DataTypes.STRING,
+        field: 'confirmation_token'
+      },
+      resetPasswordToken: {
+        type: DataTypes.STRING,
+        field: 'reset_password_token'
+      },
+      resetPasswordExpires: {
+        type: DataTypes.STRING,
+        field: 'reset_password_expires'
+      },
+      termsAccepted: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+        field: 'terms_accepted'
+      },
+      termsAcceptedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        field: 'terms_accepted_at'
       },
       createdAt: {
         allowNull: false,

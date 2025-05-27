@@ -66,6 +66,9 @@ import { GenerateReportComponent } from './reports/generate-report/generate-repo
 import { SubscriptionComponent } from './general/subscription/subscription.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { TermsComponent } from './pages/terms/terms.component';
 
 
 @NgModule({
@@ -113,7 +116,10 @@ import { OverlayModule } from '@angular/cdk/overlay';
     LandingPageComponent,
     AddProductFromReceiptComponent,
     GenerateReportComponent,
-    SubscriptionComponent
+    SubscriptionComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent,
+    TermsComponent
   ],
   imports: [
     BrowserModule,

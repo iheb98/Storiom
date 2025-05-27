@@ -64,7 +64,40 @@ module.exports = (sequelize, DataTypes) => {
     leaveDate: {
       type: DataTypes.DATE,
       field: 'leave_date'
+    },
+    isConfirmed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      field: 'is_confirmed'
+    },
+    confirmationToken: {
+      type: DataTypes.STRING,
+      field: 'confirmation_token'
+    },
+    resetPasswordToken: {
+      type: DataTypes.STRING,
+      field: 'reset_password_token'
+    },
+    tokenExpiresAt: {
+      type: DataTypes.DATE,
+      field: 'token_expires_at'
+    },
+    resetPasswordExpires: {
+      type: DataTypes.DATE,
+      field: 'reset_password_expires'
+    },
+    termsAccepted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+      field: 'terms_accepted'
+    },
+    termsAcceptedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: 'terms_accepted_at'
     }
+
   }, {
     sequelize,
     tableName: 'users',

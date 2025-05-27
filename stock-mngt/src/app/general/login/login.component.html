@@ -5,8 +5,8 @@
         <div class="mb-3 row">
           <label for="email" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Email</label>
           <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-            <input type="email" [ngClass]="{'invalid':submitted && !form.get('email').value || emailError}" class="form-control"
-              id="email" formControlName="email">
+            <input type="email" [ngClass]="{'invalid':submitted && !form.get('email').value || emailError}"
+              class="form-control" id="email" formControlName="email">
             <div *ngIf="submitted && emailError" class="form-error">
               Email non trouvé.
             </div>
@@ -16,20 +16,27 @@
         <div class="mb-3 row">
           <label for="inputPassword" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Mot de passe</label>
           <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-            <input type="password" [ngClass]="{'invalid':submitted && !form.get('password').value || passwordError}" class="form-control"
-              id="inputPassword" formControlName="password">
-              <div *ngIf="submitted && passwordError" class="form-error">
-                Mot de passe incorrect.
-              </div>
+            <input type="password" [ngClass]="{'invalid':submitted && !form.get('password').value || passwordError}"
+              class="form-control" id="inputPassword" formControlName="password">
+            <div *ngIf="submitted && passwordError" class="form-error">
+              Mot de passe incorrect.
+            </div>
+          </div>
+        </div>
+        <div class="mb-3 row justify-content-end">
+          <div class="col-auto">
+            <a [routerLink]="['/forgot-password']" class="text-decoration-none">Mot de passe oublié ?</a>
           </div>
         </div>
         <div class="mb-3 row">
-          <div class="col-12 col-sm-12 col-md-12 col-lg-12 p-2">
-            <input id="remember" type="checkbox" value="true" formControlName="remember">
-            <label for="remember" class="col-form-label p-2">Se souvenir de moi</label>
+          <div class="form-check mb-3">
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12 p-2">
+              <input id="remember" class="form-check-input" type="checkbox" formControlName="remember">
+              <label for="remember" class="form-check-label">
+                Se souvenir de moi
+              </label>
+            </div>
           </div>
-
-
         </div>
         <div class="mb-3 row justify-content-end">
           <div class="col-12 col-sm-12 col-lg-auto">

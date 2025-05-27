@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  BASE_PATH : 'http://145.223.103.252:3000/api',
+  BASE_PATH : 'https://storiom.com/api',
   couleurs : ['Blanc','Noir','Rouge','Bleu'],
-  backend:'http://145.223.103.252:3000'
+  backend:'https://storiom.com'
 };

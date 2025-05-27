@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { TermsComponent } from 'src/app/pages/terms/terms.component';
 import { AuthService } from 'src/app/services/auth.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import Swal from 'sweetalert2';
@@ -22,7 +24,8 @@ export class RegisterComponent implements OnInit {
     private router: Router,
     private formBuilder: FormBuilder,
     private authService: AuthService,
-    private loadingService: LoadingService) { }
+    private loadingService: LoadingService,
+    private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -36,6 +39,7 @@ export class RegisterComponent implements OnInit {
       phone: [''],
       password: ['', Validators.required],
       confirmPassword: ['', Validators.required],
+      termsAccepted: [false, Validators.required]
     });
   }
 
@@ -43,12 +47,12 @@ export class RegisterComponent implements OnInit {
     this.submitted = true;
     this.emailError = false;
     this.passwordError = false;
-    if (this.form.valid) {
+    if (this.form.valid && this.form.get('termsAccepted').value) {
       this.loadingService.screenLoading()
       this.authService.registerUser({ ...this.form.getRawValue(), confirmPassword: undefined })
         .subscribe(response => {
           this.loadingService.screenLoaded()
-          if (response.errorType == "EMAIL_FOUND"){
+          if (response.errorType == "EMAIL_FOUND") {
             this.emailFound = true;
             Swal.fire({
               icon: 'error',
@@ -73,7 +77,14 @@ export class RegisterComponent implements OnInit {
         })
     }
   }
+  openModal(event: Event) {
+    event.preventDefault(); // This stops the navigation to root
+  }
 
-
-
+  openTermsDialog(event: Event): void {
+    event.preventDefault();
+    this.dialog.open(TermsComponent, {
+      width: '600px'
+    });
+  }
 }

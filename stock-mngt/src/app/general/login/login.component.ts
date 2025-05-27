@@ -56,9 +56,9 @@ export class LoginComponent implements OnInit {
             this.loadingService.screenLoaded()
             Swal.fire({
               icon: 'error',
-              title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+              title: error.error.message || 'Une erreur est survenue ! Merci de réessayer plus tard',
               showConfirmButton: false,
-              timer: 1500
+              timer: 3000
             })
           })
     }

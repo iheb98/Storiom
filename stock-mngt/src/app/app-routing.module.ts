@@ -26,6 +26,9 @@ import { DashboardViewComponent } from './dashboard/dashboard-view/dashboard-vie
 import { MainComponent } from './market/main/main.component';
 import { LandingPageComponent } from './general/landing-page/landing-page.component';
 import { GenerateReportComponent } from './reports/generate-report/generate-report.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { TermsComponent } from './pages/terms/terms.component';
 
 const routes: Routes = [
 
@@ -92,6 +95,9 @@ const routes: Routes = [
   // ------------ General ------------
   { path: 'login', component: LoginComponent, data: { loginPage: true }, canActivate: [AuthGuard] },
   { path: 'register', component: RegisterComponent, data: { loginPage: true }, canActivate: [AuthGuard] },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'reset-password/:token', component: ResetPasswordComponent },
+  { path: 'terms', component: TermsComponent },
   { path: '', component: LandingPageComponent, data: { loginPage: true }, canActivate: [AuthGuard] },
   //{ path: '', component: StoreViewComponent, canActivate: [AuthGuard] }
 ];

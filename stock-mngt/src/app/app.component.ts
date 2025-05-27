@@ -55,6 +55,8 @@ export class AppComponent implements OnInit {
     })
     this.setMenu()
     this.authService.loggedIn.subscribe(response => {
+      this.subscriptionDetails = this.authService.getConnectedUser()?.subscription;
+      this.checkSubscriptionStatus(this.authService.getConnectedUser()?.subscription)
       this.connectedUser = this.authService.getConnectedUser()
       console.log(this.connectedUser)
       this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
@@ -81,6 +83,7 @@ export class AppComponent implements OnInit {
   logout() {
     this.authService.logout().subscribe(response => {
       this.connectedUser = null
+      this.subscriptionStatus = null
       this.store = null
       this.opened = false
       console.log(this.connectedUser)

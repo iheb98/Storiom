@@ -7,50 +7,73 @@ const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 const Sequelize = require('sequelize');
 const subscription = require('../models/subscription');
+const crypto = require('crypto');
+const sendMail = require('.././mailService');
 const Op = Sequelize.Op;
 
 //Register
 router.post('/register', async (req, res) => {
-    const { firstName, lastName, email, password, phone, country, street, city, state, postalCode, language, entryDate, salary, functionInStore, worksInStore, superiorId, role } = req.body
+    const {
+        firstName, lastName, email, password, phone, country,
+        street, city, state, postalCode, language, entryDate,
+        salary, functionInStore, worksInStore, superiorId, role
+    } = req.body;
+
     try {
-        const user = await User.findOne({
-            where: {
-                email
-            }
-        })
-        if (user) res.json({ success: false, errorType: "EMAIL_FOUND", message: 'The email is already being used' })
-        else {
-            bcrypt.genSalt(10, async (err, salt) => {
-                if (err) res.json(err);
-                bcrypt.hash(password, salt, async (err, hash) => {
-                    if (err) res.json(err);
-                    try {
-                        const createdUser = await User.create({ firstName, lastName, email, password, phone, language, password: hash, entryDate, salary, functionInStore, worksInStore, superiorId, role: "Owner" })
-                        const createdAddress = await Address.create({ userId: createdUser.id, country, street, city, state, postalCode })
-                        const createdSubscription = await Subscription.create({ userId: createdUser.id, duration: 'TRIAL' })
-                        const token = utility.generateAccessToken(createdUser.toJSON());
-                        const refreshToken = await utility.generateRefreshToken(createdUser.toJSON())
-                        res.json({
-                            success: true,
-                            accessToken: token,
-                            refreshToken
-                        })
-                    } catch (err) {
-                        res.status(500).json({
-                            success: false,
-                            message: err.toString()
-                        })
-                    }
-                })
-            })
+        const existingUser = await User.findOne({ where: { email } });
+        if (existingUser) {
+            return res.json({ success: false, errorType: "EMAIL_FOUND", message: 'The email is already being used' });
         }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const confirmationToken = crypto.randomBytes(32).toString('hex');
+        const tokenExpiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24h
+
+        const createdUser = await User.create({
+            firstName, lastName, email, phone, language,
+            password: hashedPassword,
+            entryDate, salary, functionInStore, worksInStore,
+            superiorId, role: "Owner",
+            confirmationToken,
+            tokenExpiresAt,
+            isConfirmed: false,
+            termsAccepted: true,
+            termsAcceptedAt: new Date()
+        });
+
+        await Address.create({
+            userId: createdUser.id,
+            country, street, city, state, postalCode
+        });
+
+        await Subscription.create({
+            userId: createdUser.id,
+            duration: 'TRIAL'
+        });
+
+        // Send confirmation email
+        const confirmUrl = `https://storiom.com/confirm?token=${confirmationToken}`;
+        await sendMail(email, 'Confirmer votre compte', `
+        <h2>Bienvenue sur Storiom</h2>
+        <p>Veuillez confirmer votre compte en cliquant sur le lien ci-dessous :</p>
+        <a href="${confirmUrl}">Activer mon compte</a>
+
+      `);
+
+        res.json({
+            success: true,
+            message: 'Inscription réussie. Veuillez vérifier votre email pour confirmer votre compte.'
+        });
+
     } catch (err) {
         res.status(500).json({
             success: false,
             message: err.toString()
-        })
+        });
     }
-})
+});
 
 
 router.post('/authenticate', async (req, res, next) => {
@@ -63,6 +86,10 @@ router.post('/authenticate', async (req, res, next) => {
         });
         if (!user) {
             return res.json({ success: false, errorType: "EMAIL_ERROR", error: "Utilisateur non trouvé" });
+        }
+
+        if (!user || !user.isConfirmed) {
+            return res.status(500).json({ message: 'Merci de confirmer votre compte. Un mail contenant le lien de vérification a été envoyé' });
         }
 
         comparePassword(password, user.password, async (err, isMatch) => {
@@ -214,7 +241,7 @@ router.post('/token', async (req, res, next) => {
             const user = await User.findOne({
                 where: {
                     id: tokenData.id
-                }, include: ['store','subscription']
+                }, include: ['store', 'subscription']
             });
             const accessToken = utility.generateAccessToken({ id: user.id, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null, role: user.role, subscription: user.subscription })
             return res.json({ accessToken })
@@ -299,6 +326,55 @@ router.get('/checkSubscription/:id', utility.authenticate, checkSubscription, (r
         })
     })
 });
+
+router.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    const user = await User.findOne({ where: { email } });
+    if (!user) return res.status(404).send('No user with that email');
+    if (!user.isConfirmed) return res.status(500).send('Merci de confirmer votre compte');
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
+
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = expires;
+    await user.save();
+
+    const resetUrl = `https://storiom.com/reset-password/${token}`;
+    await sendMail(email, 'Reset your password', `
+      <p>Click the link below to reset your password:</p>
+      <a href="${resetUrl}">${resetUrl}</a>
+      <p>This link is valid for 1 hour.</p>
+    `);
+
+    res.json({ success: true, message: 'Email de réinitialisation envoyé.' });
+});
+
+
+router.post('/reset-password', async (req, res) => {
+    const { token, newPassword } = req.body;
+
+    const user = await User.findOne({
+        where: {
+            resetPasswordToken: token,
+            resetPasswordExpires: { [Op.gt]: new Date() }
+        }
+    });
+
+    if (!user) {
+        return res.status(400).json({ success: false, message: 'Token invalide ou expiré.' });
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    await user.save();
+
+    res.json({ success: true, message: 'Mot de passe réinitialisé avec succès.' });
+});
+
+
 
 function comparePassword(candidatePassword, hash, callback) {
     bcrypt.compare(candidatePassword, hash, (err, isMatch) => {
