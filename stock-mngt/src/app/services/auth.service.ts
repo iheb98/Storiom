@@ -82,19 +82,19 @@ export class AuthService {
     return this.http.delete<any>(this.baseUrl + 'logout', options);
   }
 
-  checkSubscription(id) {
+  checkSubscription(id): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'checkSubscription/' + id);
   }
 
-  forgotPassword(body) {
+  forgotPassword(body): Observable<any> {
     return this.http.post(this.baseUrl + 'forgot-password', body);
   }
 
-  resetPassword(body) {
+  resetPassword(body): Observable<any> {
     return this.http.post(this.baseUrl + 'reset-password', body);
   }
 
-  confirmAccount(token) {
+  confirmAccount(token): Observable<any> {
     return this.http.get(this.BASE_PATH + '/confirm', {
       params: {
         token

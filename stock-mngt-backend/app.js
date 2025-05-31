@@ -85,7 +85,7 @@ app.get('/api/confirm', async (req, res) => {
   }
 
   if (user.isConfirmed) {
-    return res.status(200).send("Votre compte est déjà confirmé.");
+    return res.status(200).send({ message: "Votre compte est déjà confirmé." });
   }
 
   if (user.tokenExpiresAt > new Date()) {
@@ -93,7 +93,7 @@ app.get('/api/confirm', async (req, res) => {
     user.confirmationToken = null;
     user.tokenExpiresAt = null;
     await user.save();
-    return res.send("Votre compte a été confirmé avec succès. Vous pouvez maintenant vous connecter.");
+    return res.send({ message: "Votre compte a été confirmé avec succès. Vous pouvez maintenant vous connecter." });
   }
 
   const newToken = crypto.randomBytes(32).toString('hex');

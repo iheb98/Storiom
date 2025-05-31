@@ -25,11 +25,11 @@ export class ConfirmAccountComponent implements OnInit {
   ngOnInit(): void {
     const token = this.route.snapshot.queryParamMap.get('token');
     if (token) {
-      this.authService.confirmAccount(token).subscribe((response) => {
+      this.authService.confirmAccount(token).subscribe(response => {
         console.log(response)
         Swal.fire({
           icon: 'error',
-          title: response,
+          title: response.message,
           showConfirmButton: false,
           timer: 3000
         })
