@@ -29,6 +29,7 @@ import { GenerateReportComponent } from './reports/generate-report/generate-repo
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { TermsComponent } from './pages/terms/terms.component';
+import { ConfirmAccountComponent } from './general/confirm-account/confirm-account.component';
 
 const routes: Routes = [
 
@@ -95,6 +96,7 @@ const routes: Routes = [
   // ------------ General ------------
   { path: 'login', component: LoginComponent, data: { loginPage: true }, canActivate: [AuthGuard] },
   { path: 'register', component: RegisterComponent, data: { loginPage: true }, canActivate: [AuthGuard] },
+  { path: 'confirm', component: ConfirmAccountComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password/:token', component: ResetPasswordComponent },
   { path: 'terms', component: TermsComponent },

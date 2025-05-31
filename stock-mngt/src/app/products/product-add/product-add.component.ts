@@ -134,17 +134,17 @@ export class ProductAddComponent implements OnInit {
 
   initForm() {
     this.form = this.formBuilder.group({
-      name: ['', Validators.required],
+      name: [null, Validators.required],
       supplierId: [null],
       brandId: [null],
       categoryId: [null],
       quantity: [0],
-      unit: [''],
-      size: [''],
+      unit: [null],
+      size: [null],
       color: [null],
       description: [''],
-      buyingPrice: [''],
-      sellingPrice: [''],
+      buyingPrice: [null],
+      sellingPrice: [null],
       images: [null]
     });
   }

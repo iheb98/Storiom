@@ -69,6 +69,7 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { TermsComponent } from './pages/terms/terms.component';
+import { ConfirmAccountComponent } from './general/confirm-account/confirm-account.component';
 
 
 @NgModule({
@@ -119,7 +120,8 @@ import { TermsComponent } from './pages/terms/terms.component';
     SubscriptionComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,
-    TermsComponent
+    TermsComponent,
+    ConfirmAccountComponent
   ],
   imports: [
     BrowserModule,

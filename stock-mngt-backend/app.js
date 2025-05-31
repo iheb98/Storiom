@@ -71,7 +71,7 @@ app.post('/api/sendMail', async (req, res) => {
   }
 })
 
-app.get('/confirm', async (req, res) => {
+app.get('/api/confirm', async (req, res) => {
   const { token } = req.query;
 
   const user = await User.findOne({
@@ -111,7 +111,7 @@ app.get('/confirm', async (req, res) => {
     <p>Ce lien est valable pendant 24 heures.</p>
   `);
 
-  return res.status(200).send("Le lien a expiré. Un nouveau lien de confirmation vous a été envoyé par e-mail.");
+  return res.status(500).send("Le lien a expiré. Un nouveau lien de confirmation vous a été envoyé par e-mail.");
 });
 
 app.post('/api/uploadMultipleFiles', upload.array('file'), (req, res) => {

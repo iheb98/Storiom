@@ -89,9 +89,17 @@ export class AuthService {
   forgotPassword(body) {
     return this.http.post(this.baseUrl + 'forgot-password', body);
   }
-  
+
   resetPassword(body) {
     return this.http.post(this.baseUrl + 'reset-password', body);
+  }
+
+  confirmAccount(token) {
+    return this.http.get(this.BASE_PATH + '/confirm', {
+      params: {
+        token
+      }
+    });
   }
 }
 

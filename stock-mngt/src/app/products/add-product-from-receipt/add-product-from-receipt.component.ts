@@ -134,16 +134,16 @@ export class AddProductFromReceiptComponent implements OnInit {
 
   initForm() {
     this.form = this.formBuilder.group({
-      name: ['', Validators.required],
+      name: [null, Validators.required],
       supplierId: [null],
       brandId: [null],
       quantity: [0],
-      unit: [''],
-      size: [''],
+      unit: [null],
+      size: [null],
       color: [null],
-      description: [''],
-      buyingPrice: [''],
-      sellingPrice: [''],
+      description: [null],
+      buyingPrice: [null],
+      sellingPrice: [null],
       images: [null]
     });
   }
