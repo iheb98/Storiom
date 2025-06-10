@@ -92,10 +92,11 @@
                     {{item?.name}}
                 </div>
                 <div class="card-body flex-fill">
-                    <img src="{{item?.images[0] ? environment.backend+'/images/'+item?.images[0] : 'assets/default_product.png' }}"
-                        class="img-fluid w-100 h-100" alt="Image">
+                    <img src="{{item?.images[0] ? environment.backend+'/'+item?.images[0] : 'assets/default_product.png' }}"
+                        class="img-fluid w-100 h-100" alt="Image"
+                        (click)="openImage(environment.backend+'/'+item?.images[0])">
                 </div>
-                <div class="card-footer">
+                <div class=" card-footer">
                     <div class="row product-info">
                         <div class="col-12 col-md-12">
                             <div><label>Catégorie : </label><span>{{item?.category?.name ? item?.category?.name :
@@ -118,8 +119,7 @@
                             </button>
                         </div>
                         <div class="col-6 col-md-6 button-container">
-                            <button type="button" class="btn btn-danger"
-                                (click)="deleteProduct(item)">
+                            <button type="button" class="btn btn-danger" (click)="deleteProduct(item)">
                                 <fa-icon [icon]="deleteIcon"></fa-icon>
                                 <span class="button-label"> Supprimer</span>
                             </button>
@@ -137,4 +137,7 @@
             </mat-paginator>
         </div>
     </div>
+</div>
+<div class="image-popup" *ngIf="selectedImage" (click)="closeImage()">
+    <img [src]="selectedImage" alt="Zoomed Image">
 </div>

@@ -34,7 +34,7 @@ import { ConfirmAccountComponent } from './general/confirm-account/confirm-accou
 const routes: Routes = [
 
   // ------------ Dashboard -------------
-  { path: 'dashboard', component: DashboardViewComponent },
+  { path: 'dashboard', component: DashboardViewComponent, canActivate: [AuthGuard] },
 
   // ------------ Store ------------
   { path: 'stores', component: StoresMngtComponent, canActivate: [AuthGuard] },
@@ -43,11 +43,11 @@ const routes: Routes = [
   { path: 'stores/:id', component: StoreAddComponent, canActivate: [AuthGuard] },
 
   // ------------ Brands ------------
-  { path: 'brands', component: BrandsMngtComponent, data: { roles: ["Admin"] }, canActivate: [AuthGuard] },
+  { path: 'brands', component: BrandsMngtComponent, canActivate: [AuthGuard] },
 
   // ------------ Categories ------------
-  { path: 'categories', component: CategoriesMngtComponent, data: { roles: ["Admin"] }, canActivate: [AuthGuard] },
-  { path: 'categories/add', component: CategoriesMngtComponent, data: { roles: ["Admin"] }, canActivate: [AuthGuard] },
+  { path: 'categories', component: CategoriesMngtComponent, canActivate: [AuthGuard] },
+  { path: 'categories/add', component: CategoriesMngtComponent, canActivate: [AuthGuard] },
 
 
 

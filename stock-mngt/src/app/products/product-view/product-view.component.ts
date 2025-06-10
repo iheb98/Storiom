@@ -48,10 +48,13 @@ export class ProductViewComponent implements OnInit {
   basicData: any;
 
   basicOptions: any;
+
+  selectedImage: string | null = null;
+
   constructor(
     private productService: ProductService,
     private statService: StatService,
-    private loadingService:LoadingService,
+    private loadingService: LoadingService,
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
@@ -275,5 +278,14 @@ export class ProductViewComponent implements OnInit {
 
   lastDay(y, m) {
     return new Date(y, m + 1, 0).getDate();
+  }
+
+
+  openImage(image: string) {
+    this.selectedImage = image;
+  }
+
+  closeImage() {
+    this.selectedImage = null;
   }
 }

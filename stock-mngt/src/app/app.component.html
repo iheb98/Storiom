@@ -20,7 +20,7 @@
 
 
         <!-- Store Logo -->
-        <img [src]="store?.logo ? backend_URL +'/images/' + store?.logo : 'assets/store.jpg'" alt="Logo"
+        <img [src]="store?.logo ? backend_URL +'/' + store?.logo : 'assets/store.jpg'" alt="Logo"
             class="navbar-logo" *ngIf="store" />
         <span class="navbar-name" *ngIf="store">
             {{store?.name}}

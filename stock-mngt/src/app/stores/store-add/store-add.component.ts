@@ -71,10 +71,11 @@ export class StoreAddComponent implements OnInit {
     if (this.fileInput.nativeElement.files[0])
       fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + this.fileInput.nativeElement.files[0]?.name.substring(this.fileInput.nativeElement.files[0].name.lastIndexOf('.'))
     if (this.form.valid) {
-      this.service.addStore({ ...this.form.getRawValue(), logo: fileName, userId: this.authService.getConnectedUser().id }).subscribe(
-        response => {
-          if (this.fileInput.nativeElement.files[0])
-            this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(
+      if (this.fileInput.nativeElement.files[0])
+        this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(
+          response => {
+            const logo = response.fileUrl.split('/').pop();
+            this.service.addStore({ ...this.form.getRawValue(), logo: logo, userId: this.authService.getConnectedUser().id }).subscribe(
               response => {
                 this.authService.refreshToken().subscribe(response => {
                   localStorage.setItem('accessToken', response.accessToken);
@@ -83,13 +84,15 @@ export class StoreAddComponent implements OnInit {
                 })
               }
             )
-          else
-            this.authService.refreshToken().subscribe(response => {
-              localStorage.setItem('accessToken', response.accessToken);
-              this.router.navigate(['stores/view'])
-            })
-        }
-      )
+          }
+        )
+      else
+        this.authService.refreshToken().subscribe(response => {
+          localStorage.setItem('accessToken', response.accessToken);
+          this.authService.loggedIn.next();
+          this.router.navigate(['stores/view'])
+        })
+
     }
   }
 
@@ -98,18 +101,23 @@ export class StoreAddComponent implements OnInit {
     if (this.fileInput.nativeElement.files[0])
       fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + this.fileInput.nativeElement.files[0]?.name.substring(this.fileInput.nativeElement.files[0].name.lastIndexOf('.'))
     if (this.form.valid) {
-      this.service.updateStore({ ...this.form.getRawValue(), id: this.store.id, logo: fileName, userId: this.authService.getConnectedUser().id }).subscribe(
-        response => {
-          if (this.fileInput.nativeElement.files[0])
-            this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(
+      if (this.fileInput.nativeElement.files[0])
+        this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(
+          response => {
+            const logo = response.fileUrl.split('/').pop();
+            this.service.updateStore({ ...this.form.getRawValue(), id: this.store.id, logo: logo, userId: this.authService.getConnectedUser().id }).subscribe(
               response => {
                 this.router.navigate(['stores/view'])
               }
             )
-          else
+          }
+        )
+      else
+        this.service.updateStore({ ...this.form.getRawValue(), id: this.store.id, userId: this.authService.getConnectedUser().id }).subscribe(
+          response => {
             this.router.navigate(['stores/view'])
-        }
-      )
+          }
+        )
     }
   }
 

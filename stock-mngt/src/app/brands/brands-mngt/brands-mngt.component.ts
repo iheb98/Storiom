@@ -29,6 +29,7 @@ export class BrandsMngtComponent implements OnInit {
   faTrash = faTrash;
   faEdit = faEdit;
   faSelect = faMousePointer;
+  connectedUserRole
   constructor(
     private brandService: BrandService,
     private authService: AuthService,
@@ -39,6 +40,7 @@ export class BrandsMngtComponent implements OnInit {
     this.storeId = this.authService.getConnectedUser()?.store
     this.loading = false;
     this.getBrands();
+    this.connectedUserRole = this.authService.getConnectedUser()?.role
   }
 
   getBrands() {

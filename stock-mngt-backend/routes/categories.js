@@ -7,7 +7,7 @@ const { Op } = require('sequelize');
 
 router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
     const { name, parentCategoryId, storeId } = req.body
-    Category.create({ name, parentCategoryId, storeId, static: req.user.id == 5 ? true : false }).then(createdCategory => {
+    Category.create({ name, parentCategoryId, storeId, static: true }).then(createdCategory => {
         res.json(createdCategory)
     }).catch(err => {
         res.status(500).json({
@@ -26,7 +26,7 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
             }
         }
     ).then(category => {
-        if (req.user.id != 5 && category.static == true) {
+        if (category.static == false) {
             res.status(500).json({
                 success: false,
                 message: "Tu n'as pas le droit de modifier cette Catégorie"

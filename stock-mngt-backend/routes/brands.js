@@ -5,7 +5,7 @@ const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
     const { name, parentBrandId, storeId } = req.body
-    Brand.create({ name, parentBrandId, storeId }).then(createdBrand => {
+    Brand.create({ name, parentBrandId, storeId, static: true }).then(createdBrand => {
         res.json(createdBrand)
     }).catch(err => {
         res.status(500).json({

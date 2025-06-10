@@ -81,7 +81,7 @@
                         {{item?.name}}
                     </div>
                     <div class="card-body flex-fill">
-                        <img src="{{item?.images[0] ? environment.backend+'/images/'+item?.images[0] : 'assets/default_product.png' }}"
+                        <img src="{{item?.images[0] ? environment.backend+'/'+item?.images[0] : 'assets/default_product.png' }}"
                             class="img-fluid w-100 h-100" alt="Image">
                     </div>
                     <div class="card-footer">

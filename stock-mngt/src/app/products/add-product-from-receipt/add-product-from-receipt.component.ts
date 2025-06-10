@@ -171,11 +171,12 @@ export class AddProductFromReceiptComponent implements OnInit {
 
     if (this.form.valid) {
       this.loadingService.screenLoading()
-      this.form.get('images').setValue(images)
-      this.productService.addProduct({ ...this.form.getRawValue(), categoryId: this.getLastCategory()?.id, storeId: this.user?.store })
-        .subscribe(response => {
-          this.uploadImages(this.compressedImages, images).subscribe(
-            response => {
+      this.uploadImages(this.compressedImages, images).subscribe(
+        response => {
+          const filenames = response.files.map(file => file.location.split('/').pop());
+          this.form.get('images').setValue(filenames)
+          this.productService.addProduct({ ...this.form.getRawValue(), categoryId: this.getLastCategory()?.id, storeId: this.user?.store })
+            .subscribe(response => {
               this.loadingService.screenLoaded()
               Swal.fire({
                 icon: 'success',
@@ -185,17 +186,18 @@ export class AddProductFromReceiptComponent implements OnInit {
               })
               this.dialogRef.close()
               //this.router.navigate(['products'])
-            }
-          )
-        }, error => {
-          this.loadingService.screenLoaded()
-          Swal.fire({
-            icon: 'error',
-            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
-            showConfirmButton: false,
-            timer: 1500
-          })
-        })
+            }, error => {
+              this.loadingService.screenLoaded()
+              Swal.fire({
+                icon: 'error',
+                title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+                showConfirmButton: false,
+                timer: 1500
+              })
+            })
+        }
+      )
+
     }
   }
 
@@ -226,30 +228,33 @@ export class AddProductFromReceiptComponent implements OnInit {
       }
     if (this.form.valid) {
       this.loadingService.screenLoading()
-      this.form.get('images').setValue(images)
-      this.productService.updateProduct({ ...this.form.getRawValue(), categoryId: (this.editCategory ? this.getLastCategory()?.id : this.product?.category?.id), storeId: this.user?.store, id: this.product?.id })
-        .subscribe(response => {
-          this.uploadImages(this.compressedImages, newImages).subscribe(
-            response => {
-              this.loadingService.screenLoaded()
+      this.uploadImages(this.compressedImages, newImages).subscribe(
+        response => {
+          const filenames = response.files.map(file => file.location.split('/').pop());
+          this.form.get('images').setValue(filenames)
+          console.log(filenames)
+          this.loadingService.screenLoaded()
+          this.productService.updateProduct({ ...this.form.getRawValue(), categoryId: (this.editCategory ? this.getLastCategory()?.id : this.product?.category?.id), storeId: this.user?.store, id: this.product?.id })
+            .subscribe(response => {
               Swal.fire({
                 icon: 'success',
                 title: 'Produit modifié !',
                 showConfirmButton: false,
                 timer: 1500
               })
-              this.router.navigate(['products'])
-            }
-          )
-        }, error => {
-          this.loadingService.screenLoaded()
-          Swal.fire({
-            icon: 'error',
-            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
-            showConfirmButton: false,
-            timer: 1500
-          })
-        })
+            }, error => {
+              this.loadingService.screenLoaded()
+              Swal.fire({
+                icon: 'error',
+                title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+                showConfirmButton: false,
+                timer: 1500
+              })
+            })
+          this.router.navigate(['products'])
+        }
+      )
+
     }
   }
 
@@ -267,22 +272,22 @@ export class AddProductFromReceiptComponent implements OnInit {
     );
   }
 
-  public process (event) {
+  public process(event) {
     this.data = event.target.files;
-    this.compressedImages=[];
-    console.log('input: '  + this.data);
-    const compress = this.recursiveCompress( this.data[0], 0, this.data ).pipe(
+    this.compressedImages = [];
+    console.log('input: ' + this.data);
+    const compress = this.recursiveCompress(this.data[0], 0, this.data).pipe(
       expand(res => {
         return res.index > res.array.length - 1
           ? EMPTY
-          : this.recursiveCompress( this.data[res.index], res.index, this.data );
+          : this.recursiveCompress(this.data[res.index], res.index, this.data);
       }),
     );
     compress.subscribe(res => {
       if (res.index > res.array.length - 1) {
-  
-  
-      //Code block after completing all compression
+
+
+        //Code block after completing all compression
         console.log('Compression successful ' + this.compressedImages);
       }
     });

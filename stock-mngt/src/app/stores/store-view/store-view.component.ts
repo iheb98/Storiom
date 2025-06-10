@@ -17,6 +17,8 @@ export class StoreViewComponent implements OnInit {
   backend_URL = environment.backend
   editIcon = faEdit
   infoIcon = faInfo
+  selectedImage: string | null = null;
+
   constructor(
     private authService: AuthService,
     private storeService: StoreService,
@@ -51,5 +53,11 @@ export class StoreViewComponent implements OnInit {
     }
     return null
   }
+  openImage(image: string) {
+    this.selectedImage = image;
+  }
 
+  closeImage() {
+    this.selectedImage = null;
+  }
 }

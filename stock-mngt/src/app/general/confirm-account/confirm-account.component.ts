@@ -28,7 +28,7 @@ export class ConfirmAccountComponent implements OnInit {
       this.authService.confirmAccount(token).subscribe(response => {
         console.log(response)
         Swal.fire({
-          icon: 'error',
+          icon: 'success',
           title: response.message,
           showConfirmButton: false,
           timer: 3000

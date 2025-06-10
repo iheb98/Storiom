@@ -45,8 +45,11 @@ export class ProductsMngtComponent implements OnInit {
   editIcon = faEdit
   deleteIcon = faTrash
 
+  selectedImage: string | null = null;
+
+
   toggleFilters() {
-      this.filtersCollapsed = !this.filtersCollapsed;
+    this.filtersCollapsed = !this.filtersCollapsed;
   }
 
   constructor(
@@ -85,11 +88,11 @@ export class ProductsMngtComponent implements OnInit {
       query += query ? ",quantity < '" + this.maxQuantityFilter + "'" : "quantity < '" + this.maxQuantityFilter + "'"
     if (this.minBuyingPriceFilter != null)
       query += query ? ",buyingPrice > '" + this.minBuyingPriceFilter + "'" : "buyingPrice > '" + this.minBuyingPriceFilter + "'"
-    if (this.maxBuyingPriceFilter  != null)
+    if (this.maxBuyingPriceFilter != null)
       query += query ? ",buyingPrice < '" + this.maxBuyingPriceFilter + "'" : "buyingPrice < '" + this.maxBuyingPriceFilter + "'"
-    if (this.minSellingPriceFilter  != null)
+    if (this.minSellingPriceFilter != null)
       query += query ? ",sellingPrice > '" + this.minSellingPriceFilter + "'" : "sellingPrice > '" + this.minSellingPriceFilter + "'"
-    if (this.maxSellingPriceFilter  != null)
+    if (this.maxSellingPriceFilter != null)
       query += query ? ",sellingPrice < '" + this.maxSellingPriceFilter + "'" : "sellingPrice < '" + this.maxSellingPriceFilter + "'"
     return query
   }
@@ -199,5 +202,11 @@ export class ProductsMngtComponent implements OnInit {
     })
 
   }
+  openImage(image: string) {
+    this.selectedImage = image;
+  }
 
+  closeImage() {
+    this.selectedImage = null;
+  }
 }

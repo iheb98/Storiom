@@ -33,6 +33,9 @@ export class CategoriesMngtComponent implements OnInit {
   faTrash = faTrash;
   faEdit = faEdit;
   faSelect = faMousePointer;
+
+  connectedUserRole
+
   constructor(
     private categoryService: CategoryService,
     private authService: AuthService,
@@ -43,7 +46,8 @@ export class CategoriesMngtComponent implements OnInit {
     this.storeId = this.authService.getConnectedUser()?.store
     this.loading = false;
     this.getCategories();
-
+    this.connectedUserRole = this.authService.getConnectedUser()?.role
+    console.log(this.connectedUserRole)
 
   }
 

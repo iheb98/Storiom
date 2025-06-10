@@ -1,18 +1,18 @@
 <ngx-loading-x [show]="loading" [spinnerColor]="'#0d6efd'"></ngx-loading-x>
-<div class=""  NgxLoadingXBlur [show]="loading">
+<div class="" NgxLoadingXBlur [show]="loading">
     <div class="row title-bloc">
         <h2 class="title">
             Gestion des catégories
         </h2>
     </div>
-    <div class="row category-bloc">
+    <div class="row category-bloc" *ngIf="connectedUserRole == 'Admin'">
 
         <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item">
             <div class="category-container" [ngClass]="{'selected-mode':mode == 'SELECT'}" (click)="mode = 'SELECT'">
                 <fa-icon [icon]="faSelect" class="icon"></fa-icon> <span class="button-label">Sélectionner</span>
             </div>
         </div>
-        
+
         <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item">
             <div class="category-container" [ngClass]="{'selected-mode':mode == 'EDIT'}" (click)="mode = 'EDIT'">
                 <fa-icon [icon]="faEdit" class="icon"></fa-icon> <span class="button-label">Modifier</span>
@@ -38,7 +38,8 @@
                 <span class="categoriy-name">{{item?.name}}</span>
             </div>
         </div>
-        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item" *ngIf="mode == 'SELECT'">
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item"
+            *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'">
             <div class="add-category" (click)="addCategory()">
                 <span>+</span>
             </div>
@@ -58,7 +59,8 @@
                 <span class="categoriy-name">{{item?.name}}</span>
             </div>
         </div>
-        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item" *ngIf="mode == 'SELECT'">
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item"
+            *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'">
             <div class="add-category" (click)="addSubCategory(selectedCategory)">
                 <span>+</span>
             </div>
@@ -78,7 +80,8 @@
                 <span class="categoriy-name">{{item?.name}}</span>
             </div>
         </div>
-        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item" *ngIf="mode == 'SELECT'">
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item"
+            *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'">
             <div class="add-category" (click)="addSubCategory(selectedSubCategory1)">
                 <span>+</span>
             </div>
@@ -98,7 +101,8 @@
                 <span class="categoriy-name">{{item?.name}}</span>
             </div>
         </div>
-        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item" *ngIf="mode == 'SELECT'">
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item"
+            *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'">
             <div class="add-category" (click)="addSubCategory(selectedSubCategory2)">
                 <span>+</span>
             </div>
@@ -118,7 +122,8 @@
                 <span class="categoriy-name">{{item?.name}}</span>
             </div>
         </div>
-        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item" *ngIf="mode == 'SELECT'">
+        <div class="col-6 col-sm-6 col-md-4 col-lg-2 category-item"
+            *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'">
             <div class="add-category" (click)="addSubCategory(selectedSubCategory3)">
                 <span>+</span>
             </div>

@@ -1,7 +1,8 @@
 <div class="padding-page">
     <div class="row actions-bloc d-flex justify-content-end">
         <div class="col-12 col-md-auto mb-3">
-            <button class="btn btn-primary action-button" (click)="navigateTo('/products')">Gestions des Produits</button>
+            <button class="btn btn-primary action-button" (click)="navigateTo('/products')">Gestions des
+                Produits</button>
         </div>
         <div class="col-12 col-md-auto">
             <button class="btn btn-secondary action-button" (click)="navigateTo('/products/edit/'+product?.id)">
@@ -14,7 +15,7 @@
             {{product?.name}}
         </h2>
     </div>
-    
+
     <div class="row">
         <div class="col-12" *ngIf="product?.images?.length == 0">
             <div class="info-message">
@@ -24,7 +25,8 @@
         <div class="col-6 col-md-4" *ngFor="let item of product?.images">
             <div class="image-container">
                 <!--<button class="delete-button"><fa-icon [icon]="timesIcon"></fa-icon></button>-->
-            <img src="{{environment.backend+'/images/'+item}}" alt="" class="h-100 w-100">
+                <img [src]="environment.backend + '/' + item" alt="" class="product-image"
+                    (click)="openImage(environment.backend + '/' + item)">
             </div>
         </div>
     </div>
@@ -48,19 +50,21 @@
         <div class="col-6">
             <label>Prix d'achat :</label>
             <p>
-                {{product?.buyingPrice ? (product?.buyingPrice + " " + (product?.currency ? product?.currency : " DT")) : ""}}
+                {{product?.buyingPrice ? (product?.buyingPrice + " " + (product?.currency ? product?.currency : " DT"))
+                : ""}}
             </p>
         </div>
         <div class="col-6">
             <label>Prix de vente :</label>
             <p>
-                {{product?.sellingPrice ? (product?.sellingPrice + " " + (product?.currency ? product?.currency : " DT")) : ""}}
+                {{product?.sellingPrice ? (product?.sellingPrice + " " + (product?.currency ? product?.currency : "
+                DT")) : ""}}
             </p>
         </div>
         <div class="col-6">
             <label>Marque :</label>
             <p>
-                {{product?.brand ? product?.brand?.name  : ""}}
+                {{product?.brand ? product?.brand?.name : ""}}
             </p>
         </div>
         <div class="col-12">
@@ -82,13 +86,13 @@
             <div class="col-6 col-md-9">
                 <input *ngIf="selectedDateType=='Quotidien'" class="form-control" type="date" id="day" name="day"
                     [(ngModel)]="dayFilter" (change)="getOperationStats()">
-    
+
                 <input *ngIf="selectedDateType=='WEEKLY'" class="form-control" type="week" id="week" name="week"
                     [(ngModel)]="weekFilter" (change)="getOperationStats()">
-    
+
                 <input *ngIf="selectedDateType=='Mensuel'" class="form-control" type="month" id="month" name="month"
                     [(ngModel)]="monthFilter" (change)="getOperationStats()">
-    
+
                 <select class="form-control" *ngIf="selectedDateType=='Annuel'" [(ngModel)]="yearFilter"
                     (change)="getOperationStats()">
                     <option *ngFor="let year of years" [value]="year">{{year}}</option>
@@ -96,9 +100,12 @@
             </div>
         </div>
         <div class="col-12">
-            <p-chart type="bar" [data]="operationsData" [options]="operationsOptions" ></p-chart>
+            <p-chart type="bar" [data]="operationsData" [options]="operationsOptions"></p-chart>
         </div>
 
     </div>
 
+</div>
+<div class="image-popup" *ngIf="selectedImage" (click)="closeImage()">
+    <img [src]="selectedImage" alt="Zoomed Image">
 </div>

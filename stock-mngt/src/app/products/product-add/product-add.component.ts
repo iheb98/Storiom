@@ -172,12 +172,12 @@ export class ProductAddComponent implements OnInit {
 
     if (this.form.valid) {
       this.loadingService.screenLoading()
-      this.form.get('images').setValue(images)
-      //this.productService.addProduct({ ...this.form.getRawValue(), categoryId: this.getLastCategory()?.id, storeId: this.user?.store })
-      this.productService.addProduct({ ...this.form.getRawValue(), storeId: this.user?.store })
-        .subscribe(response => {
-          this.uploadImages(this.compressedImages, images).subscribe(
-            response => {
+      this.uploadImages(this.compressedImages, images).subscribe(
+        response => {
+          const filenames = response.files.map(file => file.location.split('/').pop());
+          this.form.get('images').setValue(filenames)
+          this.productService.addProduct({ ...this.form.getRawValue(), categoryId: this.getLastCategory()?.id, storeId: this.user?.store })
+            .subscribe(response => {
               this.loadingService.screenLoaded()
               Swal.fire({
                 icon: 'success',
@@ -185,18 +185,19 @@ export class ProductAddComponent implements OnInit {
                 showConfirmButton: false,
                 timer: 1500
               })
-              this.router.navigate(['products'])
-            }
-          )
-        }, error => {
-          this.loadingService.screenLoaded()
-          Swal.fire({
-            icon: 'error',
-            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
-            showConfirmButton: false,
-            timer: 1500
-          })
-        })
+              //this.router.navigate(['products'])
+            }, error => {
+              this.loadingService.screenLoaded()
+              Swal.fire({
+                icon: 'error',
+                title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+                showConfirmButton: false,
+                timer: 1500
+              })
+            })
+        }
+      )
+
     }
   }
 
@@ -227,31 +228,32 @@ export class ProductAddComponent implements OnInit {
       }
     if (this.form.valid) {
       this.loadingService.screenLoading()
-      this.form.get('images').setValue(images)
-      //this.productService.updateProduct({ ...this.form.getRawValue(), categoryId: (this.editCategory ? this.getLastCategory()?.id : this.product?.category?.id), storeId: this.user?.store, id: this.product?.id })
-      this.productService.updateProduct({ ...this.form.getRawValue(), storeId: this.user?.store, id: this.product?.id })
-        .subscribe(response => {
-          this.uploadImages(this.compressedImages, newImages).subscribe(
-            response => {
-              this.loadingService.screenLoaded()
+      this.uploadImages(this.compressedImages, newImages).subscribe(
+        response => {
+          const filenames = response.files.map(file => file.location.split('/').pop());
+          this.form.get('images').setValue(filenames)
+          this.loadingService.screenLoaded()
+          this.productService.updateProduct({ ...this.form.getRawValue(), categoryId: (this.editCategory ? this.getLastCategory()?.id : this.product?.category?.id), storeId: this.user?.store, id: this.product?.id })
+            .subscribe(response => {
               Swal.fire({
                 icon: 'success',
                 title: 'Produit modifié !',
                 showConfirmButton: false,
                 timer: 1500
               })
-              this.router.navigate(['products'])
-            }
-          )
-        }, error => {
-          this.loadingService.screenLoaded()
-          Swal.fire({
-            icon: 'error',
-            title: 'Une erreur est survenue ! Merci de réessayer plus tard',
-            showConfirmButton: false,
-            timer: 1500
-          })
-        })
+            }, error => {
+              this.loadingService.screenLoaded()
+              Swal.fire({
+                icon: 'error',
+                title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+                showConfirmButton: false,
+                timer: 1500
+              })
+            })
+          this.router.navigate(['products'])
+        }
+      )
+
     }
   }
 

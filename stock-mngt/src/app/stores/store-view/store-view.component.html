@@ -17,7 +17,7 @@
             <div class="col-12 col-sm-9 col-md-10">
                 <div class="row">
                     <div class="col-12">
-                        <span class="info-bloc-title"><mat-icon class="circle-icon">info</mat-icon> 
+                        <span class="info-bloc-title"><mat-icon class="circle-icon">info</mat-icon>
                             Informations générales :</span>
                     </div>
                     <div class="col-12">
@@ -34,17 +34,21 @@
                     </div>
                     <div class="col-12">
                         <span class="subtitle">Site web : </span>
-                        <span class="name" *ngIf="store?.site"><a [href]="storeWebsite" target="_blank">{{store?.site}}</a></span>
+                        <span class="name" *ngIf="store?.site"><a [href]="storeWebsite"
+                                target="_blank">{{store?.site}}</a></span>
                         <span class="name" *ngIf="!store?.site">{{"N/A"}}</span>
                     </div>
                 </div>
             </div>
-            <div class="col-12 horizontal-line"><hr/></div> 
+            <div class="col-12 horizontal-line">
+                <hr />
+            </div>
             <div class="col-12 col-sm-3 col-md-2 d-flex align-items-center justify-content-center">
                 <div class="image-container">
-                    <img [src]="store?.logo ? backend_URL +'/images/' + store?.logo : 'assets/store.jpg'"
-                        alt="Store Logo" class="image img-fluid rounded-circle"
-                        style="border: 1px solid lightgray; max-width: 100%; height: auto;">
+                    <img [src]="store?.logo ? backend_URL +'/' + store?.logo : 'assets/store.jpg'" alt="Store Logo"
+                        class="image img-fluid rounded-circle"
+                        style="border: 1px solid lightgray; max-width: 100%; height: auto;"
+                        (click)="openImage(backend_URL +'/' + store?.logo)">
                 </div>
             </div>
         </div>
@@ -54,7 +58,8 @@
         <!-- Store Address -->
         <div class="row info-bloc">
             <div class="col-12">
-                <span class="info-bloc-title"><mat-icon class="circle-icon">location_on</mat-icon> Adresse de la boutique :</span>
+                <span class="info-bloc-title"><mat-icon class="circle-icon">location_on</mat-icon> Adresse de la
+                    boutique :</span>
             </div>
             <div class="col-12">
                 <span class="subtitle">Rue : </span>
@@ -84,4 +89,7 @@
             </div>
         </div>
     </div>
+</div>
+<div class="image-popup" *ngIf="selectedImage" (click)="closeImage()">
+    <img [src]="selectedImage" alt="Zoomed Image">
 </div>

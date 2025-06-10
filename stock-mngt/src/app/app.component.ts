@@ -54,6 +54,7 @@ export class AppComponent implements OnInit {
 
     })
     this.setMenu()
+    console.log(this.authService.getConnectedUser())
     this.authService.loggedIn.subscribe(response => {
       this.subscriptionDetails = this.authService.getConnectedUser()?.subscription;
       this.checkSubscriptionStatus(this.authService.getConnectedUser()?.subscription)
@@ -135,15 +136,16 @@ export class AppComponent implements OnInit {
       link: 'categories',
     },
     {
-      label: 'Fournisseurs',
-      icon: faShuttleVan,
-      link: 'suppliers',
-    },
-    {
       label: 'Marques',
       icon: faImage,
       link: 'brands',
     },
+    {
+      label: 'Fournisseurs',
+      icon: faShuttleVan,
+      link: 'suppliers',
+    },
+
     {
       label: 'Produits',
       icon: faBox,

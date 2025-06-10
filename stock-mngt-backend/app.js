@@ -10,6 +10,21 @@ const port = process.env.PORT || 3000;
 const cors = require('cors');
 const multer = require('multer');
 const sendMail = require('./mailService');
+const multerS3 = require('multer-s3');
+const s3 = require('./config/r2');
+
+const upload = multer({
+  storage: multerS3({
+    s3,
+    bucket: process.env.R2_BUCKET_NAME,
+    acl: 'public-read',
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    key: (req, file, cb) => {
+      const filename = Date.now() + '-' + file.originalname;
+      cb(null, filename);
+    },
+  }),
+});
 
 const storage = multer.diskStorage(
   {
@@ -19,7 +34,7 @@ const storage = multer.diskStorage(
     }
   }
 )
-const upload = multer({ storage })
+//const upload = multer({ storage })
 
 
 require('dotenv/config');
@@ -53,10 +68,28 @@ app.use(express.static('.'));
 app.use(bodyparser.json({ limit: '50mb' }));
 
 
-
 app.post('/api/uploadFile', upload.single('file'), (req, res) => {
-  res.json({ success: true, message: "File uploaded" })
-})
+  res.json({
+    success: true,
+    message: "File uploaded",
+    fileUrl: req.file.location, // Cloudflare R2 returns the full public URL
+  });
+});
+
+app.post('/api/uploadMultipleFiles', upload.array('file', 10), (req, res) => {
+  // `req.files` is an array of uploaded file info
+  const uploadedFiles = req.files.map(file => ({
+    originalname: file.originalname,
+    location: file.location, // S3/R2 URL
+  }));
+
+  res.json({
+    success: true,
+    message: "Files uploaded successfully",
+    files: uploadedFiles,
+  });
+});
+
 
 app.post('/api/sendMail', async (req, res) => {
   try {
@@ -114,9 +147,7 @@ app.get('/api/confirm', async (req, res) => {
   return res.status(500).send("Le lien a expiré. Un nouveau lien de confirmation vous a été envoyé par e-mail.");
 });
 
-app.post('/api/uploadMultipleFiles', upload.array('file'), (req, res) => {
-  res.json({ success: true, message: "Files uploaded" })
-})
+
 
 const usersRoute = require('./routes/users');
 const storesRoute = require('./routes/stores');

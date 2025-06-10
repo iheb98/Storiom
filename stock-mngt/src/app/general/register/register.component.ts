@@ -64,6 +64,12 @@ export class RegisterComponent implements OnInit {
           else if (response.success) {
             this.authService.registerTokens(response.accessToken, response.refreshToken)
             this.authService.loggedIn.next();
+            Swal.fire({
+              icon: 'success',
+              title: `Merci de confirmer votre compte. Un mail contenant le lien de vérification a été envoyé`,
+              showConfirmButton: false,
+              timer: 6000
+            })
             this.router.navigate(['stores/view'])
           }
         }, error => {
