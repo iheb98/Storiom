@@ -711,7 +711,8 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
                 date: {
                     [Op.between]: [new Date(from), new Date(to)]
                 },
-                creatorUserId: req.user.id
+                creatorUserId: req.user.id,
+                type: "SOLD"
             },
             include: [{
                 model: Product,
