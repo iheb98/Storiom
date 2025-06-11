@@ -171,7 +171,7 @@ export class AddProductFromReceiptComponent implements OnInit {
 
     if (this.form.valid) {
       this.loadingService.screenLoading()
-      this.uploadImages(this.compressedImages, images).subscribe(
+      this.uploadImages(this.fileInput.nativeElement.files, images).subscribe(
         response => {
           const filenames = response.files.map(file => file.location.split('/').pop());
           this.form.get('images').setValue(filenames)
@@ -228,7 +228,7 @@ export class AddProductFromReceiptComponent implements OnInit {
       }
     if (this.form.valid) {
       this.loadingService.screenLoading()
-      this.uploadImages(this.compressedImages, newImages).subscribe(
+      this.uploadImages(this.fileInput.nativeElement.files, newImages).subscribe(
         response => {
           const filenames = response.files.map(file => file.location.split('/').pop());
           this.form.get('images').setValue(filenames)

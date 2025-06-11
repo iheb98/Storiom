@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Product, Operation, Credit, Category } = require('../models');
+const { Product, Operation, Credit, Category, Receipt } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 const sequelize = require('sequelize');
@@ -12,7 +12,8 @@ router.get('/store/:id/widgets', utility.authenticate, checkSubscription, async 
         const products = await Product.findAll({
             where: {
                 store_id: id,
-                creatorUserId: req.user.id
+                creatorUserId: req.user.id,
+                isVisible: true
             }
         })
         const credits = await Credit.findAll({
@@ -24,10 +25,18 @@ router.get('/store/:id/widgets', utility.authenticate, checkSubscription, async 
         const operations = await Operation.findAll({
             where: {
                 [utility.Op.and]: [
-                    utility.Sequelize.where(utility.Sequelize.fn('date', utility.Sequelize.col('date')), '=', utility.getSimpleDate(new Date()))
+                    utility.Sequelize.where(utility.Sequelize.fn('date', utility.Sequelize.col('Operation.date')), '=', utility.getSimpleDate(new Date()))
                 ],
                 creatorUserId: req.user.id
-            }
+            },
+            include: [
+                {
+                    model: Receipt,
+                    as: 'receipt', // This must match your association name
+                    where: { visible: true },
+                    attributes: [] // Optional: if you don't need Receipt fields in the result
+                }
+            ]
         })
         let totalValue = 0;
         let criticalStock = 0;
@@ -101,7 +110,14 @@ router.get('/store/:id/bestSelling', utility.authenticate, checkSubscription, (r
         where: {
             type: "SOLD",
             creatorUserId: req.user.id
-        }, include: ['product'],
+        }, include: ['product',
+            {
+                model: Receipt,
+                as: 'receipt',
+                where: { visible: true },
+                attributes: []
+            }
+        ],
         attributes: [
             'product_id',
             [sequelize.fn('SUM', sequelize.col('amount')), 'total_amount']
@@ -124,7 +140,14 @@ router.get('/store/:id/mostProfitable', utility.authenticate, checkSubscription,
         where: {
             type: "SOLD",
             creatorUserId: req.user.id
-        }, include: ['product'],
+        }, include: ['product',
+            {
+                model: Receipt,
+                as: 'receipt',
+                where: { visible: true },
+                attributes: []
+            }
+        ],
         attributes: [
             'product_id',
             [
@@ -156,7 +179,7 @@ router.get('/store/:id/operationStats', utility.authenticate, checkSubscription,
                     return res.status(400).json({ success: false, message: 'Invalid year format.' });
                 }
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), parseInt(value))
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "Operation"."date")`), parseInt(value))
                 );
                 break;
 
@@ -190,10 +213,10 @@ router.get('/store/:id/operationStats', utility.authenticate, checkSubscription,
                 }
 
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), year)
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "Operation"."date")`), year)
                 );
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), month)
+                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "Operation"."date")`), month)
                 );
                 break;
 
@@ -204,13 +227,13 @@ router.get('/store/:id/operationStats', utility.authenticate, checkSubscription,
                 }
                 const [y, m, d] = value.split('-').map(Number);
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), y)
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "Operation"."date")`), y)
                 );
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), m)
+                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "Operation"."date")`), m)
                 );
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(DAY FROM "date")`), d)
+                    sequelize.where(sequelize.literal(`EXTRACT(DAY FROM "Operation"."date")`), d)
                 );
                 break;
 
@@ -228,7 +251,14 @@ router.get('/store/:id/operationStats', utility.authenticate, checkSubscription,
             creatorUserId: req.user.id,
             ...(dateCondition.length > 0 && { [Op.and]: dateCondition })
         },
-        include: ['product']
+        include: ['product',
+            {
+                model: Receipt,
+                as: 'receipt',
+                where: { visible: true },
+                attributes: []
+            }
+        ]
     })
         .then(operations => {
             res.json(operations);
@@ -253,7 +283,7 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, c
                     return res.status(400).json({ success: false, message: 'Invalid year format.' });
                 }
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), parseInt(value))
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "Operation"."date")`), parseInt(value))
                 );
                 break;
 
@@ -287,10 +317,10 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, c
                 }
 
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), year)
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "Operation"."date")`), year)
                 );
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), month)
+                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "Operation"."date")`), month)
                 );
                 break;
 
@@ -301,13 +331,13 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, c
                 }
                 const [y, m, d] = value.split('-').map(Number);
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), y)
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "Operation"."date")`), y)
                 );
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), m)
+                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "Operation"."date")`), m)
                 );
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(DAY FROM "date")`), d)
+                    sequelize.where(sequelize.literal(`EXTRACT(DAY FROM "Operation"."date")`), d)
                 );
                 break;
 
@@ -333,7 +363,14 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, c
                 model: Category,
                 as: 'category'
             }]
-        }]
+        },
+        {
+            model: Receipt,
+            as: 'receipt',
+            where: { visible: true },
+            attributes: []
+        }
+        ]
     })
         .then(operations => {
             // Group by category and calculate total number of items sold per category
@@ -359,7 +396,8 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, c
             const totalSold = sortedCategories.map(([, data]) => data.totalAmount);
 
             // Define different background colors for each category
-            const backgroundColors = ['#42A5F5', '#ff9f40', '#66BB6A', '#FFA726', '#FF6384'];  // You can add more or generate dynamically
+            const backgroundColors = ['#1E88E5', '#43A047', '#F4511E', '#FB8C00', '#8E24AA']
+                ;  // You can add more or generate dynamically
 
             const chartData = {
                 labels: labels,
@@ -395,7 +433,7 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, checkSu
                     return res.status(400).json({ success: false, message: 'Invalid year format.' });
                 }
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), parseInt(value))
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "Operation"."date")`), parseInt(value))
                 );
                 break;
 
@@ -429,10 +467,10 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, checkSu
                 }
 
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), year)
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "Operation"."date")`), year)
                 );
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), month)
+                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "Operation"."date")`), month)
                 );
                 break;
 
@@ -443,13 +481,13 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, checkSu
                 }
                 const [y, m, d] = value.split('-').map(Number);
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), y)
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "Operation"."date")`), y)
                 );
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), m)
+                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "Operation"."date")`), m)
                 );
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(DAY FROM "date")`), d)
+                    sequelize.where(sequelize.literal(`EXTRACT(DAY FROM "Operation"."date")`), d)
                 );
                 break;
 
@@ -475,7 +513,14 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, checkSu
                 model: Category,
                 as: 'category'
             }]
-        }]
+        },
+        {
+            model: Receipt,
+            as: 'receipt',
+            where: { visible: true },
+            attributes: []
+        }
+        ]
     })
         .then(operations => {
             // Group by category
@@ -501,7 +546,8 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, checkSu
             const mostProfitable = sortedCategories.map(([, data]) => data.totalProfit);
 
             // Define different background colors for each category
-            const backgroundColors = ['#42A5F5', '#ff9f40', '#66BB6A', '#FFA726', '#FF6384'];  // You can add more or generate dynamically
+            const backgroundColors = ['#1E88E5', '#43A047', '#F4511E', '#FB8C00', '#8E24AA']
+                ;  // You can add more or generate dynamically
 
             const chartData = {
                 labels: labels,
@@ -540,7 +586,7 @@ router.get('/store/:id/operationStats/product', utility.authenticate, checkSubsc
                     return res.status(400).json({ success: false, message: 'Invalid year format.' });
                 }
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), parseInt(value))
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "Operation"."date")`), parseInt(value))
                 );
                 break;
 
@@ -574,10 +620,10 @@ router.get('/store/:id/operationStats/product', utility.authenticate, checkSubsc
                 }
 
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), year)
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "Operation"."date")`), year)
                 );
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), month)
+                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "Operation"."date")`), month)
                 );
                 break;
 
@@ -587,13 +633,13 @@ router.get('/store/:id/operationStats/product', utility.authenticate, checkSubsc
                 }
                 const [y, m, d] = value.split('-').map(Number);
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "date")`), y)
+                    sequelize.where(sequelize.literal(`EXTRACT(YEAR FROM "Operation"."date")`), y)
                 );
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "date")`), m)
+                    sequelize.where(sequelize.literal(`EXTRACT(MONTH FROM "Operation"."date")`), m)
                 );
                 dateCondition.push(
-                    sequelize.where(sequelize.literal(`EXTRACT(DAY FROM "date")`), d)
+                    sequelize.where(sequelize.literal(`EXTRACT(DAY FROM "Operation"."date")`), d)
                 );
                 break;
 
@@ -612,6 +658,14 @@ router.get('/store/:id/operationStats/product', utility.authenticate, checkSubsc
             product_id: product,
             ...(dateCondition.length > 0 && { [Op.and]: dateCondition })
         },
+        include: [
+            {
+                model: Receipt,
+                as: 'receipt',
+                where: { visible: true },
+                attributes: []
+            }
+        ]
     })
         .then(operations => {
             res.json(operations);
@@ -662,7 +716,14 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
             include: [{
                 model: Product,
                 as: 'product', attributes: ['name', 'buyingPrice', 'sellingPrice']
-            }]
+            },
+            {
+                model: Receipt,
+                as: 'receipt',
+                where: { visible: true },
+                attributes: []
+            }
+            ]
         });
 
         if (operations.length === 0) {
@@ -677,29 +738,30 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
         const groupedOperations = {};
 
         operations.forEach(op => {
-            console.log(op)
             const { productId, amount, price, receiptId, product } = op;
-            const revenue = amount * (product.sellingPrice || 0);
-            const cost = amount * (product.buyingPrice || 0);
-            const earnings = revenue - cost;
+            if (product) {
+                const revenue = amount * (product.sellingPrice || 0);
+                const cost = amount * (product.buyingPrice || 0);
+                const earnings = revenue - cost;
 
-            totalEarnings += earnings;
-            totalProductsSold += amount;
-            totalReceipts.add(receiptId);
+                totalEarnings += earnings;
+                totalProductsSold += amount;
+                totalReceipts.add(receiptId);
 
-            // Group operations by product
-            if (!groupedOperations[productId]) {
-                groupedOperations[productId] = {
-                    productName: product.name,
-                    buyingPrice: product.buyingPrice || 0,
-                    sellingPrice: product.sellingPrice || 0,
-                    quantitySold: 0,
-                    earnings: 0
-                };
+                // Group operations by product
+                if (!groupedOperations[productId]) {
+                    groupedOperations[productId] = {
+                        productName: product.name,
+                        buyingPrice: product.buyingPrice || 0,
+                        sellingPrice: product.sellingPrice || 0,
+                        quantitySold: 0,
+                        earnings: 0
+                    };
+                }
+
+                groupedOperations[productId].quantitySold += amount;
+                groupedOperations[productId].earnings += earnings;
             }
-
-            groupedOperations[productId].quantitySold += amount;
-            groupedOperations[productId].earnings += earnings;
         });
 
         // Format final response

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Product } = require('../models');
+const { Product, Operation } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 
@@ -57,7 +57,8 @@ router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, nex
         where: {
             store_id: id,
             ...utility.buildQuery(req.query.query),
-            creatorUserId: req.user.id
+            creatorUserId: req.user.id,
+            isVisible: true
         }, include: ['supplier', 'category']
     }, { page: req.query.page, pageSize: req.query.size })).then(products => {
         res.json(products)
@@ -75,6 +76,7 @@ router.get('/store/:id/critical', utility.authenticate, checkSubscription, (req,
         where: {
             store_id: id,
             creatorUserId: req.user.id,
+            isVisible: true,
             quantity: {
                 [utility.Op.lte]: 10
             }
@@ -99,6 +101,7 @@ router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, re
         where: {
             store_id: id,
             ...utility.buildQuery(req.query.query),
+            isVisible: true,
             creatorUserId: req.user.id
         }
     }).then(countProducts => {
@@ -113,6 +116,30 @@ router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, re
 
 
 router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
+    const id = req.params.id;
+    Product.findOne({
+        where: {
+            id,
+            creatorUserId: req.user.id
+        }
+    }).then(product => {
+        product.isVisible = false;
+        product.save().then(
+            savedProduct => {
+                res.status(200).json({ success: true, message: "Produit supprimé" })
+            }
+        ).catch(err => {
+            res.status(500).json({ err: err })
+        })
+    }).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+});
+
+/*router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Product.destroy({
         where: {
@@ -130,14 +157,15 @@ router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) 
             message: err.toString()
         })
     })
-});
+});*/
 
 router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Product.findOne({
         where: {
             id,
-            creatorUserId: req.user.id
+            creatorUserId: req.user.id,
+            isVisible: true
         }, include: ['brand', 'category', 'supplier']
     }).then(product => {
         res.json(product)

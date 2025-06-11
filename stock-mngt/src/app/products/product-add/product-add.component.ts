@@ -93,7 +93,7 @@ export class ProductAddComponent implements OnInit {
           this.form.get('color').setValue(response?.color)
           this.form.get('supplierId').setValue(response?.supplier?.id)
           this.form.get('size').setValue(response?.size)
-          this.findParentCategories(response?.category?.id)
+          //this.findParentCategories(response?.category?.id)
 
           this.images = response?.images
         })
@@ -145,7 +145,8 @@ export class ProductAddComponent implements OnInit {
       description: [''],
       buyingPrice: [null],
       sellingPrice: [null],
-      images: [null]
+      images: [null],
+      date: [(new Date()).toISOString().substring(0, 16)]
     });
   }
 
@@ -169,14 +170,16 @@ export class ProductAddComponent implements OnInit {
         fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + (counter++) + item?.name.substring(item.name.lastIndexOf('.'))
         images.push(fileName)
       }
-
+    console.log(images)
+    console.log(this.fileInput.nativeElement.files)
+    console.log(this.compressedImages)
     if (this.form.valid) {
       this.loadingService.screenLoading()
-      this.uploadImages(this.compressedImages, images).subscribe(
+      this.uploadImages(this.fileInput.nativeElement.files, images).subscribe(
         response => {
           const filenames = response.files.map(file => file.location.split('/').pop());
           this.form.get('images').setValue(filenames)
-          this.productService.addProduct({ ...this.form.getRawValue(), categoryId: this.getLastCategory()?.id, storeId: this.user?.store })
+          this.productService.addProduct({ ...this.form.getRawValue(), storeId: this.user?.store })
             .subscribe(response => {
               this.loadingService.screenLoaded()
               Swal.fire({
@@ -185,7 +188,7 @@ export class ProductAddComponent implements OnInit {
                 showConfirmButton: false,
                 timer: 1500
               })
-              //this.router.navigate(['products'])
+              this.router.navigate(['products'])
             }, error => {
               this.loadingService.screenLoaded()
               Swal.fire({
@@ -228,19 +231,20 @@ export class ProductAddComponent implements OnInit {
       }
     if (this.form.valid) {
       this.loadingService.screenLoading()
-      this.uploadImages(this.compressedImages, newImages).subscribe(
+      this.uploadImages(this.fileInput.nativeElement.files, newImages).subscribe(
         response => {
           const filenames = response.files.map(file => file.location.split('/').pop());
-          this.form.get('images').setValue(filenames)
-          this.loadingService.screenLoaded()
-          this.productService.updateProduct({ ...this.form.getRawValue(), categoryId: (this.editCategory ? this.getLastCategory()?.id : this.product?.category?.id), storeId: this.user?.store, id: this.product?.id })
+          this.form.get('images').setValue([...this.images, ...filenames])
+          this.productService.updateProduct({ ...this.form.getRawValue(), storeId: this.user?.store, id: this.product?.id })
             .subscribe(response => {
+              this.loadingService.screenLoaded()
               Swal.fire({
                 icon: 'success',
                 title: 'Produit modifié !',
                 showConfirmButton: false,
                 timer: 1500
               })
+              this.router.navigate(['products'])
             }, error => {
               this.loadingService.screenLoaded()
               Swal.fire({
@@ -250,7 +254,7 @@ export class ProductAddComponent implements OnInit {
                 timer: 1500
               })
             })
-          this.router.navigate(['products'])
+          //this.router.navigate(['products'])
         }
       )
 
