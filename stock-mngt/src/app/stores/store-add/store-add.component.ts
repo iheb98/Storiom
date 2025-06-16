@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from 'src/app/models/store';
 import { AuthService } from 'src/app/services/auth.service';
 import { FileService } from 'src/app/services/file.service';
+import { LoadingService } from 'src/app/services/loading.service';
 import { StoreService } from 'src/app/services/store.service';
 
 @Component({
@@ -22,7 +23,8 @@ export class StoreAddComponent implements OnInit {
     private fileService: FileService,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute) {
+    private route: ActivatedRoute,
+    private loadingService: LoadingService) {
   }
 
   ngOnInit(): void {
@@ -71,28 +73,42 @@ export class StoreAddComponent implements OnInit {
     if (this.fileInput.nativeElement.files[0])
       fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + this.fileInput.nativeElement.files[0]?.name.substring(this.fileInput.nativeElement.files[0].name.lastIndexOf('.'))
     if (this.form.valid) {
+      this.loadingService.screenLoading()
       if (this.fileInput.nativeElement.files[0])
         this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(
           response => {
             const logo = response.fileUrl.split('/').pop();
             this.service.addStore({ ...this.form.getRawValue(), logo: logo, userId: this.authService.getConnectedUser().id }).subscribe(
               response => {
+                console.log("TEST ==== 1")
                 this.authService.refreshToken().subscribe(response => {
                   localStorage.setItem('accessToken', response.accessToken);
+                  this.loadingService.screenLoaded()
+                  console.log("TEST ==== 2")
                   this.authService.loggedIn.next();
-                  this.router.navigate(['stores/view'])
+                  setTimeout(() => {
+                    this.router.navigate(['stores/view']);
+                  }, 1000);
                 })
               }
             )
           }
         )
       else
-        this.authService.refreshToken().subscribe(response => {
-          localStorage.setItem('accessToken', response.accessToken);
-          this.authService.loggedIn.next();
-          this.router.navigate(['stores/view'])
-        })
-
+        this.service.addStore({ ...this.form.getRawValue(), userId: this.authService.getConnectedUser().id }).subscribe(
+          response => {
+            console.log("TEST ==== 3")
+            this.authService.refreshToken().subscribe(response => {
+              localStorage.setItem('accessToken', response.accessToken);
+              this.loadingService.screenLoaded()
+              console.log("TEST ==== 4")
+              this.authService.loggedIn.next();
+              setTimeout(() => {
+                this.router.navigate(['stores/view']);
+              }, 1000);
+            })
+          }
+        )
     }
   }
 
@@ -101,12 +117,14 @@ export class StoreAddComponent implements OnInit {
     if (this.fileInput.nativeElement.files[0])
       fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + this.fileInput.nativeElement.files[0]?.name.substring(this.fileInput.nativeElement.files[0].name.lastIndexOf('.'))
     if (this.form.valid) {
+      this.loadingService.screenLoading()
       if (this.fileInput.nativeElement.files[0])
         this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(
           response => {
             const logo = response.fileUrl.split('/').pop();
             this.service.updateStore({ ...this.form.getRawValue(), id: this.store.id, logo: logo, userId: this.authService.getConnectedUser().id }).subscribe(
               response => {
+                this.loadingService.screenLoaded()
                 this.router.navigate(['stores/view'])
               }
             )
@@ -115,6 +133,7 @@ export class StoreAddComponent implements OnInit {
       else
         this.service.updateStore({ ...this.form.getRawValue(), id: this.store.id, userId: this.authService.getConnectedUser().id }).subscribe(
           response => {
+            this.loadingService.screenLoaded()
             this.router.navigate(['stores/view'])
           }
         )

@@ -3,6 +3,8 @@ const router = express.Router();
 const { Brand } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
+const { Op } = require('sequelize');
+
 router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
     const { name, parentBrandId, storeId } = req.body
     Brand.create({ name, parentBrandId, storeId, static: true }).then(createdBrand => {
@@ -49,7 +51,10 @@ router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, nex
 
     Brand.findAll({
         where: {
-            storeId
+            [Op.or]: {
+                storeId,
+                static: true
+            }
         }
     }).then(brand => {
         res.json(brand)
@@ -86,7 +91,10 @@ router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => 
     const id = req.params.id;
     Brand.findOne({
         where: {
-            id
+            [Op.or]: {
+                id,
+                static: true
+            }
         },
         include: {
             model: Brand, as: 'subBrands', include: {

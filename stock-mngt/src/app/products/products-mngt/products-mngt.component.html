@@ -94,7 +94,7 @@
                 <div class="card-body flex-fill">
                     <img src="{{item?.images[0] ? environment.backend+'/'+item?.images[0] : 'assets/default_product.png' }}"
                         class="img-fluid w-100 h-100" alt="Image"
-                        (click)="openImage(environment.backend+'/'+item?.images[0])">
+                        (click)="openImage(item?.images[0] ? environment.backend+'/'+item?.images[0] : 'assets/default_product.png')">
                 </div>
                 <div class=" card-footer">
                     <div class="row product-info">

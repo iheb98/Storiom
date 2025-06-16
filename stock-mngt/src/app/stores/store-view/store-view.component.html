@@ -48,7 +48,7 @@
                     <img [src]="store?.logo ? backend_URL +'/' + store?.logo : 'assets/store.jpg'" alt="Store Logo"
                         class="image img-fluid rounded-circle"
                         style="border: 1px solid lightgray; max-width: 100%; height: auto;"
-                        (click)="openImage(backend_URL +'/' + store?.logo)">
+                        (click)="openImage(store?.logo ? backend_URL +'/' + store?.logo : 'assets/store.jpg')">
                 </div>
             </div>
         </div>

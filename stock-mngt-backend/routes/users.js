@@ -243,8 +243,12 @@ router.post('/token', async (req, res, next) => {
                     id: tokenData.id
                 }, include: ['store', 'subscription']
             });
-            const accessToken = utility.generateAccessToken({ id: user.id, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null, role: user.role, subscription: user.subscription })
-            return res.json({ accessToken })
+            if (user) {
+                const accessToken = utility.generateAccessToken({ id: user.id, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null, role: user.role, subscription: user.subscription })
+                return res.json({ accessToken })
+            } else {
+                return res.sendStatus(500)
+            }
         })
     } catch (err) {
         return res.sendStatus(500)
