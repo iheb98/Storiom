@@ -39,7 +39,7 @@ export class GenerateReportComponent implements OnInit {
       this.loading = false;
     },
       (error) => {
-        this.errorMessage = "Erreur lors de la génération du rapport.";
+        this.errorMessage = error.error.message || "Erreur lors de la génération du rapport.";
         this.loading = false;
       }
     )

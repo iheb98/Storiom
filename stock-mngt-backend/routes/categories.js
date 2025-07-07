@@ -26,7 +26,7 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
             }
         }
     ).then(category => {
-        if (category.static == false) {
+        if (req.user.role != 'Admin') {
             res.status(500).json({
                 success: false,
                 message: "Tu n'as pas le droit de modifier cette Catégorie"
@@ -159,7 +159,6 @@ function extractCategories(data) {
 
 router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
-
     Category.findOne(
         {
             where: {
@@ -167,7 +166,7 @@ router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) 
             }
         }
     ).then(category => {
-        if (req.user.id != 5 && category.static == true) {
+        if (req.user.role != 'Admin') {
             res.status(500).json({
                 success: false,
                 message: "Tu n'as pas le droit de modifier cette Catégorie"

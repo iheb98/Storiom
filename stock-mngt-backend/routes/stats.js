@@ -728,7 +728,7 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
         });
 
         if (operations.length === 0) {
-            return res.status(404).json({ message: "No operations found in the given date range." });
+            return res.status(404).json({ message: "Aucune opération trouvée dans la plage de dates donnée." });
         }
 
         // Calculate report data

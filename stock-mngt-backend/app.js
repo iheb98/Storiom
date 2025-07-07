@@ -147,6 +147,41 @@ app.get('/api/confirm', async (req, res) => {
   return res.status(500).send("Le lien a expiré. Un nouveau lien de confirmation vous a été envoyé par e-mail.");
 });
 
+app.get('/api/resendConfirmationMail', async (req, res) => {
+  const { email } = req.query;
+
+  const user = await User.findOne({
+    where: {
+      email
+    }
+  });
+
+  if (!user) {
+    return res.status(400).send("Email invalide.");
+  }
+
+  if (user.isConfirmed) {
+    return res.status(200).send({ message: "Votre compte est déjà confirmé." });
+  }
+
+  const newToken = crypto.randomBytes(32).toString('hex');
+  const newExpiry = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24h
+
+  user.confirmationToken = newToken;
+  user.tokenExpiresAt = newExpiry;
+  await user.save();
+
+  const confirmUrl = `https://storiom.com/confirm?token=${newToken}`;
+  await sendMail(user.email, 'Nouveau lien de confirmation', `
+    <h2>Votre lien a expiré</h2>
+    <p>Voici un nouveau lien pour confirmer votre compte :</p>
+    <a href="${confirmUrl}">Confirmer mon compte</a>
+    <p>Ce lien est valable pendant 24 heures.</p>
+  `);
+
+  return res.status(200).send("Un nouveau lien de confirmation vous a été envoyé par e-mail.");
+});
+
 
 
 const usersRoute = require('./routes/users');
