@@ -24,10 +24,10 @@
                         {{ operation?.product?.name }}
                     </td>
                     <td>
-                        {{ operation?.product?.sellingPrice + " DT" }}
+                        {{ (operation?.product?.sellingPrice ? operation?.product?.sellingPrice : "--") + " DT" }}
                     </td>
                     <td>
-                        {{ operation?.total_profit + " DT" }}
+                        {{ (operation?.total_profit ? operation?.total_profit : "--") + " DT" }}
                     </td>
                     <td>
                         {{ operation?.product?.quantity }}

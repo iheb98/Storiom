@@ -70,6 +70,8 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { TermsComponent } from './pages/terms/terms.component';
 import { ConfirmAccountComponent } from './general/confirm-account/confirm-account.component';
+import { SellProductComponent } from './products/sell-product/sell-product.component';
+import { OperationsMngtComponent } from './receipts/operations-mngt/operations-mngt.component';
 
 
 @NgModule({
@@ -121,7 +123,9 @@ import { ConfirmAccountComponent } from './general/confirm-account/confirm-accou
     ForgotPasswordComponent,
     ResetPasswordComponent,
     TermsComponent,
-    ConfirmAccountComponent
+    ConfirmAccountComponent,
+    SellProductComponent,
+    OperationsMngtComponent
   ],
   imports: [
     BrowserModule,

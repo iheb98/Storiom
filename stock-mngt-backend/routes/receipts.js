@@ -52,6 +52,102 @@ router.post('/create', utility.authenticate, checkSubscription, async (req, res)
 
 })
 
+
+router.post('/sell/single', utility.authenticate, checkSubscription, async (req, res) => {
+    let { amount, price, id } = req.body
+    Operation.create({
+        amount, type: "SOLD", price, date: new Date(), productId: id,
+        receiptId: null, creatorUserId: req.user.id
+    }).then(
+        async createdOperation => {
+            let product = await Product.findOne({
+                where: {
+                    id
+                }
+            })
+            await product.update({ quantity: product.quantity - amount })
+            res.json({
+                operation: createdOperation
+            })
+        }
+    ).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+})
+
+
+
+router.post('/load/single', utility.authenticate, checkSubscription, async (req, res) => {
+    let { amount, price, id } = req.body
+    Operation.create({
+        amount, type: "LOADED", price, date: new Date(), productId: id,
+        receiptId: null, creatorUserId: req.user.id
+    }).then(
+        async createdOperation => {
+            let product = await Product.findOne({
+                where: {
+                    id
+                }
+            })
+            await product.update({ quantity: product.quantity + amount })
+            res.json({
+                operation: createdOperation
+            })
+        }
+    ).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+})
+
+router.get('/operations', utility.authenticate, checkSubscription, async (req, res) => {
+    Operation.findAll(utility.paginate({
+        where: {
+            ...utility.buildQuery(req.query.query),
+            creatorUserId: req.user.id
+        },
+        include: ['product'],
+        order: [
+            ['date', 'DESC']
+        ]
+    }, { page: req.query.page, pageSize: req.query.size })).then(
+        operations => {
+            res.json(
+                operations
+            )
+        }
+    ).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+})
+
+router.get('/count/operations', utility.authenticate, checkSubscription, (req, res, next) => {
+    const id = req.params.id;
+    Operation.count({
+        where: {
+            ...utility.buildQuery(req.query.query),
+            creatorUserId: req.user.id
+        }
+    }).then(countOperations => {
+        res.json(countOperations)
+    }).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+});
+
+
+
 router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Receipt.findOne({

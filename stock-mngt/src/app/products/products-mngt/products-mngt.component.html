@@ -86,54 +86,67 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-6 col-md-6 col-lg-4" *ngFor="let item of products">
-            <div class="card d-flex flex-column">
-                <div class="card-header">
-                    {{item?.name}}
+        <div class="col-6 col-md-6 col-lg-4 card-container" *ngFor="let item of products">
+            <div class="card h-100 d-flex flex-column">
+                <!-- Header -->
+                <div class="card-header d-flex align-items-center justify-content-between overflow-hidden">
+                    <span class="card-title text-truncate flex-grow-1 me-2">{{ item?.name }}</span>
+                    <div class="d-flex gap-1 icon-buttons">
+                        <button type="button" class="btn btn-sm btn-outline-secondary"
+                            (click)="navigateTo('/products/edit/' + item?.id)">
+                            <fa-icon [icon]="editIcon" class="icon-sm"></fa-icon>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteProduct(item)">
+                            <fa-icon [icon]="deleteIcon" class="icon-sm"></fa-icon>
+                        </button>
+                    </div>
                 </div>
-                <div class="card-body flex-fill">
-                    <img src="{{item?.images[0] ? environment.backend+'/'+item?.images[0] : 'assets/default_product.png' }}"
-                        class="img-fluid w-100 h-100" alt="Image"
-                        (click)="openImage(item?.images[0] ? environment.backend+'/'+item?.images[0] : 'assets/default_product.png')">
+
+                <!-- Image -->
+                <div class="card-body p-0">
+                    <img [src]="item?.images[0] ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png'"
+                        class="img-fluid w-100 object-fit-cover" style="max-height: 250px" alt="Image"
+                        (click)="openImage(item?.images[0] ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png')">
                 </div>
-                <div class=" card-footer">
-                    <div class="row product-info">
-                        <div class="col-12 col-md-12">
-                            <div><label>Catégorie : </label><span>{{item?.category?.name ? item?.category?.name :
-                                    "--"}}</span></div>
-                            <div><label>Prix de vente : </label><span>{{item?.sellingPrice ? (item?.sellingPrice + ' ' +
-                                    (item?.currency? item?.currency : ' DT')) : '--'}}</span></div>
-                            <div><label>Quantité : </label><span>{{item?.quantity ? item?.quantity : "--"}}</span></div>
+
+                <!-- Footer -->
+                <div class="card-footer">
+                    <div class="row product-info mb-2">
+                        <div class="col-12">
+                            <div><label>Catégorie :</label> <span>{{ item?.category?.name || "--" }}</span></div>
+                            <div><label>Prix de vente :</label>
+                                <span>{{ item?.sellingPrice ? (item.sellingPrice + ' ' + (item.currency || ' DT')) :
+                                    '--' }}</span>
+                            </div>
+                            <div><label>Quantité :</label> <span>{{ item?.quantity || "--" }}</span></div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-12 col-md-12 button-container">
-                            <button type="button" class="btn btn-primary"
+
+                    <!-- Bottom Buttons -->
+                    <div class="row g-2">
+                        <div class="col-12 col-md-4">
+                            <button type="button" class="btn btn-primary w-100 responsive-button"
                                 (click)="consulter(item?.id)">Consulter</button>
                         </div>
-                        <div class="col-6 col-md-6 button-container">
-                            <button type="button" class="btn btn-secondary"
-                                (click)="navigateTo('/products/edit/'+item?.id)">
-                                <fa-icon [icon]="editIcon"></fa-icon>
-                                <span class="button-label"> Modifier</span>
-                            </button>
+                        <div class="col-6 col-md-4">
+                            <button type="button" class="btn btn-success w-100 responsive-button"
+                                (click)="sell(item)">Vendre</button>
                         </div>
-                        <div class="col-6 col-md-6 button-container">
-                            <button type="button" class="btn btn-danger" (click)="deleteProduct(item)">
-                                <fa-icon [icon]="deleteIcon"></fa-icon>
-                                <span class="button-label"> Supprimer</span>
-                            </button>
+                        <div class="col-6 col-md-4">
+                            <button type="button" class="btn btn-danger w-100 responsive-button"
+                                (click)="load(item)">Charger</button>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
     <div class="row">
         <div class="col-12">
             <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)" [length]="count" [pageSize]="6"
-                [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[6,12,24]" [hidePageSize]="false"
-                [pageIndex]="0" aria-label="Select page">
+                [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[6,12,24,48,100]"
+                [hidePageSize]="false" [pageIndex]="0" aria-label="Select page">
             </mat-paginator>
         </div>
     </div>

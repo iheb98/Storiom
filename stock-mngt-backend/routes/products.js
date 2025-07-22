@@ -51,6 +51,23 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
     })
 })
 
+router.get('/all', (req, res, next) => {
+    const id = req.params.id;
+    Product.findAll({
+        where: {
+            
+        }, include: ['brand', 'category', 'supplier']
+    }).then(product => {
+        res.json(product)
+
+    }).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+});
+
 router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Product.findAll(utility.paginate({
@@ -177,5 +194,7 @@ router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => 
         })
     })
 });
+
+
 
 module.exports = router;

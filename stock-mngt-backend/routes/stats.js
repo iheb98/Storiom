@@ -25,19 +25,30 @@ router.get('/store/:id/widgets', utility.authenticate, checkSubscription, async 
         const operations = await Operation.findAll({
             where: {
                 [utility.Op.and]: [
-                    utility.Sequelize.where(utility.Sequelize.fn('date', utility.Sequelize.col('Operation.date')), '=', utility.getSimpleDate(new Date()))
+                    utility.Sequelize.where(
+                        utility.Sequelize.fn('date', utility.Sequelize.col('Operation.date')),
+                        '=',
+                        utility.getSimpleDate(new Date())
+                    ),
+                    {
+                        [utility.Op.or]: [
+                            { '$receipt.visible$': true },
+                            { receiptId: null } // Adjust if your foreign key is named differently
+                        ]
+                    }
                 ],
                 creatorUserId: req.user.id
             },
             include: [
                 {
                     model: Receipt,
-                    as: 'receipt', // This must match your association name
-                    where: { visible: true },
-                    attributes: [] // Optional: if you don't need Receipt fields in the result
+                    as: 'receipt',
+                    required: false,       // <-- crucial to allow null receipts
+                    attributes: []         // <-- only if you don't need receipt fields
                 }
             ]
-        })
+        });
+
         let totalValue = 0;
         let criticalStock = 0;
         let todayRevenue = 0;
@@ -109,12 +120,18 @@ router.get('/store/:id/bestSelling', utility.authenticate, checkSubscription, (r
     Operation.findAll({
         where: {
             type: "SOLD",
-            creatorUserId: req.user.id
-        }, include: ['product',
+            creatorUserId: req.user.id,
+            [Op.or]: [
+                { '$receipt.visible$': true },
+                { receiptId: null } // Adjust if foreign key has a different name
+            ]
+        },
+        include: [
+            'product',
             {
                 model: Receipt,
                 as: 'receipt',
-                where: { visible: true },
+                required: false,   // LEFT JOIN to include null receipts
                 attributes: []
             }
         ],
@@ -123,7 +140,7 @@ router.get('/store/:id/bestSelling', utility.authenticate, checkSubscription, (r
             [sequelize.fn('SUM', sequelize.col('amount')), 'total_amount']
         ],
         group: ['product_id', 'product.id'],
-        order: [[sequelize.literal('total_amount'), 'DESC']],
+        order: [[sequelize.literal('total_amount'), 'DESC']]
     }).then(operations => {
 
         res.json(operations)
@@ -249,13 +266,22 @@ router.get('/store/:id/operationStats', utility.authenticate, checkSubscription,
         where: {
             type: ["SOLD", "LOADED"],
             creatorUserId: req.user.id,
-            ...(dateCondition.length > 0 && { [Op.and]: dateCondition })
+            [Op.and]: [
+                ...(dateCondition.length > 0 ? dateCondition : []),
+                {
+                    [Op.or]: [
+                        { '$receipt.visible$': true },
+                        { receiptId: null }
+                    ]
+                }
+            ]
         },
-        include: ['product',
+        include: [
+            'product',
             {
                 model: Receipt,
                 as: 'receipt',
-                where: { visible: true },
+                required: false,
                 attributes: []
             }
         ]
@@ -354,22 +380,33 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, c
         where: {
             type: ["SOLD"],
             creatorUserId: req.user.id,
-            ...(dateCondition.length > 0 && { [Op.and]: dateCondition })
+            [Op.and]: [
+                ...(dateCondition.length > 0 ? dateCondition : []),
+                {
+                    [Op.or]: [
+                        { '$receipt.visible$': true },
+                        { receiptId: null } // adjust this if your foreign key is named differently
+                    ]
+                }
+            ]
         },
-        include: [{
-            model: Product,
-            as: 'product',
-            include: [{
-                model: Category,
-                as: 'category'
-            }]
-        },
-        {
-            model: Receipt,
-            as: 'receipt',
-            where: { visible: true },
-            attributes: []
-        }
+        include: [
+            {
+                model: Product,
+                as: 'product',
+                include: [
+                    {
+                        model: Category,
+                        as: 'category'
+                    }
+                ]
+            },
+            {
+                model: Receipt,
+                as: 'receipt',
+                attributes: [],
+                required: false // Important: left join to allow nulls
+            }
         ]
     })
         .then(operations => {
@@ -504,22 +541,33 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, checkSu
         where: {
             type: ["SOLD"],
             creatorUserId: req.user.id,
-            ...(dateCondition.length > 0 && { [Op.and]: dateCondition })
+            [Op.and]: [
+                ...(dateCondition.length > 0 ? dateCondition : []),
+                {
+                    [Op.or]: [
+                        { '$receipt.visible$': true },
+                        { receiptId: null } // adjust if your foreign key is different
+                    ]
+                }
+            ]
         },
-        include: [{
-            model: Product,
-            as: 'product',
-            include: [{
-                model: Category,
-                as: 'category'
-            }]
-        },
-        {
-            model: Receipt,
-            as: 'receipt',
-            where: { visible: true },
-            attributes: []
-        }
+        include: [
+            {
+                model: Product,
+                as: 'product',
+                include: [
+                    {
+                        model: Category,
+                        as: 'category'
+                    }
+                ]
+            },
+            {
+                model: Receipt,
+                as: 'receipt',
+                required: false,       // <-- important: allows nulls (LEFT JOIN)
+                attributes: []         // <-- no fields selected from receipt
+            }
         ]
     })
         .then(operations => {
@@ -656,13 +704,21 @@ router.get('/store/:id/operationStats/product', utility.authenticate, checkSubsc
             type: ["SOLD", "LOADED"],
             creatorUserId: req.user.id,
             product_id: product,
-            ...(dateCondition.length > 0 && { [Op.and]: dateCondition })
+            [Op.and]: [
+                ...(dateCondition.length > 0 ? dateCondition : []),
+                {
+                    [Op.or]: [
+                        { '$receipt.visible$': true },
+                        { receiptId: null } // adjust this if the foreign key is named differently
+                    ]
+                }
+            ]
         },
         include: [
             {
                 model: Receipt,
                 as: 'receipt',
-                where: { visible: true },
+                required: false, // LEFT JOIN to allow nulls
                 attributes: []
             }
         ]
@@ -712,20 +768,27 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
                     [Op.between]: [new Date(from), new Date(to)]
                 },
                 creatorUserId: req.user.id,
-                type: "SOLD"
+                type: "SOLD",
+                [Op.or]: [
+                    { '$receipt.visible$': true },
+                    { receiptId: null } // Adjust if your FK is named differently
+                ]
             },
-            include: [{
-                model: Product,
-                as: 'product', attributes: ['name', 'buyingPrice', 'sellingPrice']
-            },
-            {
-                model: Receipt,
-                as: 'receipt',
-                where: { visible: true },
-                attributes: []
-            }
+            include: [
+                {
+                    model: Product,
+                    as: 'product',
+                    attributes: ['name', 'buyingPrice', 'sellingPrice']
+                },
+                {
+                    model: Receipt,
+                    as: 'receipt',
+                    required: false, // important to allow null receipts
+                    attributes: []
+                }
             ]
         });
+
 
         if (operations.length === 0) {
             return res.status(404).json({ message: "Aucune opération trouvée dans la plage de dates donnée." });

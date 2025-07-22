@@ -1,14 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTrash, faEye, faArrowUp, faArrowDown, faPen, } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/services/auth.service';
 import { CategoryService } from 'src/app/services/category.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { ProductService } from 'src/app/services/product.service';
 import { QueryService } from 'src/app/services/query.service';
+import { ReceiptService } from 'src/app/services/receipt.service';
 import { SupplierService } from 'src/app/services/supplier.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
+import { SellProductComponent } from '../sell-product/sell-product.component';
 
 @Component({
   selector: 'app-products-mngt',
@@ -47,6 +50,10 @@ export class ProductsMngtComponent implements OnInit {
 
   selectedImage: string | null = null;
 
+  faEye = faEye;
+  faArrowUp = faArrowUp;
+  faArrowDown = faArrowDown;
+
 
   toggleFilters() {
     this.filtersCollapsed = !this.filtersCollapsed;
@@ -54,13 +61,14 @@ export class ProductsMngtComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
+    private receiptService: ReceiptService,
     private supplierService: SupplierService,
     private categoryService: CategoryService,
     private authService: AuthService,
     private loadingService: LoadingService,
     private router: Router,
-    private queryService: QueryService
-  ) { }
+    private queryService: QueryService,
+    public dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.getSuppliers();
@@ -172,6 +180,40 @@ export class ProductsMngtComponent implements OnInit {
 
   consulter(id) {
     this.router.navigate(['/products/view/' + id])
+  }
+
+  sell(product) {
+    const dialogRef = this.dialog.open(SellProductComponent, {
+      data: {
+        product,
+        operationType: "SOLD"
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(result)
+
+      if (result && result?.success) {
+        product.quantity -= result.amount
+      }
+    });
+  }
+
+  load(product) {
+    const dialogRef = this.dialog.open(SellProductComponent, {
+      data: {
+        product,
+        operationType: "LOADED"
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(result)
+
+      if (result && result?.success) {
+        product.quantity += result.amount
+      }
+    });
   }
 
   navigateTo(link) {

@@ -32,7 +32,7 @@
                         {{ receipt?.name }}
                     </td>
                     <td>
-                        {{ receipt?.total + ' DT' }}
+                        {{ (receipt?.total ? receipt?.total : "--" ) + ' DT' }}
                     </td>
                     <td>
                         {{ receipt?.date | date:'short' }}

@@ -24,10 +24,10 @@
                         {{ product?.name }}
                     </td>
                     <td>
-                        {{ product?.buyingPrice + ' DT' }}
+                        {{ (product?.buyingPrice ? product?.buyingPrice : "--" )+ ' DT' }}
                     </td>
                     <td>
-                        {{ product?.sellingPrice + ' DT' }}
+                        {{ (product?.sellingPrice ? product?.sellingPrice : "--" ) + ' DT' }}
                     </td>
                     <td>
                         {{ product?.quantity }}

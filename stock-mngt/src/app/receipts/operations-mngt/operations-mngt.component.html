@@ -1,0 +1,116 @@
+<div class="padding-page">
+    <div class="row title-bloc">
+        <h2 class="title">
+            Opérations
+        </h2>
+    </div>
+
+    <div class="row d-flex">
+        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
+            <button class="btn btn-secondary toggle-filters d-flex align-items-center" (click)="toggleFilters()">
+                <mat-icon class="me-2">more_vert</mat-icon> Afficher / Masquer les Filtres
+            </button>
+        </div>
+        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
+            <button class="btn btn-secondary add-button d-flex align-items-center" (click)="create()">
+                <mat-icon class="me-2">add</mat-icon> Ajouter
+            </button>
+        </div>
+        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
+            <button class="btn btn-secondary d-flex align-items-center" (click)="reset()">
+                <mat-icon class="me-2">restart_alt</mat-icon> Réinitialiser
+            </button>
+        </div>
+        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
+            <button class="btn btn-primary d-flex align-items-center" (click)="filter()">
+                <mat-icon class="me-2">search</mat-icon> Filtrer
+            </button>
+        </div>
+    </div>
+
+    <div class="filter-section" [ngClass]="{'collapsed': filtersCollapsed}">
+
+        <div class="row">
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="supplier" class="form-label">Fournisseur</label>
+                <ng-select [(ngModel)]="supplierFilter" name="supplier">
+                    <ng-option *ngFor="let element of suppliers" [value]="element?.id">{{element.firstName + ' ' +
+                        element.lastName}}</ng-option>
+                </ng-select>
+            </div>
+
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="code" class="form-label">Code</label>
+                <input type="text" class="form-control" id="code" [(ngModel)]="codeFilter">
+            </div>
+
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="name" class="form-label">Nom du client</label>
+                <input type="text" class="form-control" id="name" [(ngModel)]="nameFilter">
+            </div>
+
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="type" class="form-label">Type</label>
+                <ng-select [(ngModel)]="typeFilter" name="type" id="type">
+                    <ng-option *ngFor="let element of types" [value]="element?.value">{{element?.label}}</ng-option>
+                </ng-select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="fromDateFilter" class="form-label">Date</label>
+                <input type="date" class="form-control amount-input" id="fromDateFilter" [(ngModel)]="fromDateFilter"
+                    placeholder="De">
+                <input type="date" class="form-control amount-input" id="toDateFilter" [(ngModel)]="toDateFilter"
+                    placeholder="Jusqu'à">
+            </div>
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="minTotalFilter" class="form-label">Total</label>
+                <input type="number" class="form-control amount-input" id="minTotalFilter" [(ngModel)]="minTotalFilter"
+                    placeholder="De">
+                <input type="number" class="form-control amount-input" id="maxTotalFilter" [(ngModel)]="maxTotalFilter"
+                    placeholder="Jusqu'à">
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 table-bloc">
+            <table class="table table-responsive table-hover ">
+                <thead>
+                    <tr class="center">
+                        <th scope="col">Produit</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Prix</th>
+                        <th scope="col">Quantité</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let operation of operations">
+                        <td>{{operation?.product?.name}}</td>
+                        <td>{{operation?.type == "SOLD" ? "Vente" : (operation?.type == "LOADED" ? "Chargement" : "")}}
+                        </td>
+
+                        <td>{{(operation?.price ? operation?.price : "--" )+ ' DT'}}</td>
+                        <td>{{operation?.amount}}</td>
+                        <td>{{((operation?.price * operation?.amount) ? (operation?.price * operation?.amount) : "--") +
+                            ' DT'}}</td>
+                        <td>{{operation?.date | date:'short'}}</td>
+
+                    </tr>
+                    <tr *ngIf="count == 0">
+                        <td colspan="8" class="not-found-message">Pas de facture trouvé</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
+            [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[5,10,20,50,100]" [hidePageSize]="false"
+            [pageIndex]="0" aria-label="Select page">
+        </mat-paginator>
+    </div>
+
+</div>

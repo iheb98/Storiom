@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { faNode } from '@fortawesome/free-brands-svg-icons';
+import { faBuyNLarge, faNode } from '@fortawesome/free-brands-svg-icons';
 import { faArrowAltCircleRight, faChartBar } from '@fortawesome/free-regular-svg-icons';
 import { faPowerOff, faHome, faStore, faUser, faCodeBranch, faHandHoldingUsd, faCoins, faShuttleVan, faBox, faReceipt, faImage, faFile } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from './services/auth.service';
@@ -41,6 +41,29 @@ export class AppComponent implements OnInit {
     public storeService: StoreService,
     private dialog: MatDialog
   ) {
+    console.log("constructor loaded")
+    this.authService.loggedIn.subscribe(response => {
+      console.log("Test 1")
+      this.subscriptionDetails = this.authService.getConnectedUser()?.subscription;
+      console.log("Test 2")
+      this.checkSubscriptionStatus(this.authService.getConnectedUser()?.subscription)
+      console.log("Test 3")
+
+      this.connectedUser = this.authService.getConnectedUser()
+      console.log("Test 4")
+
+      console.log(this.connectedUser)
+      this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
+        store => {
+          console.log("Test 5")
+          this.store = store
+          console.log("Test 6")
+          this.loadingService.screenLoaded()
+        }, error => {
+          this.loadingService.screenLoaded()
+        }
+      )
+    })
   }
   ngOnInit() {
     this.connectedUser = this.authService.getConnectedUser()
@@ -55,20 +78,7 @@ export class AppComponent implements OnInit {
     })
     this.setMenu()
     console.log(this.authService.getConnectedUser())
-    this.authService.loggedIn.subscribe(response => {
-      this.subscriptionDetails = this.authService.getConnectedUser()?.subscription;
-      this.checkSubscriptionStatus(this.authService.getConnectedUser()?.subscription)
-      this.connectedUser = this.authService.getConnectedUser()
-      console.log(this.connectedUser)
-      this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
-        store => {
-          this.store = store
-          this.loadingService.screenLoaded()
-        }, error => {
-          this.loadingService.screenLoaded()
-        }
-      )
-    })
+
     this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
       store => {
         this.store = store
@@ -155,6 +165,12 @@ export class AppComponent implements OnInit {
       label: 'Factures',
       icon: faReceipt,
       link: 'receipts',
+    }
+    ,
+    {
+      label: 'Operations',
+      icon: faBuyNLarge,
+      link: 'operations',
     }
       ,
     {

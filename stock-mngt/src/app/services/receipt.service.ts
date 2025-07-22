@@ -56,4 +56,30 @@ export class ReceiptService {
   deleteReceipt(id): Observable<any> {
     return this.http.delete<any>(this.baseUrl + "/" + id);
   }
+
+  sellProduct(body): Observable<any> {
+    return this.http.post<any>(this.baseUrl + 'sell/single', body);
+  }
+
+  loadProduct(body): Observable<any> {
+    return this.http.post<any>(this.baseUrl + 'load/single', body);
+  }
+
+  getOperations(query): Observable<any> {
+    return this.http.get<any>(this.baseUrl + "operations", {
+      params: {
+        ...query
+      }
+    });
+  }
+
+    countOperationsByStoreId( query): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'count/operations',
+      {
+        params: {
+          ...query
+        }
+      });
+  }
+
 }

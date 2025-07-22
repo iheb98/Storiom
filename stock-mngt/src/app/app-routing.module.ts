@@ -30,6 +30,7 @@ import { ResetPasswordComponent } from './reset-password/reset-password.componen
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { TermsComponent } from './pages/terms/terms.component';
 import { ConfirmAccountComponent } from './general/confirm-account/confirm-account.component';
+import { OperationsMngtComponent } from './receipts/operations-mngt/operations-mngt.component';
 
 const routes: Routes = [
 
@@ -86,6 +87,11 @@ const routes: Routes = [
   { path: 'receipts', component: ReceiptsMngtComponent, canActivate: [AuthGuard] },
   { path: 'receipts/add', component: ReceiptAddComponent, canActivate: [AuthGuard] },
   { path: 'receipts/view/:id', component: ReceiptViewComponent, canActivate: [AuthGuard] },
+
+
+
+  // ------------ Operations ------------
+  { path: 'operations', component: OperationsMngtComponent, canActivate: [AuthGuard] },
 
   // ------------ Receipts ------------
   { path: 'reports/generate', component: GenerateReportComponent, canActivate: [AuthGuard] },

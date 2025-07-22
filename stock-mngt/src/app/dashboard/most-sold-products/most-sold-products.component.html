@@ -24,7 +24,7 @@
                         {{ operation?.product?.name }}
                     </td>
                     <td>
-                        {{ operation?.product?.sellingPrice + " DT" }}
+                        {{ (operation?.product?.sellingPrice ? operation?.product?.sellingPrice : "--") + " DT" }}
                     </td>
                     <td>
                         {{ operation?.total_amount }}
