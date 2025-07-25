@@ -845,4 +845,90 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
     }
 });
 
+
+router.get('/store/:id/parentCategoriesStats', utility.authenticate, checkSubscription, async (req, res, next) => {
+    try {
+        const allCategories = await Category.findAll({
+            attributes: ['id', 'name', 'parentCategoryId']
+        });
+
+        // Build map: parentId -> [children...]
+        const categoryMap = new Map();
+        allCategories.forEach(cat => {
+            const parentId = cat.parentCategoryId || null;
+            if (!categoryMap.has(parentId)) categoryMap.set(parentId, []);
+            categoryMap.get(parentId).push(cat);
+        });
+
+        // Get only top-level categories
+        const parentCategories = categoryMap.get(null) || [];
+
+        const results = [];
+
+        for (const parentCategory of parentCategories) {
+            const categoryIds = collectDescendantCategoryIds(parentCategory.id, categoryMap);
+
+            const products = await Product.findAll({
+                where: {
+                    categoryId: { [Op.in]: categoryIds }
+                },
+                attributes: ['id', 'quantity', 'buyingPrice', 'sellingPrice']
+            });
+
+            const productIds = products.map(p => p.id);
+
+            const stockValue = products.reduce((sum, p) => sum + (p.quantity * p.buyingPrice), 0);
+            const stockNetValue = products.reduce((sum, p) => sum + (p.quantity * p.sellingPrice), 0);
+
+            let totalSold = 0;
+            let totalSoldNet = 0;
+
+            if (productIds.length > 0) {
+                const soldStats = await Operation.findAll({
+                    where: {
+                        productId: { [Op.in]: productIds },
+                        type: 'SOLD'
+                    },
+                    attributes: [
+                        [utility.Sequelize.fn('SUM', utility.Sequelize.col('amount')), 'totalSold'],
+                        [utility.Sequelize.fn('SUM', utility.Sequelize.literal('amount * price')), 'totalSoldNet']
+                    ],
+                    raw: true
+                });
+
+                totalSold = parseFloat(soldStats[0].totalSold || 0);
+                totalSoldNet = parseFloat(soldStats[0].totalSoldNet || 0);
+            }
+
+            results.push({
+                categoryId: parentCategory.id,
+                categoryName: parentCategory.name,
+                stockValue,
+                stockNetValue,
+                totalSold,
+                totalSoldNet
+            });
+        }
+
+        res.json(results);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+
+
+function collectDescendantCategoryIds(categoryId, allCategoriesMap) {
+    const result = [categoryId];
+
+    const children = allCategoriesMap.get(categoryId) || [];
+
+    for (const child of children) {
+        result.push(...collectDescendantCategoryIds(child.id, allCategoriesMap));
+    }
+
+    return result;
+}
+
 module.exports = router;

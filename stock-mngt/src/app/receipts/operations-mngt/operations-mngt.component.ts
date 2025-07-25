@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/services/auth.service';
 import { LoadingService } from 'src/app/services/loading.service';
 import { ReceiptService } from 'src/app/services/receipt.service';
@@ -39,6 +39,7 @@ export class OperationsMngtComponent implements OnInit {
   store;
 
   faTrash = faTrash;
+  faEdit = faEdit
   faEye = faEye;
   currentPage = 0;
   currentSize = 5;
@@ -158,11 +159,11 @@ export class OperationsMngtComponent implements OnInit {
       query += query ? ",total > '" + this.minTotalFilter + "'" : "total > '" + this.minTotalFilter + "'"
     if (this.maxTotalFilter)
       query += query ? ",total < '" + this.maxTotalFilter + "'" : "total < '" + this.maxTotalFilter + "'"
-     if (this.minPriceFilter)
+    if (this.minPriceFilter)
       query += query ? ",price > '" + this.minPriceFilter + "'" : "price > '" + this.minPriceFilter + "'"
     if (this.maxPriceFilter)
       query += query ? ",price < '" + this.maxPriceFilter + "'" : "price < '" + this.maxPriceFilter + "'"
-     if (this.minAmountFilter)
+    if (this.minAmountFilter)
       query += query ? ",amount > '" + this.minAmountFilter + "'" : "amount > '" + this.minAmountFilter + "'"
     if (this.maxAmountFilter)
       query += query ? ",amount < '" + this.maxAmountFilter + "'" : "amount < '" + this.maxAmountFilter + "'"
@@ -175,16 +176,16 @@ export class OperationsMngtComponent implements OnInit {
   }
 
 
-  deleteOperation(receipt) {
+  deleteOperation(operation) {
     Swal.fire({
-      title: 'Etes vous sûr de vouloir supprimer la facture ' + receipt.code + ' ?',
+      title: 'Etes vous sûr de vouloir supprimer la facture ' + operation.id + ' ?',
       denyButtonText: `Annuler`,
       showDenyButton: true,
       confirmButtonText: 'Supprimer',
     }).then((result) => {
       if (result.isConfirmed) {
         this.loadingService.screenLoading()
-        /*this.receiptService.deleteOperation(receipt.id).subscribe(response => {
+        this.receiptService.deleteOperation(operation.id).subscribe(response => {
           this.loadingService.screenLoaded();
           Swal.fire({
             icon: 'success',
@@ -194,7 +195,7 @@ export class OperationsMngtComponent implements OnInit {
           })
           this.getOperations(this.currentPage, this.currentSize)
           this.countOperations()
-        })*/
+        })
       }
     })
   }
@@ -203,4 +204,8 @@ export class OperationsMngtComponent implements OnInit {
     this.router.navigate(['operations/view/' + receipt.id])
   }
 
+  editOperation(operation: any) {
+    // open dialog or navigate to edit form
+    this.router.navigate(['operations/edit/' + operation.id])
+  }
 }

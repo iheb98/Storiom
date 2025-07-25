@@ -1,0 +1,37 @@
+
+textarea {
+    resize: none;
+  }
+
+  .padding-page {
+    padding: 5rem 15rem 2rem 15rem;
+}
+
+@media screen and (max-width: 1500px) {
+    .padding-page {
+        padding: 20px 50px 150px 50px;
+
+    }
+
+    .title {
+        width: 100%;
+        text-align: center;
+        padding: 20px 0 0 0;
+        font-size: 30px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .padding-page {
+        padding: 20px 20px 0 20px;
+        
+        font-size: small !important;
+    }
+
+    .title {
+        width: 100%;
+        text-align: center;
+        padding: 20px 0 0 0;
+        font-size: 30px;
+    }
+}

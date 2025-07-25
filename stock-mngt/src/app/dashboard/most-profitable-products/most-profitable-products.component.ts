@@ -25,7 +25,7 @@ export class MostProfitableProductsComponent implements OnInit {
   getMostProfitableProducts() {
     this.statService.getMostProfitableProducts(this.user?.store).subscribe(
       response => {
-        this.operations = response
+        this.operations = response.slice(0, 5)
       }
     )
   }

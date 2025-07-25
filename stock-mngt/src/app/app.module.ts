@@ -72,6 +72,8 @@ import { TermsComponent } from './pages/terms/terms.component';
 import { ConfirmAccountComponent } from './general/confirm-account/confirm-account.component';
 import { SellProductComponent } from './products/sell-product/sell-product.component';
 import { OperationsMngtComponent } from './receipts/operations-mngt/operations-mngt.component';
+import { OperationEditComponent } from './receipts/operation-edit/operation-edit.component';
+import { ParentCategoriesStatsComponent } from './dashboard/parent-categories-stats/parent-categories-stats.component';
 
 
 @NgModule({
@@ -125,7 +127,9 @@ import { OperationsMngtComponent } from './receipts/operations-mngt/operations-m
     TermsComponent,
     ConfirmAccountComponent,
     SellProductComponent,
-    OperationsMngtComponent
+    OperationsMngtComponent,
+    OperationEditComponent,
+    ParentCategoriesStatsComponent
   ],
   imports: [
     BrowserModule,

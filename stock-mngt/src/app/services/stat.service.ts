@@ -71,4 +71,8 @@ export class StatService {
     });
   }
 
+    getParentCateoriesStats(id): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'store/' + id + '/parentCategoriesStats');
+  }
+
 }

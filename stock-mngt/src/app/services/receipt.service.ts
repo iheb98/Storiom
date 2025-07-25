@@ -54,7 +54,7 @@ export class ReceiptService {
   }
 
   deleteReceipt(id): Observable<any> {
-    return this.http.delete<any>(this.baseUrl + "/" + id);
+    return this.http.delete<any>(this.baseUrl + id);
   }
 
   sellProduct(body): Observable<any> {
@@ -73,7 +73,7 @@ export class ReceiptService {
     });
   }
 
-    countOperationsByStoreId( query): Observable<any> {
+  countOperationsByStoreId(query): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'count/operations',
       {
         params: {
@@ -82,4 +82,15 @@ export class ReceiptService {
       });
   }
 
+  updateOperation(body): Observable<any> {
+    return this.http.put<any>(this.baseUrl + 'operations/edit', body);
+  }
+
+  deleteOperation(id): Observable<any> {
+    return this.http.delete<any>(this.baseUrl + "operations/" + id);
+  }
+
+  getOperation(id): Observable<any> {
+    return this.http.get<any>(this.baseUrl + "operations/" + id);
+  }
 }

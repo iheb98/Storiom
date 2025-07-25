@@ -25,7 +25,7 @@ export class ProductResultTableComponent implements OnInit {
   getLastOperations() {
     this.productService.getCriticalStockProducts(this.user?.store).subscribe(
       response => {
-        this.products = response
+        this.products = response.slice(0, 5)
       }
     )
   }

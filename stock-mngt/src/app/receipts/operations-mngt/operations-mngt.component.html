@@ -91,6 +91,7 @@
                         <th scope="col">Quantité</th>
                         <th scope="col">Total</th>
                         <th scope="col">Date</th>
+                        <th scope="col">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -104,7 +105,14 @@
                         <td>{{((operation?.price * operation?.amount) ? (operation?.price * operation?.amount) : "--") +
                             ' DT'}}</td>
                         <td>{{operation?.date | date:'short'}}</td>
-
+                        <td>
+                            <button class="action-button" (click)="editOperation(operation)">
+                                <fa-icon [icon]="faEdit"></fa-icon>
+                            </button>
+                            <button class="action-button" (click)="deleteOperation(operation)">
+                                <fa-icon [icon]="faTrash" style="color: #DC3545;"></fa-icon>
+                            </button>
+                        </td>
                     </tr>
                     <tr *ngIf="count == 0">
                         <td colspan="8" class="not-found-message">Pas de facture trouvé</td>

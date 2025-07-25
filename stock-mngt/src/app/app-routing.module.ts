@@ -31,6 +31,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { TermsComponent } from './pages/terms/terms.component';
 import { ConfirmAccountComponent } from './general/confirm-account/confirm-account.component';
 import { OperationsMngtComponent } from './receipts/operations-mngt/operations-mngt.component';
+import { OperationEditComponent } from './receipts/operation-edit/operation-edit.component';
 
 const routes: Routes = [
 
@@ -92,6 +93,7 @@ const routes: Routes = [
 
   // ------------ Operations ------------
   { path: 'operations', component: OperationsMngtComponent, canActivate: [AuthGuard] },
+  { path: 'operations/edit/:id', component: OperationEditComponent, canActivate: [AuthGuard] },
 
   // ------------ Receipts ------------
   { path: 'reports/generate', component: GenerateReportComponent, canActivate: [AuthGuard] },

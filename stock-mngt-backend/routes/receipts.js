@@ -184,6 +184,26 @@ router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) 
     })
 });
 
+router.delete('/operations/:id', utility.authenticate, checkSubscription, (req, res, next) => {
+    const id = req.params.id;
+    Operation.destroy({
+        where: {
+            id,
+            creatorUserId: req.user.id
+        }
+    }).then(deletedRows => {
+        if (deletedRows > 0)
+            res.json({ success: true, message: "Operation deleted" })
+        else
+            res.status(500).json({ success: false, message: "Operation not found" })
+    }).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+});
+
 router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Receipt.findAll(utility.paginate({
@@ -206,6 +226,51 @@ router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, nex
         })
     })
 });
+
+router.get('/operations/:id', utility.authenticate, checkSubscription, (req, res, next) => {
+    const id = req.params.id;
+    Operation.findOne({
+        where: {
+            id,
+            creatorUserId: req.user.id,
+        },
+        include: ['product']
+    }).then(operation => {
+        res.json(operation)
+
+    }).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+});
+
+router.put('/operations/edit', utility.authenticate, checkSubscription, (req, res) => {
+    const { id, price, amount, type, date } = req.body
+    Operation.findOne(
+        {
+            where: {
+                id,
+                creatorUserId: req.user.id
+            }
+        }
+    ).then(operation => {
+        operation.price = price
+        operation.amount = amount
+        operation.date = date
+        operation.type = type
+        operation.save().then(
+            savedOperation => {
+                res.json({ message: 'Operation modifié', success: true })
+            }
+        ).catch(err => {
+            res.status(500).json({ err: err })
+        })
+    }).catch(err => {
+        res.status(500).json({ err: err })
+    })
+})
 
 router.get('/store/:id/last', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
