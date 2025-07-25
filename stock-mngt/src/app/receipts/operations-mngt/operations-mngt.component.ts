@@ -20,8 +20,14 @@ import Swal from 'sweetalert2';
 export class OperationsMngtComponent implements OnInit {
   minTotalFilter;
   maxTotalFilter;
+  minPriceFilter;
+  maxPriceFilter;
+  minAmountFilter;
+  maxAmountFilter;
   fromDateFilter;
   toDateFilter;
+  productName;
+
   nameFilter;
   codeFilter;
   supplierFilter;
@@ -126,11 +132,13 @@ export class OperationsMngtComponent implements OnInit {
   reset() {
     this.minTotalFilter = null;
     this.maxTotalFilter = null;
+    this.minPriceFilter = null;
+    this.maxPriceFilter = null;
+    this.minAmountFilter = null;
+    this.maxAmountFilter = null;
     this.fromDateFilter = null;
     this.toDateFilter = null;
-    this.nameFilter = null;
-    this.codeFilter = null;
-    this.supplierFilter = null;
+    this.productName = null;
     this.typeFilter = null;
     this.getOperations(this.currentPage, this.currentSize)
     this.countOperations();
@@ -140,16 +148,24 @@ export class OperationsMngtComponent implements OnInit {
     let query = "";
     if (this.typeFilter)
       query += query ? ",type ~ '" + this.typeFilter + "'" : "type ~ '" + this.typeFilter + "'"
-    if (this.codeFilter)
-      query += query ? ",code ~ '" + this.codeFilter + "'" : "code ~ '" + this.codeFilter + "'"
-    if (this.nameFilter)
-      query += query ? ",name ~ '" + this.nameFilter + "'" : "name ~ '" + this.nameFilter + "'"
-    if (this.supplierFilter)
-      query += query ? ",supplierId = '" + this.supplierFilter + "'" : "supplierId = '" + this.supplierFilter + "'"
+    if (this.productName)
+      query += query ? ",product.name ~ '" + this.productName + "'" : "product.name ~ '" + this.productName + "'"
+    // if (this.nameFilter)
+    //   query += query ? ",name ~ '" + this.nameFilter + "'" : "name ~ '" + this.nameFilter + "'"
+    // if (this.supplierFilter)
+    //   query += query ? ",supplierId = '" + this.supplierFilter + "'" : "supplierId = '" + this.supplierFilter + "'"
     if (this.minTotalFilter)
       query += query ? ",total > '" + this.minTotalFilter + "'" : "total > '" + this.minTotalFilter + "'"
     if (this.maxTotalFilter)
       query += query ? ",total < '" + this.maxTotalFilter + "'" : "total < '" + this.maxTotalFilter + "'"
+     if (this.minPriceFilter)
+      query += query ? ",price > '" + this.minPriceFilter + "'" : "price > '" + this.minPriceFilter + "'"
+    if (this.maxPriceFilter)
+      query += query ? ",price < '" + this.maxPriceFilter + "'" : "price < '" + this.maxPriceFilter + "'"
+     if (this.minAmountFilter)
+      query += query ? ",amount > '" + this.minAmountFilter + "'" : "amount > '" + this.minAmountFilter + "'"
+    if (this.maxAmountFilter)
+      query += query ? ",amount < '" + this.maxAmountFilter + "'" : "amount < '" + this.maxAmountFilter + "'"
     if (this.fromDateFilter)
       query += query ? ",date > '" + this.fromDateFilter + "'" : "date > '" + this.fromDateFilter + "'"
     if (this.toDateFilter)

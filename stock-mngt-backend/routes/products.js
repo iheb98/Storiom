@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { Product, Operation } = require('../models');
+const { Product, Operation, Supplier, Category } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
+const { Op } = require('sequelize');
 
 router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
     const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, quantity, unit, storeId, supplierId, categoryId, brandId } = req.body
@@ -55,7 +56,7 @@ router.get('/all', (req, res, next) => {
     const id = req.params.id;
     Product.findAll({
         where: {
-            
+
         }, include: ['brand', 'category', 'supplier']
     }).then(product => {
         res.json(product)
@@ -69,22 +70,67 @@ router.get('/all', (req, res, next) => {
 });
 
 router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
-    const id = req.params.id;
-    Product.findAll(utility.paginate({
-        where: {
-            store_id: id,
-            ...utility.buildQuery(req.query.query),
-            creatorUserId: req.user.id,
-            isVisible: true
-        }, include: ['supplier', 'category']
-    }, { page: req.query.page, pageSize: req.query.size })).then(products => {
-        res.json(products)
-    }).catch(err => {
-        res.status(500).json({
-            success: false,
-            message: err.toString()
+    if (!req.query.searchable) {
+        const id = req.params.id;
+        Product.findAll(utility.paginate({
+            where: {
+                store_id: id,
+                ...utility.buildQuery(req.query.query),
+                creatorUserId: req.user.id,
+                isVisible: true
+            }, include: ['supplier', 'category']
+        }, { page: req.query.page, pageSize: req.query.size })).then(products => {
+            res.json(products)
+        }).catch(err => {
+            res.status(500).json({
+                success: false,
+                message: err.toString()
+            })
         })
-    })
+    } else {
+        const id = req.params.id;
+        const searchable = req.query.searchable;
+
+        const searchFilter = searchable
+            ? {
+                [Op.or]: [
+                    { name: { [Op.iLike]: `%${searchable}%` } },
+                    { '$category.name$': { [Op.iLike]: `%${searchable}%` } },
+                ]
+            }
+            : {};
+
+        Product.findAll(utility.paginate({
+            where: {
+                ...searchFilter,
+                store_id: id,
+                creatorUserId: req.user.id,
+                isVisible: true
+            },
+            include: [
+                {
+                    model: Supplier,
+                    as: 'supplier',
+                    required: false // optional join
+                },
+                {
+                    model: Category,
+                    as: 'category',
+                    required: false
+                }
+            ]
+        }, { page: req.query.page, pageSize: req.query.size }))
+            .then(products => {
+                res.json(products);
+            })
+            .catch(err => {
+                res.status(500).json({
+                    success: false,
+                    message: err.toString()
+                });
+            });
+    }
+
 });
 
 router.get('/store/:id/critical', utility.authenticate, checkSubscription, (req, res, next) => {
@@ -113,22 +159,64 @@ router.get('/store/:id/critical', utility.authenticate, checkSubscription, (req,
 });
 
 router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
-    const id = req.params.id;
-    Product.count({
-        where: {
-            store_id: id,
-            ...utility.buildQuery(req.query.query),
-            isVisible: true,
-            creatorUserId: req.user.id
-        }
-    }).then(countProducts => {
-        res.json(countProducts)
-    }).catch(err => {
-        res.status(500).json({
-            success: false,
-            message: err.toString()
+    if (!req.query.searchable) {
+        const id = req.params.id;
+        Product.count({
+            where: {
+                store_id: id,
+                ...utility.buildQuery(req.query.query),
+                isVisible: true,
+                creatorUserId: req.user.id
+            }
+        }).then(countProducts => {
+            res.json(countProducts)
+        }).catch(err => {
+            res.status(500).json({
+                success: false,
+                message: err.toString()
+            })
         })
-    })
+
+    } else {
+
+        const id = req.params.id;
+        const searchable = req.query.searchable;
+
+        const searchFilter = searchable
+            ? {
+                [Op.or]: [
+                    { name: { [Op.iLike]: `%${searchable}%` } },
+                    { '$category.name$': { [Op.iLike]: `%${searchable}%` } }
+                ]
+            }
+            : {};
+
+        Product.count({
+            where: {
+                store_id: id,
+                isVisible: true,
+                creatorUserId: req.user.id,
+                ...searchFilter,
+            },
+            include: [
+                {
+                    model: Category,
+                    as: 'category',
+                    required: false
+                }
+            ]
+        })
+            .then(countProducts => {
+                res.json(countProducts);
+            })
+            .catch(err => {
+                res.status(500).json({
+                    success: false,
+                    message: err.toString()
+                });
+            });
+
+    }
 });
 
 

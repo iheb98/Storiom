@@ -44,6 +44,7 @@ export class ProductsMngtComponent implements OnInit {
   currentSize = 6;
 
   filtersCollapsed = true;
+  searchable;
 
   editIcon = faEdit
   deleteIcon = faTrash
@@ -250,5 +251,30 @@ export class ProductsMngtComponent implements OnInit {
 
   closeImage() {
     this.selectedImage = null;
+  }
+
+  search() {
+    console.log(this.searchable)
+    this.loadingService.screenLoading()
+    this.productService.getProductsByStoreId(this.authService.getConnectedUser()?.store, {
+      page: this.currentPage,
+      size: this.currentSize,
+      searchable: this.searchable,
+    }).subscribe(
+      response => {
+        this.loadingService.screenLoaded()
+        this.products = response
+      },
+      error => {
+        this.loadingService.screenLoaded()
+      }
+    )
+    this.loadingService.screenLoading()
+    this.productService.countProductsByStoreId(this.authService.getConnectedUser()?.store, {
+      searchable: this.searchable,
+    }).subscribe(response => {
+      this.loadingService.screenLoaded()
+      this.count = response;
+    })
   }
 }

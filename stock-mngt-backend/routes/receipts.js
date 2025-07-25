@@ -3,6 +3,8 @@ const router = express.Router();
 const { Receipt, Operation, Product, Store, Address } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
+const { Op } = require('sequelize');
+
 router.post('/create', utility.authenticate, checkSubscription, async (req, res) => {
     const { code, tva, type, name, date, userId, storeId, supplierId, operations } = req.body
     let total = 0;
@@ -111,7 +113,17 @@ router.get('/operations', utility.authenticate, checkSubscription, async (req, r
             ...utility.buildQuery(req.query.query),
             creatorUserId: req.user.id
         },
-        include: ['product'],
+        include: [{
+            model: Product,
+            as: 'product',
+            where: {
+                name: {
+                    [Op.iLike]: req.query.query.indexOf('product') != -1 ?
+                        `%${req.query.query.match(/product\.name\s*~\s*'([^']+)'/)[1]}%` :
+                        '%%'
+                }
+            }
+        }],
         order: [
             ['date', 'DESC']
         ]

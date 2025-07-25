@@ -32,21 +32,8 @@
 
         <div class="row">
             <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="supplier" class="form-label">Fournisseur</label>
-                <ng-select [(ngModel)]="supplierFilter" name="supplier">
-                    <ng-option *ngFor="let element of suppliers" [value]="element?.id">{{element.firstName + ' ' +
-                        element.lastName}}</ng-option>
-                </ng-select>
-            </div>
-
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="code" class="form-label">Code</label>
-                <input type="text" class="form-control" id="code" [(ngModel)]="codeFilter">
-            </div>
-
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="name" class="form-label">Nom du client</label>
-                <input type="text" class="form-control" id="name" [(ngModel)]="nameFilter">
+                <label for="supplier" class="form-label">Produit</label>
+                <input type="text" class="form-control" id="code" [(ngModel)]="productName">
             </div>
 
             <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
@@ -55,21 +42,39 @@
                     <ng-option *ngFor="let element of types" [value]="element?.value">{{element?.label}}</ng-option>
                 </ng-select>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="fromDateFilter" class="form-label">Date</label>
-                <input type="date" class="form-control amount-input" id="fromDateFilter" [(ngModel)]="fromDateFilter"
-                    placeholder="De">
-                <input type="date" class="form-control amount-input" id="toDateFilter" [(ngModel)]="toDateFilter"
-                    placeholder="Jusqu'à">
-            </div>
             <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                 <label for="minTotalFilter" class="form-label">Total</label>
                 <input type="number" class="form-control amount-input" id="minTotalFilter" [(ngModel)]="minTotalFilter"
                     placeholder="De">
                 <input type="number" class="form-control amount-input" id="maxTotalFilter" [(ngModel)]="maxTotalFilter"
+                    placeholder="Jusqu'à">
+            </div>
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="minPriceFilter" class="form-label">Prix</label>
+                <input type="number" class="form-control amount-input" id="minPriceFilter" [(ngModel)]="minPriceFilter"
+                    placeholder="De">
+                <input type="number" class="form-control amount-input" id="maxPriceFilter" [(ngModel)]="maxPriceFilter"
+                    placeholder="Jusqu'à">
+            </div>
+
+        </div>
+
+        <div class="row">
+
+
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="minAmountFilter" class="form-label">Quantité</label>
+                <input type="number" class="form-control amount-input" id="minAmountFilter"
+                    [(ngModel)]="minAmountFilter" placeholder="De">
+                <input type="number" class="form-control amount-input" id="maxAmountFilter"
+                    [(ngModel)]="maxAmountFilter" placeholder="Jusqu'à">
+            </div>
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <label for="fromDateFilter" class="form-label">Date</label>
+                <input type="date" class="form-control amount-input" id="fromDateFilter" [(ngModel)]="fromDateFilter"
+                    placeholder="De">
+                <input type="date" class="form-control amount-input" id="toDateFilter" [(ngModel)]="toDateFilter"
                     placeholder="Jusqu'à">
             </div>
         </div>

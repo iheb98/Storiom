@@ -5,6 +5,12 @@
         </h2>
     </div>
     <div class="row d-flex">
+        <div class="col-12 col-sm-12 col-md-auto col-lg-12 mb-3">
+            <input type="name" id="form1" class="form-control search-input" placeholder="Rechercher"
+                [(ngModel)]="searchable" [ngModelOptions]="{standalone: true}" (keyup)="search()" />
+        </div>
+    </div>
+    <div class="row d-flex">
         <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
             <button class="btn btn-secondary toggle-filters d-flex align-items-center" (click)="toggleFilters()">
                 <mat-icon class="me-2">more_vert</mat-icon> Afficher / Masquer les Filtres

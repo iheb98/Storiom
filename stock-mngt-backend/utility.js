@@ -39,27 +39,29 @@ const buildQuery = (sentQuery) => {
         let operator = item.substring(0, item.indexOf(' '))
         item = item.substring(item.indexOf(' ') + 1)
         let value = item.substring(1, item.length - 1)
+        if (name.indexOf(".") == -1) {
+            if (operator == '~') {
+                finalQuery[name] = {
+                    [Op.like]: '%' + value + '%'
+                }
+            } else if (operator == '=') {
+                finalQuery[name] = {
+                    [Op.eq]: value
+                }
+            } else if (operator == '>') {
+                finalQuery[name] = {
+                    ...finalQuery[name],
+                    [Op.gte]: value
+                }
+            }
+            else if (operator == '<') {
+                finalQuery[name] = {
+                    ...finalQuery[name],
+                    [Op.lte]: value
+                }
+            }
+        }
 
-        if (operator == '~') {
-            finalQuery[name] = {
-                [Op.like]: '%' + value + '%'
-            }
-        } else if (operator == '=') {
-            finalQuery[name] = {
-                [Op.eq]: value
-            }
-        } else if (operator == '>') {
-            finalQuery[name] = {
-                ...finalQuery[name],
-                [Op.gte]: value
-            }
-        }
-        else if (operator == '<') {
-            finalQuery[name] = {
-                ...finalQuery[name],
-                [Op.lte]: value
-            }
-        }
     }
     return finalQuery
 };
