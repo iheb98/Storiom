@@ -186,22 +186,42 @@ router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) 
 
 router.delete('/operations/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
-    Operation.destroy({
+    Operation.findOne({
         where: {
-            id,
-            creatorUserId: req.user.id
-        }
-    }).then(deletedRows => {
-        if (deletedRows > 0)
-            res.json({ success: true, message: "Operation deleted" })
-        else
-            res.status(500).json({ success: false, message: "Operation not found" })
-    }).catch(err => {
-        res.status(500).json({
-            success: false,
-            message: err.toString()
+            id
+        },
+        include: ['product']
+    }).then(operation => {
+        Product.findOne({
+            where: {
+                id: operation.product.id
+            }
+        }).then(product => {
+            if (operation.type == "SOLD") {
+                product.quantity += operation.amount
+            } else {
+                product.quantity -= operation.amount
+            }
+            product.save();
+            Operation.destroy({
+                where: {
+                    id,
+                    creatorUserId: req.user.id
+                }
+            }).then(deletedRows => {
+                if (deletedRows > 0)
+                    res.json({ success: true, message: "Operation deleted" })
+                else
+                    res.status(500).json({ success: false, message: "Operation not found" })
+            }).catch(err => {
+                res.status(500).json({
+                    success: false,
+                    message: err.toString()
+                })
+            })
         })
     })
+
 });
 
 router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
@@ -253,19 +273,40 @@ router.put('/operations/edit', utility.authenticate, checkSubscription, (req, re
             where: {
                 id,
                 creatorUserId: req.user.id
-            }
+            }, include: ['product']
         }
     ).then(operation => {
-        operation.price = price
-        operation.amount = amount
-        operation.date = date
-        operation.type = type
-        operation.save().then(
-            savedOperation => {
-                res.json({ message: 'Operation modifié', success: true })
+        Product.findOne({
+            where: {
+                id: operation.product.id
             }
-        ).catch(err => {
-            res.status(500).json({ err: err })
+        }).then(product => {
+
+            operation.price = price
+            if (operation.type == "SOLD") {
+                if (amount > operation.amount) {
+                    product.quantity -= amount - operation.amount
+                } else if (amount < operation.amount) {
+                    product.quantity += operation.amount - amount
+                }
+            } else {
+                if (amount > operation.amount) {
+                    product.quantity += amount - operation.amount
+                } else if (amount < operation.amount) {
+                    product.quantity -= operation.amount - amount
+                }
+            }
+            product.save();
+            operation.amount = amount
+            operation.date = date
+            operation.type = type
+            operation.save().then(
+                savedOperation => {
+                    res.json({ message: 'Operation modifié', success: true })
+                }
+            ).catch(err => {
+                res.status(500).json({ err: err })
+            })
         })
     }).catch(err => {
         res.status(500).json({ err: err })

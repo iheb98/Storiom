@@ -52,7 +52,7 @@ export class OperationEditComponent implements OnInit {
   initForm() {
     this.form = this.formBuilder.group({
       productName: [{ value: '', disabled: true }],
-      type: [''],
+      type: [{ value: '', disabled: true }],
       price: [''],
       amount: [''],
       date: [''],
