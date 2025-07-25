@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { faBuyNLarge, faNode } from '@fortawesome/free-brands-svg-icons';
 import { faArrowAltCircleRight, faChartBar } from '@fortawesome/free-regular-svg-icons';
-import { faPowerOff, faHome, faStore, faUser, faCodeBranch, faHandHoldingUsd, faCoins, faShuttleVan, faBox, faReceipt, faImage, faFile, faWindowRestore } from '@fortawesome/free-solid-svg-icons';
+import { faPowerOff, faHome, faStore, faUser, faCodeBranch, faHandHoldingUsd, faCoins, faShuttleVan, faBox, faReceipt, faImage, faFile, faWindowRestore, faInfo, faGripHorizontal, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from './services/auth.service';
 import { ListenerService } from './services/listener.service';
 import { LoadingService } from './services/loading.service';
@@ -136,8 +136,8 @@ export class AppComponent implements OnInit {
 
   setMenu() {
     this.menu = [{
-      label: 'Accueil',
-      icon: this.homeIcon,
+      label: 'Boutique',
+      icon: faInfoCircle,
       link: 'stores/view',
     },
     {
