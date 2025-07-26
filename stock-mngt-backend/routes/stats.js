@@ -53,9 +53,11 @@ router.get('/store/:id/widgets', utility.authenticate, checkSubscription, async 
         let criticalStock = 0;
         let todayRevenue = 0;
         let totalCredits = 0;
+        let stockValue = 0;
         products.forEach(element => {
             totalValue += element.quantity * element.sellingPrice
-            criticalStock += element.quantity < 10 ? 1 : 0
+            stockValue += element.quantity * element.buyingPrice
+            criticalStock += element.quantity <= element.criticalStockIndicator ? 1 : 0
         });
 
         credits.forEach(element => {
@@ -67,7 +69,7 @@ router.get('/store/:id/widgets', utility.authenticate, checkSubscription, async 
                 todayRevenue += element.amount * element.price
             }
         })
-        res.json({ totalValue, criticalStock, todayRevenue, totalCredits })
+        res.json({ totalValue, criticalStock, todayRevenue, totalCredits, stockValue })
     } catch (err) {
         res.status(500).json({
             success: false,
@@ -574,7 +576,7 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, checkSu
             // Group by category
             const categoryData = operations.reduce((acc, operation) => {
                 const category = operation.product.category ? operation.product.category.name : "Non classé";
-                const profit = operation.price * operation.amount;
+                const profit = (operation.price - operation.product.buyingPrice) * operation.amount;
 
                 if (!acc[category]) {
                     acc[category] = { totalProfit: 0 };
@@ -870,7 +872,9 @@ router.get('/store/:id/parentCategoriesStats', utility.authenticate, checkSubscr
 
             const products = await Product.findAll({
                 where: {
-                    categoryId: { [Op.in]: categoryIds }
+                    categoryId: { [Op.in]: categoryIds },
+                    creatorUserId: req.user.id,
+                    isVisible: true
                 },
                 attributes: ['id', 'quantity', 'buyingPrice', 'sellingPrice']
             });
@@ -878,32 +882,102 @@ router.get('/store/:id/parentCategoriesStats', utility.authenticate, checkSubscr
             const productIds = products.map(p => p.id);
 
             const stockValue = products.reduce((sum, p) => sum + (p.quantity * p.buyingPrice), 0);
-            const stockNetValue = products.reduce((sum, p) => sum + (p.quantity * p.sellingPrice), 0);
+            const stockNetValue = products.reduce((sum, p) => sum + (p.quantity * (p.sellingPrice - p.buyingPrice)), 0);
+            const stockSellingValue = products.reduce((sum, p) => sum + (p.quantity * p.sellingPrice), 0);
 
             let totalSold = 0;
             let totalSoldNet = 0;
 
             if (productIds.length > 0) {
-                const soldStats = await Operation.findAll({
+                const soldOperations = await Operation.findAll({
                     where: {
                         productId: { [Op.in]: productIds },
                         type: 'SOLD'
                     },
-                    attributes: [
-                        [utility.Sequelize.fn('SUM', utility.Sequelize.col('amount')), 'totalSold'],
-                        [utility.Sequelize.fn('SUM', utility.Sequelize.literal('amount * price')), 'totalSoldNet']
-                    ],
-                    raw: true
+                    include: [
+                        {
+                            model: Product,
+                            as: 'product',
+                            attributes: ['buyingPrice']
+                        }
+                    ]
                 });
 
-                totalSold = parseFloat(soldStats[0].totalSold || 0);
-                totalSoldNet = parseFloat(soldStats[0].totalSoldNet || 0);
+                for (const op of soldOperations) {
+                    const price = op.price;
+                    const amount = op.amount;
+                    const buyingPrice = op.product?.buyingPrice;
+
+                    if (amount != null && price != null && buyingPrice != null) {
+                        totalSold += amount * price;
+                        totalSoldNet += amount * (price - buyingPrice);
+                    }
+                }
             }
 
             results.push({
                 categoryId: parentCategory.id,
                 categoryName: parentCategory.name,
                 stockValue,
+                stockSellingValue,
+                stockNetValue,
+                totalSold,
+                totalSoldNet
+            });
+        }
+
+        // ⬇️ Extra Row: Products with no category
+        const uncategorizedProducts = await Product.findAll({
+            where: {
+                categoryId: null,
+                creatorUserId: req.user.id,
+                isVisible: true
+            },
+            attributes: ['id', 'quantity', 'buyingPrice', 'sellingPrice']
+        });
+
+        console.log(uncategorizedProducts.length)
+
+        if (uncategorizedProducts.length > 0) {
+            const productIds = uncategorizedProducts.map(p => p.id);
+
+            const stockValue = uncategorizedProducts.reduce((sum, p) => sum + (p.quantity * p.buyingPrice), 0);
+            const stockNetValue = uncategorizedProducts.reduce((sum, p) => sum + (p.quantity * (p.sellingPrice - p.buyingPrice)), 0);
+            const stockSellingValue = uncategorizedProducts.reduce((sum, p) => sum + (p.quantity * p.sellingPrice), 0);
+
+            let totalSold = 0;
+            let totalSoldNet = 0;
+
+            const soldOperations = await Operation.findAll({
+                where: {
+                    productId: { [Op.in]: productIds },
+                    type: 'SOLD'
+                },
+                include: [
+                    {
+                        model: Product,
+                        as: 'product',
+                        attributes: ['buyingPrice']
+                    }
+                ]
+            });
+
+            for (const op of soldOperations) {
+                const price = op.price;
+                const amount = op.amount;
+                const buyingPrice = op.product?.buyingPrice;
+
+                if (amount != null && price != null && buyingPrice != null) {
+                    totalSold += amount * price;
+                    totalSoldNet += amount * (price - buyingPrice);
+                }
+            }
+
+            results.push({
+                categoryId: null,
+                categoryName: 'Sans catégorie',
+                stockValue,
+                stockSellingValue,
                 stockNetValue,
                 totalSold,
                 totalSoldNet
@@ -917,6 +991,233 @@ router.get('/store/:id/parentCategoriesStats', utility.authenticate, checkSubscr
     }
 });
 
+router.get('/store/:id/total-sold-pie', utility.authenticate, async (req, res) => {
+    try {
+        const { type, value } = req.query;
+        const creatorUserId = req.user.id;
+
+        const categories = await Category.findAll({ raw: true });
+        const parentCategories = categories.filter(c => !c.parentCategoryId);
+        const result = [];
+
+        // Date filter
+        const dateFilter = {};
+        if (type === 'Quotidien') {
+            dateFilter[Op.gte] = new Date(value + ' 00:00:00');
+            dateFilter[Op.lte] = new Date(value + ' 23:59:59');
+        } else if (type === 'Mensuel') {
+            const [year, month] = value.split('-');
+            dateFilter[Op.gte] = new Date(`${year}-${month}-01`);
+            dateFilter[Op.lt] = new Date(`${year}-${parseInt(month) + 1}-01`);
+        } else if (type === 'Annuel') {
+            dateFilter[Op.gte] = new Date(`${value}-01-01`);
+            dateFilter[Op.lt] = new Date(`${parseInt(value) + 1}-01-01`);
+        }
+
+        // Handle parent categories
+        for (const parent of parentCategories) {
+            const descendantIds = await getAllDescendantCategoryIds(parent.id, categories);
+            const categoryIds = [parent.id, ...descendantIds];
+
+            const products = await Product.findAll({
+                where: {
+                    categoryId: { [Op.in]: categoryIds },
+                    creatorUserId,
+                    isVisible: true
+                },
+                attributes: ['id'],
+                raw: true
+            });
+
+            const productIds = products.map(p => p.id);
+            if (productIds.length === 0) continue;
+
+            const operations = await Operation.findAll({
+                where: {
+                    productId: { [Op.in]: productIds },
+                    type: 'SOLD',
+                    date: dateFilter
+                },
+                attributes: [
+                    [utility.Sequelize.fn('SUM', utility.Sequelize.literal('amount * price')), 'total']
+                ],
+                raw: true
+            });
+
+            const total = parseFloat(operations[0].total || 0);
+            result.push({
+                label: parent.name,
+                value: total
+            });
+        }
+
+        // Handle uncategorized products ONCE
+        const uncategorizedProducts = await Product.findAll({
+            where: {
+                categoryId: null,
+                creatorUserId,
+                isVisible: true
+            },
+            attributes: ['id'],
+            raw: true
+        });
+
+        const uncategorizedProductIds = uncategorizedProducts.map(p => p.id);
+        if (uncategorizedProductIds.length > 0) {
+            const uncategorizedOperations = await Operation.findAll({
+                where: {
+                    productId: { [Op.in]: uncategorizedProductIds },
+                    type: 'SOLD',
+                    date: dateFilter
+                },
+                attributes: [
+                    [utility.Sequelize.fn('SUM', utility.Sequelize.literal('amount * price')), 'total']
+                ],
+                raw: true
+            });
+
+            const totalUncategorized = parseFloat(uncategorizedOperations[0].total || 0);
+            result.push({
+                label: 'Non catégorisé',
+                value: totalUncategorized
+            });
+        }
+
+        res.json({
+            labels: result.map(r => r.label),
+            datasets: [{
+                data: result.map(r => r.value),
+                backgroundColor: ['#ff0000', '#FFBB00', '#0099ff', '#00cc66', '#cc33ff', '#ff66cc']
+            }]
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+
+router.get('/store/:id/net-sold-pie', utility.authenticate, async (req, res) => {
+    try {
+        const { type, value } = req.query;
+        const creatorUserId = req.user.id;
+
+        const categories = await Category.findAll({ raw: true });
+        const parentCategories = categories.filter(c => !c.parentCategoryId);
+        const result = [];
+
+        // Build date filter
+        const dateFilter = {};
+        if (type === 'Quotidien') {
+            dateFilter[Op.gte] = new Date(value + ' 00:00:00');
+            dateFilter[Op.lte] = new Date(value + ' 23:59:59');
+        } else if (type === 'Mensuel') {
+            const [year, month] = value.split('-');
+            dateFilter[Op.gte] = new Date(`${year}-${month}-01`);
+            dateFilter[Op.lt] = new Date(`${year}-${parseInt(month) + 1}-01`);
+        } else if (type === 'Annuel') {
+            dateFilter[Op.gte] = new Date(`${value}-01-01`);
+            dateFilter[Op.lt] = new Date(`${parseInt(value) + 1}-01-01`);
+        }
+
+        // 👇 Loop for each parent category
+        for (const parent of parentCategories) {
+            const descendantIds = await getAllDescendantCategoryIds(parent.id, categories);
+            const categoryIds = [parent.id, ...descendantIds];
+
+            const products = await Product.findAll({
+                where: {
+                    categoryId: { [Op.in]: categoryIds },
+                    creatorUserId,
+                    isVisible: true
+                },
+                attributes: ['id'],
+                raw: true
+            });
+
+            const productIds = products.map(p => p.id);
+            if (productIds.length === 0) continue;
+
+            const operations = await Operation.findAll({
+                where: {
+                    productId: { [Op.in]: productIds },
+                    type: 'SOLD',
+                    date: dateFilter
+                },
+                include: [{
+                    model: Product,
+                    as: 'product',
+                    required: true,
+                    attributes: []
+                }],
+                attributes: [
+                    [utility.Sequelize.literal('SUM("Operation"."amount" * ("Operation"."price" - "product"."buying_price"))'), 'total']
+                ],
+                raw: true
+            });
+
+            const total = parseFloat(operations[0].total || 0);
+            result.push({
+                label: parent.name,
+                value: total
+            });
+        }
+
+        // ✅ Handle uncategorized products separately (only once)
+        const uncategorizedProducts = await Product.findAll({
+            where: {
+                categoryId: null,
+                creatorUserId,
+                isVisible: true
+            },
+            attributes: ['id'],
+            raw: true
+        });
+
+        const uncategorizedProductIds = uncategorizedProducts.map(p => p.id);
+        if (uncategorizedProductIds.length > 0) {
+            const uncategorizedOperations = await Operation.findAll({
+                where: {
+                    productId: { [Op.in]: uncategorizedProductIds },
+                    type: 'SOLD',
+                    date: dateFilter
+                },
+                include: [{
+                    model: Product,
+                    as: 'product',
+                    required: true,
+                    attributes: []
+                }],
+                attributes: [
+                    [utility.Sequelize.literal('SUM("Operation"."amount" * ("Operation"."price" - "product"."buying_price"))'), 'total']
+                ],
+                raw: true
+            });
+
+            const totalUncategorized = parseFloat(uncategorizedOperations[0].total || 0);
+            result.push({
+                label: 'Non catégorisé',
+                value: totalUncategorized
+            });
+        }
+
+        res.json({
+            labels: result.map(r => r.label),
+            datasets: [{
+                data: result.map(r => r.value),
+                backgroundColor: ['#ff0000', '#FFBB00', '#0099ff', '#00cc66', '#cc33ff', '#ff66cc']
+            }]
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+
+
 
 
 function collectDescendantCategoryIds(categoryId, allCategoriesMap) {
@@ -929,6 +1230,21 @@ function collectDescendantCategoryIds(categoryId, allCategoriesMap) {
     }
 
     return result;
+}
+
+async function getAllDescendantCategoryIds(categoryId, allCategories) {
+    const descendants = [];
+
+    function recurse(id) {
+        const children = allCategories.filter(c => c.parentCategoryId === id);
+        for (const child of children) {
+            descendants.push(child.id);
+            recurse(child.id);
+        }
+    }
+
+    recurse(categoryId);
+    return descendants;
 }
 
 module.exports = router;

@@ -135,6 +135,7 @@ export class ProductAddComponent implements OnInit {
   initForm() {
     this.form = this.formBuilder.group({
       name: [null, Validators.required],
+      criticalStockIndicator: [0],
       supplierId: [null],
       brandId: [null],
       categoryId: [null],

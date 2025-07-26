@@ -107,10 +107,10 @@ export class ProductsMngtComponent implements OnInit {
   }
 
   getSuppliers() {
-    this.loadingService.screenLoading()
+    //this.loadingService.screenLoading()
     this.supplierService.getAllSuppliersByStoreId(this.authService.getConnectedUser()?.store).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+        //this.loadingService.screenLoaded()
         this.suppliers = response
       },
       error => {
@@ -120,10 +120,10 @@ export class ProductsMngtComponent implements OnInit {
   }
 
   getCategories() {
-    this.loadingService.screenLoading()
+    //this.loadingService.screenLoading()
     this.categoryService.getFlatCategoriesByStoreId(this.authService.getConnectedUser()?.store).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+        //this.loadingService.screenLoaded()
         this.categories = response
       },
       error => {
@@ -150,11 +150,11 @@ export class ProductsMngtComponent implements OnInit {
   }
 
   countProducts() {
-    this.loadingService.screenLoading()
+    //this.loadingService.screenLoading()
     this.productService.countProductsByStoreId(this.authService.getConnectedUser()?.store, {
       query: this.buildQuery()
     }).subscribe(response => {
-      this.loadingService.screenLoaded()
+      //this.loadingService.screenLoaded()
       this.count = response;
     })
   }

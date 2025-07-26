@@ -4,74 +4,33 @@
             <h3 class="title">Dashboard</h3>
         </div>
     </div>
-    <div class="row widget-container">
-        <div class="col-6 col-md-3 col-lg-3 widget">
-            <div class="row content">
-                <div class="col-12 col-md-3">
-                    <div class="icon-box stock-value">
-                        <fa-icon [icon]="faBoxOpen"></fa-icon>
-                    </div>
+
+    <div class="row widget-container g-3 m-3">
+        <div class="col-3 col-sm-6 col-md-4 col-lg-3 widget" *ngFor="let w of widgetsList">
+            <div class="content d-flex align-items-center gap-3 p-3 shadow-sm rounded">
+                <div class="icon-box" [ngClass]="w.class">
+                    <fa-icon [icon]="w.icon"></fa-icon>
                 </div>
-                <div class="col-12 col-md-9 value-box">
-                    <div class="label">
-                        Valeur du stock
+                <div class="value-box">
+                    <div class="label text-muted small">
+                        {{ w.label }}
                     </div>
                     <div class="value">
-                        {{widgets?.totalValue ? widgets?.totalValue + ' DT': '--'  }}
+                        {{ w.value }}
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-6 col-md-3 col-lg-3 widget">
-            <div class="row content">
-                <div class="col-12 col-md-3">
-                    <div class="icon-box critical-stock">
-                        <fa-icon [icon]="faArrowDown"></fa-icon>
-                    </div>
-                </div>
-                <div class="col-12 col-md-9 value-box">
-                    <div class="label">
-                        Stock Critique
-                    </div>
-                    <div class="value">
-                        {{widgets?.criticalStock ? widgets?.criticalStock : '--' }}
+    </div>
 
-                    </div>
+    <div class="row">
+        <div class="col-12 col-md-12 fixed-height">
+            <div class="row">
+                <div class="col-12">
+                    <span class="subtitle">Détails sur les Catégories</span>
                 </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3 col-lg-3 widget">
-            <div class="row content">
-                <div class="col-12 col-md-3">
-                    <div class="icon-box today-revenue">
-                        <fa-icon [icon]="faBill"></fa-icon>
-                    </div>
-                </div>
-                <div class="col-12 col-md-9 value-box">
-                    <div class="label">
-                        Ventes du Jour
-                    </div>
-                    <div class="value">
-                        {{widgets?.todayRevenue ? widgets?.todayRevenue + ' DT' : '--' }}
-
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-3 col-lg-3 widget">
-            <div class="row content">
-                <div class="col-12 col-md-3">
-                    <div class="icon-box credit">
-                        <fa-icon [icon]="faHand"></fa-icon>
-                    </div>
-                </div>
-                <div class="col-12 col-md-9 value-box">
-                    <div class="label">
-                        Total des crédits </div>
-                    <div class="value">
-                        {{widgets?.totalCredits ? widgets?.totalCredits + ' DT' : '--' }}
-
-                    </div>
+                <div class="col-12">
+                    <app-parent-categories-stats></app-parent-categories-stats>
                 </div>
             </div>
         </div>

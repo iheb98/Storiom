@@ -3,14 +3,27 @@ const router = express.Router();
 const { Product, Operation, Supplier, Category } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
-const { Op } = require('sequelize');
+const { Op, literal } = require('sequelize');
 
 router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
-    const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, quantity, unit, storeId, supplierId, categoryId, brandId } = req.body
-    Product.create({ name, code, buyingPrice, sellingPrice, currency, color, size, description, images: JSON.stringify(images), quantity, unit, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id }).then(createdProduct => {
-        res.json({
-            product: createdProduct
-        })
+    const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, quantity, unit, storeId, supplierId, categoryId, brandId, criticalStockIndicator } = req.body
+    Product.create({ name, code, buyingPrice, sellingPrice, currency, color, size, description, images: JSON.stringify(images), quantity, unit, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id, criticalStockIndicator }).then(createdProduct => {
+        console.log(quantity)
+        if (quantity > 0) {
+            Operation.create({ receiptId: null, type: "LOADED", productId: createdProduct.id, amount: quantity, price: createdProduct.buyingPrice, date: new Date(), creatorUserId: req.user.id })
+                .then(createdOperation => {
+                    res.json({
+                        product: createdProduct
+                    })
+                }).catch(err => {
+                    console.log(err)
+                    res.status(500).json({ err })
+                })
+        } else {
+            res.json({
+                product: createdProduct
+            })
+        }
     }).catch(err => {
         console.log(err)
         res.status(500).json({ err })
@@ -18,7 +31,7 @@ router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
 })
 
 router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
-    const { id, name, color, quantity, unit, images, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId } = req.body
+    const { id, name, color, quantity, unit, images, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId, criticalStockIndicator } = req.body
     Product.findOne(
         {
             where: {
@@ -38,6 +51,7 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
         product.description = description
         product.sellingPrice = sellingPrice
         product.buyingPrice = buyingPrice
+        product.criticalStockIndicator = criticalStockIndicator
         product.size = size
         product.save().then(
             savedProduct => {
@@ -68,27 +82,36 @@ router.get('/all', (req, res, next) => {
         })
     })
 });
-
 router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
+    const id = req.params.id;
+
+    // Pagination options
+    const pagination = {
+        page: req.query.page,
+        pageSize: req.query.size
+    };
+
+    // Common ordering clause: newest first
+    const order = [['createdAt', 'DESC']];
+
     if (!req.query.searchable) {
-        const id = req.params.id;
-        Product.findAll(utility.paginate({
-            where: {
-                store_id: id,
-                ...utility.buildQuery(req.query.query),
-                creatorUserId: req.user.id,
-                isVisible: true
-            }, include: ['supplier', 'category']
-        }, { page: req.query.page, pageSize: req.query.size })).then(products => {
-            res.json(products)
+        Product.findAll(
+            utility.paginate({
+                where: {
+                    store_id: id,
+                    ...utility.buildQuery(req.query.query),
+                    creatorUserId: req.user.id,
+                    isVisible: true
+                },
+                include: ['supplier', 'category'],
+                order
+            }, pagination)
+        ).then(products => {
+            res.json(products);
         }).catch(err => {
-            res.status(500).json({
-                success: false,
-                message: err.toString()
-            })
-        })
+            res.status(500).json({ success: false, message: err.toString() });
+        });
     } else {
-        const id = req.params.id;
         const searchable = req.query.searchable;
 
         const searchFilter = searchable
@@ -100,62 +123,50 @@ router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, nex
             }
             : {};
 
-        Product.findAll(utility.paginate({
-            where: {
-                ...searchFilter,
-                store_id: id,
-                creatorUserId: req.user.id,
-                isVisible: true
-            },
-            include: [
-                {
-                    model: Supplier,
-                    as: 'supplier',
-                    required: false // optional join
+        Product.findAll(
+            utility.paginate({
+                where: {
+                    ...searchFilter,
+                    store_id: id,
+                    creatorUserId: req.user.id,
+                    isVisible: true
                 },
-                {
-                    model: Category,
-                    as: 'category',
-                    required: false
-                }
-            ]
-        }, { page: req.query.page, pageSize: req.query.size }))
-            .then(products => {
-                res.json(products);
-            })
-            .catch(err => {
-                res.status(500).json({
-                    success: false,
-                    message: err.toString()
-                });
-            });
+                include: [
+                    { model: Supplier, as: 'supplier', required: false },
+                    { model: Category, as: 'category', required: false }
+                ],
+                order
+            }, pagination)
+        ).then(products => {
+            res.json(products);
+        }).catch(err => {
+            res.status(500).json({ success: false, message: err.toString() });
+        });
     }
-
 });
 
 router.get('/store/:id/critical', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
+
     Product.findAll({
         where: {
             store_id: id,
             creatorUserId: req.user.id,
             isVisible: true,
-            quantity: {
-                [utility.Op.lte]: 10
-            }
+            [Op.and]: [
+                literal('"quantity" <= "critical_stock_indicator"')
+            ]
         },
         limit: req.query.limit ? Number(req.query.limit) : null,
-        order: [
-            ['quantity', 'ASC']
-        ]
-    }).then(products => {
-        res.json([...products])
-    }).catch(err => {
-        res.status(500).json({
-            success: false,
-            message: err.toString()
-        })
+        order: [['quantity', 'ASC']]
     })
+        .then(products => res.json(products))
+        .catch(err => {
+            res.status(500).json({
+                success: false,
+                message: err.toString()
+            });
+        });
 });
 
 router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {

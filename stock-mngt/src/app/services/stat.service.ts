@@ -71,6 +71,24 @@ export class StatService {
     });
   }
 
+   getCategoriesTotalSold(id, type, value): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'store/' + id + '/total-sold-pie', {
+      params: {
+        type,
+        value
+      }
+    });
+  }
+
+  getCategoriesTotalNetSold(id, type, value): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'store/' + id + '/net-sold-pie', {
+      params: {
+        type,
+        value
+      }
+    });
+  }
+
     getParentCateoriesStats(id): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'store/' + id + '/parentCategoriesStats');
   }

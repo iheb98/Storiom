@@ -64,11 +64,11 @@ module.exports = {
       },
       isVisible: {
         type: DataTypes.BOOLEAN,
-        defaultValue : true
+        defaultValue: true
       },
       toDisplay: {
         type: DataTypes.BOOLEAN,
-        defaultValue : true
+        defaultValue: true
       },
       creatorUserId: {
         type: DataTypes.INTEGER
@@ -76,6 +76,12 @@ module.exports = {
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE
+      },
+      criticalStockIndicator: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 0,
+        field: 'critical_stock_indicator'
       },
       updatedAt: {
         allowNull: false,

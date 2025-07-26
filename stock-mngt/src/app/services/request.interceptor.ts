@@ -27,7 +27,7 @@ export class RequestInterceptor implements HttpInterceptor {
 
     return next.handle(authReq).pipe(catchError(error => {
       console.log("tes")
-      this.loadingService.screenLoaded();
+      //this.loadingService.screenLoaded();
       if (error instanceof HttpErrorResponse && !authReq.url.includes('login') && error.status === 403) {
         return this.handle401Error(authReq, next);
       }

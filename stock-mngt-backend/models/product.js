@@ -73,6 +73,12 @@ module.exports = (sequelize, DataTypes) => {
     isVisible: {
       type: DataTypes.BOOLEAN
     },
+    criticalStockIndicator: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 0,
+      field: 'critical_stock_indicator'
+    },
     toDisplay: {
       type: DataTypes.BOOLEAN
     },

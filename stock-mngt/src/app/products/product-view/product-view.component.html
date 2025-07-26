@@ -48,6 +48,12 @@
             </p>
         </div>
         <div class="col-6">
+            <label>Indicateur stock critique :</label>
+            <p>
+                {{product?.criticalStockIndicator || product?.criticalStockIndicator == 0 ? product?.criticalStockIndicator : "--"}}
+            </p>
+        </div>
+        <div class="col-6">
             <label>Prix d'achat :</label>
             <p>
                 {{product?.buyingPrice ? (product?.buyingPrice + " " + (product?.currency ? product?.currency : " DT"))

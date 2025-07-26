@@ -18,6 +18,8 @@ export class CategoryStatsComponent implements OnInit {
   operationsLabels: any = [];
   operationsOptions: any;
 
+  pieChartOptions
+
   operations: any = [];
   typesOfDate = ["Quotidien", "Mensuel", "Annuel"]
   selectedDateType = 'Mensuel'
@@ -26,6 +28,9 @@ export class CategoryStatsComponent implements OnInit {
   weekFilter;
   monthFilter;
   yearFilter;
+
+  totalSoldData;
+  totalSoldNetData;
 
 
   hoursLabels = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
@@ -85,6 +90,32 @@ export class CategoryStatsComponent implements OnInit {
       }
     };
 
+    this.pieChartOptions = {
+
+      //display labels on data elements in graph
+      plugins: {
+
+        datalabels: {
+          align: 'end',
+          anchor: 'end',
+          borderRadius: 4,
+          backgroundColor: 'teal',
+          color: 'white',
+          font: {
+            weight: 'bold',
+          },
+        },
+        // display chart title
+        title: {
+          display: true,
+          fontSize: 10,
+        },
+        legend: {
+          position: 'bottom',
+        },
+      },
+    };
+
     this.updateOperationStats()
   }
 
@@ -141,6 +172,60 @@ export class CategoryStatsComponent implements OnInit {
     )
   }
 
+  getCategoriesTotalNetSold() {
+    let filterValue;
+    let month;
+    let year;
+    let day;
+    switch (this.selectedDateType) {
+      case 'Quotidien':
+        day = new Date(this.dayFilter).getDate();
+        month = new Date(this.dayFilter).getMonth() + 1;
+        year = new Date(this.dayFilter).getFullYear();
+        filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day
+        break;
+      case 'Annuel':
+        year = this.yearFilter
+        filterValue = year
+        break;
+      default:
+        month = new Date(this.monthFilter).getMonth() + 1;
+        year = new Date(this.monthFilter).getFullYear();
+        filterValue = year + '-' + month
+        break;
+    }
+    this.statService.getCategoriesTotalNetSold(this.user.id, this.selectedDateType, filterValue).subscribe(response => {
+      this.totalSoldNetData = response
+    })
+  }
+
+   getCategoriesTotalSold() {
+    let filterValue;
+    let month;
+    let year;
+    let day;
+    switch (this.selectedDateType) {
+      case 'Quotidien':
+        day = new Date(this.dayFilter).getDate();
+        month = new Date(this.dayFilter).getMonth() + 1;
+        year = new Date(this.dayFilter).getFullYear();
+        filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day
+        break;
+      case 'Annuel':
+        year = this.yearFilter
+        filterValue = year
+        break;
+      default:
+        month = new Date(this.monthFilter).getMonth() + 1;
+        year = new Date(this.monthFilter).getFullYear();
+        filterValue = year + '-' + month
+        break;
+    }
+    this.statService.getCategoriesTotalSold(this.user.id, this.selectedDateType, filterValue).subscribe(response => {
+      this.totalSoldData = response
+    })
+  }
+
   getOperationItemsStats() {
     let filterValue;
     let month;
@@ -183,6 +268,8 @@ export class CategoryStatsComponent implements OnInit {
   updateOperationStats() {
     this.getOperationStats();
     this.getOperationItemsStats()
+    this.getCategoriesTotalNetSold()
+    this.getCategoriesTotalSold()
   }
 
 }

@@ -7,7 +7,10 @@
                         Catégorie
                     </th>
                     <th>
-                        Valeur
+                        Valeur de fond
+                    </th>
+                    <th>
+                        Valeur du vente
                     </th>
                     <th>
                         Valeur Net
@@ -31,13 +34,16 @@
                         {{ (stat?.stockValue ? stat?.stockValue : "--") + " DT" }}
                     </td>
                     <td>
+                        {{ (stat?.stockSellingValue ? stat?.stockSellingValue : "--") + " DT" }}
+                    </td>
+                    <td>
                         {{ (stat?.stockNetValue ? stat?.stockNetValue : "--") + " DT" }}
                     </td>
                     <td>
                         {{ (stat?.totalSold ? stat?.totalSold : "--") + " DT" }}
                     </td>
                     <td>
-                        {{ (stat?.totalNetSold ? stat?.totalNetSold : "--") + " DT" }}
+                        {{ (stat?.totalSoldNet ? stat?.totalSoldNet : "--") + " DT" }}
                     </td>
 
                 </tr>
