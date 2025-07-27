@@ -41,7 +41,7 @@ export class ProductsMngtComponent implements OnInit {
   count;
 
   currentPage = 0;
-  currentSize = 6;
+  currentSize = 24;
 
   filtersCollapsed = true;
   searchable;

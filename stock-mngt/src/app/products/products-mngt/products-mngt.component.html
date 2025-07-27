@@ -5,7 +5,7 @@
         </h2>
     </div>
     <div class="row d-flex">
-        <div class="col-12 col-sm-12 col-md-auto col-lg-12 mb-3">
+        <div class="col-12 mb-3">
             <input type="name" id="form1" class="form-control search-input" placeholder="Rechercher"
                 [(ngModel)]="searchable" [ngModelOptions]="{standalone: true}" (keyup)="search()" />
         </div>
@@ -150,8 +150,8 @@
     </div>
     <div class="row">
         <div class="col-12">
-            <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)" [length]="count" [pageSize]="6"
-                [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[6,12,24,48,100]"
+            <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)" [length]="count"
+                [pageSize]="24" [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[24,48,100,200]"
                 [hidePageSize]="false" [pageIndex]="0" aria-label="Select page">
             </mat-paginator>
         </div>
