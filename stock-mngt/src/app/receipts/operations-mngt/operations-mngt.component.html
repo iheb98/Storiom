@@ -43,13 +43,13 @@
                 </ng-select>
             </div>
 
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
+            <!--<div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                 <label for="minTotalFilter" class="form-label">Total</label>
                 <input type="number" class="form-control amount-input" id="minTotalFilter" [(ngModel)]="minTotalFilter"
                     placeholder="De">
                 <input type="number" class="form-control amount-input" id="maxTotalFilter" [(ngModel)]="maxTotalFilter"
                     placeholder="Jusqu'à">
-            </div>
+            </div>-->
             <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                 <label for="minPriceFilter" class="form-label">Prix</label>
                 <input type="number" class="form-control amount-input" id="minPriceFilter" [(ngModel)]="minPriceFilter"
@@ -57,12 +57,6 @@
                 <input type="number" class="form-control amount-input" id="maxPriceFilter" [(ngModel)]="maxPriceFilter"
                     placeholder="Jusqu'à">
             </div>
-
-        </div>
-
-        <div class="row">
-
-
             <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                 <label for="minAmountFilter" class="form-label">Quantité</label>
                 <input type="number" class="form-control amount-input" id="minAmountFilter"
@@ -70,6 +64,12 @@
                 <input type="number" class="form-control amount-input" id="maxAmountFilter"
                     [(ngModel)]="maxAmountFilter" placeholder="Jusqu'à">
             </div>
+        </div>
+
+        <div class="row">
+
+
+
             <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
                 <label for="fromDateFilter" class="form-label">Date</label>
                 <input type="date" class="form-control amount-input" id="fromDateFilter" [(ngModel)]="fromDateFilter"

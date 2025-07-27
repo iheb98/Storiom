@@ -266,22 +266,21 @@ router.get('/operations/:id', utility.authenticate, checkSubscription, (req, res
     })
 });
 
-router.put('/operations/edit', utility.authenticate, checkSubscription, (req, res) => {
+router.put('/operations/edit', utility.authenticate, checkSubscription, async (req, res) => {
     const { id, price, amount, type, date } = req.body
     Operation.findOne(
         {
             where: {
                 id,
                 creatorUserId: req.user.id
-            }, include: ['product']
+            }, include: ['product', 'receipt']
         }
-    ).then(operation => {
+    ).then(async operation => {
         Product.findOne({
             where: {
                 id: operation.product.id
             }
-        }).then(product => {
-
+        }).then(async product => {
             operation.price = price
             if (operation.type == "SOLD") {
                 if (amount > operation.amount) {
@@ -296,20 +295,34 @@ router.put('/operations/edit', utility.authenticate, checkSubscription, (req, re
                     product.quantity -= operation.amount - amount
                 }
             }
-            product.save();
+            await product.save();
             operation.amount = amount
             operation.date = date
             operation.type = type
             operation.save().then(
-                savedOperation => {
+                async savedOperation => {
+                    if (operation.receipt) {
+                        const receipt = await Receipt.findOne({
+                            where: {
+                                id: operation.receipt.id
+                            }, include: ['operations']
+                        })
+                        let total = 0;
+                        console.log(receipt.operations)
+                        for (let op of receipt.operations) {
+                            total += op.amount * op.price
+                        }
+                        receipt.total = total;
+                        await receipt.save()
+                    }
                     res.json({ message: 'Operation modifié', success: true })
                 }
             ).catch(err => {
-                res.status(500).json({ err: err })
+                res.status(500).json(err)
             })
         })
     }).catch(err => {
-        res.status(500).json({ err: err })
+        res.status(500).json(JSON.stringify(err))
     })
 })
 
