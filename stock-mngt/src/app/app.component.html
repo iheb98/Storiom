@@ -1,62 +1,6 @@
+<!-- keep global spinner if you want it app-wide -->
 <ngx-loading-x [show]="loadingService.isScreenLoading()" [spinnerColor]="'#0d6efd'"></ngx-loading-x>
-<mat-toolbar class="custom-toolbar" fixedInViewport="true">
-    <mat-toolbar-row class="toolbar-row">
-        <!-- Menu Button -->
-        <button mat-button (click)="opened = !opened" style="color:white" *ngIf="connectedUser">
-            <mat-icon>menu</mat-icon>
-        </button>
-        <span class="navbar-fill-remaining-space"></span>
 
-        <span *ngIf="subscriptionStatus" class="subscription-status" [ngClass]="{
-        'active': subscriptionStatus === 'Active',
-        'expired': subscriptionStatus === 'Expired'
-      }" matTooltip="{{ getSubscriptionTooltip() }}" matTooltipPosition="below" matTooltipClass="custom-tooltip">
-            {{ subscriptionDetails?.duration == "TRIAL" ? "Demo" : subscriptionDetails?.duration}}
-            <mat-icon *ngIf="subscriptionStatus === 'Active'" color="success">check_circle</mat-icon>
-            <mat-icon *ngIf="subscriptionStatus === 'Expired'" color="warn">error</mat-icon>
-        </span>
-
-
-
-
-        <!-- Store Logo -->
-        <img [src]="store?.logo ? backend_URL +'/' + store?.logo : 'assets/store.jpg'" alt="Logo"
-            class="navbar-logo" *ngIf="store" />
-        <span class="navbar-name" *ngIf="store">
-            {{store?.name}}
-        </span>
-
-        <img src="assets/logo.png" alt="Logo" class="navbar-logo" *ngIf="!store && !connectedUser" />
-        <span class="navbar-name" *ngIf="!store && !connectedUser">
-            Storiom
-        </span>
-    </mat-toolbar-row>
-</mat-toolbar>
-
-<mat-sidenav-container>
-    <mat-sidenav [(opened)]="opened">
-        <mat-list>
-            <mat-list-item *ngFor="let item of menu">
-                <a [routerLink]="['/' + item.link]" routerLinkActive="router-link-active">
-                    <button mat-button>
-                        <fa-icon [icon]="item.icon"></fa-icon>
-                        {{item?.label}}
-                    </button>
-                </a>
-            </mat-list-item>
-            <mat-list-item>
-                <a>
-                    <button mat-button (click)="logout()">
-                        <fa-icon [icon]="powerIcon"></fa-icon>
-                        Log out
-                    </button>
-                </a>
-            </mat-list-item>
-        </mat-list>
-    </mat-sidenav>
-    <mat-sidenav-content>
-        <div class="full-page">
-            <router-outlet></router-outlet>
-        </div>
-    </mat-sidenav-content>
-</mat-sidenav-container>
+<!-- all UI will be rendered inside layout components via routing -->
+ 
+<router-outlet></router-outlet>

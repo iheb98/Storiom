@@ -1,0 +1,62 @@
+<div class="amazon-product-page">
+
+    <!-- LEFT: IMAGE GALLERY -->
+    <div class="left-column">
+
+        <div class="thumbs-vertical" *ngIf="product?.images?.length > 1">
+            <img *ngFor="let img of product?.images" [src]="environment.backend + '/' + img"
+                (click)="openImage(environment.backend + '/' + img)" class="thumb">
+        </div>
+
+        <div class="main-image">
+            <img [src]="product?.images?.length ? environment.backend + '/' + product?.images[0] : 'assets/default_product.png'"
+                (click)="openImage(environment.backend + '/' + product?.images[0])">
+        </div>
+
+    </div>
+
+    <!-- MIDDLE: PRODUCT DETAILS -->
+    <div class="middle-column">
+        <h1>{{ product?.name }}</h1>
+        <p class="store">Brand: {{ product?.brand?.name || '--' }}</p>
+
+        <div class="price">{{ product?.sellingPrice }} DT</div>
+
+        <ul class="info-list">
+            <li><strong>Category:</strong> {{ product?.category?.name }}</li>
+            <li>
+                <span [ngClass]="{
+      'in-stock': product?.quantity > 0,
+      'out-stock': product?.quantity === 0
+    }">
+                    {{ product?.quantity > 0 ? 'In Stock' : 'Out of Stock' }}
+                </span>
+            </li>
+        </ul>
+
+        <div class="description">
+            <h3>Product Description</h3>
+            <p>{{ product?.description || 'No description available.' }}</p>
+        </div>
+    </div>
+
+    <!-- RIGHT: ADD TO CART BOX -->
+    <div class="right-column">
+        <div class="buy-box">
+            <div class="price">{{ product?.sellingPrice }} DT</div>
+
+            <button class="buy-btn" (click)="addToCart(product)">
+                Add to Cart
+            </button>
+
+            <p class="seller">Sold by: <strong>{{ product?.store?.name }}</strong></p>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- IMAGE POPUP -->
+<div class="image-popup" *ngIf="selectedImage" (click)="closeImage()">
+    <img [src]="selectedImage">
+</div>

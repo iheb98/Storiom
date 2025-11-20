@@ -1,0 +1,86 @@
+<!-- 1. Navigation Bar -->
+<!--<nav class="navbar">
+    <div class="navbar-brand">
+        <a routerLink="/">Marketplace</a>
+    </div>
+    <div class="search-bar">
+        <input type="text" placeholder="Search for products...">
+        <button><fa-icon [icon]="searchIcon"></fa-icon></button>
+    </div>
+    <div class="navbar-links">
+        <a routerLink="/products">All Products</a>
+        <a routerLink="/stores">Stores</a>
+        <a routerLink="/cart" class="nav-icon"><fa-icon [icon]="cartIcon"></fa-icon></a>
+        <a routerLink="/login" class="nav-icon"><fa-icon [icon]="userIcon"></fa-icon></a>
+    </div>
+</nav>-->
+
+<div class="home-container">
+    <!-- 2. Hero Section -->
+    <header class="hero-section">
+        <h1>Discover Unique Products from Local Stores</h1>
+        <p class="subtitle">
+            Your one-stop shop for items from the best independent businesses.
+        </p>
+        <a routerLink="/products" class="btn btn-primary btn-large">Explore All Products</a>
+    </header>
+
+    <!-- 3. Shop by Category -->
+    <section id="categories" class="category-section">
+        <h2>Shop by Category</h2>
+
+        <div *ngIf="isLoading">Loading categories...</div>
+
+        <div class="category-grid" *ngIf="!isLoading">
+            <div class="category-card" *ngFor="let category of categories" [routerLink]="['publicProducts']" [queryParams]="{ category: category.id }">
+
+                <div class="category-image">
+                    <img [src]="category.image || 'assets/images/default_category_image.png'" alt="{{ category.name }}">
+                </div>
+
+                <h3>{{ category.name }}</h3>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- 4. Featured Products Section -->
+    <section id="featured-products" class="featured-products-section">
+        <h2>Featured Products</h2>
+        <!-- Repeat this product-card for each featured product -->
+        <div class="products-grid">
+            <app-product-card *ngFor="let product of featuredProducts" [product]="product">
+            </app-product-card>
+        </div>
+
+    </section>
+
+    <!-- 5. Why Shop With Us? -->
+    <section id="benefits" class="benefits-section">
+        <h2>Why You'll Love Shopping Here</h2>
+        <div class="features-grid">
+            <div class="feature-card"><fa-icon [icon]="storeIcon"></fa-icon>
+                <h3>Support Local Stores</h3>
+                <p>Discover and support independent businesses in your community.</p>
+            </div>
+            <div class="feature-card"><fa-icon [icon]="boxOpenIcon"></fa-icon>
+                <h3>Wide Selection</h3>
+                <p>Find everything you need from a variety of trusted sellers.</p>
+            </div>
+            <div class="feature-card"><fa-icon [icon]="shieldIcon"></fa-icon>
+                <h3>Secure Checkout</h3>
+                <p>Shop with confidence with our safe and secure payment system.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Footer -->
+ <!--   <footer class="footer">
+        <div class="footer-links">
+            <a href="/about">About Us</a> | <a href="/contact">Contact</a> | <a href="/faq">FAQ</a> | <a
+                href="/shipping">Shipping & Returns</a>
+        </div>
+        <p>&copy; 2025 Marketplace. All rights reserved.</p>
+        <p><a href="/privacy">Privacy Policy</a> | <a href="/terms">Terms of Service</a></p>
+    </footer>-->
+</div>

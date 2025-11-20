@@ -1,0 +1,284 @@
+mat-sidenav-container {
+    height: 100%;
+    padding-top: 64px; /* Ensure content starts after navbar */
+}
+
+
+mat-sidenav {
+    width: 300px;
+    padding-top: 80px;
+    //background-color: #eee;
+}
+
+.navbar-fill-remaining-space {
+    flex: 1 1 auto;
+}
+
+.connected-user {
+    width: 60%;
+    text-align: right;
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-right: 20px;
+}
+
+.user-icon {
+    margin: 1px 10px;
+}
+
+@media screen and (max-width: 480px) {
+    mat-sidenav {
+        width: 200px;
+    }
+
+    mat-sidenav button {
+        font-size: 10px;
+    }
+}
+
+.stores-list {
+    border: 1px solid lightgray;
+    min-height: 100%;
+    margin: 10px 10px 10px 10px;
+}
+
+.list-item-card {
+    border: 1px solid lightgray;
+    background-color: white;
+    padding: 10px;
+    height: 100%;
+    transition: 0.3s;
+}
+
+.list-item {
+    height: 530px;
+    padding: 10px;
+}
+
+.list-item-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.203);
+}
+
+.list-item-header {
+    padding: 10px;
+}
+
+.list-item-title {
+    margin: auto;
+    text-align: left;
+    font-weight: bold;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 18px;
+}
+
+.list-item-actions {
+    text-align: left;
+    padding: 0;
+}
+
+.only-icon-button {
+    padding: 0 !important;
+    width: fit-content !important;
+}
+
+.list-item-content {
+    border: 1px solid lightgray;
+    background-color: #eee;
+}
+
+.store-image {
+    box-sizing: content-box;
+}
+
+.list-item-description {
+    padding: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-height: 120px;
+}
+
+.description-label {
+    color: gray;
+    font-weight: 600;
+}
+
+.description {
+    text-align: left;
+    max-height: 120px;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    white-space: pre-line;
+    overflow: hidden;
+    font-size: 18px;
+}
+
+.list-item-content-add-store {
+    float: right;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-button {
+    width: 100%;
+    height: 100%;
+    font-size: 80px;
+}
+
+.list-item-footer {
+    height: 100%;
+}
+
+.select-button {
+    width: 100%;
+    padding: 10px;
+}
+
+.select-button mat-icon {
+    font-size: 30px;
+}
+
+mat-list-item a,
+mat-list-item button {
+    width: 100%;
+    font-size: 1.2rem;
+}
+
+mat-list-item {
+    //margin-bottom: 20px;
+}
+
+.mat-focus-indicator.mat-button.mat-button-base {
+    text-align: left !important;
+    color: #3b3b3b;
+}
+
+.custom-toolbar {
+    background-color: #343a40;
+    color: white;
+    /* Optional: Set text color for contrast */
+}
+
+
+
+mat-toolbar {
+    height: 64px;
+    position: fixed;
+    top: 0;
+    /* Ensure it's fixed at the top */
+    left: 0;
+    width: 100%;
+    z-index: 100;
+}
+
+/* Ensure the toolbar row uses flexbox for alignment */
+.toolbar-row {
+    display: flex;
+    align-items: center;
+    /* Vertically center all items in the row */
+}
+
+/* Logo Styles */
+.navbar-logo {
+    height: 50px;
+    /* Adjust the size as needed */
+    width: 50px;
+    /* Ensure height and width are equal for a perfect circle */
+    border-radius: 50%;
+    /* Makes the image circular */
+    object-fit: cover;
+    /* Ensures the image fits within the circle */
+    margin-right: 10px;
+    /* Adds spacing between the logo and the name */
+}
+
+/* Name Styles */
+.navbar-name {
+    font-size: 1.2em;
+    /* Adjust font size */
+    font-weight: bold;
+    margin-left: 10px;
+    /* Add spacing between logo and text */
+    display: flex;
+    align-items: center;
+}
+
+/* Spacer Styles */
+.navbar-fill-remaining-space {
+    flex: 1 1 auto;
+    /* Fills remaining space */
+}
+
+
+
+@media screen and (max-width: 480px) {
+    mat-sidenav {
+        width: 200px;
+    }
+
+    .list-item {
+        min-height: 450px;
+        height: 100%;
+    }
+
+    mat-list-item a,
+    mat-list-item button {
+        width: 100%;
+        font-size: 15px;
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    mat-sidenav {
+        width: 200px;
+    }
+
+    .list-item {
+        min-height: 450px;
+        height: 100%;
+    }
+}
+
+.subscription-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.subscription-status.expired {
+    color: red;
+}
+
+.custom-tooltip {
+    background: #333;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+}
+
+.custom-tooltip p {
+    margin: 4px 0;
+}
+.custom-tooltip {
+    white-space: pre-line !important; /* Enables new lines */
+    font-size: 14px;
+    background: #333;
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+    max-width: 200px;
+}

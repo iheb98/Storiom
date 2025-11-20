@@ -1,0 +1,12 @@
+<div class="product-card" *ngIf="product">
+  <div class="product-image-container">
+    <img [src]="product.images && product.images.length > 0 
+        ? environment.backend + '/' + product.images[0] 
+        : 'assets/default_product.png'"
+         [alt]="product.name">
+  </div>
+  <h3>{{ product.name }}</h3>
+  <p class="price">{{ product.sellingPrice | currency:'DT' }}</p>
+  <p class="store-name" *ngIf="product.store">{{ product.store.name }}</p>
+  <button class="add-to-cart">Add to Cart</button>
+</div>
