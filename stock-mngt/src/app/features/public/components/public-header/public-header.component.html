@@ -1,17 +1,19 @@
 <nav class="navbar">
-    <div class="navbar-brand">
-        <a routerLink="/">Marketplace</a>
-    </div>
-    <div class="search-bar">
-        <input type="text" placeholder="Search for products..." [(ngModel)]="searchText" (keyup.enter)="onSearch()">
-        <button (click)="onSearch()">
-            <fa-icon [icon]="searchIcon"></fa-icon>
-        </button>
-    </div>
-    <div class="navbar-links">
-        <a routerLink="/products">All Products</a>
-        <a routerLink="/stores">Stores</a>
-        <a routerLink="/cart" class="nav-icon"><fa-icon [icon]="cartIcon"></fa-icon></a>
-        <a routerLink="/login" class="nav-icon"><fa-icon [icon]="userIcon"></fa-icon></a>
-    </div>
+  <div class="navbar-brand">
+      <a routerLink="/">Marketplace</a>
+  </div>
+
+  <div class="search-bar">
+      <input type="text" placeholder="Search for products..." [(ngModel)]="searchText" (keyup.enter)="onSearch()">
+      <button (click)="onSearch()">
+          <fa-icon [icon]="searchIcon"></fa-icon>
+      </button>
+  </div>
+
+  <div class="navbar-links">
+      <a routerLink="/publicProducts">All Products</a>
+      <a routerLink="/stores">Stores</a>
+      <a (click)="goToCart()" class="nav-icon"><fa-icon [icon]="cartIcon"></fa-icon></a>
+      <a (click)="goToProfile()" class="nav-icon"><fa-icon [icon]="userIcon"></fa-icon></a>
+  </div>
 </nav>

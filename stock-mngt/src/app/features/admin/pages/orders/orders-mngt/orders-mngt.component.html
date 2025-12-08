@@ -1,0 +1,62 @@
+<div class="orders-container">
+    <div class="title-section">
+        <h1>Gestion des Commandes</h1>
+    </div>
+
+    <div class="orders-list">
+        <div class="order-card" *ngFor="let order of orders">
+
+            <div class="order-header">
+                <div>
+                    <span class="order-id">Commande #{{ order.id }}</span>
+                    <span class="order-date"> - {{ order.createdAt | date:'medium' }}</span>
+                </div>
+                <div class="order-status" [style.background-color]="getStatusColor(order.status)">
+                    <fa-icon [icon]="getStatusIcon(order.status)"></fa-icon>
+                    {{ order.status }}
+                </div>
+            </div>
+
+            <div class="order-body">
+                <div class="customer-info" *ngIf="order.user">
+                    <h4>Client</h4>
+                    <p>{{ order.user.firstName }} {{ order.user.lastName }}</p>
+                    <p>{{ order.user.email }}</p>
+                    <p>{{ order.user.phone }}</p>
+                </div>
+
+                <div class="total-amount">
+                    <span>Total</span>
+                    <h3>{{ order.totalAmount | currency: store?.currency || 'TND ' }}</h3>
+                </div>
+            </div>
+
+            <div class="order-items">
+                <div class="item-row" *ngFor="let item of order.items">
+                    <span class="item-name">{{ item.product?.name }}</span>
+                    <span class="item-qty">x{{ item.quantity }}</span>
+                    <span class="item-price">{{ item.price | currency: store?.currency || 'TND' }}</span>
+                </div>
+            </div>
+
+            <div class="order-actions">
+                <button mat-stroked-button color="primary" [matMenuTriggerFor]="menu">
+                    Changer Statut
+                </button>
+                <mat-menu #menu="matMenu">
+                    <button mat-menu-item (click)="updateStatus(order, 'PENDING')">PENDING</button>
+                    <button mat-menu-item (click)="updateStatus(order, 'CONFIRMED')">CONFIRMED</button>
+                    <button mat-menu-item (click)="updateStatus(order, 'SHIPPED')">SHIPPED</button>
+                    <button mat-menu-item (click)="updateStatus(order, 'DELIVERED')">DELIVERED</button>
+                    <button mat-menu-item (click)="updateStatus(order, 'CANCELLED')">CANCELLED</button>
+                </mat-menu>
+            </div>
+
+        </div>
+
+        <div *ngIf="orders.length === 0" style="text-align: center; padding: 40px; color: #888;">
+            <fa-icon [icon]="faBox" size="3x"></fa-icon>
+            <p>Aucune commande pour le moment.</p>
+        </div>
+    </div>
+</div>

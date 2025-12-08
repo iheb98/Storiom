@@ -27,7 +27,7 @@
             <li>
                 <span [ngClass]="{
       'in-stock': product?.quantity > 0,
-      'out-stock': product?.quantity === 0
+      'out-stock': product?.quantity <= 0
     }">
                     {{ product?.quantity > 0 ? 'In Stock' : 'Out of Stock' }}
                 </span>
@@ -45,6 +45,13 @@
         <div class="buy-box">
             <div class="price">{{ product?.sellingPrice }} DT</div>
 
+            <!-- Quantity Selector -->
+            <div class="quantity-selector">
+                <button (click)="decreaseQuantity()">-</button>
+                <span>{{ quantity }}</span>
+                <button (click)="increaseQuantity()">+</button>
+            </div>
+
             <button class="buy-btn" (click)="addToCart(product)">
                 Add to Cart
             </button>
@@ -52,6 +59,7 @@
             <p class="seller">Sold by: <strong>{{ product?.store?.name }}</strong></p>
         </div>
     </div>
+
 
 </div>
 

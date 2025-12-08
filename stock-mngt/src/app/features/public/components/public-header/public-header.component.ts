@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { CartService } from '../../services/cart.service';
 import { faBars, faBoxOpen, faCartPlus, faSearch, faShieldAlt, faShoppingCart, faStore, faUser } from '@fortawesome/free-solid-svg-icons';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-public-header',
@@ -27,6 +27,7 @@ export class PublicHeaderComponent implements OnInit {
 
   constructor(private router: Router,
     private route: ActivatedRoute,
+    private authService: AuthService
 
   ) { }
 
@@ -59,6 +60,23 @@ export class PublicHeaderComponent implements OnInit {
     this.router.navigate(['/publicProducts'], {
       queryParams
     });
+  }
+
+  goToCart() {
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/cart']);
+    } else {
+      // guest users also go to cart page (localStorage)
+      this.router.navigate(['/cart']);
+    }
+  }
+
+  goToProfile() {
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/profile']);
+    } else {
+      this.router.navigate(['/login']);
+    }
   }
 
 }

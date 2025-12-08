@@ -14,6 +14,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { NgxMatFileInputModule } from '@angular-material-components/file-input';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -62,6 +63,7 @@ import { OperationEditComponent } from './pages/receipts/operation-edit/operatio
 import { ParentCategoriesStatsComponent } from './pages/dashboard/parent-categories-stats/parent-categories-stats.component';
 import { ChartModule } from 'primeng/chart';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { OrdersMngtComponent } from './pages/orders/orders-mngt/orders-mngt.component';
 
 
 @NgModule({
@@ -110,6 +112,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     OperationsMngtComponent,
     OperationEditComponent,
     ParentCategoriesStatsComponent,
+    OrdersMngtComponent,
   ],
   imports: [
     CommonModule,
@@ -145,7 +148,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     FormsModule,
     ReactiveFormsModule,
     FontAwesomeModule,
-    ChartModule
+    ChartModule,
+    MatMenuModule
   ]
 })
 export class AdminModule { }

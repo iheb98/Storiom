@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryService } from 'src/app/core/services/category.service';
 import { ProductService } from 'src/app/core/services/product.service';
-import { CartService } from '../../services/cart.service';
 import { environment } from 'src/environments/environment.prod';
 import { PublicService } from 'src/app/core/services/public.service';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
+import { CartService } from 'src/app/core/services/cart.service';
+import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
   selector: 'app-public-products',
@@ -43,7 +44,8 @@ export class PublicProductsComponent implements OnInit {
     private publicService: PublicService,
     private categoryService: CategoryService,
     private cartService: CartService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -154,7 +156,14 @@ export class PublicProductsComponent implements OnInit {
   }
 
   addToCart(product: any) {
-    //this.cartService.addToCart(product);
+    if (this.authService.isLoggedIn()) {
+      this.productService.addToCart(product.id, 1).subscribe(res => {
+        // Optional: Show success message/toast
+        console.log('Added to cart (server)');
+      });
+    } else {
+      this.cartService.addToCart(product);
+    }
   }
 
   viewProduct(product: any) {

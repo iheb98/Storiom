@@ -28,6 +28,7 @@ import { ChartModule } from 'primeng/chart';
 import { MatMenuModule } from '@angular/material/menu';
 import { PublicProductsComponent } from './pages/public-products/public-products.component';
 import { PublicViewProductComponent } from './pages/public-view-product/public-view-product.component';
+import { CartComponent } from './pages/cart/cart.component';
 
 
 
@@ -40,7 +41,8 @@ import { PublicViewProductComponent } from './pages/public-view-product/public-v
     ProductCardComponent,
     PublicLayoutComponent,
     PublicProductsComponent,
-    PublicViewProductComponent
+    PublicViewProductComponent,
+    CartComponent
   ],
   imports: [
     CommonModule,

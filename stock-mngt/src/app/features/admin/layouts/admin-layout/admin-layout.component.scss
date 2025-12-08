@@ -1,6 +1,8 @@
 mat-sidenav-container {
-    height: 100%;
-    padding-top: 64px; /* Ensure content starts after navbar */
+    height: 100vh;
+    padding-top: 64px;
+    /* Ensure content starts after navbar */
+    box-sizing: border-box;
 }
 
 
@@ -273,8 +275,10 @@ mat-toolbar {
 .custom-tooltip p {
     margin: 4px 0;
 }
+
 .custom-tooltip {
-    white-space: pre-line !important; /* Enables new lines */
+    white-space: pre-line !important;
+    /* Enables new lines */
     font-size: 14px;
     background: #333;
     color: white;

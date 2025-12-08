@@ -1,9 +1,102 @@
 const express = require('express');
 const router = express.Router();
-const { Product, Operation, Supplier, Category } = require('../models');
+const { Product, Operation, Supplier, Category, CartItem } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 const { Op, literal } = require('sequelize');
+
+
+
+// GET CART
+router.get('/cart', utility.authenticate, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const items = await CartItem.findAll({
+            where: { userId },
+            include: [{ model: Product, as: "product" }]
+        });
+
+        res.json(items);
+
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// CLEAR FULL CART
+router.delete('/cart', utility.authenticate, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        await CartItem.destroy({ where: { userId } });
+
+        res.json({ success: true });
+
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// ADD TO CART
+router.post('/cart/add', utility.authenticate, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { productId, quantity } = req.body;
+
+        let item = await CartItem.findOne({ where: { userId, productId } });
+
+        if (item) {
+            item.quantity += quantity;
+            await item.save();
+        } else {
+            item = await CartItem.create({ userId, productId, quantity });
+        }
+
+        res.json({ success: true, item });
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// UPDATE CART QUANTITY
+router.put('/cart/update', utility.authenticate, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { productId, quantity } = req.body;
+
+        const item = await CartItem.findOne({ where: { userId, productId } });
+
+        if (!item) {
+            return res.status(404).json({ success: false, message: "Item not found" });
+        }
+
+        item.quantity = quantity;
+        await item.save();
+
+        res.json({ success: true, item });
+
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// REMOVE ITEM FROM CART
+router.delete('/cart/:productId', utility.authenticate, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const productId = req.params.productId;
+
+        await CartItem.destroy({ where: { userId, productId } });
+
+        res.json({ success: true });
+
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
 
 router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
     const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, quantity, unit, storeId, supplierId, categoryId, brandId, criticalStockIndicator } = req.body
@@ -424,21 +517,21 @@ router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => 
  * Recursive function to get all descendant category IDs
  */
 async function getAllCategoryIds(CategoryModel, parentCategoryId) {
-  const ids= [parentCategoryId];
+    const ids = [parentCategoryId];
 
-  async function getChildren(id) {
-    const children = await CategoryModel.findAll({
-      where: { parentCategoryId: id },
-      attributes: ['id']
-    });
-    for (const child of children) {
-      ids.push(child.id);
-      await getChildren(child.id);
+    async function getChildren(id) {
+        const children = await CategoryModel.findAll({
+            where: { parentCategoryId: id },
+            attributes: ['id']
+        });
+        for (const child of children) {
+            ids.push(child.id);
+            await getChildren(child.id);
+        }
     }
-  }
 
-  await getChildren(parentCategoryId);
-  return ids;
+    await getChildren(parentCategoryId);
+    return ids;
 }
 
 /**
@@ -451,99 +544,100 @@ async function getAllCategoryIds(CategoryModel, parentCategoryId) {
  * - query (optional, filters built by utility.buildQuery)
  */
 router.get('/allStores/products', utility.authenticate, checkSubscription, async (req, res) => {
-  try {
+    try {
 
-    // Pagination options
-    const pagination = {
-      page: parseInt(req.query.page) || 0,
-      pageSize: parseInt(req.query.size) || 24
-    };
+        // Pagination options
+        const pagination = {
+            page: parseInt(req.query.page) || 0,
+            pageSize: parseInt(req.query.size) || 24
+        };
 
-    const order = [['createdAt', 'DESC']];
+        const order = [['createdAt', 'DESC']];
 
-    // Base where clause
-    let whereClause = {
-      creatorUserId: req.user.id,
-      isVisible: true,
-      ...utility.buildQuery(req.query.query)
-    };
+        // Base where clause
+        let whereClause = {
+            creatorUserId: req.user.id,
+            isVisible: true,
+            ...utility.buildQuery(req.query.query)
+        };
 
-    // Handle category filter (parent + all descendants)
-    if (req.query.categoryId) {
-      const categoryIds = await getAllCategoryIds(Category, parseInt(req.query.categoryId));
-      whereClause.categoryId = { [Op.in]: categoryIds };
+        // Handle category filter (parent + all descendants)
+        if (req.query.categoryId) {
+            const categoryIds = await getAllCategoryIds(Category, parseInt(req.query.categoryId));
+            whereClause.categoryId = { [Op.in]: categoryIds };
+        }
+
+        // Handle search
+        if (req.query.searchable) {
+            const searchable = req.query.searchable;
+            whereClause = {
+                ...whereClause,
+                [Op.or]: [
+                    { name: { [Op.iLike]: `%${searchable}%` } },
+                    { '$category.name$': { [Op.iLike]: `%${searchable}%` } }
+                ]
+            };
+        }
+
+        const products = await Product.findAll(
+            utility.paginate({
+                where: whereClause,
+                include: [
+                    { model: Supplier, as: 'supplier', required: false },
+                    { model: Category, as: 'category', required: false }
+                ],
+                order
+            }, pagination)
+        );
+
+        res.json(products);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.toString() });
     }
-
-    // Handle search
-    if (req.query.searchable) {
-      const searchable = req.query.searchable;
-      whereClause = {
-        ...whereClause,
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${searchable}%` } },
-          { '$category.name$': { [Op.iLike]: `%${searchable}%` } }
-        ]
-      };
-    }
-
-    const products = await Product.findAll(
-      utility.paginate({
-        where: whereClause,
-        include: [
-          { model: Supplier, as: 'supplier', required: false },
-          { model: Category, as: 'category', required: false }
-        ],
-        order
-      }, pagination)
-    );
-
-    res.json(products);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: err.toString() });
-  }
 });
 
 router.get('/allStores/products/count', utility.authenticate, checkSubscription, async (req, res) => {
-  try {
-    // Base where clause
-    let whereClause = {
-      creatorUserId: req.user.id,
-      isVisible: true,
-      ...utility.buildQuery(req.query.query)
-    };
+    try {
+        // Base where clause
+        let whereClause = {
+            creatorUserId: req.user.id,
+            isVisible: true,
+            ...utility.buildQuery(req.query.query)
+        };
 
-    // Handle category filter (parent + all descendants)
-    if (req.query.categoryId) {
-      const categoryIds = await getAllCategoryIds(Category, parseInt(req.query.categoryId));
-      whereClause.categoryId = { [Op.in]: categoryIds };
+        // Handle category filter (parent + all descendants)
+        if (req.query.categoryId) {
+            const categoryIds = await getAllCategoryIds(Category, parseInt(req.query.categoryId));
+            whereClause.categoryId = { [Op.in]: categoryIds };
+        }
+
+        // Handle search
+        if (req.query.searchable) {
+            const searchable = req.query.searchable;
+            whereClause = {
+                ...whereClause,
+                [Op.or]: [
+                    { name: { [Op.iLike]: `%${searchable}%` } },
+                    { '$category.name$': { [Op.iLike]: `%${searchable}%` } }
+                ]
+            };
+        }
+
+        const count = await Product.count({
+            where: whereClause,
+            include: [
+                { model: Supplier, as: 'supplier', required: false },
+                { model: Category, as: 'category', required: false }
+            ]
+        });
+
+        res.json({ count });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.toString() });
     }
-
-    // Handle search
-    if (req.query.searchable) {
-      const searchable = req.query.searchable;
-      whereClause = {
-        ...whereClause,
-        [Op.or]: [
-          { name: { [Op.iLike]: `%${searchable}%` } },
-          { '$category.name$': { [Op.iLike]: `%${searchable}%` } }
-        ]
-      };
-    }
-
-    const count = await Product.count({
-      where: whereClause,
-      include: [
-        { model: Supplier, as: 'supplier', required: false },
-        { model: Category, as: 'category', required: false }
-      ]
-    });
-
-    res.json({ count });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: err.toString() });
-  }
 });
+
 
 module.exports = router;

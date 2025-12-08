@@ -64,7 +64,7 @@ export class AdminLayoutComponent implements OnInit {
       if (isExpired) {
         this.dialog.open(SubscriptionComponent, { width: '400px' });
       }
-    }, _ => {});
+    }, _ => { });
 
     this.setMenu();
 
@@ -179,7 +179,8 @@ export class AdminLayoutComponent implements OnInit {
       { label: 'Statistiques', icon: this.statsIcon, link: 'admin/dashboard' },
       { label: 'Dépenses', icon: faCoins, link: 'admin/expenses' },
       { label: 'Crédits', icon: faHandHoldingUsd, link: 'admin/credits' },
-      { label: 'Rapport', icon: faFile, link: 'admin/reports/generate' }
+      { label: 'Rapport', icon: faFile, link: 'admin/reports/generate' },
+      { label: 'Commandes', icon: faBox, link: 'admin/orders' }
     ];
   }
 }

@@ -168,3 +168,55 @@
   color: #dc3545; /* red */
   font-weight: 600;
 }
+
+.buy-box {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+
+  .price {
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .quantity-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    button {
+      width: 32px;
+      height: 32px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background: #f7f7f7;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    span {
+      min-width: 20px;
+      text-align: center;
+      font-weight: 500;
+    }
+  }
+
+  .buy-btn {
+    padding: 12px;
+    background-color: #ff9900;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background-color: #e68a00;
+    }
+  }
+}

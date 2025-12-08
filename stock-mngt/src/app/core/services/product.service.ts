@@ -13,6 +13,35 @@ export class ProductService {
 
   constructor(private http: HttpClient) { }
 
+  // ===========================
+  // 🔥 CART API METHODS (NEW)
+  // ===========================
+
+  addToCart(productId: number, quantity: number = 1): Observable<any> {
+    return this.http.post(this.baseUrl + 'cart/add', { productId, quantity });
+  }
+
+  updateCart(productId: number, quantity: number): Observable<any> {
+    return this.http.put(this.baseUrl + 'cart/update', { productId, quantity });
+  }
+
+  getCart(): Observable<any> {
+    return this.http.get(this.baseUrl + 'cart');
+  }
+
+  removeFromCart(productId: number): Observable<any> {
+    return this.http.delete(this.baseUrl + 'cart/' + productId);
+  }
+
+  clearCart(): Observable<any> {
+    return this.http.delete(this.baseUrl + 'cart/clear');
+  }
+
+
+  // ===========================
+  // EXISTING PRODUCT METHODS
+  // ===========================
+
   getProductsByStoreId(id, query): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'store/' + id, {
       params: {
@@ -37,7 +66,7 @@ export class ProductService {
     });
   }
 
-    countPublicProducts(query): Observable<any> {
+  countPublicProducts(query): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'allStores/products/count', {
       params: {
         ...query
@@ -45,15 +74,14 @@ export class ProductService {
     });
   }
 
-
   countProductsAllStores(query): Observable<any> {
-    return this.http.get<any>(this.baseUrl + 'count/allStores',
-      {
-        params: {
-          ...query
-        }
-      });
+    return this.http.get<any>(this.baseUrl + 'count/allStores', {
+      params: {
+        ...query
+      }
+    });
   }
+
   getCriticalStockProducts(id): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'store/' + id + '/critical');
   }
@@ -63,20 +91,16 @@ export class ProductService {
   }
 
   countProductsByStoreId(id, query): Observable<any> {
-    return this.http.get<any>(this.baseUrl + 'count/store/' + id,
-      {
-        params: {
-          ...query
-        }
-      });
+    return this.http.get<any>(this.baseUrl + 'count/store/' + id, {
+      params: {
+        ...query
+      }
+    });
   }
 
   getProduct(id): Observable<any> {
     return this.http.get<any>(this.baseUrl + id);
   }
-
-
-
 
   addProduct(body): Observable<any> {
     return this.http.post<any>(this.baseUrl + 'create', body);
