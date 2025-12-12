@@ -133,4 +133,10 @@
         </mat-paginator>
     </div>
 
-</div>
+    <!-- Hidden Printable Invoice Template -->
+    <div style="position: absolute; left: -9999px; top: 0;">
+        <div #printingInvoice>
+            <app-receipt-invoice *ngIf="printingReceipt" [receipt]="printingReceipt"
+                [store]="store"></app-receipt-invoice>
+        </div>
+    </div>

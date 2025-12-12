@@ -6,6 +6,7 @@ import { PublicService } from 'src/app/core/services/public.service';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CartService } from 'src/app/core/services/cart.service';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 interface CartItem {
   id: number;
@@ -33,7 +34,8 @@ export class PublicViewProductComponent implements OnInit {
     private publicService: PublicService,
     private loadingService: LoadingService,
     private cartService: CartService,
-    private authService: AuthService
+    private authService: AuthService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -72,13 +74,18 @@ export class PublicViewProductComponent implements OnInit {
 
     if (this.authService.isLoggedIn()) {
       // User is logged in → use API
-      this.productService.addToCart(product.id, this.quantity).subscribe(() => {
-        console.log("Added to server cart");
+      this.productService.addToCart(product.id, this.quantity).subscribe({
+        next: () => {
+          this.toastService.showSuccess('Produit ajouté au panier');
+        },
+        error: () => {
+          this.toastService.showError('Échec de l\'ajout au panier');
+        }
       });
     } else {
       // User NOT logged in → use localStorage
       this.cartService.addToCart(product, this.quantity);
-      console.log("Added to localStorage cart");
+      this.toastService.showSuccess('Produit ajouté au panier (Local)');
     }
   }
 

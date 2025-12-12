@@ -1,0 +1,82 @@
+<div class="profile-details-container">
+    <div class="header">
+        <h2>Détails du profil</h2>
+        <p>Mettez à jour vos informations personnelles</p>
+    </div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="save()" class="profile-form">
+
+        <div class="alert success" *ngIf="successMessage">
+            <i class="fa fa-check-circle"></i> {{ successMessage }}
+        </div>
+
+        <div class="alert error" *ngIf="errorMessage">
+            <i class="fa fa-exclamation-circle"></i> {{ errorMessage }}
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Prénom</label>
+                <input type="text" formControlName="firstName" placeholder="Entrez le prénom">
+                <div class="error-msg"
+                    *ngIf="profileForm.get('firstName').touched && profileForm.get('firstName').invalid">
+                    Le prénom est obligatoire
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Nom</label>
+                <input type="text" formControlName="lastName" placeholder="Entrez le nom">
+                <div class="error-msg"
+                    *ngIf="profileForm.get('lastName').touched && profileForm.get('lastName').invalid">
+                    Le nom est obligatoire
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Adresse Email</label>
+            <input type="email" formControlName="email" class="disabled-input">
+            <small>L'email ne peut pas être modifié directement.</small>
+        </div>
+
+        <div class="form-group">
+            <label>Numéro de téléphone</label>
+            <input type="text" formControlName="phone" placeholder="Entrez le numéro de téléphone">
+            <div class="error-msg" *ngIf="profileForm.get('phone').touched && profileForm.get('phone').invalid">
+                Le téléphone est obligatoire
+            </div>
+        </div>
+
+        <div class="header" style="margin-top: 40px; border-bottom: none; padding-bottom: 0;">
+            <h2 style="font-size: 1.2rem;">Adresse</h2>
+        </div>
+        <hr style="margin-bottom: 20px; border-top: 1px solid #f0f0f0;">
+
+        <div class="form-group">
+            <label>Pays</label>
+            <input type="text" formControlName="country" placeholder="Pays">
+        </div>
+
+        <div class="form-group">
+            <label>Ville</label>
+            <input type="text" formControlName="city" placeholder="Ville">
+        </div>
+
+        <div class="form-group">
+            <label>Rue / Adresse</label>
+            <input type="text" formControlName="street" placeholder="Rue / Adresse">
+        </div>
+
+        <div class="form-group">
+            <label>Code Postal</label>
+            <input type="text" formControlName="postalCode" placeholder="Code Postal">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="save-btn" [disabled]="profileForm.invalid || isSaving">
+                <i class="fa fa-spinner fa-spin" *ngIf="isSaving"></i>
+                {{ isSaving ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+            </button>
+        </div>
+    </form>
+</div>

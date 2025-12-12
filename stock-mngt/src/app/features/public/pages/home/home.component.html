@@ -18,21 +18,30 @@
 <div class="home-container">
     <!-- 2. Hero Section -->
     <header class="hero-section">
-        <h1>Discover Unique Products from Local Stores</h1>
-        <p class="subtitle">
-            Your one-stop shop for items from the best independent businesses.
-        </p>
-        <a routerLink="/products" class="btn btn-primary btn-large">Explore All Products</a>
+        <div class="hero-content">
+            <h1>Découvrez des Produits Uniques<br>de Magasins Locaux</h1>
+            <p class="subtitle">
+                Soutenez les commerces indépendants et trouvez tout ce dont vous avez besoin au même endroit.
+            </p>
+            <div class="hero-buttons">
+                <a routerLink="/products" class="btn btn-primary btn-large">Acheter Maintenant</a>
+                <a routerLink="/stores" class="btn btn-secondary btn-large">Voir les Magasins</a>
+            </div>
+        </div>
     </header>
 
     <!-- 3. Shop by Category -->
     <section id="categories" class="category-section">
-        <h2>Shop by Category</h2>
+        <div class="section-header">
+            <h2>Explorer les Catégories</h2>
+            <p>Trouvez exactement ce que vous cherchez.</p>
+        </div>
 
-        <div *ngIf="isLoading">Loading categories...</div>
+        <div *ngIf="isLoading">Chargement des catégories...</div>
 
         <div class="category-grid" *ngIf="!isLoading">
-            <div class="category-card" *ngFor="let category of categories" [routerLink]="['publicProducts']" [queryParams]="{ category: category.id }">
+            <div class="category-card" *ngFor="let category of categories" [routerLink]="['publicProducts']"
+                [queryParams]="{ category: category.id }">
 
                 <div class="category-image">
                     <img [src]="category.image || 'assets/images/default_category_image.png'" alt="{{ category.name }}">
@@ -46,7 +55,10 @@
 
     <!-- 4. Featured Products Section -->
     <section id="featured-products" class="featured-products-section">
-        <h2>Featured Products</h2>
+        <div class="section-header">
+            <h2>Produits Tendance</h2>
+            <p>Articles sélectionnés juste pour vous.</p>
+        </div>
         <!-- Repeat this product-card for each featured product -->
         <div class="products-grid">
             <app-product-card *ngFor="let product of featuredProducts" [product]="product">
@@ -57,25 +69,37 @@
 
     <!-- 5. Why Shop With Us? -->
     <section id="benefits" class="benefits-section">
-        <h2>Why You'll Love Shopping Here</h2>
+        <div class="section-header">
+            <h2>Pourquoi choisir Storiom ?</h2>
+        </div>
+
         <div class="features-grid">
-            <div class="feature-card"><fa-icon [icon]="storeIcon"></fa-icon>
-                <h3>Support Local Stores</h3>
-                <p>Discover and support independent businesses in your community.</p>
+            <div class="feature-card">
+                <div class="icon-wrapper">
+                    <fa-icon [icon]="storeIcon"></fa-icon>
+                </div>
+                <h3>Soutenez le Local</h3>
+                <p>Soutenez directement les propriétaires de magasins indépendants et votre économie locale.</p>
             </div>
-            <div class="feature-card"><fa-icon [icon]="boxOpenIcon"></fa-icon>
-                <h3>Wide Selection</h3>
-                <p>Find everything you need from a variety of trusted sellers.</p>
+            <div class="feature-card">
+                <div class="icon-wrapper">
+                    <fa-icon [icon]="boxOpenIcon"></fa-icon>
+                </div>
+                <h3>Sélection Soignée</h3>
+                <p>Parcourez une grande variété de produits uniques que vous ne trouverez pas ailleurs.</p>
             </div>
-            <div class="feature-card"><fa-icon [icon]="shieldIcon"></fa-icon>
-                <h3>Secure Checkout</h3>
-                <p>Shop with confidence with our safe and secure payment system.</p>
+            <div class="feature-card">
+                <div class="icon-wrapper">
+                    <fa-icon [icon]="shieldIcon"></fa-icon>
+                </div>
+                <h3>Achats Sécurisés</h3>
+                <p>Profitez d'une expérience de paiement sûre et fluide à chaque fois.</p>
             </div>
         </div>
     </section>
 
     <!-- 6. Footer -->
- <!--   <footer class="footer">
+    <!--   <footer class="footer">
         <div class="footer-links">
             <a href="/about">About Us</a> | <a href="/contact">Contact</a> | <a href="/faq">FAQ</a> | <a
                 href="/shipping">Shipping & Returns</a>

@@ -1,66 +1,99 @@
-<div class="amazon-product-page">
+<div class="product-detail-container" *ngIf="product">
 
     <!-- LEFT: IMAGE GALLERY -->
-    <div class="left-column">
-
-        <div class="thumbs-vertical" *ngIf="product?.images?.length > 1">
-            <img *ngFor="let img of product?.images" [src]="environment.backend + '/' + img"
-                (click)="openImage(environment.backend + '/' + img)" class="thumb">
-        </div>
-
+    <div class="images-column">
         <div class="main-image">
             <img [src]="product?.images?.length ? environment.backend + '/' + product?.images[0] : 'assets/default_product.png'"
                 (click)="openImage(environment.backend + '/' + product?.images[0])">
         </div>
-
-    </div>
-
-    <!-- MIDDLE: PRODUCT DETAILS -->
-    <div class="middle-column">
-        <h1>{{ product?.name }}</h1>
-        <p class="store">Brand: {{ product?.brand?.name || '--' }}</p>
-
-        <div class="price">{{ product?.sellingPrice }} DT</div>
-
-        <ul class="info-list">
-            <li><strong>Category:</strong> {{ product?.category?.name }}</li>
-            <li>
-                <span [ngClass]="{
-      'in-stock': product?.quantity > 0,
-      'out-stock': product?.quantity <= 0
-    }">
-                    {{ product?.quantity > 0 ? 'In Stock' : 'Out of Stock' }}
-                </span>
-            </li>
-        </ul>
-
-        <div class="description">
-            <h3>Product Description</h3>
-            <p>{{ product?.description || 'No description available.' }}</p>
+        <div class="thumbs-list" *ngIf="product?.images?.length > 1">
+            <img *ngFor="let img of product?.images" [src]="environment.backend + '/' + img"
+                (click)="openImage(environment.backend + '/' + img)" class="thumb">
         </div>
     </div>
 
-    <!-- RIGHT: ADD TO CART BOX -->
-    <div class="right-column">
-        <div class="buy-box">
-            <div class="price">{{ product?.sellingPrice }} DT</div>
+    <!-- MIDDLE: INFO -->
+    <div class="info-column">
+        <h1>{{ product?.name }}</h1>
+        <div class="store-link" *ngIf="product.brand">
+            Marque : <span>{{ product?.brand?.name }}</span>
+        </div>
+        <div class="rating-placeholder">
+            <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i
+                class="fa fa-star-half-o"></i>
+            <span>(4.5)</span>
+        </div>
 
-            <!-- Quantity Selector -->
-            <div class="quantity-selector">
-                <button (click)="decreaseQuantity()">-</button>
-                <span>{{ quantity }}</span>
-                <button (click)="increaseQuantity()">+</button>
+        <hr>
+
+        <div class="price-section">
+            <span class="price-value">{{ product?.sellingPrice }}</span>
+            <span class="currency"> TND</span>
+        </div>
+
+        <div class="description-section">
+            <h3>À propos de cet article</h3>
+            <p>{{ product?.description || 'Aucune description disponible pour ce produit.' }}</p>
+        </div>
+
+        <div class="details-list">
+            <div class="detail-item">
+                <span class="label">Catégorie :</span>
+                <span class="value">{{ product?.category?.name }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="label">Stock :</span>
+                <span class="value" [class.in-stock]="product?.quantity > 0" [class.out-stock]="product?.quantity <= 0">
+                    {{ product?.quantity > 0 ? 'En Stock' : 'Rupture de Stock' }}
+                </span>
+            </div>
+            <div class="detail-item">
+                <span class="label">Vendu par :</span>
+                <span class="value seller-name">{{ product?.store?.name }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: BUY BOX -->
+    <div class="action-column">
+        <div class="buy-box">
+            <div class="price-row">
+                <span class="price">{{ product?.sellingPrice }} TND</span>
             </div>
 
-            <button class="buy-btn" (click)="addToCart(product)">
-                Add to Cart
+            <div class="stock-status" *ngIf="product?.quantity > 0; else outOfStock">
+                En Stock.
+            </div>
+            <ng-template #outOfStock>
+                <div class="stock-status out">Actuellement indisponible.</div>
+            </ng-template>
+
+            <div class="quantity-selector">
+                <label>Qté :</label>
+                <div class="qty-controls">
+                    <button (click)="decreaseQuantity()">-</button>
+                    <span>{{ quantity }}</span>
+                    <button (click)="increaseQuantity()">+</button>
+                </div>
+            </div>
+
+            <button class="add-to-cart-btn" (click)="addToCart(product)" [disabled]="product?.quantity <= 0">
+                Ajouter au Panier
             </button>
 
-            <p class="seller">Sold by: <strong>{{ product?.store?.name }}</strong></p>
+            <div class="secure-transaction">
+                <i class="fa fa-lock"></i> Transaction sécurisée
+            </div>
+
+
         </div>
     </div>
 
+</div>
 
+<!-- IMAGE POPUP -->
+<div class="image-popup" *ngIf="selectedImage" (click)="closeImage()">
+    <img [src]="selectedImage">
 </div>
 
 

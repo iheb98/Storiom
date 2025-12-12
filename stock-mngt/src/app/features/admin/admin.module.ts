@@ -66,6 +66,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { OrdersMngtComponent } from './pages/orders/orders-mngt/orders-mngt.component';
 
 
+import { ReceiptInvoiceComponent } from './components/receipt-invoice/receipt-invoice.component';
+
 @NgModule({
   declarations: [
     AdminComponent,
@@ -113,6 +115,7 @@ import { OrdersMngtComponent } from './pages/orders/orders-mngt/orders-mngt.comp
     OperationEditComponent,
     ParentCategoriesStatsComponent,
     OrdersMngtComponent,
+    ReceiptInvoiceComponent
   ],
   imports: [
     CommonModule,

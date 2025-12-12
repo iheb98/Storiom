@@ -5,6 +5,7 @@ import { CartService } from 'src/app/core/services/cart.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { OrderService } from 'src/app/core/services/order.service';
 import { environment } from 'src/environments/environment.prod';
+import { ToastService } from 'src/app/core/services/toast.service';
 
 interface CartItem {
   id: number;
@@ -28,7 +29,8 @@ export class CartComponent implements OnInit {
     private authService: AuthService,
     private cartService: CartService,
     private productService: ProductService,
-    private orderService: OrderService
+    private orderService: OrderService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -125,7 +127,7 @@ export class CartComponent implements OnInit {
   checkout() {
     if (!this.authService.isLoggedIn()) {
       // Redirect to login or show message
-      alert("Please login to checkout.");
+      this.toastService.showWarning("Veuillez vous connecter pour commander.");
       this.router.navigate(['/login']);
       return;
     }
@@ -135,7 +137,7 @@ export class CartComponent implements OnInit {
     this.orderService.createOrder().subscribe(
       (res) => {
         if (res.success) {
-          alert("Order placed successfully!");
+          this.toastService.showSuccess("Commande passée avec succès !");
           this.cart = []; // Clear local view
           this.calculateTotals();
           // Optionally navigate to orders page
@@ -144,7 +146,7 @@ export class CartComponent implements OnInit {
       },
       (err) => {
         console.error(err);
-        alert("Failed to place order: " + (err.error?.message || err.message));
+        this.toastService.showError("Échec de la commande : " + (err.error?.message || err.message));
       }
     );
   }

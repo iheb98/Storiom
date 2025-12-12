@@ -14,8 +14,11 @@ export class PublicHeaderComponent implements OnInit {
   searchIcon = faSearch;
   cartIcon = faShoppingCart;
   userIcon = faUser;
+  menuIcon = faBars;
   searchText = '';
   searchable;
+
+  isMenuOpen = false;
 
   filters = {
     category: null,
@@ -73,10 +76,15 @@ export class PublicHeaderComponent implements OnInit {
 
   goToProfile() {
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/profile']);
+      this.router.navigate(['/account']);
     } else {
       this.router.navigate(['/login']);
     }
+    this.isMenuOpen = false;
+  }
+
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
   }
 
 }

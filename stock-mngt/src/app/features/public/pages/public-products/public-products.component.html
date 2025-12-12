@@ -3,40 +3,40 @@
     <!-- HEADER -->
     <header class="products-header">
         <h1 *ngIf="category">{{ category.name }}</h1>
-        <h1 *ngIf="!category && searchQuery">Search results for "{{ searchQuery }}"</h1>
-        <h1 *ngIf="!category && !searchQuery">All Products</h1>
+        <h1 *ngIf="!category && searchQuery">Résultats pour "{{ searchQuery }}"</h1>
+        <h1 *ngIf="!category && !searchQuery">Tous les Produits</h1>
     </header>
 
     <div class="products-content">
 
         <!-- FILTERS SIDEBAR -->
         <aside class="filters">
-            <h3>Filters</h3>
+            <h3>Filtres</h3>
 
             <!-- Category Filter -->
             <div class="filter-group">
-                <label>Category</label>
+                <label>Catégorie</label>
                 <!-- <select [(ngModel)]="filters.category" (change)="applyFilters()">
                     <option value="">All Categories</option>
                     <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
                 </select> -->
 
                 <ng-select [(ngModel)]="filters.category" name="category" id="category">
-                    <ng-option value="">All Categories</ng-option>
+                    <ng-option value="">Toutes les Catégories</ng-option>
                     <ng-option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</ng-option>
                 </ng-select>
             </div>
 
             <!-- Price Filter -->
             <div class="filter-group">
-                <label>Price Range</label>
+                <label>Fourchette de Prix</label>
                 <input type="number" placeholder="Min" [(ngModel)]="filters.minPrice">
                 <input type="number" placeholder="Max" [(ngModel)]="filters.maxPrice">
             </div>
 
             <!-- Store Filter -->
             <div class="filter-group">
-                <label>Store</label>
+                <label>Magasin</label>
                 <!-- <select [(ngModel)]="filters.store" (change)="applyFilters()">
                     <option value="">All Stores</option>
                     <option *ngFor="let store of stores" [value]="store.id">{{ store.name }}</option>
@@ -49,7 +49,7 @@
 
             <!-- Sort -->
             <div class="filter-group">
-                <label>Sort By</label>
+                <label>Trier Par</label>
                 <!-- <select [(ngModel)]="filters.sort" (change)="applyFilters()">
                     <option value="priceAsc">Price: Low to High</option>
                     <option value="priceDesc">Price: High to Low</option>
@@ -57,53 +57,23 @@
                 </select> -->
 
                 <ng-select [(ngModel)]="filters.sort" name="sort" id="sort">
-                    <ng-option value="priceAsc">Price: Low to High</ng-option>
-                    <ng-option value="priceDesc">Price: High to Low</ng-option>
-                    <ng-option value="latest">Latest</ng-option>
+                    <ng-option value="priceAsc">Prix : Croissant</ng-option>
+                    <ng-option value="priceDesc">Prix : Décroissant</ng-option>
+                    <ng-option value="latest">Plus Récents</ng-option>
                 </ng-select>
             </div>
 
-            <button class="apply-filters-btn" (click)="applyFilters()">Apply Filters</button>
-            <button class="reset-filters-btn" (click)="resetFilters()">Reset Filters</button>
+            <button class="apply-filters-btn" (click)="applyFilters()">Appliquer</button>
+            <button class="reset-filters-btn" (click)="resetFilters()">Réinitialiser</button>
 
         </aside>
 
         <!-- PRODUCTS GRID -->
         <main class="products-grid">
-            <div *ngIf="products.length === 0" class="no-products">No products found.</div>
+            <div *ngIf="products.length === 0" class="no-products">Aucun produit trouvé.</div>
 
-            <div class="product-card" *ngFor="let product of products">
-
-                <div class="product-image-container">
-                    <img [src]="product?.images[0] ? environment.backend + '/' + product?.images[0] : 'assets/default_product.png'"
-                        [alt]="product.name">
-
-                    <!-- Hover Action -->
-                    <button class="quick-view-btn" (click)="viewProduct(product)">
-                        <i class="fa fa-eye"></i> View
-                    </button>
-                </div>
-
-                <div class="product-info">
-                    <h3 class="product-name">{{ product.name }}</h3>
-                    <p class="brand" *ngIf="product.brand">{{ product.brand.name }}</p>
-
-                    <p class="price">{{ product.sellingPrice }} DT</p>
-
-                    <p class="stock" [class.low]="product.quantity <= product.criticalStockIndicator">
-                        Stock: {{ product.quantity }}
-                    </p>
-
-                    <p class="store-name">{{ product.store?.name }}</p>
-                </div>
-
-                <div class="product-actions">
-                    <button class="details-btn" (click)="viewProduct(product)">Details</button>
-                    <button class="cart-btn" (click)="addToCart(product)">
-                        <fa-icon [icon]="faCartPlus"></fa-icon>
-                    </button>
-                </div>
-            </div>
+            <app-product-card *ngFor="let product of products" [product]="product">
+            </app-product-card>
 
 
             <!-- PAGINATION -->

@@ -29,7 +29,7 @@ export class AuthService {
   }
 
   updateUser(body): Observable<any> {
-    return this.http.put<any>(this.baseUrl, body);
+    return this.http.put<any>(this.baseUrl + 'edit', body);
   }
 
   login(body): Observable<any> {

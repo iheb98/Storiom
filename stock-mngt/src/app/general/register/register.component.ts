@@ -39,8 +39,12 @@ export class RegisterComponent implements OnInit {
       phone: [''],
       password: ['', Validators.required],
       confirmPassword: ['', Validators.required],
-      termsAccepted: [false, Validators.required]
-    });
+      termsAccepted: [false, Validators.required],
+      country: [''],
+      city: [''],
+      street: [''],
+      postalCode: ['']
+    })
   }
 
   register() {

@@ -12,6 +12,7 @@ import { faAngleDoubleLeft, faBackward, faFilePdf, faPrint } from '@fortawesome/
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StoreService } from 'src/app/core/services/store.service';
+import { environment } from 'src/environments/environment.prod';
 const htmlToPdfmake = require("html-to-pdfmake");
 (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
@@ -26,6 +27,7 @@ export class ReceiptViewComponent implements OnInit {
   pdfIcon = faFilePdf
   printIcon = faPrint
   backIcon = faAngleDoubleLeft
+  environment = environment
   store;
   receiptId;
   receipt;
@@ -59,13 +61,18 @@ export class ReceiptViewComponent implements OnInit {
   }
 
 
+
+  print() {
+    window.print();
+  }
+
   downloadAsPDF() {
     const content = this.receiptSection.nativeElement;
     const options = {
-      margin: [10, 20, 10, 20],
+      margin: [0, 0, 0, 0],
       filename: this.receipt?.code + '.pdf',
       image: { type: 'png', quality: 0.98 },
-      html2canvas: { scale: 2 },
+      html2canvas: { scale: 2, windowWidth: 1200 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     console.log(content)

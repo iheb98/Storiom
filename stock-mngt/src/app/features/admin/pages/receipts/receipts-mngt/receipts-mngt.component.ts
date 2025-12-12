@@ -117,9 +117,9 @@ export class ReceiptsMngtComponent implements OnInit {
       this.loadingService.screenLoaded()
       this.count = response;
     },
-    error => {
-      this.loadingService.screenLoaded()
-    })
+      error => {
+        this.loadingService.screenLoaded()
+      })
   }
 
   handlePageEvent(event) {
@@ -200,200 +200,52 @@ export class ReceiptsMngtComponent implements OnInit {
   viewReceipt(receipt) {
     this.router.navigate(['receipts/view/' + receipt.id])
   }
+  // State for printing
+  printingReceipt = null;
+  @ViewChild('printingInvoice') printingInvoice!: ElementRef;
+
   downloadAsPDF(id) {
+    //this.loadingService.screenLoading();
     this.receiptService.getReceipt(id).subscribe(receipt => {
-      let operations = ''
-      receipt?.operations?.forEach(operation => {
-        operations += `<tr>
-         <td>${operation?.product?.name}</td>
-         <td>${operation?.amount}</td>
-         <td>${operation?.price ? operation?.price + " DT" : ""}</td>
-         <td>${(operation?.price * operation?.amount) + " DT"}</td>
-     </tr>`
-      });
-      const content = `
-      <head>
-      <style>
-      body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-    color: #333;
-}
+      this.printingReceipt = receipt;
 
-.invoice-container {
-    max-width: 800px;
-    margin: 50px auto;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+      // Give Angular a moment to render the hidden component with new data
+      setTimeout(() => {
+        try {
+          const content = this.printingInvoice.nativeElement;
+          const options = {
+            margin: [0, 0, 0, 0],
+            filename: this.printingReceipt?.code + '.pdf',
+            image: { type: 'png', quality: 0.98 },
+            html2canvas: { scale: 2, windowWidth: 1200 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+          };
 
-.invoice-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #343a40 ;
-    padding-bottom: 20px;
-}
-
-.invoice-header img {
-    max-width: 150px;
-}
-
-.invoice-header h1 {
-    font-size: 24px;
-    color: #343a40 ;
-}
-
-.invoice-details {
-    margin: 20px 0;
-}
-
-.invoice-details div {
-    margin-bottom: 10px;
-}
-
-.invoice-details .details-label {
-    font-weight: bold;
-}
-
-.invoice-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-
-.invoice-table th,
-.invoice-table td {
-    padding: 15px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-.invoice-table th {
-    background-color: #343a40 ;
-    color: #fff;
-}
-
-.invoice-total {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 20px;
-}
-
-.invoice-total div {
-    width: 200px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.invoice-footer {
-    text-align: center;
-    color: #888;
-    font-size: 12px;
-    border-top: 1px solid #ddd;
-    padding-top: 20px;
-}
-
-.invoice-info {
-    display: flex;
-    justify-content: space-between;
-    margin: 20px 0;
-}
-
-.invoice-details {
-    width: 48%;
-}
-
-.store-contact {
-    width: 48%;
-    text-align: right;
-}
-
-.store-contact p {
-    margin: 2px 0;
-    font-size: 14px;
-    color: #555;
-}
-
-.bold-text{
-font-weight: bold;
-}
-
-      </style>
-      </head>
-      <div id="receiptSection" #receiptSection>
-      <div class="invoice-container">
-    <div class="invoice-header">
-        <div class="company-details">
-          <h4><strong>${this.store?.name}</strong></h4>
-        </div>
-        <div class="invoice-title">
-            <h1>Facture</h1>
-        </div>
-    </div>
-
-    <div class="invoice-info">
-        <div class="invoice-details">
-            <div><span class="details-label">Numéro de la facture:</span> ${receipt?.code}</div>
-            <div><span class="details-label">Date:</span> ${this.datePipe.transform(receipt?.date, 'shortDate')}</div>
-            <div><span class="details-label">Nom du client:</span>
-                ${receipt?.name ? receipt?.name :
-          (receipt?.supplier?.firstName ? receipt?.supplier?.firstName : "") + " " +
-          (receipt?.supplier?.lastName ? receipt?.supplier?.lastName : "")}
-            </div>
-        </div>
-
-        <div class="invoice-details" style="text-align:left">
-            <div> <span class="details-label">Addresse: </span> ${receipt?.store?.address?.state + ' ' + receipt?.store?.address?.city} </div>
-            <div><span class="details-label">Email: </span> ${this.store?.email}</div>
-            <div><span class="details-label">téléphone:</span> ${this.store?.phone}</div>
-        </div>
-    </div>
-
-    <table class="invoice-table">
-        <thead>
-            <tr>
-                <th>Description</th>
-                <th>Quantité</th>
-                <th>Prix Unité</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${operations}
-        </tbody>
-    </table>
-
-    <div class="invoice-total">
-        <div>
-            <div class="bold-text">Subtotal:</div>
-            <div>${receipt?.total - (receipt?.tva * receipt?.total / 100) + " DT"}</div>
-        </div>
-        <div>
-            <div class="bold-text">Tax ${receipt?.tva}%:</div>
-            <div>${receipt?.tva * receipt?.total / 100 + " DT"}</div>
-        </div>
-        <div>
-            <div class="bold-text">Total:</div>
-            <div>${receipt?.total + " DT"}</div>
-        </div>
-    </div>
-</div>
-  </div>`;
-      const options = {
-        margin: [10, 20, 10, 20],
-        filename: receipt?.code + '.pdf',
-        image: { type: 'png', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      html2pdf().from(content).set(options).save();
+          html2pdf()
+            .from(content)
+            .set(options)
+            .save()
+            .then(() => {
+              this.printingReceipt = null; // Cleanup
+              this.loadingService.screenLoaded();
+            })
+            .catch((err) => {
+              console.error("PDF Generation Error:", err);
+              this.printingReceipt = null;
+              this.loadingService.screenLoaded();
+              Swal.fire('Erreur', 'Erreur lors de la génération du PDF.', 'error');
+            });
+        } catch (e) {
+          console.error("PDF Setup Error:", e);
+          this.printingReceipt = null;
+          this.loadingService.screenLoaded();
+          Swal.fire('Erreur', 'Erreur lors de la préparation du PDF.', 'error');
+        }
+      }, 500); // 500ms delay to ensure rendering
+    }, error => {
+      console.error("Receipt Fetch Error:", error);
+      this.loadingService.screenLoaded();
+      Swal.fire('Erreur', 'Impossible de charger la facture.', 'error');
     })
-
   }
 }

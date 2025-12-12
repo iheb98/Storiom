@@ -1,0 +1,56 @@
+<div class="account-container">
+    <div class="account-header">
+        <h1>Mon Compte</h1>
+        <p>Gérez votre profil et consultez vos commandes</p>
+    </div>
+
+    <div class="account-layout" *ngIf="user; else loading">
+        <!-- SIDEBAR -->
+        <div class="account-sidebar">
+            <div class="user-brief">
+                <div class="avatar-circle">
+                    {{ user.firstName[0] }}{{ user.lastName[0] }}
+                </div>
+                <div class="user-names">
+                    <h3>{{ user.firstName }} {{ user.lastName }}</h3>
+                    <span class="email">{{ user.email }}</span>
+                </div>
+            </div>
+
+            <nav class="nav-links">
+                <button [class.active]="activeTab === 'profile'" (click)="switchTab('profile')">
+                    <i class="fa fa-user"></i> Détails du profil
+                </button>
+                <button [class.active]="activeTab === 'orders'" (click)="switchTab('orders')">
+                    <i class="fa fa-shopping-bag"></i> Mes Commandes
+                </button>
+                <div class="separator"></div>
+                <button class="logout-btn" (click)="logout()">
+                    <i class="fa fa-sign-out"></i> Déconnexion
+                </button>
+            </nav>
+        </div>
+
+        <!-- CONTENT AREA -->
+        <div class="account-content">
+
+            <!-- PROFILE TAB -->
+            <div class="tab-content" *ngIf="activeTab === 'profile'">
+                <app-profile-details [user]="user"></app-profile-details>
+            </div>
+
+            <!-- ORDERS TAB -->
+            <div class="tab-content" *ngIf="activeTab === 'orders'">
+                <!-- <app-order-history [userId]="user.id"></app-order-history> -->
+                <p>Historique des commandes à venir...</p>
+            </div>
+
+        </div>
+    </div>
+
+    <ng-template #loading>
+        <div class="loading-state">
+            <p>Chargement du profil...</p>
+        </div>
+    </ng-template>
+</div>

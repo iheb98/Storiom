@@ -1,12 +1,48 @@
-<div class="product-card" *ngIf="product">
+<div class="product-card" (click)="viewDetails()">
   <div class="product-image-container">
-    <img [src]="product.images && product.images.length > 0 
-        ? environment.backend + '/' + product.images[0] 
-        : 'assets/default_product.png'"
-         [alt]="product.name">
+    <!-- New Badge (conditional) -->
+    <!-- <span class="badge new" *ngIf="isNew(product)">New</span> -->
+
+    <img [src]="product?.images?.length ? environment.backend + '/' + product?.images[0] : 'assets/default_product.png'"
+      [alt]="product.name">
+
+    <!-- Overlay Utils -->
+    <div class="overlay-utils">
+      <button class="util-btn" title="Aperçu Rapide" (click)="$event.stopPropagation(); viewDetails()">
+        <i class="fa fa-eye"></i>
+      </button>
+    </div>
   </div>
-  <h3>{{ product.name }}</h3>
-  <p class="price">{{ product.sellingPrice | currency:'DT' }}</p>
-  <p class="store-name" *ngIf="product.store">{{ product.store.name }}</p>
-  <button class="add-to-cart">Add to Cart</button>
+
+  <div class="product-details">
+    <div class="category-name" *ngIf="product.category">{{ product.category.name }}</div>
+
+    <h3>{{ product.name }}</h3>
+
+    <div class="rating">
+      <i class="fa fa-star checked"></i>
+      <i class="fa fa-star checked"></i>
+      <i class="fa fa-star checked"></i>
+      <i class="fa fa-star checked"></i>
+      <i class="fa fa-star"></i>
+      <span>(5.0)</span>
+    </div>
+
+    <div class="price-row">
+      <span class="price">{{ product.sellingPrice }} TND</span>
+    </div>
+
+    <div class="store-name" *ngIf="product.store">
+      Vendu par {{ product.store.name }}
+    </div>
+
+    <div class="card-footer">
+      <button class="action-btn details-btn" (click)="$event.stopPropagation(); viewDetails()">
+        Détails
+      </button>
+      <button class="action-btn cart-btn" (click)="addToCart($event)">
+        <i class="fa fa-shopping-cart"></i> Ajouter
+      </button>
+    </div>
+  </div>
 </div>
