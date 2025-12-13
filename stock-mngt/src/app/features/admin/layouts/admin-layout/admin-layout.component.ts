@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, HostListener } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { faChartBar } from '@fortawesome/free-regular-svg-icons';
 import {
   faPowerOff, faHome, faStore, faUser, faCodeBranch, faHandHoldingUsd,
-  faCoins, faShuttleVan, faBox, faReceipt, faImage, faFile, faWindowRestore, faInfoCircle
+  faCoins, faShuttleVan, faBox, faReceipt, faImage, faFile, faWindowRestore, faInfoCircle, faShoppingCart
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../../../../core/services/auth.service';
 import { LoadingService } from '../../../../core/services/loading.service';
@@ -19,13 +20,20 @@ import { SubscriptionComponent } from '../../../../general/subscription/subscrip
 })
 export class AdminLayoutComponent implements OnInit {
   backend_URL = environment.backend;
+
+  // Icons
   storeIcon = faStore;
   homeIcon = faHome;
   powerIcon = faPowerOff;
   userIcon = faUser;
   categoryIcon = faCodeBranch;
   statsIcon = faChartBar;
-  opened = false;
+
+  // State
+  sidebarCollapsed = false;
+  mobileMenuOpen = false;
+  userMenuOpen = false;
+  currentPageTitle = 'Tableau de bord';
 
   connectedUser: any;
   store: any;
@@ -44,7 +52,6 @@ export class AdminLayoutComponent implements OnInit {
     this.authService.loggedIn.subscribe(() => {
       this.subscriptionDetails = this.authService.getConnectedUser()?.subscription;
       this.checkSubscriptionStatus(this.subscriptionDetails);
-
       this.connectedUser = this.authService.getConnectedUser();
 
       this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
@@ -55,18 +62,27 @@ export class AdminLayoutComponent implements OnInit {
         _ => this.loadingService.screenLoaded()
       );
     });
+
+    // Track route changes for page title
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.updatePageTitle();
+      this.closeMobileMenu();
+      this.userMenuOpen = false;
+    });
   }
 
   ngOnInit(): void {
     this.connectedUser = this.authService.getConnectedUser();
+    this.setMenu();
+    this.updatePageTitle();
 
     this.authService.checkSubscription(this.authService.getConnectedUser()?.id).subscribe(isExpired => {
       if (isExpired) {
         this.dialog.open(SubscriptionComponent, { width: '400px' });
       }
     }, _ => { });
-
-    this.setMenu();
 
     this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
       store => {
@@ -80,14 +96,60 @@ export class AdminLayoutComponent implements OnInit {
     if (this.subscriptionDetails) {
       this.checkSubscriptionStatus(this.subscriptionDetails);
     }
+
+    // Check screen size for initial sidebar state
+    if (window.innerWidth <= 992) {
+      this.sidebarCollapsed = true;
+    }
   }
 
+  // ========================================
+  // UI Toggle Methods
+  // ========================================
+  toggleSidebar() {
+    this.sidebarCollapsed = !this.sidebarCollapsed;
+  }
+
+  toggleMobileMenu() {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+    document.body.style.overflow = this.mobileMenuOpen ? 'hidden' : '';
+  }
+
+  closeMobileMenu() {
+    this.mobileMenuOpen = false;
+    document.body.style.overflow = '';
+  }
+
+  toggleUserMenu() {
+    this.userMenuOpen = !this.userMenuOpen;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.user-profile') && !target.closest('.user-dropdown')) {
+      this.userMenuOpen = false;
+    }
+  }
+
+  // ========================================
+  // Page Title
+  // ========================================
+  updatePageTitle() {
+    const url = this.router.url;
+    const menuItem = this.menu.find(item => url.includes(item.link));
+    this.currentPageTitle = menuItem?.label || 'Tableau de bord';
+  }
+
+  // ========================================
+  // Auth & Subscription
+  // ========================================
   logout() {
     this.authService.logout().subscribe(_ => {
       this.connectedUser = null;
       this.subscriptionStatus = null;
       this.store = null;
-      this.opened = false;
+      this.mobileMenuOpen = false;
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('accessToken');
       this.router.navigate(['login']);
@@ -113,7 +175,6 @@ export class AdminLayoutComponent implements OnInit {
     }
 
     this.subscriptionStatus = new Date() > calculatedExpirationDate ? 'Expired' : 'Active';
-    // keep a normalized expirationDate for the tooltip
     this.subscriptionDetails.expirationDate = calculatedExpirationDate.toISOString();
   }
 
@@ -124,63 +185,24 @@ export class AdminLayoutComponent implements OnInit {
     return `Abonnement valide du ${new Date(activationDate).toLocaleDateString()} au ${new Date(expirationDate).toLocaleDateString()}`;
   }
 
-  categories: any[] = [
-    {
-      name: 'Electronics',
-      subcategories: [
-        {
-          name: 'Phones',
-          subcategories: [
-            { id: 111, name: 'Smartphones' },
-            { id: 112, name: 'Feature Phones' }
-          ]
-        },
-        {
-          name: 'Laptops',
-          subcategories: [
-            { id: 121, name: 'Gaming Laptops' },
-            { id: 122, name: 'Ultrabooks' }
-          ]
-        }
-      ]
-    },
-    {
-      name: 'Fashion',
-      subcategories: [
-        {
-          name: 'Men',
-          subcategories: [
-            { id: 211, name: 'Shirts' },
-            { id: 212, name: 'Shoes' }
-          ]
-        },
-        {
-          name: 'Women',
-          subcategories: [
-            { id: 221, name: 'Dresses' },
-            { id: 222, name: 'Bags' }
-          ]
-        }
-      ]
-    }
-  ];
-
-
+  // ========================================
+  // Menu Setup
+  // ========================================
   setMenu() {
     this.menu = [
-      { label: 'Boutique', icon: faInfoCircle, link: 'admin/stores/view' },
+      { label: 'Ma Boutique', icon: faInfoCircle, link: 'admin/stores/view' },
+      { label: 'Statistiques', icon: this.statsIcon, link: 'admin/dashboard' },
+      { label: 'Commandes', icon: faShoppingCart, link: 'admin/orders' },
+      { label: 'Produits', icon: faBox, link: 'admin/products' },
       { label: 'Catégories', icon: this.categoryIcon, link: 'admin/categories' },
       { label: 'Marques', icon: faImage, link: 'admin/brands' },
       { label: 'Fournisseurs', icon: faShuttleVan, link: 'admin/suppliers' },
-      { label: 'Produits', icon: faBox, link: 'admin/products' },
       { label: 'Factures', icon: faReceipt, link: 'admin/receipts' },
-      { label: 'Operations', icon: faWindowRestore, link: 'admin/operations' },
+      { label: 'Opérations', icon: faWindowRestore, link: 'admin/operations' },
       { label: 'Travailleurs', icon: this.userIcon, link: 'admin/workers' },
-      { label: 'Statistiques', icon: this.statsIcon, link: 'admin/dashboard' },
       { label: 'Dépenses', icon: faCoins, link: 'admin/expenses' },
       { label: 'Crédits', icon: faHandHoldingUsd, link: 'admin/credits' },
-      { label: 'Rapport', icon: faFile, link: 'admin/reports/generate' },
-      { label: 'Commandes', icon: faBox, link: 'admin/orders' }
+      { label: 'Rapport', icon: faFile, link: 'admin/reports/generate' }
     ];
   }
 }
