@@ -1,95 +1,178 @@
-<div class="padding-page">
-    <div *ngIf="store" class="store-details">
-        <!-- Modifier Button -->
-        <div class="row">
-            <div class="col-12 text-right">
-                <button class="btn btn-primary" [routerLink]="['/admin/stores/edit/'+store?.id]"
-                    routerLinkActive="router-link-active">
-                    <fa-icon [icon]="editIcon"></fa-icon>
-                    Modifier
+<div class="store-view-container" *ngIf="store">
+    <!-- Store Header -->
+    <div class="store-header">
+        <div class="header-content">
+            <div class="store-logo"
+                (click)="openImage(store?.logo ? backend_URL + '/' + store?.logo : 'assets/default_store.png')">
+                <img [src]="store?.logo ? backend_URL + '/' + store?.logo : 'assets/default_store.png'"
+                    [alt]="store?.name">
+            </div>
+            <div class="store-info">
+                <h1>{{ store?.name }}</h1>
+                <div class="store-badges">
+                    <span class="badge" [class.active]="store?.active" [class.inactive]="!store?.active">
+                        <i class="fa" [class.fa-check-circle]="store?.active"
+                            [class.fa-times-circle]="!store?.active"></i>
+                        {{ store?.active ? 'Actif' : 'Inactif' }}
+                    </span>
+                    <span class="badge delivery" *ngIf="store?.isSupportingDeliveries">
+                        <i class="fa fa-truck"></i> Livraison disponible
+                    </span>
+                    <span class="badge no-delivery" *ngIf="!store?.isSupportingDeliveries">
+                        <i class="fa fa-times-circle"></i> Pas de livraison
+                    </span>
+                    <span class="badge visibility" *ngIf="store?.isVisibleToPublic">
+                        <i class="fa fa-eye"></i> Visible au public
+                    </span>
+                </div>
+                <p class="store-description" *ngIf="store?.description">{{ store?.description }}</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-edit" [routerLink]="['/admin/stores/edit/' + store?.id]">
+                    <i class="fa fa-edit"></i> Modifier
                 </button>
             </div>
         </div>
+    </div>
 
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon products">
+                <i class="fa fa-box"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ productsCount }}</span>
+                <span class="stat-label">Produits</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon orders">
+                <i class="fa fa-shopping-cart"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ ordersCount }}</span>
+                <span class="stat-label">Commandes</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon reviews">
+                <i class="fa fa-star"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ averageRating | number:'1.1-1' }}</span>
+                <span class="stat-label">Note moyenne</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon views">
+                <i class="fa fa-eye"></i>
+            </div>
+            <div class="stat-content">
+                <span class="stat-number">{{ totalViews }}</span>
+                <span class="stat-label">Vues</span>
+            </div>
+        </div>
+    </div>
 
-        <!-- General Information -->
-        <div class="row info-bloc">
-            <div class="col-12 col-sm-9 col-md-10">
-                <div class="row">
-                    <div class="col-12">
-                        <span class="info-bloc-title"><mat-icon class="circle-icon">info</mat-icon>
-                            Informations générales :</span>
-                    </div>
-                    <div class="col-12">
-                        <span class="subtitle">Nom du boutique : </span>
-                        <span class="name">{{store?.name || 'N/A'}}</span>
-                    </div>
-                    <div class="col-12">
-                        <span class="subtitle">Téléphone : </span>
-                        <span class="name">{{store?.phone || 'N/A'}}</span>
-                    </div>
-                    <div class="col-12">
-                        <span class="subtitle">Email : </span>
-                        <span class="name">{{store?.email || 'N/A'}}</span>
-                    </div>
-                    <div class="col-12">
-                        <span class="subtitle">Site web : </span>
-                        <span class="name" *ngIf="store?.site"><a [href]="storeWebsite"
-                                target="_blank">{{store?.site}}</a></span>
-                        <span class="name" *ngIf="!store?.site">{{"N/A"}}</span>
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+        <!-- Contact Information -->
+        <div class="info-card">
+            <div class="card-header">
+                <i class="fa fa-phone-alt"></i>
+                <h3>Coordonnées</h3>
+            </div>
+            <div class="card-body">
+                <div class="info-row">
+                    <div class="info-icon"><i class="fa fa-phone"></i></div>
+                    <div class="info-content">
+                        <span class="info-label">Téléphone</span>
+                        <span class="info-value">{{ store?.phone || 'Non renseigné' }}</span>
                     </div>
                 </div>
-            </div>
-            <div class="col-12 horizontal-line">
-                <hr />
-            </div>
-            <div class="col-12 col-sm-3 col-md-2 d-flex align-items-center justify-content-center">
-                <div class="image-container">
-                    <img [src]="store?.logo ? backend_URL +'/' + store?.logo : 'assets/store.jpg'" alt="Store Logo"
-                        class="image img-fluid rounded-circle"
-                        style="border: 1px solid lightgray; max-width: 100%; height: auto;"
-                        (click)="openImage(store?.logo ? backend_URL +'/' + store?.logo : 'assets/store.jpg')">
+                <div class="info-row">
+                    <div class="info-icon"><i class="fa fa-envelope"></i></div>
+                    <div class="info-content">
+                        <span class="info-label">Email</span>
+                        <span class="info-value">{{ store?.email || 'Non renseigné' }}</span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-icon"><i class="fa fa-globe"></i></div>
+                    <div class="info-content">
+                        <span class="info-label">Site web</span>
+                        <a *ngIf="store?.site" [href]="storeWebsite" target="_blank" class="info-link">
+                            {{ store?.site }}
+                        </a>
+                        <span *ngIf="!store?.site" class="info-value">Non renseigné</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-
-
-        <!-- Store Address -->
-        <div class="row info-bloc">
-            <div class="col-12">
-                <span class="info-bloc-title"><mat-icon class="circle-icon">location_on</mat-icon> Adresse de la
-                    boutique :</span>
+        <!-- Address Information -->
+        <div class="info-card">
+            <div class="card-header">
+                <i class="fa fa-map-marker-alt"></i>
+                <h3>Adresse</h3>
             </div>
-            <div class="col-12">
-                <span class="subtitle">Rue : </span>
-                <span class="name">{{store?.address?.street || 'N/A'}}</span>
-            </div>
-            <div class="col-12">
-                <span class="subtitle">Cité : </span>
-                <span class="name">{{store?.address?.city || 'N/A'}}</span>
-            </div>
-            <!--<div class="col-12">
-                <span class="subtitle">Code Postale : </span>
-                <span class="name">{{store?.address?.postalCode || 'N/A'}}</span>
-            </div>-->
-            <div class="col-12">
-                <span class="subtitle">Etat : </span>
-                <span class="name">{{store?.address?.state || 'N/A'}}</span>
+            <div class="card-body">
+                <div class="info-row">
+                    <div class="info-icon"><i class="fa fa-road"></i></div>
+                    <div class="info-content">
+                        <span class="info-label">Rue</span>
+                        <span class="info-value">{{ store?.address?.street || 'Non renseigné' }}</span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-icon"><i class="fa fa-city"></i></div>
+                    <div class="info-content">
+                        <span class="info-label">Ville</span>
+                        <span class="info-value">{{ store?.address?.city || 'Non renseigné' }}</span>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-icon"><i class="fa fa-map"></i></div>
+                    <div class="info-content">
+                        <span class="info-label">État/Région</span>
+                        <span class="info-value">{{ store?.address?.state || 'Non renseigné' }}</span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Store Description -->
-        <div class="row info-bloc">
-            <div class="col-12">
-                <span class="info-bloc-title"><mat-icon class="circle-icon">description</mat-icon> Description :</span>
+        <!-- Quick Actions -->
+        <div class="info-card actions-card">
+            <div class="card-header">
+                <i class="fa fa-bolt"></i>
+                <h3>Actions rapides</h3>
             </div>
-            <div class="col-12">
-                <span class="name">{{store?.description || 'Aucune description disponible'}}</span>
+            <div class="card-body">
+                <div class="quick-actions">
+                    <a [routerLink]="['/admin/products/add']" class="action-btn">
+                        <i class="fa fa-plus"></i>
+                        <span>Ajouter un produit</span>
+                    </a>
+                    <a [routerLink]="['/admin/products']" class="action-btn">
+                        <i class="fa fa-box"></i>
+                        <span>Voir les produits</span>
+                    </a>
+                    <a [routerLink]="['/admin/orders']" class="action-btn">
+                        <i class="fa fa-shopping-cart"></i>
+                        <span>Voir les commandes</span>
+                    </a>
+                    <a [routerLink]="['/store', store?.id]" target="_blank" class="action-btn">
+                        <i class="fa fa-external-link-alt"></i>
+                        <span>Voir la boutique</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Image Popup -->
 <div class="image-popup" *ngIf="selectedImage" (click)="closeImage()">
-    <img [src]="selectedImage" alt="Zoomed Image">
+    <img [src]="selectedImage" alt="Image agrandie">
 </div>

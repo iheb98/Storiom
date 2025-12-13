@@ -1,11 +1,13 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Form, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from 'src/app/models/store';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { FileService } from 'src/app/core/services/file.service';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { StoreService } from 'src/app/core/services/store.service';
+import { environment } from 'src/environments/environment';
+import { getAllGovernorates, getCitiesForGovernorate, getAllCities } from 'src/app/shared/data/tunisia-locations';
 
 @Component({
   selector: 'app-store-add',
@@ -15,42 +17,85 @@ import { StoreService } from 'src/app/core/services/store.service';
 export class StoreAddComponent implements OnInit {
   store: Store;
   form: FormGroup;
-  storeId
-  storeTypes = ['Boutique', 'Quincaillerie']
+  storeId: string;
+  storeTypes = ['Boutique', 'Quincaillerie'];
+  backend_URL = environment.backend;
+
+  // File upload
+  selectedFileName: string = '';
+  logoPreview: string = null;
+
+  // Autocomplete for address
+  governorateSearchText = '';
+  citySearchText = '';
+  availableGovernorates: string[] = [];
+  availableCities: string[] = [];
+  filteredGovernorates: string[] = [];
+  filteredCities: string[] = [];
+  showGovernorateSuggestions = false;
+  showCitySuggestions = false;
+
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
-  constructor(private formBuilder: FormBuilder,
+
+  constructor(
+    private formBuilder: FormBuilder,
     private service: StoreService,
     private fileService: FileService,
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private loadingService: LoadingService) {
-  }
+    private loadingService: LoadingService
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
+    this.initLocationData();
+
     this.route.paramMap.subscribe(paramMap => {
       this.storeId = paramMap.get('id');
-    })
+    });
+
     if (this.storeId) {
-      this.service.getStore(this.storeId).subscribe(
-        response => {
-          this.store = response
-          this.form.get('name').setValue(response?.name)
-          this.form.get('description').setValue(response?.description)
-          this.form.get('phone').setValue(response?.phone)
-          this.form.get('email').setValue(response?.email)
-          this.form.get('site').setValue(response?.site)
-          this.form.get('country').setValue(response?.address?.country)
-          this.form.get('state').setValue(response?.address?.state)
-          this.form.get('city').setValue(response?.address?.city)
-          this.form.get('street').setValue(response?.address?.street)
-          this.form.get('postalCode').setValue(response?.address?.postalCode)
-          this.form.get('logo').setValue(response?.logo)
-          this.form.get('isVisibleToPublic').setValue(response?.isVisibleToPublic)
-          this.form.get('isSupportingDeliveries').setValue(response?.isSupportingDeliveries)
-        })
+      this.loadStore();
     }
+  }
+
+  initLocationData() {
+    this.availableGovernorates = getAllGovernorates();
+    this.filteredGovernorates = [...this.availableGovernorates];
+    this.availableCities = getAllCities();
+    this.filteredCities = [...this.availableCities];
+  }
+
+  loadStore() {
+    this.service.getStore(this.storeId).subscribe(response => {
+      this.store = response;
+      this.form.patchValue({
+        name: response?.name,
+        description: response?.description,
+        phone: response?.phone,
+        email: response?.email,
+        site: response?.site,
+        country: response?.address?.country,
+        state: response?.address?.state,
+        city: response?.address?.city,
+        street: response?.address?.street,
+        postalCode: response?.address?.postalCode,
+        logo: response?.logo,
+        isVisibleToPublic: response?.isVisibleToPublic,
+        isSupportingDeliveries: response?.isSupportingDeliveries
+      });
+
+      // Set autocomplete text values
+      this.governorateSearchText = response?.address?.state || '';
+      this.citySearchText = response?.address?.city || '';
+
+      // Update available cities based on governorate
+      if (this.governorateSearchText) {
+        this.availableCities = getCitiesForGovernorate(this.governorateSearchText);
+        this.filteredCities = [...this.availableCities];
+      }
+    });
   }
 
   initForm() {
@@ -72,82 +117,195 @@ export class StoreAddComponent implements OnInit {
     });
   }
 
+  // ========================================
+  // Governorate Autocomplete
+  // ========================================
+  normalizeText(text: string): string {
+    return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  onGovernorateSearch() {
+    const searchTerm = this.normalizeText(this.governorateSearchText.trim());
+    if (!searchTerm) {
+      this.filteredGovernorates = [...this.availableGovernorates];
+      this.form.patchValue({ state: '' });
+      this.availableCities = getAllCities();
+      this.filteredCities = [...this.availableCities];
+    } else {
+      this.filteredGovernorates = this.availableGovernorates.filter(gov =>
+        this.normalizeText(gov).includes(searchTerm)
+      );
+    }
+    this.showGovernorateSuggestions = true;
+  }
+
+  selectGovernorate(governorate: string) {
+    this.governorateSearchText = governorate;
+    this.form.patchValue({ state: governorate });
+    this.showGovernorateSuggestions = false;
+
+    // Update cities based on selected governorate
+    this.availableCities = getCitiesForGovernorate(governorate);
+    this.filteredCities = [...this.availableCities];
+    this.citySearchText = '';
+    this.form.patchValue({ city: '' });
+  }
+
+  toggleGovernorateSuggestions() {
+    this.showGovernorateSuggestions = !this.showGovernorateSuggestions;
+    if (this.showGovernorateSuggestions) {
+      this.filteredGovernorates = [...this.availableGovernorates];
+    }
+  }
+
+  hideGovernorateSuggestionsDelayed() {
+    setTimeout(() => {
+      this.showGovernorateSuggestions = false;
+    }, 200);
+  }
+
+  // ========================================
+  // City Autocomplete
+  // ========================================
+  onCitySearch() {
+    const searchTerm = this.normalizeText(this.citySearchText.trim());
+    if (!searchTerm) {
+      this.filteredCities = [...this.availableCities];
+      this.form.patchValue({ city: '' });
+    } else {
+      this.filteredCities = this.availableCities.filter(city =>
+        this.normalizeText(city).includes(searchTerm)
+      );
+    }
+    this.showCitySuggestions = true;
+  }
+
+  selectCity(city: string) {
+    this.citySearchText = city;
+    this.form.patchValue({ city: city });
+    this.showCitySuggestions = false;
+  }
+
+  toggleCitySuggestions() {
+    this.showCitySuggestions = !this.showCitySuggestions;
+    if (this.showCitySuggestions) {
+      this.filteredCities = [...this.availableCities];
+    }
+  }
+
+  hideCitySuggestionsDelayed() {
+    setTimeout(() => {
+      this.showCitySuggestions = false;
+    }, 200);
+  }
+
+  // ========================================
+  // File Upload
+  // ========================================
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      this.selectedFileName = file.name;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.logoPreview = e.target.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // ========================================
+  // Save / Edit
+  // ========================================
   save() {
     let fileName = null;
-    if (this.fileInput.nativeElement.files[0])
-      fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + this.fileInput.nativeElement.files[0]?.name.substring(this.fileInput.nativeElement.files[0].name.lastIndexOf('.'))
+    if (this.fileInput.nativeElement.files[0]) {
+      fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() +
+        this.fileInput.nativeElement.files[0]?.name.substring(
+          this.fileInput.nativeElement.files[0].name.lastIndexOf('.')
+        );
+    }
+
     if (this.form.valid) {
-      this.loadingService.screenLoading()
-      if (this.fileInput.nativeElement.files[0])
-        this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(
-          response => {
-            const logo = response.fileUrl.split('/').pop();
-            this.service.addStore({ ...this.form.getRawValue(), logo: logo, userId: this.authService.getConnectedUser().id }).subscribe(
-              response => {
-                console.log("TEST ==== 1")
-                this.authService.refreshToken().subscribe(response => {
-                  localStorage.setItem('accessToken', response.accessToken);
-                  this.loadingService.screenLoaded()
-                  console.log("TEST ==== 2")
-                  this.authService.loggedIn.next();
-                  setTimeout(() => {
-                    this.router.navigate(['stores/view']);
-                  }, 1000);
-                })
-              }
-            )
-          }
-        )
-      else
-        this.service.addStore({ ...this.form.getRawValue(), userId: this.authService.getConnectedUser().id }).subscribe(
-          response => {
-            console.log("TEST ==== 3")
+      this.loadingService.screenLoading();
+      if (this.fileInput.nativeElement.files[0]) {
+        this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(response => {
+          const logo = response.fileUrl.split('/').pop();
+          this.service.addStore({
+            ...this.form.getRawValue(),
+            logo: logo,
+            userId: this.authService.getConnectedUser().id
+          }).subscribe(response => {
             this.authService.refreshToken().subscribe(response => {
               localStorage.setItem('accessToken', response.accessToken);
-              this.loadingService.screenLoaded()
-              console.log("TEST ==== 4")
+              this.loadingService.screenLoaded();
               this.authService.loggedIn.next();
               setTimeout(() => {
-                this.router.navigate(['stores/view']);
+                this.router.navigate(['admin/stores/view']);
               }, 1000);
-            })
-          }
-        )
+            });
+          });
+        });
+      } else {
+        this.service.addStore({
+          ...this.form.getRawValue(),
+          userId: this.authService.getConnectedUser().id
+        }).subscribe(response => {
+          this.authService.refreshToken().subscribe(response => {
+            localStorage.setItem('accessToken', response.accessToken);
+            this.loadingService.screenLoaded();
+            this.authService.loggedIn.next();
+            setTimeout(() => {
+              this.router.navigate(['admin/stores/view']);
+            }, 1000);
+          });
+        });
+      }
     }
   }
 
   edit() {
     let fileName = null;
-    if (this.fileInput.nativeElement.files[0])
-      fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + this.fileInput.nativeElement.files[0]?.name.substring(this.fileInput.nativeElement.files[0].name.lastIndexOf('.'))
+    if (this.fileInput.nativeElement.files[0]) {
+      fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() +
+        this.fileInput.nativeElement.files[0]?.name.substring(
+          this.fileInput.nativeElement.files[0].name.lastIndexOf('.')
+        );
+    }
+
     if (this.form.valid) {
-      this.loadingService.screenLoading()
-      if (this.fileInput.nativeElement.files[0])
-        this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(
-          response => {
-            const logo = response.fileUrl.split('/').pop();
-            this.service.updateStore({ ...this.form.getRawValue(), id: this.store.id, logo: logo, userId: this.authService.getConnectedUser().id }).subscribe(
-              response => {
-                this.loadingService.screenLoaded()
-                this.router.navigate(['stores/view'])
-              }
-            )
-          }
-        )
-      else
-        this.service.updateStore({ ...this.form.getRawValue(), id: this.store.id, userId: this.authService.getConnectedUser().id }).subscribe(
-          response => {
-            this.loadingService.screenLoaded()
-            this.router.navigate(['stores/view'])
-          }
-        )
+      this.loadingService.screenLoading();
+      if (this.fileInput.nativeElement.files[0]) {
+        this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(response => {
+          const logo = response.fileUrl.split('/').pop();
+          this.service.updateStore({
+            ...this.form.getRawValue(),
+            id: this.store.id,
+            logo: logo,
+            userId: this.authService.getConnectedUser().id
+          }).subscribe(response => {
+            this.loadingService.screenLoaded();
+            this.router.navigate(['admin/stores/view']);
+          });
+        });
+      } else {
+        this.service.updateStore({
+          ...this.form.getRawValue(),
+          id: this.store.id,
+          userId: this.authService.getConnectedUser().id
+        }).subscribe(response => {
+          this.loadingService.screenLoaded();
+          this.router.navigate(['admin/stores/view']);
+        });
+      }
     }
   }
 
-
-  uploadLogo(imageBlob, fileName) {
+  uploadLogo(imageBlob: File, fileName: string) {
     const file = new FormData();
-    file.set('file', imageBlob, fileName)
-    return this.fileService.uploadFile(file)
+    file.set('file', imageBlob, fileName);
+    return this.fileService.uploadFile(file);
   }
 }

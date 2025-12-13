@@ -1,41 +1,504 @@
-.form-container {
-    padding-top: 100px;
-    padding-bottom: 100px;
+// Variables
+$primary: #3f51b5;
+$primary-dark: #303f9f;
+$primary-light: rgba(63, 81, 181, 0.1);
+$success: #2e7d32;
+$warning: #f57c00;
+$danger: #c62828;
+$text-primary: #2c3e50;
+$text-secondary: #7f8c8d;
+$border-color: #e8ecef;
+$background: #f5f7fa;
+$white: #ffffff;
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 20px rgba(0, 0, 0, 0.1);
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+
+.store-form-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px 20px 60px;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    @media (max-width: 768px) {
+        padding: 20px 15px 40px;
+    }
 }
 
-textarea {
-    resize: none;
-}
+// ============================================
+// FORM HEADER
+// ============================================
+.form-header {
+    background: linear-gradient(135deg, rgba(26, 35, 126, 0.95) 0%, rgba(63, 81, 181, 0.9) 100%);
+    border-radius: $radius-lg;
+    padding: 35px;
+    margin-bottom: 30px;
+    color: $white;
 
-.padding-page {
-    padding: 0 20rem 1rem 20rem;
-}
+    .header-content {
+        display: flex;
+        align-items: center;
+        gap: 20px;
 
-@media screen and (max-width: 1500px) {
-    .padding-page {
-        padding: 20px 50px 150px 50px;
-
+        @media (max-width: 576px) {
+            flex-direction: column;
+            text-align: center;
+        }
     }
 
-    .title {
+    .header-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        flex-shrink: 0;
+    }
+
+    .header-text {
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0 0 8px;
+
+            @media (max-width: 576px) {
+                font-size: 1.5rem;
+            }
+        }
+
+        p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+    }
+}
+
+// ============================================
+// FORM CARDS
+// ============================================
+.form-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-card {
+    background: $white;
+    border-radius: $radius-md;
+    border: 1px solid $border-color;
+    overflow: visible;
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 20px 25px;
+        background: $background;
+        border-bottom: 1px solid $border-color;
+
+        i {
+            font-size: 1.1rem;
+            color: $primary;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            color: $text-primary;
+        }
+    }
+
+    .card-body {
+        padding: 25px;
+        overflow: visible;
+    }
+}
+
+// ============================================
+// FORM ELEMENTS
+// ============================================
+.form-row {
+    margin-bottom: 20px;
+    overflow: visible;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    &.two-columns {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+
+        @media (max-width: 576px) {
+            grid-template-columns: 1fr;
+        }
+    }
+}
+
+.form-group {
+    overflow: visible;
+    position: relative;
+
+    &.full-width {
         width: 100%;
-        text-align: center;
-        padding: 20px 0 0 0;
-        font-size: 30px;
+    }
+
+    label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: $text-primary;
+        margin-bottom: 10px;
+
+        i {
+            color: $primary;
+            font-size: 0.85rem;
+        }
+
+        .required {
+            color: $danger;
+        }
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="url"],
+    textarea {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid $border-color;
+        border-radius: $radius-sm;
+        font-size: 0.95rem;
+        font-family: inherit;
+        transition: all 0.2s;
+        background: $white;
+
+        &::placeholder {
+            color: lighten($text-secondary, 15%);
+        }
+
+        &:focus {
+            outline: none;
+            border-color: $primary;
+            box-shadow: 0 0 0 3px $primary-light;
+        }
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .error-message {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 8px;
+        font-size: 0.85rem;
+        color: $danger;
+
+        i {
+            font-size: 0.8rem;
+        }
+    }
+
+    .char-count {
+        display: block;
+        text-align: right;
+        margin-top: 8px;
+        font-size: 0.8rem;
+        color: $text-secondary;
     }
 }
 
-@media screen and (max-width: 600px) {
-    .padding-page {
-        padding: 20px 20px 0 20px;
-        
-        font-size: small !important;
+// ============================================
+// AUTOCOMPLETE DROPDOWN
+// ============================================
+.autocomplete-wrapper {
+    position: relative;
+
+    input {
+        padding-right: 40px;
     }
 
-    .title {
-        width: 100%;
+    .dropdown-icon {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: $text-secondary;
+        cursor: pointer;
+        transition: color 0.2s;
+
+        &:hover {
+            color: $primary;
+        }
+    }
+
+    .suggestions-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: $white;
+        border: 1px solid $border-color;
+        border-top: none;
+        border-radius: 0 0 $radius-sm $radius-sm;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 100;
+        box-shadow: $shadow-md;
+
+        .suggestion-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+
+            &:hover {
+                background: $primary-light;
+                color: $primary;
+            }
+        }
+    }
+}
+
+// ============================================
+// FILE UPLOAD
+// ============================================
+.file-upload-wrapper {
+    position: relative;
+
+    input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    .file-upload-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 30px;
+        border: 2px dashed $border-color;
+        border-radius: $radius-md;
         text-align: center;
-        padding: 20px 0 0 0;
-        font-size: 30px;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: $primary;
+            background: $primary-light;
+        }
+
+        .upload-icon {
+            font-size: 2rem;
+            color: $primary;
+        }
+
+        .upload-text {
+            font-size: 0.95rem;
+            color: $text-primary;
+            font-weight: 500;
+        }
+
+        .upload-hint {
+            font-size: 0.8rem;
+            color: $text-secondary;
+        }
+    }
+}
+
+.logo-preview {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+    padding: 15px;
+    background: $background;
+    border-radius: $radius-sm;
+
+    img {
+        width: 60px;
+        height: 60px;
+        border-radius: $radius-sm;
+        object-fit: contain;
+        background: $white;
+        border: 1px solid $border-color;
+    }
+
+    span {
+        font-size: 0.9rem;
+        color: $text-secondary;
+    }
+}
+
+// ============================================
+// TOGGLE SETTINGS
+// ============================================
+.settings-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.toggle-setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background: $background;
+    border-radius: $radius-sm;
+
+    @media (max-width: 576px) {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .toggle-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+
+        @media (max-width: 576px) {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .setting-icon {
+            font-size: 1.3rem;
+            color: $primary;
+        }
+
+        .toggle-text {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+
+            .toggle-title {
+                font-size: 0.95rem;
+                font-weight: 600;
+                color: $text-primary;
+            }
+
+            .toggle-desc {
+                font-size: 0.85rem;
+                color: $text-secondary;
+            }
+        }
+    }
+}
+
+.toggle-switch {
+    position: relative;
+    width: 56px;
+    height: 30px;
+
+    input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+
+        &:checked+.toggle-slider {
+            background-color: $success;
+
+            &::before {
+                transform: translateX(26px);
+            }
+        }
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background-color: #ccc;
+        border-radius: 30px;
+        transition: 0.3s;
+
+        &::before {
+            content: '';
+            position: absolute;
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: $white;
+            border-radius: 50%;
+            transition: 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+    }
+}
+
+// ============================================
+// FORM ACTIONS
+// ============================================
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid $border-color;
+
+    @media (max-width: 576px) {
+        flex-direction: column;
+    }
+
+    button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px 28px;
+        border-radius: $radius-sm;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+
+        @media (max-width: 576px) {
+            width: 100%;
+        }
+    }
+
+    .btn-cancel {
+        background: $background;
+        color: $text-secondary;
+
+        &:hover {
+            background: darken($background, 5%);
+        }
+    }
+
+    .btn-submit {
+        background: $primary;
+        color: $white;
+
+        &:hover:not(:disabled) {
+            background: $primary-dark;
+            transform: translateY(-2px);
+            box-shadow: $shadow-md;
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
     }
 }

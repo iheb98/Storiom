@@ -1,117 +1,230 @@
-<div class="padding-page">
-    <div class="row title-bloc">
-        <h2 class="title">
-            {{ storeId ? 'Modifier la boutique' : 'Créer votre boutique' }}
-        </h2>
+<div class="store-form-container">
+    <!-- Header -->
+    <div class="form-header">
+        <div class="header-content">
+            <div class="header-icon">
+                <i class="fa" [class.fa-store]="!storeId" [class.fa-edit]="storeId"></i>
+            </div>
+            <div class="header-text">
+                <h1>{{ storeId ? 'Modifier la boutique' : 'Créer votre boutique' }}</h1>
+                <p>{{ storeId ? 'Mettez à jour les informations de votre boutique' : 'Remplissez les informations pour
+                    créer votre boutique' }}</p>
+            </div>
+        </div>
     </div>
-    <form class="form-container" [formGroup]="form" (ngSubmit)="storeId ? edit() : save()">
-        <div class="row">
 
-            <div class="col-lg-12">
-
-                <div class="mb-3">
-                    <label for="name" class="form-label">Nom de la boutique<span class="form-error">*</span></label>
-                    <input type="text" class="form-control" id="name" formControlName="name">
-                    <div
-                        *ngIf="form.controls['name'].invalid && (form.controls['name'].dirty || form.controls['name'].touched)">
-                        <div *ngIf="form.controls['name'].errors.required" class="form-error">
-                            Le nom est obligatoire.
+    <form [formGroup]="form" (ngSubmit)="storeId ? edit() : save()">
+        <div class="form-sections">
+            <!-- Store Information Section -->
+            <div class="form-card">
+                <div class="card-header">
+                    <i class="fa fa-info-circle"></i>
+                    <h2>Informations générales</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="name">
+                                Nom de la boutique <span class="required">*</span>
+                            </label>
+                            <input type="text" id="name" formControlName="name" placeholder="Ex: Ma Super Boutique">
+                            <div class="error-message"
+                                *ngIf="form.controls['name'].invalid && (form.controls['name'].dirty || form.controls['name'].touched)">
+                                <i class="fa fa-exclamation-circle"></i>
+                                Le nom est obligatoire.
+                            </div>
                         </div>
                     </div>
-                </div>
-                <!--<div class="mb-3">
-                    <label for="phone" class="form-label">Type <span class="form-error">*</span></label>
-                    <ng-select formControlName="storeType" name="storeType" id="storeType">
-                        <ng-option *ngFor="let element of storeTypes" [value]="element">{{element}}</ng-option>
-                    </ng-select>
-                    <div
-                        *ngIf="form.controls['storeType'].invalid && (form.controls['storeType'].dirty || form.controls['storeType'].touched)">
-                        <div *ngIf="form.controls['storeType'].errors.required" class="form-error">
-                            Le type est obligatoire.
+
+                    <div class="form-row two-columns">
+                        <div class="form-group">
+                            <label for="phone">
+                                <i class="fa fa-phone"></i> Téléphone
+                            </label>
+                            <input type="tel" id="phone" formControlName="phone" placeholder="Ex: +216 XX XXX XXX">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">
+                                <i class="fa fa-envelope"></i> Email
+                            </label>
+                            <input type="email" id="email" formControlName="email"
+                                placeholder="Ex: contact@boutique.com">
                         </div>
                     </div>
-                </div>-->
-                <div class="mb-3">
-                    <label for="phone" class="form-label">Téléphone</label>
-                    <input type="text" class="form-control" id="phone" formControlName="phone">
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">Adresse mail</label>
-                    <input type="text" class="form-control" id="email" formControlName="email">
-                </div>
-                <div class="mb-3">
-                    <label for="site" class="form-label">Site web</label>
-                    <input type="text" class="form-control" id="site" formControlName="site">
-                </div>
-                <!--<div class="mb-3">
-                    <label for="country" class="form-label">Pays</label>
-                    <input type="text" class="form-control" id="country" formControlName="country">
-                </div>-->
-                <div class="mb-3">
-                    <label for="state" class="form-label">Etat</label>
-                    <input type="text" class="form-control" id="state" formControlName="state">
-                </div>
-                <div class="mb-3">
-                    <label for="city" class="form-label">Cité</label>
-                    <input type="text" class="form-control" id="city" formControlName="city">
-                </div>
-                <!--<div class="mb-3">
-                    <label for="postalCode" class="form-label">Code postal</label>
-                    <input type="text" class="form-control" id="postalCode" formControlName="postalCode">
-                </div>-->
-                <div class="mb-3">
-                    <label for="street" class="form-label">Rue</label>
-                    <input type="text" class="form-control" id="street" formControlName="street">
-                </div>
-                <div class="mb-3">
-                    <label for="logo" class="form-label">Logo</label>
-                    <input #fileInput type="file" class="form-control">
-                </div>
 
-            </div>
-
-            <div class="col-lg-12">
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-check form-switch" style="padding-left: 2.5em;">
-                            <input class="form-check-input" type="checkbox" id="isVisibleToPublic"
-                                formControlName="isVisibleToPublic" style="width: 3em; height: 1.5em;">
-                            <label class="form-check-label ms-2" for="isVisibleToPublic"
-                                style="font-size: 1.1em; padding-top: 2px;">Visible au public</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <div class="form-check form-switch" style="padding-left: 2.5em;">
-                            <input class="form-check-input" type="checkbox" id="isSupportingDeliveries"
-                                formControlName="isSupportingDeliveries" style="width: 3em; height: 1.5em;">
-                            <label class="form-check-label ms-2" for="isSupportingDeliveries"
-                                style="font-size: 1.1em; padding-top: 2px;">Supporte la livraison</label>
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="site">
+                                <i class="fa fa-globe"></i> Site web
+                            </label>
+                            <input type="url" id="site" formControlName="site" placeholder="Ex: www.maboutique.com">
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-12">
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea maxlength="50000" rows="10" resize="none" class="form-control"
-                        formControlName="description" id="description">
-                    </textarea>
+
+            <!-- Address Section -->
+            <div class="form-card">
+                <div class="card-header">
+                    <i class="fa fa-map-marker-alt"></i>
+                    <h2>Adresse de la boutique</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-row two-columns">
+                        <!-- Governorate Autocomplete -->
+                        <div class="form-group">
+                            <label for="state">
+                                <i class="fa fa-map"></i> Gouvernorat
+                            </label>
+                            <div class="autocomplete-wrapper">
+                                <input type="text" id="state" [(ngModel)]="governorateSearchText"
+                                    [ngModelOptions]="{standalone: true}" (input)="onGovernorateSearch()"
+                                    (focus)="showGovernorateSuggestions = true"
+                                    (blur)="hideGovernorateSuggestionsDelayed()"
+                                    placeholder="Rechercher un gouvernorat..." autocomplete="off">
+                                <i class="fa fa-chevron-down dropdown-icon"
+                                    (click)="toggleGovernorateSuggestions()"></i>
+                                <div class="suggestions-dropdown"
+                                    *ngIf="showGovernorateSuggestions && filteredGovernorates.length > 0">
+                                    <div class="suggestion-item" *ngFor="let gov of filteredGovernorates"
+                                        (mousedown)="selectGovernorate(gov)">
+                                        {{ gov }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- City Autocomplete -->
+                        <div class="form-group">
+                            <label for="city">
+                                <i class="fa fa-city"></i> Ville / Délégation
+                            </label>
+                            <div class="autocomplete-wrapper">
+                                <input type="text" id="city" [(ngModel)]="citySearchText"
+                                    [ngModelOptions]="{standalone: true}" (input)="onCitySearch()"
+                                    (focus)="showCitySuggestions = true" (blur)="hideCitySuggestionsDelayed()"
+                                    placeholder="Rechercher une ville..." autocomplete="off">
+                                <i class="fa fa-chevron-down dropdown-icon" (click)="toggleCitySuggestions()"></i>
+                                <div class="suggestions-dropdown"
+                                    *ngIf="showCitySuggestions && filteredCities.length > 0">
+                                    <div class="suggestion-item" *ngFor="let city of filteredCities"
+                                        (mousedown)="selectCity(city)">
+                                        {{ city }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="street">
+                                <i class="fa fa-road"></i> Rue / Adresse complète
+                            </label>
+                            <input type="text" id="street" formControlName="street"
+                                placeholder="Ex: 123 Avenue Habib Bourguiba">
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-lg-12">
-                    <button type="submit" class="btn btn-primary" *ngIf="!storeId">Ajouter</button>
+            <!-- Logo & Settings Section -->
+            <div class="form-card">
+                <div class="card-header">
+                    <i class="fa fa-cog"></i>
+                    <h2>Logo et paramètres</h2>
                 </div>
-                <div class="col-lg-12">
-                    <button type="submit" class="btn btn-primary" *ngIf="storeId">Modifier</button>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="logo">
+                                <i class="fa fa-image"></i> Logo de la boutique
+                            </label>
+                            <div class="file-upload-wrapper">
+                                <input #fileInput type="file" id="logo" accept="image/*"
+                                    (change)="onFileSelected($event)">
+                                <div class="file-upload-content">
+                                    <div class="upload-icon">
+                                        <i class="fa fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <span class="upload-text">
+                                        {{ selectedFileName || 'Cliquez pour sélectionner une image' }}
+                                    </span>
+                                    <span class="upload-hint">PNG, JPG jusqu'à 5MB</span>
+                                </div>
+                            </div>
+                            <div class="logo-preview" *ngIf="logoPreview || (storeId && store?.logo)">
+                                <img [src]="logoPreview || (backend_URL + '/' + store?.logo)" alt="Logo preview">
+                                <span>Aperçu du logo</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-grid">
+                        <div class="toggle-setting">
+                            <div class="toggle-info">
+                                <i class="fa fa-eye setting-icon"></i>
+                                <div class="toggle-text">
+                                    <span class="toggle-title">Visible au public</span>
+                                    <span class="toggle-desc">Votre boutique sera visible sur le marketplace</span>
+                                </div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" formControlName="isVisibleToPublic">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-setting">
+                            <div class="toggle-info">
+                                <i class="fa fa-truck setting-icon"></i>
+                                <div class="toggle-text">
+                                    <span class="toggle-title">Supporte la livraison</span>
+                                    <span class="toggle-desc">Vous proposez la livraison à domicile</span>
+                                </div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" formControlName="isSupportingDeliveries">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <!-- Description Section -->
+            <div class="form-card">
+                <div class="card-header">
+                    <i class="fa fa-align-left"></i>
+                    <h2>Description</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="description">
+                                Décrivez votre boutique
+                            </label>
+                            <textarea id="description" formControlName="description" rows="6"
+                                placeholder="Présentez votre boutique, vos produits, vos valeurs..."></textarea>
+                            <span class="char-count">
+                                {{ form.get('description').value?.length || 0 }} / 50000 caractères
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" routerLink="/admin/stores/view" *ngIf="storeId">
+                <i class="fa fa-times"></i> Annuler
+            </button>
+            <button type="submit" class="btn-submit" [disabled]="form.invalid">
+                <i class="fa" [class.fa-plus]="!storeId" [class.fa-save]="storeId"></i>
+                {{ storeId ? 'Enregistrer les modifications' : 'Créer la boutique' }}
+            </button>
         </div>
     </form>
 </div>
