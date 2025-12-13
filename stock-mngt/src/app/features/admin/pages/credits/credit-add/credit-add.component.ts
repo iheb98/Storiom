@@ -127,4 +127,8 @@ export class CreditAddComponent implements OnInit {
     }
   }
 
+  navigateTo(link: string) {
+    this.router.navigate([link])
+  }
 }
+

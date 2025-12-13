@@ -1,159 +1,186 @@
-<mat-dialog-content class="mat-typography">
+<div class="add-product-dialog">
+    <!-- Dialog Header -->
+    <div class="dialog-header">
+        <div class="header-content">
+            <i class="fa fa-box"></i>
+            <div>
+                <h2>{{ productId ? 'Modifier' : 'Ajouter' }} un produit</h2>
+                <p>Renseignez les informations du produit</p>
+            </div>
+        </div>
+        <button class="close-btn" mat-dialog-close>
+            <i class="fa fa-times"></i>
+        </button>
+    </div>
 
-    <div class="padding-page">
-        <form [formGroup]="form" (ngSubmit)="productId ? update() : create() ">
-            <div class="row justify-content-center">
-                <div class="col-12 col-sm-12 col-md-12 col-lg-12 login-block">
-                    <div class="mb-3 row">
-                        <label for="name" class="col-12 col-sm-12 col-md-3 col-lg-12 col-form-label">Nom</label>
-                        <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                            <input type="text" [ngClass]="{'invalid':submitted && !form.get('name').value}"
-                                class="form-control" id="name" formControlName="name">
-                            <div *ngIf="submitted && !form.get('name').value" class="form-error">
-                                Le nom est obligatoire.
-                            </div>
-                        </div>
-                    </div>
-                    <!--<div class="mb-3 row">
-                    <label for="color" class="col-12 col-sm-12 col-md-3 col-lg-12 col-form-label">Couleur</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <ng-select formControlName="color" name="color" id="color">
-                            <ng-option *ngFor="let element of colors" [value]="element">{{element}}</ng-option>
+    <!-- Dialog Content -->
+    <div class="dialog-content" mat-dialog-content>
+        <form [formGroup]="form" (ngSubmit)="productId ? update() : create()">
+            <!-- Product Name -->
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="name">
+                        <i class="fa fa-tag"></i> Nom du produit <span class="required">*</span>
+                    </label>
+                    <input type="text" id="name" formControlName="name" placeholder="Ex: iPhone 15 Pro Max"
+                        [class.invalid]="submitted && !form.get('name').value">
+                    <span class="error-message" *ngIf="submitted && !form.get('name').value">
+                        Le nom est obligatoire
+                    </span>
+                </div>
+            </div>
+
+            <!-- Category & Details -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fa fa-folder"></i> Classification</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="supplier"><i class="fa fa-truck"></i> Fournisseur</label>
+                        <ng-select formControlName="supplierId" id="supplier" placeholder="Sélectionner...">
+                            <ng-option *ngFor="let element of suppliers" [value]="element?.id">
+                                {{ element.firstName + ' ' + element.lastName }}
+                            </ng-option>
                         </ng-select>
                     </div>
-                </div>-->
-
-                    <div class="mb-3 row">
-                        <label for="supplier"
-                            class="col-12 col-sm-12 col-md-3 col-lg-12 col-form-label">Fournisseur</label>
-                        <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                            <ng-select formControlName="supplierId" name="supplier" id="supplier">
-                                <ng-option *ngFor="let element of suppliers" [value]="element?.id">{{element.firstName +
-                                    ' '
-                                    +
-                                    element.lastName}}</ng-option>
-                            </ng-select>
-                        </div>
-                    </div>
-
-                    <div class="mb-3 row">
-                        <label for="brand" class="col-12 col-sm-12 col-md-3 col-lg-12 col-form-label">Marque</label>
-                        <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                            <ng-select formControlName="brandId" name="brand" id="brand">
-                                <ng-option *ngFor="let element of brands"
-                                    [value]="element?.id">{{element.name}}</ng-option>
-                            </ng-select>
-                        </div>
-                    </div>
-
-                    <div class="mb-3 row">
-                        <label for="category"
-                            class="col-12 col-sm-12 col-md-3 col-lg-12 col-form-label">Catégorie</label>
-                        <div class="col-11 col-sm-11 col-md-8 col-lg-9" *ngIf="edit && !editCategory">
-                            <input type="text" class="form-control" [(ngModel)]="selectedCategory"
-                                [ngModelOptions]="{standalone: true}" disabled>
-                        </div>
-                        <div class="col-1 col-sm-1 col-md-1 col-lg-1 p-0" *ngIf="edit && !editCategory">
-                            <button (click)="editCategory = true" *ngIf="edit && !editCategory" class="edit-category"
-                                class="h-100 w-100 p-0"><fa-icon [icon]="editIcon"></fa-icon></button>
-                        </div>
-                        <div class="col-12 col-sm-12 col-md-9 col-lg-9" *ngIf="!edit ||editCategory">
-                            <ng-select [(ngModel)]="parentCategory" name="category" id="category"
-                                [ngModelOptions]="{standalone: true}" (change)="categoryChanged(0)">
-                                <ng-option *ngFor="let element of categories"
-                                    [value]="element">{{element.name}}</ng-option>
-                            </ng-select>
-
-                            <ng-select [(ngModel)]="subCategory" name="category" class="category-field" id="subCategory"
-                                *ngIf="parentCategory?.subCategories?.length > 0" [ngModelOptions]="{standalone: true}"
-                                (change)="categoryChanged(1)">
-                                <ng-option *ngFor="let element of parentCategory?.subCategories"
-                                    [value]="element">{{element.name}}</ng-option>
-                            </ng-select>
-
-                            <ng-select [(ngModel)]="subCategory2" name="category" class="category-field"
-                                id="subCategory2" *ngIf="subCategory?.subCategories?.length > 0"
-                                [ngModelOptions]="{standalone: true}" (change)="categoryChanged(2)">
-                                <ng-option *ngFor="let element of subCategory?.subCategories"
-                                    [value]="element">{{element.name}}</ng-option>
-                            </ng-select>
-
-                            <ng-select [(ngModel)]="subCategory3" name="category" class="category-field"
-                                id="subCategory3" *ngIf="subCategory2?.subCategories?.length > 0"
-                                [ngModelOptions]="{standalone: true}" (change)="categoryChanged(3)">
-                                <ng-option *ngFor="let element of subCategory2?.subCategories"
-                                    [value]="element">{{element.name}}</ng-option>
-                            </ng-select>
-
-                            <ng-select [(ngModel)]="subCategory4" name="category" class="category-field"
-                                id="subCategory4" *ngIf="subCategory3?.subCategories?.length > 0"
-                                [ngModelOptions]="{standalone: true}">
-                                <ng-option *ngFor="let element of subCategory3?.subCategories"
-                                    [value]="element">{{element.name}}</ng-option>
-                            </ng-select>
-                        </div>
-                    </div>
-                    <!--<div class="mb-3 row">
-                    <label for="size" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Taille</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="text" class="form-control" id="size" formControlName="size">
+                    <div class="form-group">
+                        <label for="brand"><i class="fa fa-award"></i> Marque</label>
+                        <ng-select formControlName="brandId" id="brand" placeholder="Sélectionner...">
+                            <ng-option *ngFor="let element of brands" [value]="element?.id">
+                                {{ element.name }}
+                            </ng-option>
+                        </ng-select>
                     </div>
                 </div>
-                <div class="mb-3 row">
-                    <label for="quantity" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Quantité</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="number" class="form-control" id="quantity" formControlName="quantity">
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="unit" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Unité</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="text" class="form-control" id="unit" formControlName="unit" placeholder="Piece, Litre, Gramme...">
-                    </div>
-                </div>-->
-                    <div class="mb-3 row">
-                        <label for="buyingPrice" class="col-12 col-sm-12 col-md-3 col-lg-12 col-form-label">Prix
-                            d'achat</label>
-                        <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                            <input type="number" class="form-control" id="buyingPrice" formControlName="buyingPrice">
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="sellingPrice" class="col-12 col-sm-12 col-md-3 col-lg-12 col-form-label">Prix de
-                            vente</label>
-                        <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                            <input type="number" class="form-control" id="sellingPrice" formControlName="sellingPrice">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea maxlength="50000" rows="10" resize="none" class="form-control"
-                            formControlName="description" id="description">
-                    </textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="logo" class="form-label">Images</label>
-                        <div class="row images-bloc">
-                            <div class="col-6 col-md-4" *ngFor="let item of images">
-                                <div class="image-container">
-                                    <button class="delete-button" (click)="deleteImage(item)"><fa-icon
-                                            [icon]="timesIcon"></fa-icon></button>
-                                    <img src="{{environment.backend+'/'+item}}" alt="" class="h-100 w-100">
-                                </div>
-                            </div>
-                        </div>
-                        <input #fileInput type="file" class="form-control" (change)="process($event)"
-                            accept="image/x-png,image/gif,image/jpeg" multiple>
+
+                <div class="form-group">
+                    <label><i class="fa fa-sitemap"></i> Catégorie</label>
+
+                    <!-- Edit Category Display -->
+                    <div class="category-display" *ngIf="edit && !editCategory">
+                        <span class="category-path">{{ selectedCategory || 'Aucune catégorie' }}</span>
+                        <button type="button" class="btn-edit-category" (click)="editCategory = true">
+                            <fa-icon [icon]="editIcon"></fa-icon>
+                        </button>
                     </div>
 
-                    <div class="mb-3 row justify-content-end">
-                        <div class="col-12 col-sm-12 col-lg-auto">
-                            <button type="submit" class="btn btn-primary full-width" *ngIf="!productId">Ajouter</button>
-                            <button type="submit" class="btn btn-primary full-width" *ngIf="productId">Modifier</button>
-                        </div>
+                    <!-- Category Selectors -->
+                    <div class="category-selectors" *ngIf="!edit || editCategory">
+                        <ng-select [(ngModel)]="parentCategory" [ngModelOptions]="{standalone: true}"
+                            placeholder="Catégorie principale" (change)="categoryChanged(0)">
+                            <ng-option *ngFor="let element of categories" [value]="element">
+                                {{ element.name }}
+                            </ng-option>
+                        </ng-select>
+
+                        <ng-select *ngIf="parentCategory?.subCategories?.length > 0" [(ngModel)]="subCategory"
+                            [ngModelOptions]="{standalone: true}" placeholder="Sous-catégorie"
+                            (change)="categoryChanged(1)">
+                            <ng-option *ngFor="let element of parentCategory?.subCategories" [value]="element">
+                                {{ element.name }}
+                            </ng-option>
+                        </ng-select>
+
+                        <ng-select *ngIf="subCategory?.subCategories?.length > 0" [(ngModel)]="subCategory2"
+                            [ngModelOptions]="{standalone: true}" placeholder="Sous-catégorie 2"
+                            (change)="categoryChanged(2)">
+                            <ng-option *ngFor="let element of subCategory?.subCategories" [value]="element">
+                                {{ element.name }}
+                            </ng-option>
+                        </ng-select>
+
+                        <ng-select *ngIf="subCategory2?.subCategories?.length > 0" [(ngModel)]="subCategory3"
+                            [ngModelOptions]="{standalone: true}" placeholder="Sous-catégorie 3"
+                            (change)="categoryChanged(3)">
+                            <ng-option *ngFor="let element of subCategory2?.subCategories" [value]="element">
+                                {{ element.name }}
+                            </ng-option>
+                        </ng-select>
+
+                        <ng-select *ngIf="subCategory3?.subCategories?.length > 0" [(ngModel)]="subCategory4"
+                            [ngModelOptions]="{standalone: true}" placeholder="Sous-catégorie 4">
+                            <ng-option *ngFor="let element of subCategory3?.subCategories" [value]="element">
+                                {{ element.name }}
+                            </ng-option>
+                        </ng-select>
                     </div>
                 </div>
             </div>
+
+            <!-- Pricing -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fa fa-coins"></i> Prix</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="buyingPrice"><i class="fa fa-arrow-down text-danger"></i> Prix d'achat</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="buyingPrice" formControlName="buyingPrice" placeholder="0.00">
+                            <span class="suffix">DT</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sellingPrice"><i class="fa fa-arrow-up text-success"></i> Prix de vente</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="sellingPrice" formControlName="sellingPrice" placeholder="0.00">
+                            <span class="suffix">DT</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profit-indicator" *ngIf="form.get('buyingPrice').value && form.get('sellingPrice').value">
+                    <i class="fa fa-chart-line"></i>
+                    <span>Marge: <strong>{{ (form.get('sellingPrice').value - form.get('buyingPrice').value) |
+                            number:'1.2-2' }} DT</strong></span>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="description"><i class="fa fa-align-left"></i> Description</label>
+                    <textarea id="description" formControlName="description" rows="4"
+                        placeholder="Décrivez votre produit..."></textarea>
+                </div>
+            </div>
+
+            <!-- Images -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fa fa-images"></i> Images
+                    <span class="image-count">{{ images?.length || 0 }}/3</span>
+                </h3>
+
+                <div class="images-grid" *ngIf="images?.length > 0">
+                    <div class="image-preview" *ngFor="let item of images">
+                        <img [src]="environment.backend + '/' + item" alt="Product image">
+                        <button type="button" class="delete-image" (click)="deleteImage(item)">
+                            <fa-icon [icon]="timesIcon"></fa-icon>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="upload-zone">
+                    <input #fileInput type="file" id="fileUpload" (change)="process($event)"
+                        accept="image/x-png,image/gif,image/jpeg" multiple hidden>
+                    <label for="fileUpload" class="upload-label">
+                        <i class="fa fa-cloud-upload-alt"></i>
+                        <span>Ajouter des images</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Submit Button (hidden, triggered by dialog action) -->
+            <button type="submit" hidden #submitBtn></button>
         </form>
     </div>
-</mat-dialog-content>
+
+    <!-- Dialog Actions -->
+    <div class="dialog-actions" mat-dialog-actions>
+        <button type="button" class="btn-cancel" mat-dialog-close>Annuler</button>
+        <button type="button" class="btn-submit" (click)="productId ? update() : create()">
+            <i class="fa" [class.fa-plus]="!productId" [class.fa-save]="productId"></i>
+            {{ productId ? 'Enregistrer' : 'Ajouter le produit' }}
+        </button>
+    </div>
+</div>

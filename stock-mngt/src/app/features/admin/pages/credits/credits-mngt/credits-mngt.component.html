@@ -1,117 +1,137 @@
-<ngx-loading-x [show]="loading" [spinnerColor]="'#0d6efd'"></ngx-loading-x>
-<div class="padding-page">
-    <div class="row title-bloc">
-        <h3 class="title">Gestion des crédits</h3>
+<div class="credits-page">
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Gestion des Crédits</h1>
+            <p>{{ count || 0 }} crédits au total</p>
+        </div>
+        <button class="btn-add" (click)="create()">
+            <i class="fa fa-plus"></i>
+            <span>Nouveau Crédit</span>
+        </button>
+    </header>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+        <button class="btn-filter" [class.active]="!filtersCollapsed" (click)="toggleFilters()">
+            <i class="fa fa-filter"></i>
+            <span>Filtres</span>
+        </button>
+        <button class="btn-reset" (click)="reset()">
+            <i class="fa fa-undo"></i>
+        </button>
     </div>
 
-    <div class="row d-flex">
-        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary toggle-filters d-flex align-items-center" (click)="toggleFilters()">
-                <mat-icon class="me-2">more_vert</mat-icon> Afficher / Masquer les Filtres
-            </button>
+    <!-- Filters Panel -->
+    <div class="filters-panel" [class.collapsed]="filtersCollapsed">
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label><i class="fa fa-user"></i> Prénom</label>
+                <input type="text" [(ngModel)]="firstNameFilter" placeholder="Rechercher...">
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fa fa-user"></i> Nom</label>
+                <input type="text" [(ngModel)]="lastNameFilter" placeholder="Rechercher...">
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fa fa-phone"></i> Téléphone</label>
+                <input type="text" [(ngModel)]="phoneFilter" placeholder="Rechercher...">
+            </div>
+
+            <div class="filter-group range-group">
+                <label><i class="fa fa-coins"></i> Montant</label>
+                <div class="range-inputs">
+                    <input type="number" [(ngModel)]="minAmountFilter" placeholder="Min">
+                    <span class="range-separator">—</span>
+                    <input type="number" [(ngModel)]="maxAmountFilter" placeholder="Max">
+                </div>
+            </div>
+
+            <div class="filter-group range-group">
+                <label><i class="fa fa-calendar-plus"></i> Date de prêt</label>
+                <div class="range-inputs">
+                    <input type="date" [(ngModel)]="fromGivenDateFilter">
+                    <span class="range-separator">—</span>
+                    <input type="date" [(ngModel)]="toGivenDateFilter">
+                </div>
+            </div>
+
+            <div class="filter-group range-group">
+                <label><i class="fa fa-calendar-check"></i> Date de retour</label>
+                <div class="range-inputs">
+                    <input type="date" [(ngModel)]="fromReturnDateFilter">
+                    <span class="range-separator">—</span>
+                    <input type="date" [(ngModel)]="toReturnDateFilter">
+                </div>
+            </div>
         </div>
-        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary add-button d-flex align-items-center" (click)="create()">
-                <mat-icon class="me-2">add</mat-icon> Ajouter
-            </button>
-        </div>
-        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary d-flex align-items-center" (click)="reset()">
-                <mat-icon class="me-2">restart_alt</mat-icon> Réinitialiser
-            </button>
-        </div>
-        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-primary d-flex align-items-center" (click)="filter()">
-                <mat-icon class="me-2">search</mat-icon> Filtrer
+
+        <div class="filters-actions">
+            <button class="btn-apply" (click)="filter()">
+                <i class="fa fa-search"></i> Appliquer les filtres
             </button>
         </div>
     </div>
 
-
-    <div class="filter-section" [ngClass]="{'collapsed': filtersCollapsed}">
-        <div class="row">
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="firstName" class="form-label">Prénom</label>
-                <input type="text" class="form-control" id="firstName" [(ngModel)]="firstNameFilter">
+    <!-- Credits List -->
+    <div class="credits-list" *ngIf="borrowers?.length > 0">
+        <div class="credit-item" *ngFor="let borrower of borrowers">
+            <div class="borrower-avatar">
+                <span>{{ (borrower?.firstName?.charAt(0) || '') + (borrower?.lastName?.charAt(0) || '') }}</span>
             </div>
 
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="lastName" class="form-label">Nom</label>
-                <input type="text" class="form-control" id="lastName" [(ngModel)]="lastNameFilter">
+            <div class="credit-info">
+                <div class="credit-header">
+                    <span class="borrower-name">{{ borrower?.firstName }} {{ borrower?.lastName }}</span>
+                </div>
+                <div class="credit-details">
+                    <span class="detail-item" *ngIf="borrower?.phone">
+                        <i class="fa fa-phone"></i>
+                        {{ borrower?.phone }}
+                    </span>
+                    <span class="detail-item">
+                        <i class="fa fa-calendar-plus"></i>
+                        Prêté: {{ borrower?.givenDate | date:'dd/MM/yyyy' }}
+                    </span>
+                    <span class="detail-item" *ngIf="borrower?.returnDate">
+                        <i class="fa fa-calendar-check"></i>
+                        Retour: {{ borrower?.returnDate | date:'dd/MM/yyyy' }}
+                    </span>
+                </div>
             </div>
 
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="phone" class="form-label">Téléphone</label>
-                <input type="phone" class="form-control" id="phone" [(ngModel)]="phoneFilter">
+            <div class="credit-amount">
+                <span class="amount-value">{{ borrower?.amount | number:'1.2-2' }}</span>
+                <span class="amount-currency">DT</span>
             </div>
 
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="minAmountFilter" class="form-label">Montant</label>
-                <input type="number" class="form-control amount-input" id="minAmountFilter"
-                    [(ngModel)]="minAmountFilter" placeholder="De">
-                <input type="number" class="form-control amount-input" id="maxAmountFilter"
-                    [(ngModel)]="maxAmountFilter" placeholder="Jusqu'à">
-            </div>
-        </div>
-
-        <div class="row">
-
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="fromGivenDateFilter" class="form-label">Date de prête</label>
-                <input type="date" class="form-control amount-input" id="fromGivenDateFilter"
-                    [(ngModel)]="fromGivenDateFilter" placeholder="De">
-                <input type="date" class="form-control amount-input" id="toGivenDateFilter"
-                    [(ngModel)]="toGivenDateFilter" placeholder="Jusqu'à">
-            </div>
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="fromReturnDateFilter" class="form-label">Date de retour</label>
-                <input type="date" class="form-control amount-input" id="fromReturnDateFilter"
-                    [(ngModel)]="fromReturnDateFilter" placeholder="De">
-                <input type="date" class="form-control amount-input" id="toReturnDateFilter"
-                    [(ngModel)]="toReturnDateFilter" placeholder="Jusqu'à">
+            <div class="credit-actions">
+                <button class="btn-action edit" (click)="editBorrower(borrower)" title="Modifier">
+                    <fa-icon [icon]="faEdit"></fa-icon>
+                </button>
+                <button class="btn-action delete" (click)="deleteBorrower(borrower)" title="Supprimer">
+                    <fa-icon [icon]="faTrash"></fa-icon>
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-12 table-bloc">
-            <table class="table table-responsive table-hover ">
-                <thead>
-                    <tr>
-                        <th scope="col">Nom et Prénom</th>
-                        <th scope="col">Téléphone</th>
-                        <th scope="col">Montant</th>
-                        <th scope="col">Date de prête</th>
-                        <th scope="col">Date de retour</th>
-                        <th scope="col">Modifier</th>
-                        <th scope="col">Supprimer</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let borrower of borrowers">
-                        <td>{{borrower?.firstName + ' ' + borrower?.lastName}}</td>
-                        <td>{{borrower?.phone}}</td>
-                        <td>{{borrower?.amount + ' DT'}}</td>
-                        <td>{{borrower?.givenDate | date:'shortDate'}}</td>
-                        <td>{{borrower?.returnDate | date:'shortDate'}}</td>
-                        <td>
-                            <button class="action-button" (click)="editBorrower(borrower)"><fa-icon
-                                    [icon]="faEdit"></fa-icon></button>
-                        </td>
-                        <td>
-                            <button class="action-button" (click)="deleteBorrower(borrower)"> <fa-icon
-                                    [icon]="faTrash"></fa-icon></button>
-                        </td>
-                    </tr>
-                    <tr *ngIf="count == 0">
-                        <td colspan="8" class="not-found-message">Pas de crédits trouvé</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
-            [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[5,10,20]" [hidePageSize]="false"
-            [pageIndex]="0" aria-label="Select page">
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="count === 0">
+        <i class="fa fa-hand-holding-usd"></i>
+        <h3>Aucun crédit trouvé</h3>
+        <p>Essayez de modifier vos critères de recherche ou ajoutez un nouveau crédit</p>
+        <button class="btn-add-empty" (click)="create()">
+            <i class="fa fa-plus"></i> Ajouter un crédit
+        </button>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-wrapper" *ngIf="borrowers?.length > 0">
+        <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
+            [showFirstLastButtons]="true" [pageSizeOptions]="[5, 10, 20]" [pageIndex]="0">
         </mat-paginator>
     </div>
 </div>

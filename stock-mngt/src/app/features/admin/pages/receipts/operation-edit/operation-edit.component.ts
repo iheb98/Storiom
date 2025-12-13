@@ -90,4 +90,8 @@ export class OperationEditComponent implements OnInit {
   calculateTotal() {
     this.form.get('total').setValue(this.form.get('price').value * this.form.get('amount').value)
   }
+
+  navigateTo(link: string) {
+    this.router.navigate([link])
+  }
 }

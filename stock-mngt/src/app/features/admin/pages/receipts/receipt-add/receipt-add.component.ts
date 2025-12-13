@@ -225,4 +225,8 @@ export class ReceiptAddComponent implements OnInit {
     return test
   }
 
+  navigateTo(link: string) {
+    this.router.navigate([link])
+  }
+
 }

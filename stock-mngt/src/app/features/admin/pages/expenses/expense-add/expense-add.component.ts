@@ -118,4 +118,8 @@ export class ExpenseAddComponent implements OnInit {
     }
   }
 
+  navigateTo(link: string) {
+    this.router.navigate([link])
+  }
 }
+

@@ -1,73 +1,100 @@
-<ngx-loading-x [show]="loading" [spinnerColor]="'#0d6efd'"></ngx-loading-x>
-<div class="padding-page">
-    <div class="row title-bloc">
-        <h2 class="title">
-            {{ workerId ? 'Modifier' : 'Ajouter'}} un Travailleur
-        </h2>
-    </div>
-    <form [formGroup]="form" (ngSubmit)="workerId ? edit() : create() ">
-        <div class="row justify-content-center">
-            <div class="col-12 col-sm-12 col-md-12 col-lg-6 login-block">
-                <div class="mb-3 row">
-                    <label for="lastName" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Nom</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="text" [ngClass]="{'invalid':submitted && !form.get('lastName').value}"
-                            class="form-control" id="lastName" formControlName="lastName">
-                        <div *ngIf="submitted && !form.get('lastName').value" class="form-error">
-                            Le nom est obligatoire.
+<div class="worker-form-page">
+    <!-- Page Header -->
+    <header class="page-header">
+        <a class="back-link" (click)="navigateTo('/workers')">
+            <i class="fa fa-arrow-left"></i>
+            <span>Retour aux travailleurs</span>
+        </a>
+        <h1>{{ workerId ? 'Modifier' : 'Ajouter' }} un travailleur</h1>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="workerId ? edit() : create()">
+        <div class="form-card">
+            <!-- Personal Info Section -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fa fa-user"></i> Informations personnelles</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">
+                            <i class="fa fa-user"></i> Prénom <span class="required">*</span>
+                        </label>
+                        <input type="text" id="firstName" formControlName="firstName" placeholder="Entrez le prénom..."
+                            [class.invalid]="submitted && !form.get('firstName').value">
+                        <span class="error-message" *ngIf="submitted && !form.get('firstName').value">
+                            Le prénom est obligatoire
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">
+                            <i class="fa fa-user"></i> Nom <span class="required">*</span>
+                        </label>
+                        <input type="text" id="lastName" formControlName="lastName" placeholder="Entrez le nom..."
+                            [class.invalid]="submitted && !form.get('lastName').value">
+                        <span class="error-message" *ngIf="submitted && !form.get('lastName').value">
+                            Le nom est obligatoire
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fa fa-address-book"></i> Coordonnées</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email"><i class="fa fa-envelope"></i> Email</label>
+                        <input type="email" id="email" formControlName="email" placeholder="exemple@email.com"
+                            [class.invalid]="submitted && form.get('email').errors?.pattern">
+                        <span class="error-message" *ngIf="submitted && form.get('email').errors?.pattern">
+                            Format d'email invalide
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone"><i class="fa fa-phone"></i> Téléphone</label>
+                        <input type="tel" id="phone" formControlName="phone" placeholder="+216 XX XXX XXX">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Work Info Section -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fa fa-briefcase"></i> Informations professionnelles</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="functionInStore"><i class="fa fa-id-badge"></i> Fonction</label>
+                        <input type="text" id="functionInStore" formControlName="functionInStore"
+                            placeholder="Ex: Vendeur, Caissier...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="salary"><i class="fa fa-coins"></i> Salaire</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="salary" formControlName="salary" placeholder="0.00">
+                            <span class="suffix">DT</span>
                         </div>
                     </div>
                 </div>
-                <div class="mb-3 row">
-                    <label for="firstName" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Prénom</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="firstName" [ngClass]="{'invalid':submitted && !form.get('firstName').value}"
-                            class="form-control" id="firstName" formControlName="firstName">
-                        <div *ngIf="submitted && !form.get('firstName').value" class="form-error">
-                            Le prénom est obligatoire.
-                        </div>
-                    </div>
+
+                <div class="form-group">
+                    <label for="entryDate"><i class="fa fa-calendar-alt"></i> Date d'entrée</label>
+                    <input type="date" id="entryDate" formControlName="entryDate">
                 </div>
-                <div class="mb-3 row">
-                    <label for="email" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Email</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="email" [ngClass]="{'invalid':submitted && !form.get('email').value || emailError}"
-                            class="form-control" id="email" formControlName="email" email="true">
-                        <div *ngIf="submitted && form.get('email').errors?.pattern" class="form-error">
-                            Mauvaise format d'email
-                        </div>
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="phone" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Téléphone</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="phone" class="form-control" id="phone" formControlName="phone">
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="salary" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Salaire</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="number" class="form-control" id="salary" formControlName="salary">
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="functionInStore" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Fonction</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="text" class="form-control" id="functionInStore" formControlName="functionInStore">
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="entryDate" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Date d'entrée</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="date" class="form-control" formControlName="entryDate" name="entryDate" id="entryDate">
-                    </div>
-                </div>
-                <div class="mb-3 row justify-content-end">
-                    <div class="col-12 col-sm-12 col-lg-auto">
-                        <button type="submit" class="btn btn-primary full-width" *ngIf="!workerId">Ajouter</button>
-                        <button type="submit" class="btn btn-primary full-width" *ngIf="workerId">Modifier</button>
-                    </div>
-                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" (click)="navigateTo('/workers')">Annuler</button>
+                <button type="submit" class="btn-submit" [disabled]="loading">
+                    <i class="fa" [class.fa-plus]="!workerId && !loading" [class.fa-save]="workerId && !loading"
+                        [class.fa-spinner]="loading" [class.fa-spin]="loading"></i>
+                    {{ loading ? 'Enregistrement...' : (workerId ? 'Enregistrer les modifications' : 'Ajouter le
+                    travailleur') }}
+                </button>
             </div>
         </div>
     </form>

@@ -1,134 +1,464 @@
-.amount-input {
-    margin-bottom: 5px;
+// Variables
+$primary: #3f51b5;
+$primary-dark: #303f9f;
+$primary-light: rgba(63, 81, 181, 0.1);
+$success: #2e7d32;
+$success-light: rgba(46, 125, 50, 0.1);
+$warning: #f57c00;
+$warning-light: rgba(245, 124, 0, 0.1);
+$danger: #c62828;
+$danger-light: rgba(198, 40, 40, 0.1);
+$text-primary: #2c3e50;
+$text-secondary: #7f8c8d;
+$border-color: #e8ecef;
+$background: #f5f7fa;
+$white: #ffffff;
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+
+.search-dialog {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
 }
 
-.align-filter-button {
-    text-align: right;
-}
-// ===============
+// ============================================
+// DIALOG HEADER
+// ============================================
+.dialog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+    color: $white;
 
-.card {
-    margin: 20px 0;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    .header-content {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+
+        >i {
+            font-size: 1.5rem;
+            opacity: 0.8;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0 0 4px;
+        }
+
+        p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+    }
+
+    .close-btn {
+        width: 36px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 50%;
+        color: $white;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    }
 }
 
-.selected{
-    border: 2px solid rebeccapurple;
-    box-shadow: 0 0 20px rebeccapurple;
+// ============================================
+// SEARCH SECTION
+// ============================================
+.search-section {
+    display: flex;
+    gap: 10px;
+    padding: 20px 25px;
+    background: $white;
+    border-bottom: 1px solid $border-color;
+
+    .search-input-wrapper {
+        flex: 1;
+        position: relative;
+
+        i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: $text-secondary;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            border: 1px solid $border-color;
+            border-radius: $radius-sm;
+            font-size: 0.95rem;
+            font-family: inherit;
+
+            &:focus {
+                outline: none;
+                border-color: $primary;
+                box-shadow: 0 0 0 3px $primary-light;
+            }
+        }
+    }
+
+    .btn-filter {
+        width: 46px;
+        height: 46px;
+        background: $background;
+        border: 1px solid $border-color;
+        border-radius: $radius-sm;
+        color: $text-secondary;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover,
+        &.active {
+            background: $primary-light;
+            border-color: $primary;
+            color: $primary;
+        }
+    }
 }
 
-.card-header {
-    background-color: #f9f9f9;
-    border-bottom: 1px solid #e8e8e8;
-    font-size: 18px;
-    font-weight: bold;
-    padding: 15px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-}
-.product-info{
-    margin-bottom:10px;
-}
-.product-info label{
-    color:gray;
-    font-weight: bold;
-    margin-right:10px;
+// ============================================
+// FILTERS PANEL
+// ============================================
+.filters-panel {
+    padding: 20px 25px;
+    background: $background;
+    border-bottom: 1px solid $border-color;
+    transition: all 0.3s ease;
+
+    &.collapsed {
+        display: none;
+    }
 }
 
-.card-footer {
-    background-color: #f9f9f9;
-    border-top: 1px solid #e8e8e8;
-    padding: 15px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
 }
 
-.card-footer .btn {
-    margin-right: 10px;
+.filter-group {
+    label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: $text-secondary;
+        margin-bottom: 6px;
+    }
+
+    input,
+    ng-select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid $border-color;
+        border-radius: $radius-sm;
+        font-size: 0.9rem;
+        font-family: inherit;
+        background: $white;
+
+        &:focus {
+            outline: none;
+            border-color: $primary;
+        }
+    }
+
+    &.range {
+        .range-inputs {
+            display: flex;
+            gap: 8px;
+
+            input {
+                flex: 1;
+                min-width: 0;
+            }
+        }
+    }
 }
 
-.card-body {
-    height: 250px;
+.filter-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    .btn-reset,
+    .btn-apply {
+        padding: 10px 18px;
+        border-radius: $radius-sm;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-reset {
+        background: $white;
+        border: 1px solid $border-color;
+        color: $text-primary;
+
+        &:hover {
+            border-color: $text-secondary;
+        }
+    }
+
+    .btn-apply {
+        background: $primary;
+        border: none;
+        color: $white;
+
+        &:hover {
+            background: $primary-dark;
+        }
+    }
+}
+
+// ============================================
+// SELECTED BADGE
+// ============================================
+.selected-badge {
     display: flex;
     align-items: center;
+    gap: 8px;
+    padding: 12px 25px;
+    background: $success-light;
+    border-bottom: 1px solid rgba($success, 0.2);
+    font-size: 0.9rem;
+    color: $success;
+
+    .badge-count {
+        width: 24px;
+        height: 24px;
+        background: $success;
+        color: $white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+}
+
+// ============================================
+// PRODUCTS GRID
+// ============================================
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+    padding: 20px 25px;
+    overflow-y: auto;
+    max-height: 400px;
+    background: $white;
+}
+
+.product-card {
+    position: relative;
+    background: $white;
+    border: 2px solid $border-color;
+    border-radius: $radius-md;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        border-color: $primary;
+        box-shadow: 0 4px 12px rgba($primary, 0.15);
+    }
+
+    &.selected {
+        border-color: $success;
+        background: $success-light;
+
+        .selection-indicator {
+            background: $success;
+            color: $white;
+        }
+    }
+
+    .selection-indicator {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 28px;
+        height: 28px;
+        background: $background;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        color: $text-secondary;
+        transition: all 0.2s;
+    }
+
+    .product-image {
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 12px;
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: $radius-sm;
+        }
+    }
+
+    .product-info {
+        .product-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: $text-primary;
+            margin: 0 0 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-category {
+            display: block;
+            font-size: 0.75rem;
+            color: $text-secondary;
+            margin-bottom: 10px;
+        }
+
+        .product-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-price {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: $success;
+        }
+
+        .product-stock {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            background: $background;
+            border-radius: 10px;
+            color: $text-secondary;
+
+            &.low {
+                background: $warning-light;
+                color: $warning;
+            }
+
+            &.critical {
+                background: $danger-light;
+                color: $danger;
+            }
+        }
+    }
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-}
+    padding: 50px 20px;
+    text-align: center;
 
-.card-body img {
-    object-fit: contain;
-    max-width: 100%;
-    max-height: 100%;
-}
+    i {
+        font-size: 3rem;
+        color: $text-secondary;
+        opacity: 0.3;
+        margin-bottom: 15px;
+    }
 
-@media (max-width: 767px) {
-    .card-body {
-        height: 200px;
+    p {
+        font-size: 0.95rem;
+        color: $text-secondary;
+        margin: 0;
     }
 }
 
-.button-container{
-    padding:5px
-}
+// ============================================
+// PAGINATION
+// ============================================
+.pagination-section {
+    padding: 10px 25px;
+    background: $background;
+    border-top: 1px solid $border-color;
 
-.button-container button{
-    width: 100%;
-}
-
-mat-paginator{
-    width: 100%;
-}
-
-@media screen and (max-width: 1000px) {
-    button{
-     width: 100%;
-    }
- }
-
- .padding-page {
-    padding: 5rem 5rem 2rem 5rem;
-}
-
-@media screen and (max-width: 1500px) {
-    .padding-page {
-        padding: 20px 50px 150px 50px;
-
-    }
-
-    .title {
-        width: 100%;
-        text-align: center;
-        padding: 20px 0 0 0;
-        font-size: 30px;
+    mat-paginator {
+        background: transparent;
     }
 }
 
-@media screen and (max-width: 600px) {
-    .padding-page {
-        padding: 20px 20px 0 20px;
-        
-        font-size: small !important;
+// ============================================
+// DIALOG ACTIONS
+// ============================================
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 25px;
+    background: $white;
+    border-top: 1px solid $border-color;
+
+    .btn-cancel {
+        padding: 12px 24px;
+        background: $white;
+        border: 1px solid $border-color;
+        border-radius: $radius-sm;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: $text-primary;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: $text-secondary;
+        }
     }
 
-    .title {
-        width: 100%;
-        text-align: center;
-        padding: 20px 0 0 0;
-        font-size: 30px;
+    .btn-confirm {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: $success;
+        border: none;
+        border-radius: $radius-sm;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: $white;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            background: darken($success, 8%);
+        }
     }
 }
 
-
-.filter-section {
-    transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+// ============================================
+// MAT DIALOG OVERRIDES
+// ============================================
+::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface {
+    padding: 0 !important;
+    border-radius: $radius-lg !important;
     overflow: hidden;
-    max-height: 500px; /* Adjust based on content */
-    opacity: 1;
-}
-
-.filter-section.collapsed {
-    max-height: 0;
-    opacity: 0;
-    padding: 0;
-    margin: 0;
 }

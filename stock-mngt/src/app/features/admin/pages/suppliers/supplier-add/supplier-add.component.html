@@ -1,66 +1,97 @@
-<ngx-loading-x [show]="loading" [spinnerColor]="'#683ab7'"></ngx-loading-x>
-<div class="padding-page">
-    <div class="row title-bloc">
-        <h2 class="title">
-            {{ supplierId ? 'Modifier' : 'Ajouter'}} un fournisseur
-        </h2>
-    </div>
-    <form [formGroup]="form" (ngSubmit)="supplierId ? edit() : create() ">
-        <div class="row justify-content-center">
-            <div class="col-12 col-sm-12 col-md-12 col-lg-6 login-block">
-                <div class="mb-3 row">
-                    <label for="lastName" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Nom</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="text" [ngClass]="{'invalid':submitted && !form.get('lastName').value}"
-                            class="form-control" id="lastName" formControlName="lastName">
-                        <div *ngIf="submitted && !form.get('lastName').value" class="form-error">
-                            Le nom est obligatoire.
-                        </div>
+<div class="supplier-form-page">
+    <!-- Page Header -->
+    <header class="page-header">
+        <a class="back-link" (click)="navigateTo('/suppliers')">
+            <i class="fa fa-arrow-left"></i>
+            <span>Retour aux fournisseurs</span>
+        </a>
+        <h1>{{ supplierId ? 'Modifier' : 'Ajouter' }} un fournisseur</h1>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="supplierId ? edit() : create()">
+        <div class="form-card">
+            <!-- Personal Info Section -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fa fa-user"></i> Informations personnelles</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">
+                            <i class="fa fa-user"></i> Prénom <span class="required">*</span>
+                        </label>
+                        <input type="text" id="firstName" formControlName="firstName" placeholder="Entrez le prénom..."
+                            [class.invalid]="submitted && !form.get('firstName').value">
+                        <span class="error-message" *ngIf="submitted && !form.get('firstName').value">
+                            Le prénom est obligatoire
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">
+                            <i class="fa fa-user"></i> Nom <span class="required">*</span>
+                        </label>
+                        <input type="text" id="lastName" formControlName="lastName" placeholder="Entrez le nom..."
+                            [class.invalid]="submitted && !form.get('lastName').value">
+                        <span class="error-message" *ngIf="submitted && !form.get('lastName').value">
+                            Le nom est obligatoire
+                        </span>
                     </div>
                 </div>
-                <div class="mb-3 row">
-                    <label for="firstName" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Prénom</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="firstName" [ngClass]="{'invalid':submitted && !form.get('firstName').value}"
-                            class="form-control" id="firstName" formControlName="firstName">
-                        <div *ngIf="submitted && !form.get('firstName').value" class="form-error">
-                            Le prénom est obligatoire.
-                        </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fa fa-address-book"></i> Coordonnées</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email"><i class="fa fa-envelope"></i> Email</label>
+                        <input type="email" id="email" formControlName="email" placeholder="exemple@email.com"
+                            [class.invalid]="submitted && form.get('email').errors?.pattern">
+                        <span class="error-message" *ngIf="submitted && form.get('email').errors?.pattern">
+                            Format d'email invalide
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone"><i class="fa fa-phone"></i> Téléphone</label>
+                        <input type="tel" id="phone" formControlName="phone" placeholder="+216 XX XXX XXX">
                     </div>
                 </div>
-                <div class="mb-3 row">
-                    <label for="email" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Email</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="email" [ngClass]="{'invalid':submitted && !form.get('email').value || emailError}"
-                            class="form-control" id="email" formControlName="email" email="true">
-                        <div *ngIf="submitted && form.get('email').errors?.pattern" class="form-error">
-                            Mauvaise format d'email
-                        </div>
+            </div>
+
+            <!-- Financial Section -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fa fa-coins"></i> Crédit</h3>
+
+                <div class="form-group">
+                    <label for="credit"><i class="fa fa-wallet"></i> Montant du crédit</label>
+                    <div class="input-with-suffix">
+                        <input type="number" id="credit" formControlName="credit" placeholder="0.00">
+                        <span class="suffix">DT</span>
                     </div>
+                    <span class="input-hint">Montant que vous devez à ce fournisseur</span>
                 </div>
-                <div class="mb-3 row">
-                    <label for="phone" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Téléphone</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="phone" class="form-control" id="phone" formControlName="phone">
-                    </div>
+            </div>
+
+            <!-- Description Section -->
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="description"><i class="fa fa-align-left"></i> Notes / Description</label>
+                    <textarea id="description" formControlName="description" rows="4"
+                        placeholder="Ajoutez des notes sur ce fournisseur..."></textarea>
                 </div>
-                <div class="mb-3 row">
-                    <label for="credit" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Crédit</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="number" class="form-control" id="credit" formControlName="credit">
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea maxlength="50000" rows="10" resize="none" class="form-control" formControlName="description" id="description">
-                    </textarea>
-                </div>
-                <div class="mb-3 row justify-content-end">
-                    <div class="col-12 col-sm-12 col-lg-auto">
-                        <button type="submit" class="btn btn-primary full-width" *ngIf="!supplierId">Ajouter</button>
-                        <button type="submit" class="btn btn-primary full-width" *ngIf="supplierId">Modifier</button>
-                    </div>
-                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" (click)="navigateTo('/suppliers')">Annuler</button>
+                <button type="submit" class="btn-submit" [disabled]="loading">
+                    <i class="fa" [class.fa-plus]="!supplierId && !loading" [class.fa-save]="supplierId && !loading"
+                        [class.fa-spinner]="loading" [class.fa-spin]="loading"></i>
+                    {{ loading ? 'Enregistrement...' : (supplierId ? 'Enregistrer les modifications' : 'Ajouter le
+                    fournisseur') }}
+                </button>
             </div>
         </div>
     </form>

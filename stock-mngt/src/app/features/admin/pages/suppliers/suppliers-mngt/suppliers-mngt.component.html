@@ -1,103 +1,120 @@
-<ngx-loading-x [show]="loading" [spinnerColor]="'#0d6efd'"></ngx-loading-x>
-<div class="padding-page">
-    <div class="row title-bloc">
-        <h3 class="title">Gestion des fournisseurs</h3>
+<div class="suppliers-page">
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Gestion des Fournisseurs</h1>
+            <p>{{ count || 0 }} fournisseurs au total</p>
+        </div>
+        <button class="btn-add" (click)="create()">
+            <i class="fa fa-plus"></i>
+            <span>Nouveau Fournisseur</span>
+        </button>
+    </header>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+        <button class="btn-filter" [class.active]="!filtersCollapsed" (click)="toggleFilters()">
+            <i class="fa fa-filter"></i>
+            <span>Filtres</span>
+        </button>
+        <button class="btn-reset" (click)="reset()">
+            <i class="fa fa-undo"></i>
+        </button>
     </div>
 
-    <div class="row d-flex">
-        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary toggle-filters d-flex align-items-center" (click)="toggleFilters()">
-                <mat-icon class="me-2">more_vert</mat-icon> Afficher / Masquer les Filtres
-            </button>
+    <!-- Filters Panel -->
+    <div class="filters-panel" [class.collapsed]="filtersCollapsed">
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label><i class="fa fa-user"></i> Prénom</label>
+                <input type="text" [(ngModel)]="firstNameFilter" placeholder="Rechercher...">
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fa fa-user"></i> Nom</label>
+                <input type="text" [(ngModel)]="lastNameFilter" placeholder="Rechercher...">
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fa fa-phone"></i> Téléphone</label>
+                <input type="text" [(ngModel)]="phoneFilter" placeholder="Rechercher...">
+            </div>
+
+            <div class="filter-group">
+                <label><i class="fa fa-envelope"></i> Email</label>
+                <input type="text" [(ngModel)]="emailFilter" placeholder="Rechercher...">
+            </div>
+
+            <div class="filter-group range-group">
+                <label><i class="fa fa-coins"></i> Crédit</label>
+                <div class="range-inputs">
+                    <input type="number" [(ngModel)]="minCreditFilter" placeholder="Min">
+                    <span class="range-separator">—</span>
+                    <input type="number" [(ngModel)]="maxCreditFilter" placeholder="Max">
+                </div>
+            </div>
         </div>
-        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary add-button d-flex align-items-center" (click)="create()">
-                <mat-icon class="me-2">add</mat-icon> Ajouter
-            </button>
-        </div>
-        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary d-flex align-items-center" (click)="reset()">
-                <mat-icon class="me-2">restart_alt</mat-icon> Réinitialiser
-            </button>
-        </div>
-        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-primary d-flex align-items-center" (click)="filter()">
-                <mat-icon class="me-2">search</mat-icon> Filtrer
+
+        <div class="filters-actions">
+            <button class="btn-apply" (click)="filter()">
+                <i class="fa fa-search"></i> Appliquer les filtres
             </button>
         </div>
     </div>
 
+    <!-- Suppliers List -->
+    <div class="suppliers-list" *ngIf="suppliers?.length > 0">
+        <div class="supplier-item" *ngFor="let supplier of suppliers">
+            <div class="supplier-avatar">
+                <span>{{ (supplier?.firstName?.charAt(0) || '') + (supplier?.lastName?.charAt(0) || '') }}</span>
+            </div>
 
-    <div class="filter-section" [ngClass]="{'collapsed': filtersCollapsed}">
-        <div class="row">
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="firstName" class="form-label">Prénom</label>
-                <input type="text" class="form-control" id="firstName" [(ngModel)]="firstNameFilter">
+            <div class="supplier-info">
+                <div class="supplier-header">
+                    <span class="supplier-name">{{ supplier?.firstName }} {{ supplier?.lastName }}</span>
+                </div>
+                <div class="supplier-details">
+                    <span class="detail-item" *ngIf="supplier?.phone">
+                        <i class="fa fa-phone"></i>
+                        {{ supplier?.phone }}
+                    </span>
+                    <span class="detail-item" *ngIf="supplier?.email">
+                        <i class="fa fa-envelope"></i>
+                        {{ supplier?.email }}
+                    </span>
+                </div>
             </div>
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="lastName" class="form-label">Nom</label>
-                <input type="text" class="form-control" id="lastName" [(ngModel)]="lastNameFilter">
+
+            <div class="supplier-credit" *ngIf="supplier?.credit" [class.positive]="supplier?.credit > 0">
+                <span class="credit-label">Crédit</span>
+                <span class="credit-value">{{ supplier?.credit | number:'1.2-2' }} DT</span>
             </div>
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="phone" class="form-label">Téléphone</label>
-                <input type="phone" class="form-control" id="phone" [(ngModel)]="phoneFilter">
-            </div>
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" [(ngModel)]="emailFilter">
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="minCreditFilter" class="form-label">Crédit</label>
-                <input type="number" class="form-control amount-input" id="minCreditFilter"
-                    [(ngModel)]="minCreditFilter" placeholder="De">
-                <input type="number" class="form-control amount-input" id="maxCreditFilter"
-                    [(ngModel)]="maxCreditFilter" placeholder="Jusqu'à">
+
+            <div class="supplier-actions">
+                <button class="btn-action edit" (click)="editSupplier(supplier)" title="Modifier">
+                    <fa-icon [icon]="faEdit"></fa-icon>
+                </button>
+                <button class="btn-action delete" (click)="deleteSupplier(supplier)" title="Supprimer">
+                    <fa-icon [icon]="faTrash"></fa-icon>
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="count === 0">
+        <i class="fa fa-truck"></i>
+        <h3>Aucun fournisseur trouvé</h3>
+        <p>Essayez de modifier vos critères de recherche ou ajoutez un nouveau fournisseur</p>
+        <button class="btn-add-empty" (click)="create()">
+            <i class="fa fa-plus"></i> Ajouter un fournisseur
+        </button>
+    </div>
 
-    <div class="row">
-        <div class="col-12 table-bloc">
-            <table class="table table-responsive table-hover ">
-                <thead>
-                    <tr>
-                        <th scope="col">Prénom</th>
-                        <th scope="col">Nom</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Téléphone</th>
-                        <th scope="col">Crédit</th>
-                        <th scope="col">Modifier</th>
-                        <th scope="col">Supprimer</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let supplier of suppliers">
-                        <td>{{supplier?.firstName}}</td>
-                        <td>{{supplier?.lastName}}</td>
-                        <td>{{supplier?.email}}</td>
-                        <td>{{supplier?.phone}}</td>
-                        <td>{{supplier?.credit ? supplier?.credit + " DT" : ""}}</td>
-                        <td>
-                            <button class="action-button" (click)="editSupplier(supplier)"><fa-icon
-                                    [icon]="faEdit"></fa-icon></button>
-                        </td>
-                        <td>
-                            <button class="action-button" (click)="deleteSupplier(supplier)"> <fa-icon
-                                    [icon]="faTrash"></fa-icon></button>
-                        </td>
-                    </tr>
-                    <tr *ngIf="count == 0">
-                        <td colspan="7" class="not-found-message">Pas de fournisseur trouvé</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
-            [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[5,10,20]" [hidePageSize]="false"
-            [pageIndex]="0" aria-label="Select page">
+    <!-- Pagination -->
+    <div class="pagination-wrapper" *ngIf="suppliers?.length > 0">
+        <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
+            [showFirstLastButtons]="true" [pageSizeOptions]="[5, 10, 20]" [pageIndex]="0">
         </mat-paginator>
     </div>
 </div>

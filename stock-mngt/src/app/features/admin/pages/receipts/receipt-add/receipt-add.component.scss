@@ -1,78 +1,555 @@
-.screen-title-bloc {
-  padding: 50px;
-}
-table {
-  margin-top: 50px;
-}
-td,
-th {
-  text-align: center;
-}
+// Variables
+$primary: #3f51b5;
+$primary-dark: #303f9f;
+$primary-light: rgba(63, 81, 181, 0.1);
+$success: #2e7d32;
+$success-light: rgba(46, 125, 50, 0.1);
+$warning: #f57c00;
+$warning-light: rgba(245, 124, 0, 0.1);
+$danger: #c62828;
+$danger-light: rgba(198, 40, 40, 0.1);
+$info: #0288d1;
+$purple: #7c3aed;
+$purple-light: rgba(124, 58, 237, 0.1);
+$text-primary: #2c3e50;
+$text-secondary: #7f8c8d;
+$border-color: #e8ecef;
+$background: #f5f7fa;
+$white: #ffffff;
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
 
-.value-input {
-  border: 1px solid lightgray;
-  border-radius: 5px;
-  text-align: center;
-}
+.receipt-form-page {
+  padding: 30px;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
 
-.not-found-message {
-  font-size: 20px;
-}
-
-.total-text {
-  font-size: 30px;
-  font-weight: bold;
-}
-
-.total-row {
-  margin-top: 100px;
-}
-
-.table-bloc {
-  overflow-x: auto;
-}
-
-@media screen and (max-width: 1000px) {
-  button {
-    width: 100%;
+  @media (max-width: 768px) {
+    padding: 20px 15px;
   }
+}
+
+// ============================================
+// PAGE HEADER
+// ============================================
+.page-header {
+  margin-bottom: 30px;
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: $primary;
+    cursor: pointer;
+    margin-bottom: 15px;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0;
+  }
+}
+
+// ============================================
+// FORM LAYOUT
+// ============================================
+.form-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-card {
+  background: $white;
+  border-radius: $radius-lg;
+  border: 1px solid $border-color;
+  overflow: hidden;
+
+  &.products-card {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 25px;
+  background: $background;
+  border-bottom: 1px solid $border-color;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+
+    i {
+      color: $primary;
+    }
+  }
+
+  .product-count {
+    width: 28px;
+    height: 28px;
+    background: $primary;
+    color: $white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+}
+
+.section-body {
+  padding: 25px;
+}
+
+// ============================================
+// TYPE SELECTOR
+// ============================================
+.type-selector {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.type-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 15px;
+  background: $background;
+  border: 2px solid transparent;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  i {
+    font-size: 1.5rem;
+    opacity: 0.6;
+  }
+
+  span {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: $text-secondary;
+  }
+
+  &.sold {
+
+    &:hover,
+    &.active {
+      background: $success-light;
+      border-color: $success;
+
+      i {
+        color: $success;
+        opacity: 1;
+      }
+
+      span {
+        color: $success;
+      }
+    }
+  }
+
+  &.loaded {
+
+    &:hover,
+    &.active {
+      background: $warning-light;
+      border-color: $warning;
+
+      i {
+        color: $warning;
+        opacity: 1;
+      }
+
+      span {
+        color: $warning;
+      }
+    }
+  }
+
+  &.returned {
+
+    &:hover,
+    &.active {
+      background: $purple-light;
+      border-color: $purple;
+
+      i {
+        color: $purple;
+        opacity: 1;
+      }
+
+      span {
+        color: $purple;
+      }
+    }
+  }
+}
+
+// ============================================
+// FORM CONTROLS
+// ============================================
+.form-group {
+  margin-bottom: 20px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $text-secondary;
+    margin-bottom: 8px;
+
+    i {
+      margin-right: 6px;
+      color: $primary;
+    }
+
+    .required {
+      color: $danger;
+    }
+  }
+
+  input,
+  ng-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: $white;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px $primary-light;
+    }
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.input-with-suffix {
+  position: relative;
+
+  input {
+    padding-right: 50px;
+  }
+
+  .suffix {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9rem;
+    color: $text-secondary;
+    font-weight: 500;
+  }
+
+  &.small {
+    input {
+      padding: 10px 12px;
+      padding-right: 40px;
+    }
+
+    .suffix {
+      right: 12px;
+      font-size: 0.8rem;
+    }
+  }
+}
+
+.error-message {
+  display: block;
+  font-size: 0.8rem;
+  color: $danger;
+  margin-top: 6px;
+}
+
+// ============================================
+// PRODUCT ACTIONS
+// ============================================
+.product-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .btn-select-products,
+  .btn-new-product {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 20px;
+    border-radius: $radius-md;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-select-products {
+    background: $primary;
+    color: $white;
+    border: none;
+
+    &:hover {
+      background: $primary-dark;
+    }
+  }
+
+  .btn-new-product {
+    background: $white;
+    color: $primary;
+    border: 1px solid $primary;
+
+    &:hover {
+      background: $primary-light;
+    }
+  }
+}
+
+// ============================================
+// PRODUCTS LIST
+// ============================================
+.products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.product-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: $background;
+  border-radius: $radius-sm;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+  }
+
+  .product-info {
+    flex: 1;
+    min-width: 0;
+
+    .product-name {
+      display: block;
+      font-weight: 600;
+      color: $text-primary;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .product-stock {
+      font-size: 0.8rem;
+      color: $text-secondary;
+    }
+  }
+
+  .product-inputs {
+    display: flex;
+    gap: 10px;
+
+    .input-group {
+      label {
+        display: block;
+        font-size: 0.7rem;
+        color: $text-secondary;
+        margin-bottom: 4px;
+      }
+
+      input {
+        width: 80px;
+        padding: 8px 10px;
+        border: 1px solid $border-color;
+        border-radius: $radius-sm;
+        font-size: 0.9rem;
+        text-align: center;
+
+        &:focus {
+          outline: none;
+          border-color: $primary;
+        }
+
+        &.warning {
+          border-color: $danger;
+          background: $danger-light;
+        }
+      }
+    }
+
+    .qty-input {
+      width: 60px;
+    }
+  }
+
+  .product-subtotal {
+    font-weight: 600;
+    color: $success;
+    white-space: nowrap;
+  }
+
+  .btn-remove {
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    border-radius: $radius-sm;
+    color: $text-secondary;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: $danger-light;
+      color: $danger;
+    }
+  }
+}
+
+.empty-products {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 20px;
+  text-align: center;
+
+  i {
+    font-size: 3rem;
+    color: $text-secondary;
+    opacity: 0.3;
+    margin-bottom: 15px;
+  }
+
+  p {
+    font-size: 0.95rem;
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+// ============================================
+// TOTAL SECTION
+// ============================================
+.total-section {
+  padding: 20px 25px;
+  background: $background;
+  border-top: 1px solid $border-color;
 
   .total-row {
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+
+    .total-label {
+      font-size: 0.9rem;
+      color: $text-secondary;
+    }
+
+    .total-value {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: $text-primary;
+    }
+
+    &.tva {
+      border-bottom: 1px dashed $border-color;
+      padding-bottom: 12px;
+    }
+
+    &.grand {
+      padding-top: 12px;
+
+      .total-label {
+        font-weight: 600;
+        color: $text-primary;
+        font-size: 1rem;
+      }
+
+      .total-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: $primary;
+      }
+    }
   }
 }
 
-.invalid {
-  border: 1px solid red;
-}
+// ============================================
+// SUBMIT BUTTON
+// ============================================
+.btn-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, $success 0%, darken($success, 10%) 100%);
+  color: $white;
+  border: none;
+  border-radius: $radius-md;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
 
-.padding-page {
-  padding: 5rem 15rem 2rem 15rem;
-}
-
-@media screen and (max-width: 1500px) {
-  .padding-page {
-      padding: 0 50px 150px 50px;
-  }
-
-  .title {
-      width: 100%;
-      text-align: center;
-      padding: 20px 0 0 0;
-      font-size: 30px;
-  }
-}
-
-@media screen and (max-width: 600px) {
-  .padding-page {
-      padding: 20px 20px 0 20px;
-      
-  }
-
-  .title {
-      width: 100%;
-      text-align: center;
-      padding: 20px 0 0 0;
-      font-size: 30px;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba($success, 0.4);
   }
 }

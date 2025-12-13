@@ -1,83 +1,103 @@
-<ngx-loading-x [show]="loading" [spinnerColor]="'#0d6efd'"></ngx-loading-x>
-<div class="padding-page">
-    <div class="row title-bloc">
-        <h2 class="title">
-            {{ borrowerId ? 'Modifier' : 'Ajouter'}} un crédit
-        </h2>
-    </div>
-    <form [formGroup]="form" (ngSubmit)="borrowerId ? edit() : create() ">
-        <div class="row justify-content-center">
-            <div class="col-12 col-sm-12 col-md-12 col-lg-6 login-block">
-                <div class="mb-3 row">
-                    <label for="lastName" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Nom</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="text" [ngClass]="{'invalid':submitted && !form.get('lastName').value}"
-                            class="form-control" id="lastName" formControlName="lastName">
-                        <div *ngIf="submitted && !form.get('lastName').value" class="form-error">
-                            Le nom est obligatoire.
-                        </div>
+<div class="credit-form-page">
+    <!-- Page Header -->
+    <header class="page-header">
+        <a class="back-link" (click)="navigateTo('/credits')">
+            <i class="fa fa-arrow-left"></i>
+            <span>Retour aux crédits</span>
+        </a>
+        <h1>{{ borrowerId ? 'Modifier' : 'Ajouter' }} un crédit</h1>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="borrowerId ? edit() : create()">
+        <div class="form-card">
+            <!-- Borrower Info Section -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fa fa-user"></i> Informations de l'emprunteur</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">
+                            <i class="fa fa-user"></i> Prénom <span class="required">*</span>
+                        </label>
+                        <input type="text" id="firstName" formControlName="firstName" placeholder="Entrez le prénom..."
+                            [class.invalid]="submitted && !form.get('firstName').value">
+                        <span class="error-message" *ngIf="submitted && !form.get('firstName').value">
+                            Le prénom est obligatoire
+                        </span>
                     </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="firstName" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Prénom</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="firstName" [ngClass]="{'invalid':submitted && !form.get('firstName').value}"
-                            class="form-control" id="firstName" formControlName="firstName">
-                        <div *ngIf="submitted && !form.get('firstName').value" class="form-error">
-                            Le prénom est obligatoire.
-                        </div>
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="email" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Email</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="email" [ngClass]="{'invalid':submitted && !form.get('email').value || emailError}"
-                            class="form-control" id="email" formControlName="email" email="true">
-                        <div *ngIf="submitted && form.get('email').errors?.pattern" class="form-error">
-                            Mauvaise format d'email
-                        </div>
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="phone" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Téléphone</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="phone" class="form-control" id="phone" formControlName="phone">
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="amount" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Montant</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="number" class="form-control" id="amount" formControlName="amount">
+
+                    <div class="form-group">
+                        <label for="lastName">
+                            <i class="fa fa-user"></i> Nom <span class="required">*</span>
+                        </label>
+                        <input type="text" id="lastName" formControlName="lastName" placeholder="Entrez le nom..."
+                            [class.invalid]="submitted && !form.get('lastName').value">
+                        <span class="error-message" *ngIf="submitted && !form.get('lastName').value">
+                            Le nom est obligatoire
+                        </span>
                     </div>
                 </div>
 
-                <div class="mb-3 row">
-                    <label for="givenDate" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Date de
-                        prête</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="date" class="form-control" formControlName="givenDate" name="givenDate"
-                            id="givenDate">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email"><i class="fa fa-envelope"></i> Email</label>
+                        <input type="email" id="email" formControlName="email" placeholder="exemple@email.com"
+                            [class.invalid]="submitted && form.get('email').errors?.pattern">
+                        <span class="error-message" *ngIf="submitted && form.get('email').errors?.pattern">
+                            Format d'email invalide
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone"><i class="fa fa-phone"></i> Téléphone</label>
+                        <input type="tel" id="phone" formControlName="phone" placeholder="+216 XX XXX XXX">
                     </div>
                 </div>
-                <div class="mb-3 row">
-                    <label for="returnDate" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Date de
-                        retour</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="date" class="form-control" formControlName="returnDate" name="returnDate"
-                            id="returnDate">
+            </div>
+
+            <!-- Credit Info Section -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fa fa-hand-holding-usd"></i> Informations du crédit</h3>
+
+                <div class="form-group">
+                    <label for="amount"><i class="fa fa-coins"></i> Montant</label>
+                    <div class="input-with-suffix">
+                        <input type="number" id="amount" formControlName="amount" placeholder="0.00">
+                        <span class="suffix">DT</span>
                     </div>
                 </div>
-                <div class="mb-3">
-                    <label for="comment" class="form-label">Commentaire</label>
-                    <textarea maxlength="50000" rows="10" resize="none" class="form-control" formControlName="comment" id="comment">
-                    </textarea>
-                </div>
-                <div class="mb-3 row justify-content-end">
-                    <div class="col-12 col-sm-12 col-lg-auto">
-                        <button type="submit" class="btn btn-primary full-width" *ngIf="!borrowerId">Ajouter</button>
-                        <button type="submit" class="btn btn-primary full-width" *ngIf="borrowerId">Modifier</button>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="givenDate"><i class="fa fa-calendar-plus"></i> Date de prêt</label>
+                        <input type="date" id="givenDate" formControlName="givenDate">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="returnDate"><i class="fa fa-calendar-check"></i> Date de retour prévue</label>
+                        <input type="date" id="returnDate" formControlName="returnDate">
                     </div>
                 </div>
+            </div>
+
+            <!-- Comment Section -->
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="comment"><i class="fa fa-comment"></i> Commentaire / Notes</label>
+                    <textarea id="comment" formControlName="comment" rows="4"
+                        placeholder="Ajoutez des notes sur ce crédit..."></textarea>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" (click)="navigateTo('/credits')">Annuler</button>
+                <button type="submit" class="btn-submit" [disabled]="loading">
+                    <i class="fa" [class.fa-plus]="!borrowerId && !loading" [class.fa-save]="borrowerId && !loading"
+                        [class.fa-spinner]="loading" [class.fa-spin]="loading"></i>
+                    {{ loading ? 'Enregistrement...' : (borrowerId ? 'Enregistrer les modifications' : 'Ajouter le
+                    crédit') }}
+                </button>
             </div>
         </div>
     </form>

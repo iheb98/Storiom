@@ -38,7 +38,7 @@ export class WorkerAddComponent implements OnInit {
           this.form.get('lastName').setValue(response.lastName)
           this.form.get('phone').setValue(response.phone)
           this.form.get('email').setValue(response.email)
-          this.form.get('entryDate').setValue(response.entryDate.substring(0,10))
+          this.form.get('entryDate').setValue(response.entryDate.substring(0, 10))
           this.form.get('salary').setValue(response.salary)
           this.form.get('functionInStore').setValue(response.function)
         })
@@ -52,10 +52,10 @@ export class WorkerAddComponent implements OnInit {
       email: ['', [Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
       phone: [''],
       salary: [''],
-      role:['Worker'],
+      role: ['Worker'],
       functionInStore: [''],
       superiorId: [this.authService.getConnectedUser()?.id],
-      worksInStore:[this.authService.getConnectedUser()?.store?.id],
+      worksInStore: [this.authService.getConnectedUser()?.store?.id],
       entryDate: [null]
     });
   }
@@ -114,4 +114,8 @@ export class WorkerAddComponent implements OnInit {
     }
   }
 
+  navigateTo(link: string) {
+    this.router.navigate([link])
+  }
 }
+

@@ -1,129 +1,141 @@
-<div class="padding-page">
-    <div class="row title-bloc">
-        <h2 class="title">
-            Opérations
-        </h2>
+<div class="operations-page">
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Gestion des Opérations</h1>
+            <p>{{ count || 0 }} opérations au total</p>
+        </div>
+        <button class="btn-add" (click)="create()">
+            <i class="fa fa-plus"></i>
+            <span>Nouvelle Opération</span>
+        </button>
+    </header>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+        <button class="btn-filter" [class.active]="!filtersCollapsed" (click)="toggleFilters()">
+            <i class="fa fa-filter"></i>
+            <span>Filtres</span>
+        </button>
+        <button class="btn-reset" (click)="reset()">
+            <i class="fa fa-undo"></i>
+        </button>
     </div>
 
-    <div class="row d-flex">
-        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary toggle-filters d-flex align-items-center" (click)="toggleFilters()">
-                <mat-icon class="me-2">more_vert</mat-icon> Afficher / Masquer les Filtres
-            </button>
-        </div>
-        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary add-button d-flex align-items-center" (click)="create()">
-                <mat-icon class="me-2">add</mat-icon> Ajouter
-            </button>
-        </div>
-        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary d-flex align-items-center" (click)="reset()">
-                <mat-icon class="me-2">restart_alt</mat-icon> Réinitialiser
-            </button>
-        </div>
-        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-primary d-flex align-items-center" (click)="filter()">
-                <mat-icon class="me-2">search</mat-icon> Filtrer
-            </button>
-        </div>
-    </div>
-
-    <div class="filter-section" [ngClass]="{'collapsed': filtersCollapsed}">
-
-        <div class="row">
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="supplier" class="form-label">Produit</label>
-                <input type="text" class="form-control" id="code" [(ngModel)]="productName">
+    <!-- Filters Panel -->
+    <div class="filters-panel" [class.collapsed]="filtersCollapsed">
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label><i class="fa fa-box"></i> Produit</label>
+                <input type="text" [(ngModel)]="productName" placeholder="Nom du produit...">
             </div>
 
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="type" class="form-label">Type</label>
-                <ng-select [(ngModel)]="typeFilter" name="type" id="type">
-                    <ng-option *ngFor="let element of types" [value]="element?.value">{{element?.label}}</ng-option>
+            <div class="filter-group">
+                <label><i class="fa fa-tag"></i> Type</label>
+                <ng-select [(ngModel)]="typeFilter" placeholder="Tous les types">
+                    <ng-option *ngFor="let element of types" [value]="element?.value">
+                        {{ element?.label }}
+                    </ng-option>
                 </ng-select>
             </div>
 
-            <!--<div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="minTotalFilter" class="form-label">Total</label>
-                <input type="number" class="form-control amount-input" id="minTotalFilter" [(ngModel)]="minTotalFilter"
-                    placeholder="De">
-                <input type="number" class="form-control amount-input" id="maxTotalFilter" [(ngModel)]="maxTotalFilter"
-                    placeholder="Jusqu'à">
-            </div>-->
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="minPriceFilter" class="form-label">Prix</label>
-                <input type="number" class="form-control amount-input" id="minPriceFilter" [(ngModel)]="minPriceFilter"
-                    placeholder="De">
-                <input type="number" class="form-control amount-input" id="maxPriceFilter" [(ngModel)]="maxPriceFilter"
-                    placeholder="Jusqu'à">
+            <div class="filter-group range-group">
+                <label><i class="fa fa-coins"></i> Prix</label>
+                <div class="range-inputs">
+                    <input type="number" [(ngModel)]="minPriceFilter" placeholder="Min">
+                    <span class="range-separator">—</span>
+                    <input type="number" [(ngModel)]="maxPriceFilter" placeholder="Max">
+                </div>
             </div>
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="minAmountFilter" class="form-label">Quantité</label>
-                <input type="number" class="form-control amount-input" id="minAmountFilter"
-                    [(ngModel)]="minAmountFilter" placeholder="De">
-                <input type="number" class="form-control amount-input" id="maxAmountFilter"
-                    [(ngModel)]="maxAmountFilter" placeholder="Jusqu'à">
+
+            <div class="filter-group range-group">
+                <label><i class="fa fa-cubes"></i> Quantité</label>
+                <div class="range-inputs">
+                    <input type="number" [(ngModel)]="minAmountFilter" placeholder="Min">
+                    <span class="range-separator">—</span>
+                    <input type="number" [(ngModel)]="maxAmountFilter" placeholder="Max">
+                </div>
+            </div>
+
+            <div class="filter-group range-group">
+                <label><i class="fa fa-calendar"></i> Date</label>
+                <div class="range-inputs">
+                    <input type="date" [(ngModel)]="fromDateFilter">
+                    <span class="range-separator">—</span>
+                    <input type="date" [(ngModel)]="toDateFilter">
+                </div>
             </div>
         </div>
 
-        <div class="row">
+        <div class="filters-actions">
+            <button class="btn-apply" (click)="filter()">
+                <i class="fa fa-search"></i> Appliquer les filtres
+            </button>
+        </div>
+    </div>
 
+    <!-- Operations List -->
+    <div class="operations-list" *ngIf="operations?.length > 0">
+        <div class="operation-item" *ngFor="let operation of operations">
+            <div class="operation-type" [class.sold]="operation?.type === 'SOLD'"
+                [class.loaded]="operation?.type === 'LOADED'" [class.returned]="operation?.type === 'RETURNED'">
+                <i class="fa" [class.fa-shopping-cart]="operation?.type === 'SOLD'"
+                    [class.fa-truck]="operation?.type === 'LOADED'"
+                    [class.fa-undo]="operation?.type === 'RETURNED'"></i>
+            </div>
 
+            <div class="operation-info">
+                <div class="operation-header">
+                    <span class="operation-product">{{ operation?.product?.name || 'Produit inconnu' }}</span>
+                    <span class="operation-badge" [class.sold]="operation?.type === 'SOLD'"
+                        [class.loaded]="operation?.type === 'LOADED'" [class.returned]="operation?.type === 'RETURNED'">
+                        {{ operation?.type === 'SOLD' ? 'Vente' : (operation?.type === 'LOADED' ? 'Chargement' :
+                        'Retour') }}
+                    </span>
+                </div>
+                <div class="operation-details">
+                    <span class="detail-item">
+                        <i class="fa fa-coins"></i>
+                        {{ operation?.price | number:'1.2-2' }} DT × {{ operation?.amount }}
+                    </span>
+                    <span class="detail-item">
+                        <i class="fa fa-calendar"></i>
+                        {{ operation?.date | date:'dd/MM/yyyy HH:mm' }}
+                    </span>
+                </div>
+            </div>
 
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="fromDateFilter" class="form-label">Date</label>
-                <input type="date" class="form-control amount-input" id="fromDateFilter" [(ngModel)]="fromDateFilter"
-                    placeholder="De">
-                <input type="date" class="form-control amount-input" id="toDateFilter" [(ngModel)]="toDateFilter"
-                    placeholder="Jusqu'à">
+            <div class="operation-total" [class.sold]="operation?.type === 'SOLD'"
+                [class.loaded]="operation?.type === 'LOADED'">
+                <span class="total-value">{{ (operation?.price * operation?.amount) | number:'1.2-2' }}</span>
+                <span class="total-currency">DT</span>
+            </div>
+
+            <div class="operation-actions">
+                <button class="btn-action edit" (click)="editOperation(operation)" title="Modifier">
+                    <fa-icon [icon]="faEdit"></fa-icon>
+                </button>
+                <button class="btn-action delete" (click)="deleteOperation(operation)" title="Supprimer">
+                    <fa-icon [icon]="faTrash"></fa-icon>
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-12 table-bloc">
-            <table class="table table-responsive table-hover ">
-                <thead>
-                    <tr class="center">
-                        <th scope="col">Produit</th>
-                        <th scope="col">Type</th>
-                        <th scope="col">Prix</th>
-                        <th scope="col">Quantité</th>
-                        <th scope="col">Total</th>
-                        <th scope="col">Date</th>
-                        <th scope="col">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let operation of operations">
-                        <td>{{operation?.product?.name}}</td>
-                        <td>{{operation?.type == "SOLD" ? "Vente" : (operation?.type == "LOADED" ? "Chargement" : "")}}
-                        </td>
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="count === 0">
+        <i class="fa fa-exchange-alt"></i>
+        <h3>Aucune opération trouvée</h3>
+        <p>Essayez de modifier vos critères de recherche ou créez une nouvelle opération</p>
+        <button class="btn-add-empty" (click)="create()">
+            <i class="fa fa-plus"></i> Nouvelle opération
+        </button>
+    </div>
 
-                        <td>{{(operation?.price ? operation?.price : "--" )+ ' DT'}}</td>
-                        <td>{{operation?.amount}}</td>
-                        <td>{{((operation?.price * operation?.amount) ? (operation?.price * operation?.amount) : "--") +
-                            ' DT'}}</td>
-                        <td>{{operation?.date | date:'short'}}</td>
-                        <td>
-                            <button class="action-button" (click)="editOperation(operation)">
-                                <fa-icon [icon]="faEdit"></fa-icon>
-                            </button>
-                            <button class="action-button" (click)="deleteOperation(operation)">
-                                <fa-icon [icon]="faTrash" style="color: #DC3545;"></fa-icon>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr *ngIf="count == 0">
-                        <td colspan="8" class="not-found-message">Pas de facture trouvé</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
-            [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[5,10,20,50,100]" [hidePageSize]="false"
-            [pageIndex]="0" aria-label="Select page">
+    <!-- Pagination -->
+    <div class="pagination-wrapper" *ngIf="operations?.length > 0">
+        <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
+            [showFirstLastButtons]="true" [pageSizeOptions]="[5, 10, 20, 50, 100]" [pageIndex]="0">
         </mat-paginator>
     </div>
-
 </div>

@@ -1,142 +1,156 @@
-<div class="padding-page">
-    <div class="row title-bloc">
-        <h2 class="title">
-            Factures
-        </h2>
+<div class="receipts-page">
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Gestion des Factures</h1>
+            <p>{{ count || 0 }} factures au total</p>
+        </div>
+        <button class="btn-add" (click)="create()">
+            <i class="fa fa-plus"></i>
+            <span>Nouvelle Facture</span>
+        </button>
+    </header>
+
+    <!-- Actions Bar -->
+    <div class="actions-bar">
+        <button class="btn-filter" [class.active]="!filtersCollapsed" (click)="toggleFilters()">
+            <i class="fa fa-filter"></i>
+            <span>Filtres</span>
+        </button>
+        <button class="btn-reset" (click)="reset()">
+            <i class="fa fa-undo"></i>
+        </button>
     </div>
 
-    <div class="row d-flex">
-        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary toggle-filters d-flex align-items-center" (click)="toggleFilters()">
-                <mat-icon class="me-2">more_vert</mat-icon> Afficher / Masquer les Filtres
-            </button>
-        </div>
-        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary add-button d-flex align-items-center" (click)="create()">
-                <mat-icon class="me-2">add</mat-icon> Ajouter
-            </button>
-        </div>
-        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary d-flex align-items-center" (click)="reset()">
-                <mat-icon class="me-2">restart_alt</mat-icon> Réinitialiser
-            </button>
-        </div>
-        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-primary d-flex align-items-center" (click)="filter()">
-                <mat-icon class="me-2">search</mat-icon> Filtrer
-            </button>
-        </div>
-    </div>
+    <!-- Filters Panel -->
+    <div class="filters-panel" [class.collapsed]="filtersCollapsed">
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label><i class="fa fa-hashtag"></i> Code</label>
+                <input type="text" [(ngModel)]="codeFilter" placeholder="Rechercher par code...">
+            </div>
 
-    <div class="filter-section" [ngClass]="{'collapsed': filtersCollapsed}">
+            <div class="filter-group">
+                <label><i class="fa fa-user"></i> Nom du client</label>
+                <input type="text" [(ngModel)]="nameFilter" placeholder="Rechercher par nom...">
+            </div>
 
-        <div class="row">
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="supplier" class="form-label">Fournisseur</label>
-                <ng-select [(ngModel)]="supplierFilter" name="supplier">
-                    <ng-option *ngFor="let element of suppliers" [value]="element?.id">{{element.firstName + ' ' +
-                        element.lastName}}</ng-option>
+            <div class="filter-group">
+                <label><i class="fa fa-truck"></i> Fournisseur</label>
+                <ng-select [(ngModel)]="supplierFilter" placeholder="Tous les fournisseurs">
+                    <ng-option *ngFor="let element of suppliers" [value]="element?.id">
+                        {{ element.firstName + ' ' + element.lastName }}
+                    </ng-option>
                 </ng-select>
             </div>
 
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="code" class="form-label">Code</label>
-                <input type="text" class="form-control" id="code" [(ngModel)]="codeFilter">
-            </div>
-
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="name" class="form-label">Nom du client</label>
-                <input type="text" class="form-control" id="name" [(ngModel)]="nameFilter">
-            </div>
-
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="type" class="form-label">Type</label>
-                <ng-select [(ngModel)]="typeFilter" name="type" id="type">
-                    <ng-option *ngFor="let element of types" [value]="element?.value">{{element?.label}}</ng-option>
+            <div class="filter-group">
+                <label><i class="fa fa-tag"></i> Type</label>
+                <ng-select [(ngModel)]="typeFilter" placeholder="Tous les types">
+                    <ng-option *ngFor="let element of types" [value]="element?.value">
+                        {{ element?.label }}
+                    </ng-option>
                 </ng-select>
+            </div>
+
+            <div class="filter-group range-group">
+                <label><i class="fa fa-calendar"></i> Date</label>
+                <div class="range-inputs">
+                    <input type="date" [(ngModel)]="fromDateFilter" placeholder="Du">
+                    <span class="range-separator">—</span>
+                    <input type="date" [(ngModel)]="toDateFilter" placeholder="Au">
+                </div>
+            </div>
+
+            <div class="filter-group range-group">
+                <label><i class="fa fa-coins"></i> Total</label>
+                <div class="range-inputs">
+                    <input type="number" [(ngModel)]="minTotalFilter" placeholder="Min">
+                    <span class="range-separator">—</span>
+                    <input type="number" [(ngModel)]="maxTotalFilter" placeholder="Max">
+                </div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="fromDateFilter" class="form-label">Date</label>
-                <input type="date" class="form-control amount-input" id="fromDateFilter" [(ngModel)]="fromDateFilter"
-                    placeholder="De">
-                <input type="date" class="form-control amount-input" id="toDateFilter" [(ngModel)]="toDateFilter"
-                    placeholder="Jusqu'à">
+        <div class="filters-actions">
+            <button class="btn-apply" (click)="filter()">
+                <i class="fa fa-search"></i> Appliquer les filtres
+            </button>
+        </div>
+    </div>
+
+    <!-- Receipts List -->
+    <div class="receipts-list" *ngIf="receipts?.length > 0">
+        <div class="receipt-item" *ngFor="let receipt of receipts">
+            <div class="receipt-type" [class.sold]="receipt?.type === 'SOLD'"
+                [class.loaded]="receipt?.type === 'LOADED'" [class.returned]="receipt?.type === 'RETURNED'">
+                <i class="fa" [class.fa-shopping-cart]="receipt?.type === 'SOLD'"
+                    [class.fa-truck]="receipt?.type === 'LOADED'" [class.fa-undo]="receipt?.type === 'RETURNED'"></i>
             </div>
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="minTotalFilter" class="form-label">Total</label>
-                <input type="number" class="form-control amount-input" id="minTotalFilter" [(ngModel)]="minTotalFilter"
-                    placeholder="De">
-                <input type="number" class="form-control amount-input" id="maxTotalFilter" [(ngModel)]="maxTotalFilter"
-                    placeholder="Jusqu'à">
+
+            <div class="receipt-info">
+                <div class="receipt-header">
+                    <span class="receipt-code">#{{ receipt?.code }}</span>
+                    <span class="receipt-badge" [class.sold]="receipt?.type === 'SOLD'"
+                        [class.loaded]="receipt?.type === 'LOADED'" [class.returned]="receipt?.type === 'RETURNED'">
+                        {{ receipt?.type === 'SOLD' ? 'Vente' : (receipt?.type === 'LOADED' ? 'Chargement' : 'Retour')
+                        }}
+                    </span>
+                </div>
+                <div class="receipt-details">
+                    <span class="receipt-name">
+                        <i class="fa fa-user"></i>
+                        {{ receipt?.name ? receipt.name : (receipt?.supplier ? (receipt.supplier.firstName || '') + ' '
+                        + (receipt.supplier.lastName || '') : '--') }}
+                    </span>
+                    <span class="receipt-date">
+                        <i class="fa fa-calendar"></i>
+                        {{ receipt?.date | date:'dd/MM/yyyy' }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="receipt-total" [class.sold]="receipt?.type === 'SOLD'"
+                [class.loaded]="receipt?.type === 'LOADED'">
+                <span class="total-value">{{ receipt?.total | number:'1.2-2' }}</span>
+                <span class="total-currency">DT</span>
+            </div>
+
+            <div class="receipt-actions">
+                <button class="btn-action view" (click)="viewReceipt(receipt)" title="Consulter">
+                    <fa-icon [icon]="faEye"></fa-icon>
+                </button>
+                <button class="btn-action pdf" (click)="downloadAsPDF(receipt?.id)" title="Télécharger PDF">
+                    <fa-icon [icon]="pdfIcon"></fa-icon>
+                </button>
+                <button class="btn-action delete" (click)="deleteReceipt(receipt)" title="Supprimer">
+                    <fa-icon [icon]="faTrash"></fa-icon>
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-12 table-bloc">
-            <table class="table table-responsive table-hover ">
-                <thead>
-                    <tr class="center">
-                        <th scope="col">Code</th>
-                        <th scope="col">Type</th>
-                        <th scope="col">Client ou Fournisseur</th>
-                        <th scope="col">Total</th>
-                        <th scope="col">Date</th>
-                        <th scope="col">Consulter</th>
-                        <th scope="col">PDF</th>
-                        <th scope="col">Supprimer</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let receipt of receipts">
-                        <td>{{receipt?.code}}</td>
-                        <td>{{receipt?.type == "SOLD" ? "Vente" : (receipt?.type == "LOADED" ? "Chargement" : "")}}</td>
-                        <td>{{
-                            receipt?.name ? (receipt?.name ? receipt?.name : "") :
-                            ((receipt?.supplier?.firstName || receipt?.supplier?.lastName) ?
-                            (receipt?.supplier?.firstName ? receipt?.supplier?.firstName : "")
-                            + " " +
-                            (receipt?.supplier?.lastName ? receipt?.supplier?.lastName : "" )
-                            : "")
-                            }}</td>
-                        <td>{{receipt?.total + ' DT'}}</td>
-                        <td>{{receipt?.date | date:'shortDate'}}</td>
-                        <td>
-                            <button class="action-button" (click)="viewReceipt(receipt)">
-                                <fa-icon [icon]="faEye" style="color: #004F9F;"></fa-icon>
-                            </button>
-                        </td>
-                        <td>
-                            <button class="action-button" (click)="downloadAsPDF(receipt?.id)">
-                                <fa-icon [icon]="pdfIcon" style="color: #871926;"></fa-icon>
-                            </button>
-                        </td>
-                        <td>
-                            <button class="action-button" (click)="deleteReceipt(receipt)">
-                                <fa-icon [icon]="faTrash" style="color: #DC3545;"></fa-icon>
-                            </button>
-                        </td>
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="count === 0">
+        <i class="fa fa-receipt"></i>
+        <h3>Aucune facture trouvée</h3>
+        <p>Essayez de modifier vos critères de recherche ou créez une nouvelle facture</p>
+        <button class="btn-add-empty" (click)="create()">
+            <i class="fa fa-plus"></i> Créer une facture
+        </button>
+    </div>
 
-                    </tr>
-                    <tr *ngIf="count == 0">
-                        <td colspan="8" class="not-found-message">Pas de facture trouvé</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
-            [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[5,10,20]" [hidePageSize]="false"
-            [pageIndex]="0" aria-label="Select page">
+    <!-- Pagination -->
+    <div class="pagination-wrapper" *ngIf="receipts?.length > 0">
+        <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
+            [showFirstLastButtons]="true" [pageSizeOptions]="[5, 10, 20]" [pageIndex]="0">
         </mat-paginator>
     </div>
+</div>
 
-    <!-- Hidden Printable Invoice Template -->
-    <div style="position: absolute; left: -9999px; top: 0;">
-        <div #printingInvoice>
-            <app-receipt-invoice *ngIf="printingReceipt" [receipt]="printingReceipt"
-                [store]="store"></app-receipt-invoice>
-        </div>
+<!-- Hidden Printable Invoice Template -->
+<div style="position: absolute; left: -9999px; top: 0;">
+    <div #printingInvoice>
+        <app-receipt-invoice *ngIf="printingReceipt" [receipt]="printingReceipt" [store]="store"></app-receipt-invoice>
     </div>
+</div>

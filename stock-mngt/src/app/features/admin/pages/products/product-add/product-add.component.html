@@ -1,206 +1,170 @@
-<div class="padding-page">
-    <div class="row actions-bloc d-flex justify-content-start mb-3">
-        <!-- Link to Product Management -->
-        <div class="col-auto">
-            <a (click)="navigateTo('/products')"
-                class="link-no-background text-decoration-none d-flex align-items-center">
-                <fa-icon [icon]="arrowLeftIcon" class="me-1"></fa-icon> <!-- Back Arrow -->
-                Gestions des Produits
-            </a>
-        </div>
-
-        <!-- Link to View Product if productId exists -->
-        <div class="col-auto" *ngIf="productId">
-            <a (click)="navigateTo('/products/view/' + product?.id)"
-                class="link-no-background text-decoration-none d-flex align-items-center">
-                <fa-icon [icon]="arrowLeftIcon" class="me-1"></fa-icon> <!-- Back Arrow -->
-                Consulter
-            </a>
-        </div>
+<div class="product-form-page">
+    <!-- Navigation -->
+    <div class="page-navigation">
+        <a class="nav-link" (click)="navigateTo('/products')">
+            <fa-icon [icon]="arrowLeftIcon"></fa-icon>
+            <span>Retour aux produits</span>
+        </a>
+        <a class="nav-link" *ngIf="productId" (click)="navigateTo('/products/view/' + product?.id)">
+            <i class="fa fa-eye"></i>
+            <span>Consulter</span>
+        </a>
     </div>
 
-    <div class="row screen-title-bloc mb-4">
-        <div class="col text-center">
-            <h2 class="screen-title">{{ productId ? 'Modifier' : 'Ajouter' }} un produit</h2>
-        </div>
-    </div>
-    <form [formGroup]="form" (ngSubmit)="productId ? update() : create() ">
-        <div class="row justify-content-center">
-            <div class="col-12 col-sm-12 col-md-12 col-lg-6 login-block">
-                <div class="mb-3 row">
-                    <label for="name" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Nom</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="text" [ngClass]="{'invalid':submitted && !form.get('name').value}"
-                            class="form-control" id="name" formControlName="name">
-                        <div *ngIf="submitted && !form.get('name').value" class="form-error">
-                            Le nom est obligatoire.
+    <!-- Page Header -->
+    <header class="page-header">
+        <h1>{{ productId ? 'Modifier' : 'Ajouter' }} un produit</h1>
+        <p>{{ productId ? 'Modifiez les informations du produit' : 'Renseignez les informations du nouveau produit' }}
+        </p>
+    </header>
+
+    <form [formGroup]="form" (ngSubmit)="productId ? update() : create()">
+        <div class="form-layout">
+            <!-- Left Column: Main Info -->
+            <div class="form-section">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2><i class="fa fa-info-circle"></i> Informations générales</h2>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-group">
+                            <label for="name">Nom du produit <span class="required">*</span></label>
+                            <input type="text" id="name" formControlName="name" placeholder="Ex: iPhone 15 Pro Max"
+                                [class.invalid]="submitted && !form.get('name').value">
+                            <span class="error-message" *ngIf="submitted && !form.get('name').value">
+                                Le nom est obligatoire
+                            </span>
                         </div>
-                    </div>
-                </div>
-                <!--<div class="mb-3 row">
-                    <label for="color" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Couleur</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <ng-select formControlName="color" name="color" id="color">
-                            <ng-option *ngFor="let element of colors" [value]="element">{{element}}</ng-option>
-                        </ng-select>
-                    </div>
-                </div>-->
 
-                <div class="mb-3 row">
-                    <label for="supplier" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Fournisseur</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <ng-select formControlName="supplierId" name="supplier" id="supplier">
-                            <ng-option *ngFor="let element of suppliers" [value]="element?.id">{{element.firstName + ' '
-                                +
-                                element.lastName}}</ng-option>
-                        </ng-select>
-                    </div>
-                </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="category"><i class="fa fa-folder"></i> Catégorie</label>
+                                <ng-select formControlName="categoryId" id="category" placeholder="Sélectionner...">
+                                    <ng-option *ngFor="let element of categories" [value]="element?.id">
+                                        {{ element?.name }}
+                                    </ng-option>
+                                </ng-select>
+                            </div>
 
-                <div class="mb-3 row">
-                    <label for="brand" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Marque</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <ng-select formControlName="brandId" name="brand" id="brand">
-                            <ng-option *ngFor="let element of brands"
-                                [value]="element?.id">{{element?.name}}</ng-option>
-                        </ng-select>
-                    </div>
-                </div>
-
-                <div class="mb-3 row">
-                    <label for="category" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Catégorie</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <ng-select formControlName="categoryId" name="category" id="category">
-                            <ng-option *ngFor="let element of categories"
-                                [value]="element?.id">{{element?.name}}</ng-option>
-                        </ng-select>
-                    </div>
-                </div>
-
-                <!--<div class="mb-3 row">
-                    <label for="category" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Catégorie</label>
-                    <div class="col-11 col-sm-11 col-md-8 col-lg-8" *ngIf="edit && !editCategory">
-                        <input type="text" class="form-control" [(ngModel)]="selectedCategory"
-                            [ngModelOptions]="{standalone: true}" disabled>
-                    </div>
-                    <div class="col-1 col-sm-1 col-md-1 col-lg-1 p-0" *ngIf="edit && !editCategory">
-                        <button (click)="editCategory = true" *ngIf="edit && !editCategory" class="edit-category"
-                            class="h-100 w-100 p-0"><fa-icon [icon]="editIcon"></fa-icon></button>
-                    </div>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9" *ngIf="!edit ||editCategory">
-                        <ng-select [(ngModel)]="parentCategory" name="category" id="category"
-                            [ngModelOptions]="{standalone: true}" (change)="categoryChanged(0)">
-                            <ng-option *ngFor="let element of categories" [value]="element">{{element.name}}</ng-option>
-                        </ng-select>
-
-                        <ng-select [(ngModel)]="subCategory" name="category" class="category-field" id="subCategory"
-                            *ngIf="parentCategory?.subCategories?.length > 0" [ngModelOptions]="{standalone: true}"
-                            (change)="categoryChanged(1)">
-                            <ng-option *ngFor="let element of parentCategory?.subCategories"
-                                [value]="element">{{element.name}}</ng-option>
-                        </ng-select>
-
-                        <ng-select [(ngModel)]="subCategory2" name="category" class="category-field" id="subCategory2"
-                            *ngIf="subCategory?.subCategories?.length > 0" [ngModelOptions]="{standalone: true}"
-                            (change)="categoryChanged(2)">
-                            <ng-option *ngFor="let element of subCategory?.subCategories"
-                                [value]="element">{{element.name}}</ng-option>
-                        </ng-select>
-
-                        <ng-select [(ngModel)]="subCategory3" name="category" class="category-field" id="subCategory3"
-                            *ngIf="subCategory2?.subCategories?.length > 0" [ngModelOptions]="{standalone: true}"
-                            (change)="categoryChanged(3)">
-                            <ng-option *ngFor="let element of subCategory2?.subCategories"
-                                [value]="element">{{element.name}}</ng-option>
-                        </ng-select>
-
-                        <ng-select [(ngModel)]="subCategory4" name="category" class="category-field" id="subCategory4"
-                            *ngIf="subCategory3?.subCategories?.length > 0" [ngModelOptions]="{standalone: true}">
-                            <ng-option *ngFor="let element of subCategory3?.subCategories"
-                                [value]="element">{{element.name}}</ng-option>
-                        </ng-select>
-                    </div>
-                </div>-->
-                <!--<div class="mb-3 row">
-                    <label for="size" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Taille</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="text" class="form-control" id="size" formControlName="size">
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="quantity" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Quantité</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="number" class="form-control" id="quantity" formControlName="quantity">
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="unit" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Unité</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="text" class="form-control" id="unit" formControlName="unit" placeholder="Piece, Litre, Gramme...">
-                    </div>
-                </div>-->
-                <div class="mb-3 row">
-                    <label for="buyingPrice" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Prix
-                        d'achat</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="number" class="form-control" id="buyingPrice" formControlName="buyingPrice">
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="sellingPrice" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Prix de
-                        vente</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="number" class="form-control" id="sellingPrice" formControlName="sellingPrice">
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="criticalStockIndicator" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Indicateur stock critique</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="number" class="form-control" id="criticalStockIndicator" formControlName="criticalStockIndicator">
-                    </div>
-                </div>
-                <div class="mb-3 row" *ngIf="!productId">
-                    <label for="quantity" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Quantité à
-                        recharger</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="number" class="form-control" id="quantity" formControlName="quantity">
-                    </div>
-                </div>
-                <!--
-                <div class="mb-3 row">
-                    <label for="date" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Date de recharge</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="datetime-local" class="form-control" formControlName="date" name="date" id="date">
-                    </div>
-                </div>-->
-                <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea maxlength="50000" rows="10" resize="none" class="form-control"
-                        formControlName="description" id="description">
-                    </textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="logo" class="form-label">Images</label>
-                    <div class="row images-bloc">
-                        <div class="col-6 col-md-4" *ngFor="let item of images">
-                            <div class="image-container">
-                                <button class="delete-button" (click)="deleteImage(item)"><fa-icon
-                                        [icon]="timesIcon"></fa-icon></button>
-                                <img src="{{environment.backend+'/'+item}}" alt="" class="h-100 w-100">
+                            <div class="form-group">
+                                <label for="brand"><i class="fa fa-tag"></i> Marque</label>
+                                <ng-select formControlName="brandId" id="brand" placeholder="Sélectionner...">
+                                    <ng-option *ngFor="let element of brands" [value]="element?.id">
+                                        {{ element?.name }}
+                                    </ng-option>
+                                </ng-select>
                             </div>
                         </div>
-                    </div>
-                    <input #fileInput type="file" class="form-control" (change)="process($event)"
-                        accept="image/x-png,image/gif,image/jpeg" multiple>
-                </div>
 
-                <div class="mb-3 row justify-content-end">
-                    <div class="col-12 col-sm-12 col-lg-auto">
-                        <button type="submit" class="btn btn-primary full-width" *ngIf="!productId">Ajouter</button>
-                        <button type="submit" class="btn btn-primary full-width" *ngIf="productId">Modifier</button>
+                        <div class="form-group">
+                            <label for="supplier"><i class="fa fa-truck"></i> Fournisseur</label>
+                            <ng-select formControlName="supplierId" id="supplier"
+                                placeholder="Sélectionner un fournisseur...">
+                                <ng-option *ngFor="let element of suppliers" [value]="element?.id">
+                                    {{ element.firstName + ' ' + element.lastName }}
+                                </ng-option>
+                            </ng-select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description"><i class="fa fa-align-left"></i> Description</label>
+                            <textarea id="description" formControlName="description" rows="5"
+                                placeholder="Décrivez votre produit..."></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Right Column: Pricing & Images -->
+            <div class="form-section">
+                <!-- Pricing Card -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2><i class="fa fa-coins"></i> Prix et stock</h2>
+                    </div>
+                    <div class="section-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="buyingPrice"><i class="fa fa-arrow-down text-danger"></i> Prix
+                                    d'achat</label>
+                                <div class="input-with-suffix">
+                                    <input type="number" id="buyingPrice" formControlName="buyingPrice"
+                                        placeholder="0.00">
+                                    <span class="suffix">DT</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="sellingPrice"><i class="fa fa-arrow-up text-success"></i> Prix de
+                                    vente</label>
+                                <div class="input-with-suffix">
+                                    <input type="number" id="sellingPrice" formControlName="sellingPrice"
+                                        placeholder="0.00">
+                                    <span class="suffix">DT</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profit-indicator"
+                            *ngIf="form.get('buyingPrice').value && form.get('sellingPrice').value">
+                            <i class="fa fa-chart-line"></i>
+                            <span>Marge: <strong>{{ (form.get('sellingPrice').value - form.get('buyingPrice').value) |
+                                    number:'1.2-2' }} DT</strong></span>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group" *ngIf="!productId">
+                                <label for="quantity"><i class="fa fa-cubes"></i> Quantité initiale</label>
+                                <input type="number" id="quantity" formControlName="quantity" placeholder="0">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="criticalStockIndicator"><i
+                                        class="fa fa-exclamation-triangle text-warning"></i> Seuil critique</label>
+                                <input type="number" id="criticalStockIndicator"
+                                    formControlName="criticalStockIndicator" placeholder="5">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Images Card -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2><i class="fa fa-images"></i> Images du produit</h2>
+                        <span class="image-count">{{ images?.length || 0 }}/3</span>
+                    </div>
+                    <div class="section-body">
+                        <div class="images-grid" *ngIf="images?.length > 0">
+                            <div class="image-preview" *ngFor="let item of images">
+                                <img [src]="environment.backend + '/' + item" alt="Product image">
+                                <button type="button" class="delete-image" (click)="deleteImage(item)">
+                                    <fa-icon [icon]="timesIcon"></fa-icon>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="upload-zone">
+                            <input #fileInput type="file" id="fileUpload" (change)="process($event)"
+                                accept="image/x-png,image/gif,image/jpeg" multiple hidden>
+                            <label for="fileUpload" class="upload-label">
+                                <i class="fa fa-cloud-upload-alt"></i>
+                                <span>Cliquez pour ajouter des images</span>
+                                <small>PNG, JPG ou GIF (max 3 images)</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="navigateTo('/products')">Annuler</button>
+            <button type="submit" class="btn-submit">
+                <i class="fa" [class.fa-plus]="!productId" [class.fa-save]="productId"></i>
+                {{ productId ? 'Enregistrer les modifications' : 'Ajouter le produit' }}
+            </button>
         </div>
     </form>
 </div>

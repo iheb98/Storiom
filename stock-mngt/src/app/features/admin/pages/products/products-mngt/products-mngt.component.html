@@ -1,162 +1,172 @@
-<div class="padding-page">
-    <div class="row title-bloc">
-        <h2 class="title">
-            Gestion des produits
-        </h2>
-    </div>
-    <div class="row d-flex">
-        <div class="col-12 mb-3">
-            <input type="name" id="form1" class="form-control search-input" placeholder="Rechercher"
-                [(ngModel)]="searchable" [ngModelOptions]="{standalone: true}" (keyup)="search()" />
+<div class="products-page">
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="header-content">
+            <h1>Gestion des Produits</h1>
+            <p>{{ count || 0 }} produits au total</p>
         </div>
-    </div>
-    <div class="row d-flex">
-        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary toggle-filters d-flex align-items-center" (click)="toggleFilters()">
-                <mat-icon class="me-2">more_vert</mat-icon> Afficher / Masquer les Filtres
+        <button class="btn-add" (click)="create()">
+            <i class="fa fa-plus"></i>
+            <span>Nouveau Produit</span>
+        </button>
+    </header>
+
+    <!-- Search and Actions Bar -->
+    <div class="search-bar">
+        <div class="search-input-wrapper">
+            <i class="fa fa-search"></i>
+            <input type="text" placeholder="Rechercher un produit..." [(ngModel)]="searchable"
+                [ngModelOptions]="{standalone: true}" (keyup)="search()">
+        </div>
+        <div class="action-buttons">
+            <button class="btn-filter" [class.active]="!filtersCollapsed" (click)="toggleFilters()">
+                <i class="fa fa-filter"></i>
+                <span>Filtres</span>
             </button>
-        </div>
-        <div class="col-12 col-sm-12 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary add-button d-flex align-items-center" (click)="create()">
-                <mat-icon class="me-2">add</mat-icon> Ajouter
-            </button>
-        </div>
-        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-secondary d-flex align-items-center" (click)="reset()">
-                <mat-icon class="me-2">restart_alt</mat-icon> Réinitialiser
-            </button>
-        </div>
-        <div class="col-6 col-sm-6 col-md-auto col-lg-auto mb-3">
-            <button class="btn btn-primary d-flex align-items-center" (click)="filter()">
-                <mat-icon class="me-2">search</mat-icon> Filtrer
+            <button class="btn-reset" (click)="reset()">
+                <i class="fa fa-undo"></i>
             </button>
         </div>
     </div>
 
-    <div class="filter-section" [ngClass]="{'collapsed': filtersCollapsed}">
-
-        <div class="row">
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="name" class="form-label">Nom</label>
-                <input type="text" class="form-control" id="name" [(ngModel)]="nameFilter">
+    <!-- Filters Panel -->
+    <div class="filters-panel" [class.collapsed]="filtersCollapsed">
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label><i class="fa fa-tag"></i> Nom</label>
+                <input type="text" [(ngModel)]="nameFilter" placeholder="Rechercher par nom...">
             </div>
 
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="description" class="form-label">Description contient</label>
-                <input type="text" class="form-control" id="description" [(ngModel)]="descriptionFilter">
+            <div class="filter-group">
+                <label><i class="fa fa-align-left"></i> Description</label>
+                <input type="text" [(ngModel)]="descriptionFilter" placeholder="Contient...">
             </div>
 
-            <!--<div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="color" class="form-label">Couleur</label>
-                <input type="text" class="form-control" id="color" [(ngModel)]="colorFilter">
-            </div>-->
-
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="supplier" class="form-label">Fournisseur</label>
-                <ng-select [(ngModel)]="supplierFilter" name="supplier">
-                    <ng-option *ngFor="let element of suppliers" [value]="element?.id">{{element.firstName + ' ' +
-                        element.lastName}}</ng-option>
+            <div class="filter-group">
+                <label><i class="fa fa-truck"></i> Fournisseur</label>
+                <ng-select [(ngModel)]="supplierFilter" placeholder="Tous les fournisseurs">
+                    <ng-option *ngFor="let element of suppliers" [value]="element?.id">
+                        {{ element.firstName + ' ' + element.lastName }}
+                    </ng-option>
                 </ng-select>
             </div>
 
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="category" class="form-label">Catégorie</label>
-                <ng-select [(ngModel)]="categoryFilter" name="category">
-                    <ng-option *ngFor="let element of categories" [value]="element?.id">{{element.name }}</ng-option>
+            <div class="filter-group">
+                <label><i class="fa fa-folder"></i> Catégorie</label>
+                <ng-select [(ngModel)]="categoryFilter" placeholder="Toutes les catégories">
+                    <ng-option *ngFor="let element of categories" [value]="element?.id">
+                        {{ element.name }}
+                    </ng-option>
                 </ng-select>
             </div>
+
+            <div class="filter-group range-group">
+                <label><i class="fa fa-cubes"></i> Quantité</label>
+                <div class="range-inputs">
+                    <input type="number" [(ngModel)]="minQuantityFilter" placeholder="Min">
+                    <span class="range-separator">—</span>
+                    <input type="number" [(ngModel)]="maxQuantityFilter" placeholder="Max">
+                </div>
+            </div>
+
+            <div class="filter-group range-group">
+                <label><i class="fa fa-arrow-down"></i> Prix d'achat</label>
+                <div class="range-inputs">
+                    <input type="number" [(ngModel)]="minBuyingPriceFilter" placeholder="Min">
+                    <span class="range-separator">—</span>
+                    <input type="number" [(ngModel)]="maxBuyingPriceFilter" placeholder="Max">
+                </div>
+            </div>
+
+            <div class="filter-group range-group">
+                <label><i class="fa fa-arrow-up"></i> Prix de vente</label>
+                <div class="range-inputs">
+                    <input type="number" [(ngModel)]="minSellingPriceFilter" placeholder="Min">
+                    <span class="range-separator">—</span>
+                    <input type="number" [(ngModel)]="maxSellingPriceFilter" placeholder="Max">
+                </div>
+            </div>
         </div>
 
-        <div class="row">
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="minQuantityFilter" class="form-label">Quantité</label>
-                <input type="number" class="form-control amount-input" id="minQuantityFilter"
-                    [(ngModel)]="minQuantityFilter" placeholder="De">
-                <input type="number" class="form-control amount-input" id="maxQuantityFilter"
-                    [(ngModel)]="maxQuantityFilter" placeholder="Jusqu'à">
+        <div class="filters-actions">
+            <button class="btn-apply" (click)="filter()">
+                <i class="fa fa-search"></i> Appliquer les filtres
+            </button>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-grid" *ngIf="products?.length > 0">
+        <div class="product-card" *ngFor="let item of products">
+            <!-- Product Image -->
+            <div class="product-image"
+                (click)="openImage(item?.images[0] ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png')">
+                <img [src]="item?.images[0] ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png'"
+                    alt="{{ item?.name }}">
+                <div class="image-overlay">
+                    <i class="fa fa-search-plus"></i>
+                </div>
+                <span class="quantity-badge" [class.critical]="item?.quantity <= 5"
+                    [class.warning]="item?.quantity > 5 && item?.quantity <= 10" [class.good]="item?.quantity > 10">
+                    {{ item?.quantity }} en stock
+                </span>
             </div>
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="minBuyingPriceFilter" class="form-label">Prix d'achat</label>
-                <input type="number" class="form-control amount-input" id="minBuyingPriceFilter"
-                    [(ngModel)]="minBuyingPriceFilter" placeholder="De">
-                <input type="number" class="form-control amount-input" id="maxBuyingPriceFilter"
-                    [(ngModel)]="maxBuyingPriceFilter" placeholder="Jusqu'à">
+
+            <!-- Product Info -->
+            <div class="product-info">
+                <h3 class="product-name">{{ item?.name }}</h3>
+                <span class="product-category">{{ item?.category?.name || 'Sans catégorie' }}</span>
+
+                <div class="product-prices">
+                    <div class="price selling">
+                        <span class="price-label">Vente</span>
+                        <span class="price-value">{{ item?.sellingPrice | number:'1.2-2' }} {{ item?.currency || 'DT'
+                            }}</span>
+                    </div>
+                </div>
             </div>
-            <div class="col-6 col-sm-6 col-md-4 col-lg-3 mb-3">
-                <label for="minSellingPriceFilter" class="form-label">Prix de vente</label>
-                <input type="number" class="form-control amount-input" id="minSellingPriceFilter"
-                    [(ngModel)]="minSellingPriceFilter" placeholder="De">
-                <input type="number" class="form-control amount-input" id="maxSellingPriceFilter"
-                    [(ngModel)]="maxSellingPriceFilter" placeholder="Jusqu'à">
+
+            <!-- Product Actions -->
+            <div class="product-actions">
+                <button class="btn-action view" (click)="consulter(item?.id)" title="Consulter">
+                    <i class="fa fa-eye"></i>
+                </button>
+                <button class="btn-action edit" (click)="navigateTo('/products/edit/' + item?.id)" title="Modifier">
+                    <fa-icon [icon]="editIcon"></fa-icon>
+                </button>
+                <button class="btn-action sell" (click)="sell(item)" title="Vendre">
+                    <i class="fa fa-shopping-cart"></i>
+                </button>
+                <button class="btn-action load" (click)="load(item)" title="Charger">
+                    <i class="fa fa-truck"></i>
+                </button>
+                <button class="btn-action delete" (click)="deleteProduct(item)" title="Supprimer">
+                    <fa-icon [icon]="deleteIcon"></fa-icon>
+                </button>
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-6 col-md-6 col-lg-4 card-container" *ngFor="let item of products">
-            <div class="card h-100 d-flex flex-column">
-                <!-- Header -->
-                <div class="card-header d-flex align-items-center justify-content-between overflow-hidden">
-                    <span class="card-title text-truncate flex-grow-1 me-2">{{ item?.name }}</span>
-                    <div class="d-flex gap-1 icon-buttons">
-                        <button type="button" class="btn btn-sm btn-outline-secondary"
-                            (click)="navigateTo('/products/edit/' + item?.id)">
-                            <fa-icon [icon]="editIcon" class="icon-sm"></fa-icon>
-                        </button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteProduct(item)">
-                            <fa-icon [icon]="deleteIcon" class="icon-sm"></fa-icon>
-                        </button>
-                    </div>
-                </div>
 
-                <!-- Image -->
-                <div class="card-body p-0">
-                    <img [src]="item?.images[0] ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png'"
-                        class="img-fluid w-100 object-fit-cover" style="max-height: 250px" alt="Image"
-                        (click)="openImage(item?.images[0] ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png')">
-                </div>
-
-                <!-- Footer -->
-                <div class="card-footer">
-                    <div class="row product-info mb-2">
-                        <div class="col-12">
-                            <div><label>Catégorie :</label> <span>{{ item?.category?.name || "--" }}</span></div>
-                            <div><label>Prix de vente :</label>
-                                <span>{{ item?.sellingPrice ? (item.sellingPrice + ' ' + (item.currency || ' DT')) :
-                                    '--' }}</span>
-                            </div>
-                            <div><label>Quantité :</label> <span>{{ item?.quantity || "--" }}</span></div>
-                        </div>
-                    </div>
-
-                    <!-- Bottom Buttons -->
-                    <div class="row g-2">
-                        <div class="col-12 col-md-4">
-                            <button type="button" class="btn btn-primary w-100 responsive-button"
-                                (click)="consulter(item?.id)">Consulter</button>
-                        </div>
-                        <div class="col-6 col-md-4">
-                            <button type="button" class="btn btn-success w-100 responsive-button"
-                                (click)="sell(item)">Vendre</button>
-                        </div>
-                        <div class="col-6 col-md-4">
-                            <button type="button" class="btn btn-danger w-100 responsive-button"
-                                (click)="load(item)">Charger</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="products?.length === 0">
+        <i class="fa fa-box-open"></i>
+        <h3>Aucun produit trouvé</h3>
+        <p>Essayez de modifier vos critères de recherche ou ajoutez un nouveau produit</p>
+        <button class="btn-add-empty" (click)="create()">
+            <i class="fa fa-plus"></i> Ajouter un produit
+        </button>
     </div>
-    <div class="row">
-        <div class="col-12">
-            <mat-paginator #paginator class="paginator" (page)="handlePageEvent($event)" [length]="count"
-                [pageSize]="24" [disabled]="false" [showFirstLastButtons]="true" [pageSizeOptions]="[24,48,100,200]"
-                [hidePageSize]="false" [pageIndex]="0" aria-label="Select page">
-            </mat-paginator>
-        </div>
+
+    <!-- Pagination -->
+    <div class="pagination-wrapper" *ngIf="products?.length > 0">
+        <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="24"
+            [showFirstLastButtons]="true" [pageSizeOptions]="[24, 48, 100, 200]" [pageIndex]="0">
+        </mat-paginator>
     </div>
 </div>
+
+<!-- Image Popup -->
 <div class="image-popup" *ngIf="selectedImage" (click)="closeImage()">
     <img [src]="selectedImage" alt="Zoomed Image">
+    <button class="close-popup"><i class="fa fa-times"></i></button>
 </div>

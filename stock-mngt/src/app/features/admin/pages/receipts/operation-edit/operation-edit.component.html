@@ -1,57 +1,86 @@
-<ngx-loading-x [show]="loading" [spinnerColor]="'#683ab7'"></ngx-loading-x>
-<div class="padding-page">
-    <div class="row title-bloc">
-        <h2 class="title">
-            Modifier une Opération
-        </h2>
-    </div>
+<div class="operation-edit-page">
+    <!-- Page Header -->
+    <header class="page-header">
+        <a class="back-link" (click)="navigateTo('/operations')">
+            <i class="fa fa-arrow-left"></i>
+            <span>Retour aux opérations</span>
+        </a>
+        <h1>Modifier une opération</h1>
+    </header>
+
     <form [formGroup]="form" (ngSubmit)="edit()">
-        <div class="row justify-content-center">
-            <div class="col-12 col-sm-12 col-md-12 col-lg-6 login-block">
-                <div class="mb-3 row">
-                    <label for="productName" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Produit</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="text" class="form-control" id="productName" formControlName="productName" [disabled]="true" >
+        <div class="form-card">
+            <!-- Product Info (Read-only) -->
+            <div class="product-header">
+                <div class="product-icon">
+                    <i class="fa fa-box"></i>
+                </div>
+                <div class="product-info">
+                    <span class="product-label">Produit</span>
+                    <span class="product-name">{{ form.get('productName').value || 'Chargement...' }}</span>
+                </div>
+                <div class="type-badge" [class.sold]="form.get('type').value === 'SOLD'"
+                    [class.loaded]="form.get('type').value === 'LOADED'"
+                    [class.returned]="form.get('type').value === 'RETURNED'">
+                    <i class="fa" [class.fa-shopping-cart]="form.get('type').value === 'SOLD'"
+                        [class.fa-truck]="form.get('type').value === 'LOADED'"
+                        [class.fa-undo]="form.get('type').value === 'RETURNED'"></i>
+                    {{ form.get('type').value === 'SOLD' ? 'Vente' : (form.get('type').value === 'LOADED' ? 'Chargement'
+                    : 'Retour') }}
+                </div>
+            </div>
+
+            <!-- Form Fields -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fa fa-coins"></i> Prix et quantité</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="price"><i class="fa fa-tag"></i> Prix unitaire</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="price" formControlName="price" (change)="calculateTotal()"
+                                placeholder="0.00">
+                            <span class="suffix">DT</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount"><i class="fa fa-cubes"></i> Quantité</label>
+                        <input type="number" id="amount" formControlName="amount" (change)="calculateTotal()"
+                            placeholder="0">
                     </div>
                 </div>
-                <div class="mb-3 row">
-                    <label for="firstName" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Type</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <ng-select formControlName="type" name="type" id="type">
-                            <ng-option *ngFor="let element of types"
-                                [value]="element?.value">{{element?.label}}</ng-option>
-                        </ng-select>
+
+                <!-- Total Display -->
+                <div class="total-display">
+                    <div class="total-label">
+                        <i class="fa fa-calculator"></i>
+                        <span>Total calculé</span>
+                    </div>
+                    <div class="total-value">
+                        <span class="amount">{{ form.get('total').value | number:'1.2-2' }}</span>
+                        <span class="currency">DT</span>
                     </div>
                 </div>
-                <div class="mb-3 row">
-                    <label for="price" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Prix</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="number" class="form-control" id="price" formControlName="price" (change)="calculateTotal()">
-                    </div>
+            </div>
+
+            <!-- Date Section -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fa fa-calendar-alt"></i> Date de l'opération</h3>
+
+                <div class="form-group">
+                    <label for="date"><i class="fa fa-clock"></i> Date et heure</label>
+                    <input type="datetime-local" id="date" formControlName="date">
                 </div>
-                <div class="mb-3 row">
-                    <label for="amount" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Quantité</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="number" class="form-control" id="amount" formControlName="amount" (change)="calculateTotal()">
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="total" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Total</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="number" class="form-control" id="total" formControlName="total">
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="date" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Date</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="datetime-local" class="form-control" id="date" formControlName="date">
-                    </div>
-                </div>
-                <div class="mb-3 row justify-content-end">
-                    <div class="col-12 col-sm-12 col-lg-auto">
-                        <button type="submit" class="btn btn-primary full-width">Modifier</button>
-                    </div>
-                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" (click)="navigateTo('/operations')">Annuler</button>
+                <button type="submit" class="btn-submit" [disabled]="loading">
+                    <i class="fa" [class.fa-save]="!loading" [class.fa-spinner]="loading" [class.fa-spin]="loading"></i>
+                    {{ loading ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+                </button>
             </div>
         </div>
     </form>
