@@ -87,14 +87,10 @@ export class RegisterComponent implements OnInit {
         })
     }
   }
-  openModal(event: Event) {
-    event.preventDefault(); // This stops the navigation to root
-  }
+  showTermsModal = false;
 
   openTermsDialog(event: Event): void {
     event.preventDefault();
-    this.dialog.open(TermsComponent, {
-      width: '600px'
-    });
+    this.showTermsModal = true;
   }
 }

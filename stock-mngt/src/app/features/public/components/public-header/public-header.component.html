@@ -22,6 +22,7 @@
         <div class="navbar-links" [class.open]="isMenuOpen">
             <a routerLink="/publicProducts" routerLinkActive="active" (click)="isMenuOpen = false">Boutique</a>
             <a routerLink="/stores" routerLinkActive="active" (click)="isMenuOpen = false">Magasins</a>
+            <a (click)="goToSellerSpace()" class="seller-link" [class.active]="isSellerActive()">Espace Vendeur</a>
 
             <div class="icon-links">
                 <a (click)="goToCart(); isMenuOpen = false" class="nav-icon" title="Panier">

@@ -87,4 +87,23 @@ export class PublicHeaderComponent implements OnInit {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
+  goToSellerSpace() {
+    this.isMenuOpen = false;
+    if (this.authService.isLoggedIn()) {
+      const user = this.authService.getConnectedUser();
+      if (user?.store) {
+        this.router.navigate(['/admin/stores/view']);
+        return;
+      }
+    }
+    this.router.navigate(['/seller-onboarding']);
+  }
+
+  isSellerActive(): boolean {
+    const url = this.router.url;
+    return url.includes('/seller-onboarding') ||
+      url.includes('/create-store') ||
+      url.includes('/admin');
+  }
+
 }

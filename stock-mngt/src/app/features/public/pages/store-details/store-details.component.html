@@ -1,0 +1,81 @@
+<div class="store-details-container" *ngIf="store">
+    <!-- Store Header -->
+    <div class="store-header">
+        <div class="header-content">
+            <div class="logo">
+                <img [src]="store.logo ? environment.backend + '/' + store.logo : 'assets/default_store.png'"
+                    alt="Logo">
+            </div>
+            <div class="info">
+                <h1>{{ store.name }}</h1>
+                <p class="desc">{{ store.description }}</p>
+                <div class="contact-info">
+                    <span *ngIf="store.address"><i class="fa fa-map-marker-alt"></i> {{ store.address.city }}, {{
+                        store.address.country }}</span>
+                    <span *ngIf="store.email"><i class="fa fa-envelope"></i> {{ store.email }}</span>
+                    <span *ngIf="store.phone"><i class="fa fa-phone"></i> {{ store.phone }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-layout">
+        <!-- Sidebar Filters -->
+        <aside class="filters-sidebar">
+            <div class="filter-group start-group">
+                <h3>Rechercher</h3>
+                <div class="search-box">
+                    <input type="text" placeholder="Produit..." [(ngModel)]="searchText">
+                    <button (click)="applyFilters()"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h3>Catégories</h3>
+                <ng-select [items]="categories" bindLabel="name" bindValue="id" placeholder="Toutes les catégories"
+                    [(ngModel)]="selectedCategory" (change)="applyFilters()">
+                </ng-select>
+            </div>
+
+            <div class="filter-group">
+                <h3>Prix (TND)</h3>
+                <div class="price-inputs">
+                    <input type="number" placeholder="Min" [(ngModel)]="minPrice">
+                    <span>-</span>
+                    <input type="number" placeholder="Max" [(ngModel)]="maxPrice">
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button class="apply-btn" (click)="applyFilters()">Appliquer</button>
+                <button class="reset-btn" (click)="resetFilters()">Réinitialiser</button>
+            </div>
+        </aside>
+
+        <!-- Products Grid -->
+        <div class="products-area">
+            <div class="sort-bar">
+                <span>{{ totalProducts }} produits trouvés</span>
+                <select [(ngModel)]="sortBy" (change)="applyFilters()">
+                    <option value="createdAtDesc">Plus récents</option>
+                    <option value="priceAsc">Prix croissant</option>
+                    <option value="priceDesc">Prix décroissant</option>
+                </select>
+            </div>
+
+            <div class="products-grid" *ngIf="products.length > 0; else noProducts">
+                <app-product-card *ngFor="let product of products" [product]="product"></app-product-card>
+            </div>
+
+            <ng-template #noProducts>
+                <div class="no-products">
+                    <p>Aucun produit trouvé dans ce magasin.</p>
+                </div>
+            </ng-template>
+
+            <mat-paginator [length]="totalProducts" [pageSize]="pageSize" [pageSizeOptions]="[12, 24, 48]"
+                (page)="onPageChange($event)" *ngIf="totalProducts > 0">
+            </mat-paginator>
+        </div>
+    </div>
+</div>

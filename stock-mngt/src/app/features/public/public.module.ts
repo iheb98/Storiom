@@ -31,6 +31,12 @@ import { PublicViewProductComponent } from './pages/public-view-product/public-v
 import { CartComponent } from './pages/cart/cart.component';
 import { AccountComponent } from './pages/account/account.component';
 import { ProfileDetailsComponent } from './components/profile-details/profile-details.component';
+import { StoresListComponent } from './pages/stores-list/stores-list.component';
+import { StoreDetailsComponent } from './pages/store-details/store-details.component';
+import { SellerOnboardingComponent } from './pages/seller-onboarding/store-onboarding.component';
+import { CreateStoreComponent } from './pages/create-store/store-add.component';
+import { LoginComponent } from 'src/app/general/login/login.component';
+import { RegisterComponent } from 'src/app/general/register/register.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +50,13 @@ import { ProfileDetailsComponent } from './components/profile-details/profile-de
     PublicViewProductComponent,
     CartComponent,
     AccountComponent,
-    ProfileDetailsComponent
+    ProfileDetailsComponent,
+    StoresListComponent,
+    StoreDetailsComponent,
+    SellerOnboardingComponent,
+    CreateStoreComponent,
+    LoginComponent,
+    RegisterComponent
   ],
   imports: [
     CommonModule,

@@ -67,6 +67,7 @@ import { OrdersMngtComponent } from './pages/orders/orders-mngt/orders-mngt.comp
 
 
 import { ReceiptInvoiceComponent } from './components/receipt-invoice/receipt-invoice.component';
+import { StoreOnboardingComponent } from './pages/stores/store-onboarding/store-onboarding.component';
 
 @NgModule({
   declarations: [
@@ -115,7 +116,8 @@ import { ReceiptInvoiceComponent } from './components/receipt-invoice/receipt-in
     OperationEditComponent,
     ParentCategoriesStatsComponent,
     OrdersMngtComponent,
-    ReceiptInvoiceComponent
+    ReceiptInvoiceComponent,
+    StoreOnboardingComponent
   ],
   imports: [
     CommonModule,

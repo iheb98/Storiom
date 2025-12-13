@@ -44,6 +44,10 @@ export class PublicService {
     return this.http.get<any>(this.apiUrl + '/allStores');
   }
 
+  getStoreById(id: any): Observable<any> {
+    return this.http.get<any>(this.apiUrl + '/store/' + id);
+  }
+
 
   /**
    * Fetches the category tree for the sidebar.

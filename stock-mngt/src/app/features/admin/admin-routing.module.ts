@@ -9,6 +9,7 @@ import { AuthGuard } from 'src/app/core/services/auth.guard';
 import { StoresMngtComponent } from 'src/app/features/admin/pages/stores/stores-mngt/stores-mngt.component';
 import { StoreAddComponent } from 'src/app/features/admin/pages/stores/store-add/store-add.component';
 import { StoreViewComponent } from 'src/app/features/admin/pages/stores/store-view/store-view.component';
+import { StoreOnboardingComponent } from 'src/app/features/admin/pages/stores/store-onboarding/store-onboarding.component';
 import { CategoriesMngtComponent } from 'src/app/features/admin/pages/categories/categories-mngt/categories-mngt.component';
 import { SupplierAddComponent } from 'src/app/features/admin/pages/suppliers/supplier-add/supplier-add.component';
 import { SuppliersMngtComponent } from 'src/app/features/admin/pages/suppliers/suppliers-mngt/suppliers-mngt.component';
@@ -44,6 +45,7 @@ const routes: Routes = [
       { path: 'stores', component: StoresMngtComponent },
       { path: 'stores/add', component: StoreAddComponent },
       { path: 'stores/view', component: StoreViewComponent },
+      { path: 'stores/onboarding', component: StoreOnboardingComponent },
       { path: 'stores/edit/:id', component: StoreAddComponent },
 
       // ------------ Brands ------------

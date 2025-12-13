@@ -1,0 +1,37 @@
+<div class="stores-page-container">
+    <div class="page-header">
+        <h1>Nos Magasins</h1>
+        <p>Découvrez nos partenaires locaux et leurs produits uniques.</p>
+    </div>
+
+    <div class="search-container">
+        <input type="text" placeholder="Rechercher un magasin par nom ou ville..." [(ngModel)]="searchText"
+            (input)="filterStores()">
+        <span class="search-icon"><i class="fa fa-search"></i></span>
+    </div>
+
+    <div class="stores-grid">
+        <div class="store-card" *ngFor="let store of filteredStores" [routerLink]="['/stores', store.id]">
+            <div class="logo-wrapper">
+                <img *ngIf="store.logo"
+                    [src]="store.logo ? environment.backend + '/' + store.logo : 'assets/default_store.png'"
+                    alt="{{store.name}}">
+            </div>
+            <div class="store-info">
+                <h3>{{ store.name }}</h3>
+                <p class="location" *ngIf="store.address">
+                    <i class="fa fa-map-marker-alt"></i>
+                    {{ store.address.city }}, {{ store.address.street }}
+                </p>
+                <p class="desc">{{ store.description || 'Bienvenue dans notre boutique.' }}</p>
+                <div class="actions">
+                    <button class="visit-btn">Visiter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="no-results" *ngIf="filteredStores.length === 0">
+        <p>Aucun magasin trouvé.</p>
+    </div>
+</div>

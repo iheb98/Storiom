@@ -29,8 +29,7 @@ const routes: Routes = [
   },
 
   // ------------ General Pages ------------
-  { path: 'login', component: LoginComponent, data: { loginPage: true } },
-  { path: 'register', component: RegisterComponent, data: { loginPage: true } },
+
   { path: 'confirm', component: ConfirmAccountComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password/:token', component: ResetPasswordComponent },
@@ -44,4 +43,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

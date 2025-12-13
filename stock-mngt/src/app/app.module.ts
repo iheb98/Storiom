@@ -82,8 +82,6 @@ import { PublicModule } from './features/public/public.module';
   declarations: [
     AppComponent,
     MainComponent,
-    LoginComponent,
-    RegisterComponent,
     LandingPageComponent,
     SubscriptionComponent,
     ForgotPasswordComponent,

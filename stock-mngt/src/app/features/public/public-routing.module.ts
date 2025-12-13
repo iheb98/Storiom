@@ -7,6 +7,13 @@ import { PublicProductsComponent } from './pages/public-products/public-products
 import { PublicViewProductComponent } from './pages/public-view-product/public-view-product.component';
 import { CartComponent } from './pages/cart/cart.component';
 import { AccountComponent } from './pages/account/account.component';
+import { StoresListComponent } from './pages/stores-list/stores-list.component';
+import { StoreDetailsComponent } from './pages/store-details/store-details.component';
+import { SellerOnboardingComponent } from './pages/seller-onboarding/store-onboarding.component';
+import { CreateStoreComponent } from './pages/create-store/store-add.component';
+import { AuthGuard } from 'src/app/core/services/auth.guard';
+import { LoginComponent } from 'src/app/general/login/login.component';
+import { RegisterComponent } from 'src/app/general/register/register.component';
 
 const routes: Routes = [
   {
@@ -16,8 +23,14 @@ const routes: Routes = [
       { path: '', component: HomeComponent },
       { path: 'publicProducts', component: PublicProductsComponent },
       { path: 'publicProduct/:id', component: PublicViewProductComponent },
+      { path: 'stores', component: StoresListComponent },
+      { path: 'stores/:id', component: StoreDetailsComponent },
+      { path: 'seller-onboarding', component: SellerOnboardingComponent },
+      { path: 'create-store', component: CreateStoreComponent, canActivate: [AuthGuard] },
       { path: 'cart', component: CartComponent },
       { path: 'account', component: AccountComponent },
+      { path: 'login', component: LoginComponent },
+      { path: 'register', component: RegisterComponent },
       /*{ path: 'product/:id', component: ProductDetailsComponent },
      { path: 'cart', component: CartComponent },
      { path: 'checkout', component: CheckoutComponent }*/
