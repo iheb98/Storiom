@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Product, Category, Store, Supplier } = require('../models');
+const { Product, Category, Store, Supplier, Review, User, Address } = require('../models');
 const { Op, Sequelize, where } = require('sequelize');
 const utility = require('../utility');
 
@@ -21,7 +21,8 @@ router.get('/products/random', async (req, res) => {
             order: Sequelize.literal('RANDOM()'), // This works for PostgreSQL and SQLite
             limit: limit,
             include: [
-                { model: Store, as: 'store', attributes: ['name'] }
+                { model: Store, as: 'store', attributes: ['name'] },
+                { model: Review, as: 'reviews', attributes: ['rating'] }
             ]
         });
         res.json(products);
@@ -84,7 +85,10 @@ router.get('/products/search', async (req, res) => {
                     { description: { [Op.iLike]: `%${query}%` } }
                 ]
             },
-            limit: 20 // Limit search results
+            limit: 20, // Limit search results
+            include: [
+                { model: Review, as: 'reviews', attributes: ['rating'] }
+            ]
         });
         res.json(products);
     } catch (err) {
@@ -216,7 +220,9 @@ router.get('/allStores/products', async (req, res) => {
                 where: whereClause,
                 include: [
                     { model: Supplier, as: 'supplier', required: false },
-                    { model: Category, as: 'category', required: false }
+                    { model: Category, as: 'category', required: false },
+                    { model: Store, as: 'store', attributes: ['name', 'isSupportingDeliveries'], required: false },
+                    { model: Review, as: 'reviews', attributes: ['rating'], required: false }
                 ],
                 order
             }, pagination)
@@ -295,7 +301,13 @@ router.get('/allStores/products/count', async (req, res) => {
 
 
 router.get('/allStores', (req, res, next) => {
-    Store.findAll().then(stores => {
+    Store.findAll({
+        where: {
+            active: true,
+            isVisibleToPublic: true
+        },
+        include: ['address']
+    }).then(stores => {
         res.json(stores)
     }).catch(err => {
         res.status(500).json({
@@ -305,6 +317,28 @@ router.get('/allStores', (req, res, next) => {
     })
 });
 
+/**
+ * @route   GET /api/public/store/:id
+ * @desc    Get a single public store details
+ * @access  Public
+ */
+router.get('/store/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const store = await Store.findOne({
+            where: { id, active: true },
+            include: ['address']
+        });
+        if (!store) {
+            return res.status(404).json({ message: 'Store not found' });
+        }
+        res.json(store);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
 router.get('/publicProduct/:id', (req, res, next) => {
     const id = req.params.id;
     Product.findOne({
@@ -312,7 +346,17 @@ router.get('/publicProduct/:id', (req, res, next) => {
             id,
             isVisible: true,
             toDisplay: true
-        }, include: ['brand', 'category', 'supplier', 'store']
+        }, include: ['brand', 'category', 'supplier', 'store', {
+            model: Review,
+            as: 'reviews',
+            where: { status: 'approved' },
+            required: false, // Include even if no reviews
+            include: [{
+                model: User,
+                as: 'user',
+                attributes: ['firstName', 'lastName']
+            }]
+        }]
     }).then(product => {
         res.json(product)
 
@@ -322,6 +366,56 @@ router.get('/publicProduct/:id', (req, res, next) => {
             message: err.toString()
         })
     })
+});
+
+router.post('/reviews', utility.authenticate, async (req, res) => {
+    let { rating, comment, productId } = req.body;
+    productId = parseInt(productId); // Ensure productId is an integer
+    try {
+        console.log(`[DEBUG] POST /reviews - User: ${req.user.id}, Product: ${productId}`);
+        const existingReview = await Review.findOne({
+            where: {
+                userId: req.user.id,
+                productId: productId
+            }
+        });
+        console.log(`[DEBUG] Existing review found: ${!!existingReview}`);
+
+        if (existingReview) {
+            existingReview.rating = rating;
+            existingReview.comment = comment;
+            existingReview.status = 'approved'; // Re-approve on edit? Or keep 'pending'? Let's keep 'approved' for now.
+            await existingReview.save();
+
+            // Fetch updated with user details
+            const updatedReview = await Review.findOne({
+                where: { id: existingReview.id },
+                include: [{ model: User, as: 'user', attributes: ['firstName', 'lastName'] }]
+            });
+            return res.json(updatedReview);
+
+        } else {
+            const newReview = await Review.create({
+                rating,
+                comment,
+                productId,
+                userId: req.user.id,
+                status: 'approved'
+            });
+
+            const fullReview = await Review.findOne({
+                where: { id: newReview.id },
+                include: [{ model: User, as: 'user', attributes: ['firstName', 'lastName'] }]
+            });
+            return res.json(fullReview);
+        }
+
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        });
+    }
 });
 
 module.exports = router;

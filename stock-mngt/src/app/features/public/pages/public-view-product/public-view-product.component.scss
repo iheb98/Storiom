@@ -18,9 +18,9 @@
 // IMAGES COLUMN
 // ----------------------------------------------------
 .images-column {
-  position: sticky;
-  top: 100px;
-  align-self: start;
+  // position: sticky;
+  // top: 100px;
+  // align-self: start;
 
   .main-image {
     border-radius: 12px;
@@ -81,12 +81,23 @@
 
   .rating-placeholder {
     color: #ffb400;
-    font-size: 0.9rem;
+    font-size: 1.2rem; // Increased from 0.9rem
     margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+
+    i {
+      margin-right: 2px;
+      display: inline-block !important; // Force display
+      width: auto !important;
+      font-family: FontAwesome !important; // Ensure font family
+      font-style: normal;
+    }
 
     span {
+      font-size: 0.9rem;
       color: #666;
-      margin-left: 5px;
+      margin-left: 8px;
     }
   }
 
@@ -522,5 +533,23 @@
         justify-content: center;
       }
     }
+  }
+}
+
+// ----------------------------------------------------
+// REVIEWS SECTION
+// ----------------------------------------------------
+.reviews-section {
+  max-width: 1400px;
+  margin: 60px auto;
+  padding: 0 20px;
+  border-top: 1px solid #eee;
+  padding-top: 40px;
+
+  .section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #2c3e50;
   }
 }

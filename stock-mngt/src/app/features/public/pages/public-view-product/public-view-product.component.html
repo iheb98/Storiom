@@ -18,10 +18,16 @@
         <div class="store-link" *ngIf="product.brand">
             Marque : <span>{{ product?.brand?.name }}</span>
         </div>
-        <div class="rating-placeholder">
-            <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i
-                class="fa fa-star-half-o"></i>
-            <span>(4.5)</span>
+        <div class="rating-placeholder" *ngIf="product">
+            <ng-container *ngFor="let star of [1,2,3,4,5]">
+                <i class="fa" [ngClass]="{
+                       'fa-star': product.averageRating >= star,
+                       'fa-star-half-o': product.averageRating > (star - 1) && product.averageRating < star,
+                       'fa-star-o': product.averageRating < (star - 0.5)
+                   }">
+                </i>
+            </ng-container>
+            <span>({{ product.averageRating | number:'1.1-1' }}/5 - {{ product.reviews?.length || 0 }} avis)</span>
         </div>
 
         <hr>
@@ -89,6 +95,25 @@
         </div>
     </div>
 
+
+
+
+</div>
+
+<!-- REVIEWS SECTION -->
+<div class="reviews-section" *ngIf="product">
+    <div class="container">
+        <h2 class="section-title">Avis et Commentaires</h2>
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <app-review-form [productId]="product.id" [initialReview]="userReview"
+                    (reviewSubmitted)="onReviewSubmitted($event)"></app-review-form>
+            </div>
+            <div class="col-lg-8">
+                <app-review-list [reviews]="product.reviews"></app-review-list>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- IMAGE POPUP -->

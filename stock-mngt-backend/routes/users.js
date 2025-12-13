@@ -215,10 +215,30 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res, next) =>
         user.salary = req.body.salary
         user.functionInStore = req.body.functionInStore
         user.entryDate = req.body.entryDate
-        user.save().then(savedUser => {
-            res.json({ message: "User updated", success: true })
+        user.save().then(async savedUser => {
+            // Update or Create Address if fields are present
+            const { street, city, state, postalCode, country } = req.body;
+            if (street || city || state || postalCode || country) {
+                const addressData = { street, city, state, postalCode, country, userId: user.id };
+
+                const existingAddress = await Address.findOne({ where: { userId: user.id } });
+                if (existingAddress) {
+                    await existingAddress.update(addressData);
+                } else {
+                    await Address.create(addressData);
+                }
+            }
+
+            // Fetch fresh user data with address to return
+            const freshUser = await User.findOne({
+                where: { id: user.id },
+                include: ['address', 'subscription']
+            });
+
+            res.json({ message: "User and address updated", success: true, user: freshUser });
         })
     }).catch(err => {
+        console.error(err);
         res.status(500).json({
             success: false,
             message: err.toString()
@@ -273,6 +293,53 @@ router.delete('/logout', async (req, res, next) => {
 
 });
 
+router.delete('/delete-user', async (req, res, next) => {
+
+    try {
+        const foundUser = await User.destroy({
+            where: {
+                email: req.body.email
+            }
+        })
+        res.sendStatus(204)
+    } catch (err) {
+        return res.sendStatus(500)
+    }
+
+});
+
+router.put('/makeAdmin', (req, res, next) => {
+    User.findOne({
+        where: {
+            email: req.body.email
+        }
+    }).then(user => {
+
+        user.role = req.body.role
+        user.save().then(savedUser => {
+            res.json({ message: "User updated", success: true })
+        })
+    }).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+});
+
+router.get('/', async (req, res, next) => {
+    User.findAll({
+        include: ['subscription']
+    }).then(users => {
+        res.json(users)
+    }).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+
+});
 
 
 
@@ -330,6 +397,61 @@ router.get('/checkSubscription/:id', utility.authenticate, checkSubscription, (r
         })
     })
 });
+
+router.put('/extendSubscription/:id', async (req, res) => {
+    const id = req.params.id;
+    const { extensionDays } = req.body; // number of days to extend
+
+    if (!extensionDays || isNaN(extensionDays)) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid or missing 'extensionDays'."
+        });
+    }
+
+    try {
+        const user = await User.findOne({
+            where: { id },
+            include: ['subscription']
+        });
+
+        if (!user || !user.subscription) {
+            return res.status(404).json({
+                success: false,
+                message: "User or subscription not found."
+            });
+        }
+
+        let { expirationDate } = user.subscription;
+
+        let newExpirationDate;
+        if (expirationDate) {
+            newExpirationDate = new Date(expirationDate);
+        } else {
+            // If there is no expirationDate, use today as base
+            newExpirationDate = new Date();
+        }
+
+        newExpirationDate.setDate(newExpirationDate.getDate() + parseInt(extensionDays));
+
+        // Update the subscription
+        await user.subscription.update({
+            expirationDate: newExpirationDate
+        });
+
+        res.json({
+            success: true,
+            message: `Subscription extended by ${extensionDays} days.`,
+            newExpirationDate
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        });
+    }
+});
+
 
 router.post('/forgot-password', async (req, res) => {
     const { email } = req.body;

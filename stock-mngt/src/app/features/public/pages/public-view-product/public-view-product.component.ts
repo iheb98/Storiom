@@ -25,6 +25,7 @@ export class PublicViewProductComponent implements OnInit {
   product: any;
   id: string | null = null;
   selectedImage: string | null = null;
+  userReview: any;
 
   quantity: number = 1; // ✅ default quantity
 
@@ -48,11 +49,58 @@ export class PublicViewProductComponent implements OnInit {
   loadProduct(id: string) {
     this.loadingService.screenLoading();
     this.publicService.getPublicProduct(id).subscribe(res => {
-      this.product = res;
       this.loadingService.screenLoaded();
+      this.product = res;
+      this.calculateAverageRating();
+
+      const currentUser = this.authService.getConnectedUser();
+      console.log('[DEBUG] Current User:', currentUser);
+      if (currentUser && this.product.reviews) {
+        this.userReview = this.product.reviews.find((r: any) => r.userId === currentUser.id);
+        console.log('[DEBUG] User Review Found:', this.userReview);
+      }
+
+      if (this.product.images) {
+        this.product.images = JSON.parse(this.product.images);
+        this.selectedImage = environment.backend + '/' + this.product.images[0];
+      }
     }, () => {
       this.loadingService.screenLoaded();
     });
+  }
+
+  calculateAverageRating() {
+    if (this.product && this.product.reviews && this.product.reviews.length > 0) {
+      const total = this.product.reviews.reduce((acc, review) => acc + Number(review.rating), 0);
+      this.product.averageRating = total / this.product.reviews.length;
+    } else {
+      this.product.averageRating = 0;
+    }
+    console.log('Product Reviews:', this.product.reviews);
+    console.log('Calculated Rating:', this.product.averageRating);
+  }
+
+  onReviewSubmitted(review: any) {
+    if (!this.product.reviews) {
+      this.product.reviews = [];
+    }
+
+    const existingIndex = this.product.reviews.findIndex((r: any) => r.id === review.id);
+    if (existingIndex !== -1) {
+      // Update existing review
+      this.product.reviews[existingIndex] = review;
+    } else {
+      // Prepend new review
+      this.product.reviews.unshift(review);
+    }
+
+    // Update userReview tracking
+    const currentUser = this.authService.getConnectedUser();
+    if (currentUser && review.userId === currentUser.id) {
+      this.userReview = review;
+    }
+
+    this.calculateAverageRating();
   }
 
   // ----------------------------

@@ -1,0 +1,32 @@
+<div class="review-form-container">
+    <h3 class="form-title">Donner votre avis</h3>
+
+    <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+
+        <!-- Star Rating Input -->
+        <div class="rating-input">
+            <span class="label">Votre note :</span>
+            <div class="stars">
+                <i class="fa" *ngFor="let star of [1,2,3,4,5]"
+                    [ngClass]="(hoveredStar >= star || reviewForm.get('rating').value >= star) ? 'fa-star' : 'fa-star-o'"
+                    (mouseenter)="hoveredStar = star" (mouseleave)="hoveredStar = 0" (click)="setRating(star)">
+                </i>
+            </div>
+            <div *ngIf="reviewForm.get('rating').touched && reviewForm.get('rating').invalid" class="error-msg">
+                Une note est requise.
+            </div>
+        </div>
+
+        <!-- Comment Input -->
+        <div class="form-group">
+            <label for="comment">Votre commentaire (optionnel) :</label>
+            <textarea id="comment" formControlName="comment" rows="4"
+                placeholder="Partagez votre expérience avec ce produit..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" [disabled]="reviewForm.invalid || isSubmitting">
+            <span *ngIf="!isSubmitting">{{ initialReview ? 'Modifier mon avis' : 'Envoyer mon avis' }}</span>
+            <span *ngIf="isSubmitting"><i class="fa fa-spinner fa-spin"></i> Envoi...</span>
+        </button>
+    </form>
+</div>

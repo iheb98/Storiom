@@ -19,6 +19,10 @@ export class PublicService {
     return this.http.get<any[]>(`${this.apiUrl}/products/random?limit=${limit}`);
   }
 
+  submitReview(reviewData: { rating: number, comment: string, productId: number }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reviews`, reviewData);
+  }
+
   getPublicProduct(id): Observable<any> {
     return this.http.get<any>(this.apiUrl + '/publicProduct/' + id);
   }

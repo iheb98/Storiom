@@ -28,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     images: DataTypes.STRING,
     phone: DataTypes.STRING,
     email: DataTypes.STRING,
+
     site: DataTypes.STRING,
     active: {
       type: DataTypes.BOOLEAN,
@@ -38,6 +39,16 @@ module.exports = (sequelize, DataTypes) => {
       field: 'user_id'
     },
     type: DataTypes.STRING,
+    isVisibleToPublic: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+      field: 'is_visible_to_public'
+    },
+    isSupportingDeliveries: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      field: 'is_supporting_deliveries'
+    },
     selectedCategories: DataTypes.STRING,
     creatorUserId: {
       type: DataTypes.INTEGER

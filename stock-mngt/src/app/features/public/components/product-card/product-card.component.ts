@@ -16,6 +16,16 @@ export class ProductCardComponent {
 
   @Input() product: any;
 
+  get averageRating(): number {
+    if (!this.product?.reviews?.length) return 0;
+    const total = this.product.reviews.reduce((acc: number, r: any) => acc + r.rating, 0);
+    return total / this.product.reviews.length;
+  }
+
+  get reviewCount(): number {
+    return this.product?.reviews?.length || 0;
+  }
+
   constructor(
     private router: Router,
     private productService: ProductService,

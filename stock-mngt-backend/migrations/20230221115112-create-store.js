@@ -47,6 +47,16 @@ module.exports = {
       creatorUserId: {
         type: DataTypes.INTEGER
       },
+      isVisibleToPublic: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+        field: 'is_visible_to_public'
+      },
+      isSupportingDeliveries: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        field: 'is_supporting_deliveries'
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

@@ -37,6 +37,8 @@ import { SellerOnboardingComponent } from './pages/seller-onboarding/store-onboa
 import { CreateStoreComponent } from './pages/create-store/store-add.component';
 import { LoginComponent } from 'src/app/general/login/login.component';
 import { RegisterComponent } from 'src/app/general/register/register.component';
+import { ReviewListComponent } from './components/review-list/review-list.component';
+import { ReviewFormComponent } from './components/review-form/review-form.component';
 
 @NgModule({
   declarations: [
@@ -56,7 +58,9 @@ import { RegisterComponent } from 'src/app/general/register/register.component';
     SellerOnboardingComponent,
     CreateStoreComponent,
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    ReviewListComponent,
+    ReviewFormComponent
   ],
   imports: [
     CommonModule,

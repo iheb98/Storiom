@@ -141,6 +141,29 @@ router.get('/operations', utility.authenticate, checkSubscription, async (req, r
     })
 })
 
+router.get('/allOperations',  async (req, res) => {
+    Operation.findAll({
+        include: [{
+            model: Product,
+            as: 'product'
+        }],
+        order: [
+            ['date', 'DESC']
+        ]
+    }).then(
+        operations => {
+            res.json(
+                operations
+            )
+        }
+    ).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+})
+
 router.get('/count/operations', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Operation.count({

@@ -195,6 +195,8 @@ const expensesRoute = require('./routes/expenses');
 const receiptsRoute = require('./routes/receipts');
 const statsRoute = require('./routes/stats');
 const workersRoute = require('./routes/workers');
+const publicRoutes = require('./routes/public');
+const ordersRoute = require('./routes/orders');
 
 app.use('/api/receipts', receiptsRoute)
 app.use('/api/credits', creditsRoute)
@@ -207,6 +209,8 @@ app.use('/api/stores', storesRoute)
 app.use('/api/users', usersRoute)
 app.use('/api/stats', statsRoute)
 app.use('/api/workers', workersRoute)
+app.use('/api/public', publicRoutes)
+app.use('/api/orders', ordersRoute)
 
 //require('./config/passport')(passport);
 
