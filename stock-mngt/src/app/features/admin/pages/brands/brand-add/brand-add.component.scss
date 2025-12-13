@@ -1,0 +1,186 @@
+// Variables - Amber/Gold theme for brands
+$primary: #ff8f00;
+$primary-dark: #e65100;
+$primary-light: rgba(255, 143, 0, 0.1);
+$success: #2e7d32;
+$danger: #c62828;
+$danger-light: rgba(198, 40, 40, 0.1);
+$text-primary: #2c3e50;
+$text-secondary: #7f8c8d;
+$border-color: #e8ecef;
+$background: #f5f7fa;
+$white: #ffffff;
+$radius-sm: 8px;
+$radius-md: 12px;
+
+.brand-dialog {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-width: 400px;
+    max-width: 100%;
+
+    @media (max-width: 480px) {
+        min-width: 300px;
+    }
+}
+
+// ============================================
+// DIALOG HEADER
+// ============================================
+.dialog-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 25px;
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+    position: relative;
+
+    .header-icon {
+        width: 45px;
+        height: 45px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: $radius-sm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        i {
+            font-size: 1.2rem;
+            color: $white;
+        }
+    }
+
+    .header-text {
+        flex: 1;
+
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: $white;
+            margin: 0 0 4px;
+        }
+
+        p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+        }
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 32px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 50%;
+        color: $white;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    }
+}
+
+// ============================================
+// DIALOG CONTENT
+// ============================================
+.dialog-content {
+    padding: 25px;
+}
+
+.form-group {
+    label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: $text-secondary;
+        margin-bottom: 10px;
+
+        i {
+            margin-right: 6px;
+            color: $primary;
+        }
+    }
+
+    input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid $border-color;
+        border-radius: $radius-sm;
+        font-size: 0.95rem;
+        font-family: inherit;
+        background: $white;
+        transition: all 0.2s;
+
+        &:focus {
+            outline: none;
+            border-color: $primary;
+            box-shadow: 0 0 0 3px $primary-light;
+        }
+
+        &::placeholder {
+            color: lighten($text-secondary, 20%);
+        }
+    }
+}
+
+// ============================================
+// DIALOG ACTIONS
+// ============================================
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 25px;
+    background: $background;
+    border-top: 1px solid $border-color;
+
+    .btn-cancel {
+        padding: 12px 24px;
+        background: $white;
+        border: 1px solid $border-color;
+        border-radius: $radius-sm;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: $text-primary;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: $text-secondary;
+        }
+    }
+
+    .btn-submit {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+        border: none;
+        border-radius: $radius-sm;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: $white;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba($primary, 0.4);
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+}

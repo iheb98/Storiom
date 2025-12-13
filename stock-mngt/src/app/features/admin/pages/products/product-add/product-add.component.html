@@ -132,19 +132,29 @@
                 <div class="section-card">
                     <div class="section-header">
                         <h2><i class="fa fa-images"></i> Images du produit</h2>
-                        <span class="image-count">{{ images?.length || 0 }}/3</span>
+                        <span class="image-count">{{ (images?.length || 0) + selectedFiles.length }}/3</span>
                     </div>
                     <div class="section-body">
-                        <div class="images-grid" *ngIf="images?.length > 0">
+                        <div class="images-grid" *ngIf="images?.length > 0 || selectedFiles.length > 0">
+                            <!-- Existing images (already uploaded) -->
                             <div class="image-preview" *ngFor="let item of images">
                                 <img [src]="environment.backend + '/' + item" alt="Product image">
                                 <button type="button" class="delete-image" (click)="deleteImage(item)">
                                     <fa-icon [icon]="timesIcon"></fa-icon>
                                 </button>
                             </div>
+
+                            <!-- Selected files (pending upload) -->
+                            <div class="image-preview pending" *ngFor="let item of selectedFiles; let i = index">
+                                <img [src]="item.preview" alt="Selected image">
+                                <span class="pending-badge">En attente</span>
+                                <button type="button" class="delete-image" (click)="removeSelectedFile(i)">
+                                    <fa-icon [icon]="timesIcon"></fa-icon>
+                                </button>
+                            </div>
                         </div>
 
-                        <div class="upload-zone">
+                        <div class="upload-zone" *ngIf="(images?.length || 0) + selectedFiles.length < 3">
                             <input #fileInput type="file" id="fileUpload" (change)="process($event)"
                                 accept="image/x-png,image/gif,image/jpeg" multiple hidden>
                             <label for="fileUpload" class="upload-label">

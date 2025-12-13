@@ -480,14 +480,43 @@ $transition-speed: 0.3s;
 @media (max-width: 992px) {
     .sidebar {
         transform: translateX(-100%);
-
-        .mobile-open & {
-            transform: translateX(0);
-        }
     }
 
-    .sidebar-collapsed .sidebar {
-        transform: translateX(-100%);
+    // When mobile menu is open, show sidebar regardless of collapsed state
+    .mobile-open .sidebar,
+    .mobile-open.sidebar-collapsed .sidebar {
+        transform: translateX(0);
+        width: $sidebar-width;
+    }
+
+    // Show all hidden elements when mobile menu is open
+    .mobile-open.sidebar-collapsed {
+        .logo-section {
+            display: flex !important;
+        }
+
+        .store-name,
+        .nav-label {
+            display: inline !important;
+        }
+
+        .subscription-badge {
+            display: flex !important;
+        }
+
+        .nav-section-title {
+            display: block !important;
+        }
+
+        .nav-link {
+            justify-content: flex-start !important;
+            padding: 12px 15px !important;
+        }
+
+        .sidebar-header {
+            justify-content: space-between !important;
+            padding: 20px 15px !important;
+        }
     }
 
     .mobile-overlay {

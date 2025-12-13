@@ -312,6 +312,22 @@ $radius-lg: 16px;
       transform: scale(1.1);
     }
   }
+
+  &.pending {
+    border: 2px dashed $primary;
+  }
+
+  .pending-badge {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    padding: 4px 8px;
+    background: $primary;
+    color: $white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: 4px;
+  }
 }
 
 .upload-zone {

@@ -42,6 +42,7 @@ export class ProductAddComponent implements OnInit {
   compressedImages;
   data;
   selectedCategory = ''
+  selectedFiles: { file: File, preview: string }[] = []
   arrowLeftIcon = faArrowLeft;
 
   editIcon = faEdit
@@ -155,9 +156,13 @@ export class ProductAddComponent implements OnInit {
     this.submitted = true;
     this.emailError = false;
     let fileName = null;
-    const images = [];
+    const imageNames = [];
     let counter = 1;
-    if (this.images?.length + this.fileInput.nativeElement.files.length > 3) {
+
+    // Get files from selectedFiles array
+    const filesToUpload = this.selectedFiles.map(sf => sf.file);
+
+    if ((this.images?.length || 0) + filesToUpload.length > 3) {
       Swal.fire({
         icon: 'error',
         title: 'Vous pouvez selectionnez seulement 3 images',
@@ -166,17 +171,15 @@ export class ProductAddComponent implements OnInit {
       })
       return
     }
-    if (this.fileInput.nativeElement.files)
-      for (let item of this.fileInput.nativeElement.files) {
-        fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + (counter++) + item?.name.substring(item.name.lastIndexOf('.'))
-        images.push(fileName)
-      }
-    console.log(images)
-    console.log(this.fileInput.nativeElement.files)
-    console.log(this.compressedImages)
+
+    for (let item of filesToUpload) {
+      fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + (counter++) + item?.name.substring(item.name.lastIndexOf('.'))
+      imageNames.push(fileName)
+    }
+
     if (this.form.valid) {
       this.loadingService.screenLoading()
-      this.uploadImages(this.fileInput.nativeElement.files, images).subscribe(
+      this.uploadFilesFromArray(filesToUpload, imageNames).subscribe(
         response => {
           const filenames = response.files.map(file => file.location.split('/').pop());
           this.form.get('images').setValue(filenames)
@@ -201,21 +204,20 @@ export class ProductAddComponent implements OnInit {
             })
         }
       )
-
     }
   }
 
   update() {
     this.submitted = true;
     this.emailError = false;
-    const images = []
-    for (let item of this.images) {
-      images.push(item)
-    }
-    const newImages = []
+
+    // Get files from selectedFiles array
+    const filesToUpload = this.selectedFiles.map(sf => sf.file);
+    const newImageNames = []
     let counter = 1;
     let fileName = null;
-    if (this.images?.length + this.fileInput.nativeElement.files.length > 3) {
+
+    if ((this.images?.length || 0) + filesToUpload.length > 3) {
       Swal.fire({
         icon: 'error',
         title: 'Vous pouvez selectionnez seulement 3 images',
@@ -224,15 +226,15 @@ export class ProductAddComponent implements OnInit {
       })
       return
     }
-    if (this.fileInput.nativeElement.files)
-      for (let item of this.fileInput.nativeElement.files) {
-        fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + (counter++) + item?.name.substring(item.name.lastIndexOf('.'))
-        images.push(fileName)
-        newImages.push(fileName)
-      }
+
+    for (let item of filesToUpload) {
+      fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + (counter++) + item?.name.substring(item.name.lastIndexOf('.'))
+      newImageNames.push(fileName)
+    }
+
     if (this.form.valid) {
       this.loadingService.screenLoading()
-      this.uploadImages(this.fileInput.nativeElement.files, newImages).subscribe(
+      this.uploadFilesFromArray(filesToUpload, newImageNames).subscribe(
         response => {
           const filenames = response.files.map(file => file.location.split('/').pop());
           this.form.get('images').setValue([...this.images, ...filenames])
@@ -255,10 +257,8 @@ export class ProductAddComponent implements OnInit {
                 timer: 1500
               })
             })
-          //this.router.navigate(['products'])
         }
       )
-
     }
   }
 
@@ -323,12 +323,24 @@ export class ProductAddComponent implements OnInit {
     this.images = this.images.filter(element => element != item)
   }
 
+  removeSelectedFile(index: number) {
+    this.selectedFiles.splice(index, 1)
+  }
+
   uploadImages(FilesToUpload, images) {
     const files = new FormData();
     for (let i = 0; i < FilesToUpload?.length; i++) {
       files.append('file', FilesToUpload[i], images[i])
     }
     return this.fileService.uploadMultiple(files)
+  }
+
+  uploadFilesFromArray(filesToUpload: File[], imageNames: string[]) {
+    const formData = new FormData();
+    for (let i = 0; i < filesToUpload.length; i++) {
+      formData.append('file', filesToUpload[i], imageNames[i])
+    }
+    return this.fileService.uploadMultiple(formData)
   }
 
   navigateTo(link) {
@@ -353,6 +365,37 @@ export class ProductAddComponent implements OnInit {
     this.data = event.target.files;
     this.compressedImages = [];
     console.log('input: ' + this.data);
+
+    // Add files to selectedFiles array with previews
+    const currentCount = (this.images?.length || 0) + this.selectedFiles.length;
+    const maxAllowed = 3 - currentCount;
+
+    for (let i = 0; i < Math.min(this.data.length, maxAllowed); i++) {
+      const file = this.data[i];
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.selectedFiles.push({
+          file: file,
+          preview: e.target.result
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    if (this.data.length > maxAllowed) {
+      Swal.fire({
+        icon: 'warning',
+        title: `Seulement ${maxAllowed} image(s) ajoutée(s). Maximum 3 au total.`,
+        showConfirmButton: false,
+        timer: 2000
+      });
+    }
+
+    // Reset file input
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+
     const compress = this.recursiveCompress(this.data[0], 0, this.data).pipe(
       expand(res => {
         return res.index > res.array.length - 1
@@ -362,9 +405,6 @@ export class ProductAddComponent implements OnInit {
     );
     compress.subscribe(res => {
       if (res.index > res.array.length - 1) {
-
-
-        //Code block after completing all compression
         console.log('Compression successful ' + this.compressedImages);
       }
     });
