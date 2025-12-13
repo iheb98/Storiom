@@ -1,110 +1,228 @@
-<!-- 1. Navigation Bar -->
-<!--<nav class="navbar">
-    <div class="navbar-brand">
-        <a routerLink="/">Marketplace</a>
-    </div>
-    <div class="search-bar">
-        <input type="text" placeholder="Search for products...">
-        <button><fa-icon [icon]="searchIcon"></fa-icon></button>
-    </div>
-    <div class="navbar-links">
-        <a routerLink="/products">All Products</a>
-        <a routerLink="/stores">Stores</a>
-        <a routerLink="/cart" class="nav-icon"><fa-icon [icon]="cartIcon"></fa-icon></a>
-        <a routerLink="/login" class="nav-icon"><fa-icon [icon]="userIcon"></fa-icon></a>
-    </div>
-</nav>-->
-
 <div class="home-container">
-    <!-- 2. Hero Section -->
-    <header class="hero-section">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-background"></div>
         <div class="hero-content">
-            <h1>Découvrez des Produits Uniques<br>de Magasins Locaux</h1>
-            <p class="subtitle">
-                Soutenez les commerces indépendants et trouvez tout ce dont vous avez besoin au même endroit.
+            <span class="hero-badge">🛍️ Marketplace Tunisien</span>
+            <h1>Découvrez des Produits<br><span class="highlight">Uniques & Locaux</span></h1>
+            <p class="hero-subtitle">
+                Soutenez les commerces indépendants tunisiens et trouvez des produits de qualité,
+                livrés directement chez vous.
             </p>
             <div class="hero-buttons">
-                <a routerLink="/products" class="btn btn-primary btn-large">Acheter Maintenant</a>
-                <a routerLink="/stores" class="btn btn-secondary btn-large">Voir les Magasins</a>
+                <a routerLink="/publicProducts" class="btn btn-primary">
+                    <i class="fa fa-shopping-bag"></i> Explorer les Produits
+                </a>
+                <a routerLink="/stores" class="btn btn-secondary">
+                    <i class="fa fa-store"></i> Voir les Boutiques
+                </a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">{{ storesCount }}+</span>
+                    <span class="stat-label">Boutiques</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ productsCount }}+</span>
+                    <span class="stat-label">Produits</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ categoriesCount }}+</span>
+                    <span class="stat-label">Catégories</span>
+                </div>
             </div>
         </div>
-    </header>
-
-    <!-- 3. Shop by Category -->
-    <section id="categories" class="category-section">
-        <div class="section-header">
-            <h2>Explorer les Catégories</h2>
-            <p>Trouvez exactement ce que vous cherchez.</p>
+        <div class="scroll-indicator" (click)="scrollToCategories()">
+            <i class="fa fa-chevron-down"></i>
         </div>
+    </section>
 
-        <div *ngIf="isLoading">Chargement des catégories...</div>
+    <!-- Categories Section -->
+    <section id="categories" class="categories-section">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-badge">Catégories</span>
+                <h2>Explorez par Catégorie</h2>
+                <p>Trouvez exactement ce que vous cherchez parmi nos différentes catégories.</p>
+            </div>
 
-        <div class="category-grid" *ngIf="!isLoading">
-            <div class="category-card" *ngFor="let category of categories" [routerLink]="['publicProducts']"
-                [queryParams]="{ category: category.id }">
-
-                <div class="category-image">
-                    <img [src]="category.image || 'assets/images/default_category_image.png'" alt="{{ category.name }}">
+            <div class="category-grid" *ngIf="!isLoading">
+                <div class="category-card" *ngFor="let category of categories" [routerLink]="['/publicProducts']"
+                    [queryParams]="{ category: category.id }">
+                    <div class="category-icon">
+                        <i class="fa fa-tag"></i>
+                    </div>
+                    <h3>{{ category.name }}</h3>
+                    <!--<span class="category-count">{{ category.productCount || 0 }} produits</span>-->
                 </div>
+            </div>
 
-                <h3>{{ category.name }}</h3>
+            <div class="loading-skeleton" *ngIf="isLoading">
+                <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
             </div>
         </div>
     </section>
 
-
-    <!-- 4. Featured Products Section -->
-    <section id="featured-products" class="featured-products-section">
-        <div class="section-header">
-            <h2>Produits Tendance</h2>
-            <p>Articles sélectionnés juste pour vous.</p>
-        </div>
-        <!-- Repeat this product-card for each featured product -->
-        <div class="products-grid">
-            <app-product-card *ngFor="let product of featuredProducts" [product]="product">
-            </app-product-card>
-        </div>
-
-    </section>
-
-    <!-- 5. Why Shop With Us? -->
-    <section id="benefits" class="benefits-section">
-        <div class="section-header">
-            <h2>Pourquoi choisir Storiom ?</h2>
-        </div>
-
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="icon-wrapper">
-                    <fa-icon [icon]="storeIcon"></fa-icon>
-                </div>
-                <h3>Soutenez le Local</h3>
-                <p>Soutenez directement les propriétaires de magasins indépendants et votre économie locale.</p>
+    <!-- Featured Products Section -->
+    <section class="featured-section">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-badge">Tendances</span>
+                <h2>Produits Populaires</h2>
+                <p>Découvrez les articles les plus appréciés par notre communauté.</p>
             </div>
-            <div class="feature-card">
-                <div class="icon-wrapper">
-                    <fa-icon [icon]="boxOpenIcon"></fa-icon>
-                </div>
-                <h3>Sélection Soignée</h3>
-                <p>Parcourez une grande variété de produits uniques que vous ne trouverez pas ailleurs.</p>
+
+            <div class="products-grid">
+                <app-product-card *ngFor="let product of featuredProducts" [product]="product">
+                </app-product-card>
             </div>
-            <div class="feature-card">
-                <div class="icon-wrapper">
-                    <fa-icon [icon]="shieldIcon"></fa-icon>
-                </div>
-                <h3>Achats Sécurisés</h3>
-                <p>Profitez d'une expérience de paiement sûre et fluide à chaque fois.</p>
+
+            <div class="section-cta">
+                <a routerLink="/publicProducts" class="btn btn-outline">
+                    Voir tous les produits <i class="fa fa-arrow-right"></i>
+                </a>
             </div>
         </div>
     </section>
 
-    <!-- 6. Footer -->
-    <!--   <footer class="footer">
-        <div class="footer-links">
-            <a href="/about">About Us</a> | <a href="/contact">Contact</a> | <a href="/faq">FAQ</a> | <a
-                href="/shipping">Shipping & Returns</a>
+    <!-- Featured Stores Section -->
+    <section class="stores-section">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-badge">Boutiques</span>
+                <h2>Nos Meilleurs Vendeurs</h2>
+                <p>Découvrez les boutiques les plus populaires de notre marketplace.</p>
+            </div>
+
+            <div class="stores-grid">
+                <div class="store-card" *ngFor="let store of featuredStores" [routerLink]="['/store', store.id]">
+                    <div class="store-logo">
+                        <img [src]="store.logo ? environment.backend + '/' + store.logo : 'assets/default_store.png'"
+                            [alt]="store.name">
+                    </div>
+                    <div class="store-info">
+                        <h3>{{ store.name }}</h3>
+                        <span class="store-badge delivery" *ngIf="store.isSupportingDeliveries">
+                            <i class="fa fa-truck"></i> Livraison
+                        </span>
+                        <span class="store-badge no-delivery" *ngIf="!store.isSupportingDeliveries">
+                            <i class="fa fa-times-circle"></i> Pas de livraison
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-cta">
+                <a routerLink="/stores" class="btn btn-outline">
+                    Voir toutes les boutiques <i class="fa fa-arrow-right"></i>
+                </a>
+            </div>
         </div>
-        <p>&copy; 2025 Marketplace. All rights reserved.</p>
-        <p><a href="/privacy">Privacy Policy</a> | <a href="/terms">Terms of Service</a></p>
-    </footer>-->
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="benefits-section">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-badge">Pourquoi Nous?</span>
+                <h2>Les Avantages Storiom</h2>
+            </div>
+
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fa fa-store"></i>
+                    </div>
+                    <h3>Commerce Local</h3>
+                    <p>Soutenez directement les commerces indépendants tunisiens et contribuez à l'économie locale.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fa fa-truck"></i>
+                    </div>
+                    <h3>Livraison Rapide</h3>
+                    <p>Recevez vos produits rapidement grâce à nos partenaires de livraison fiables.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fa fa-gem"></i>
+                    </div>
+                    <h3>Produits Uniques</h3>
+                    <p>Découvrez une sélection soignée de produits que vous ne trouverez pas ailleurs.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">
+                        <i class="fa fa-shield-alt"></i>
+                    </div>
+                    <h3>Paiement Sécurisé</h3>
+                    <p>Profitez d'une expérience d'achat sûre avec le paiement à la livraison.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works-section">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-badge">Simple</span>
+                <h2>Comment Ça Marche?</h2>
+            </div>
+
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon"><i class="fa fa-search"></i></div>
+                    <h3>Explorez</h3>
+                    <p>Parcourez notre catalogue de produits et trouvez ce qui vous plaît.</p>
+                </div>
+
+                <div class="step-connector"></div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon"><i class="fa fa-cart-plus"></i></div>
+                    <h3>Ajoutez au Panier</h3>
+                    <p>Sélectionnez vos articles et ajoutez-les à votre panier.</p>
+                </div>
+
+                <div class="step-connector"></div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon"><i class="fa fa-credit-card"></i></div>
+                    <h3>Commandez</h3>
+                    <p>Validez votre commande et choisissez le paiement à la livraison.</p>
+                </div>
+
+                <div class="step-connector"></div>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-icon"><i class="fa fa-box"></i></div>
+                    <h3>Recevez</h3>
+                    <p>Recevez vos produits directement chez vous.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Prêt à Découvrir?</h2>
+            <p>Rejoignez des milliers de clients satisfaits et explorez notre marketplace dès maintenant.</p>
+            <div class="cta-buttons">
+                <a routerLink="/publicProducts" class="btn btn-white">
+                    <i class="fa fa-shopping-bag"></i> Commencer vos Achats
+                </a>
+                <a routerLink="/seller-onboarding" class="btn btn-outline-white">
+                    <i class="fa fa-store"></i> Devenir Vendeur
+                </a>
+            </div>
+        </div>
+    </section>
 </div>

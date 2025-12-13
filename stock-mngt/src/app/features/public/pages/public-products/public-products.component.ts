@@ -15,10 +15,11 @@ import { AuthService } from 'src/app/core/services/auth.service';
   styleUrls: ['./public-products.component.scss']
 })
 export class PublicProductsComponent implements OnInit {
-  faCartPlus = faCartPlus
+  faCartPlus = faCartPlus;
   environment = environment;
   products: any[] = [];
   categories: any[] = [];
+  flatCategories: any[] = [];
   stores: any[] = [];
   category: any = null;
   searchQuery: string = '';
@@ -35,6 +36,15 @@ export class PublicProductsComponent implements OnInit {
     maxPrice: null as number | null,
     store: null,
     sort: null
+  };
+
+  // UI State
+  mobileFiltersOpen = false;
+  collapsedSections = {
+    search: false,
+    category: false,
+    price: false,
+    store: false
   };
 
   constructor(
@@ -54,7 +64,7 @@ export class PublicProductsComponent implements OnInit {
 
     this.route.queryParams.subscribe(params => {
       this.searchQuery = params['searchable'] || '';
-      this.filters.category = Number(params['category']) || '';
+      this.filters.category = Number(params['category']) || null;
       this.filters.minPrice = params['minPrice'] ? +params['minPrice'] : null;
       this.filters.maxPrice = params['maxPrice'] ? +params['maxPrice'] : null;
       this.filters.store = params['store'] || null;
@@ -72,7 +82,19 @@ export class PublicProductsComponent implements OnInit {
   loadCategories() {
     this.publicService.getCategoryTree().subscribe(res => {
       this.categories = res;
+      this.flatCategories = this.flattenCategories(res);
     });
+  }
+
+  flattenCategories(categories: any[], level = 0): any[] {
+    let result = [];
+    for (const cat of categories) {
+      result.push({ ...cat, name: '  '.repeat(level) + cat.name });
+      if (cat.children && cat.children.length > 0) {
+        result = result.concat(this.flattenCategories(cat.children, level + 1));
+      }
+    }
+    return result;
   }
 
   loadStores() {
@@ -81,15 +103,12 @@ export class PublicProductsComponent implements OnInit {
     });
   }
 
-  loadCategory(categoryId: string) {
-    // this.categoryService.getCategoryById(categoryId).subscribe(res => {
-    //   this.category = res;
-    // });
+  loadCategory(categoryId: any) {
+    // Optional: load category details
   }
 
   buildQuery() {
     let query = '';
-    //if (this.searchQuery) query += query ? `,name ~ '${this.searchQuery}'` : `name ~ '${this.searchQuery}'`;
     if (this.filters.category) query += query ? `,categoryId = ${this.filters.category}` : `categoryId = ${this.filters.category}`;
     if (this.filters.minPrice != null) query += query ? `,sellingPrice > '${this.filters.minPrice}'` : `sellingPrice > '${this.filters.minPrice}'`;
     if (this.filters.maxPrice != null) query += query ? `,sellingPrice < '${this.filters.maxPrice}'` : `sellingPrice < '${this.filters.maxPrice}'`;
@@ -98,13 +117,13 @@ export class PublicProductsComponent implements OnInit {
   }
 
   loadProducts() {
-    this.loadingService.screenLoading()
+    this.loadingService.screenLoading();
     const query = this.buildQuery();
     this.publicService.getPublicProducts({ page: this.currentPage, size: this.currentSize, query, sort: this.filters.sort, searchable: this.searchable }).subscribe(res => {
       this.products = res;
-      this.loadingService.screenLoaded()
+      this.loadingService.screenLoaded();
     }, (error) => {
-      this.loadingService.screenLoaded()
+      this.loadingService.screenLoaded();
     });
 
     this.publicService.countPublicProducts({ query, searchable: this.searchable }).subscribe(res => {
@@ -112,18 +131,30 @@ export class PublicProductsComponent implements OnInit {
     });
   }
 
-
   applyFilters() {
-    const queryParams: any = {
-      searchable: this.searchable || null,
-      category: this.filters.category || null,
-      minPrice: this.filters.minPrice || null,
-      maxPrice: this.filters.maxPrice || null,
-      store: this.filters.store || null,
-      sort: this.filters.sort || null
-    };
-    this.currentPage = 0
+    const queryParams: any = {};
 
+    // Only add params if they have values
+    if (this.searchable && this.searchable.trim()) {
+      queryParams.searchable = this.searchable.trim();
+    }
+    if (this.filters.category) {
+      queryParams.category = this.filters.category;
+    }
+    if (this.filters.minPrice != null) {
+      queryParams.minPrice = this.filters.minPrice;
+    }
+    if (this.filters.maxPrice != null) {
+      queryParams.maxPrice = this.filters.maxPrice;
+    }
+    if (this.filters.store) {
+      queryParams.store = this.filters.store;
+    }
+    if (this.filters.sort) {
+      queryParams.sort = this.filters.sort;
+    }
+
+    this.currentPage = 0;
     this.router.navigate([], { queryParams });
   }
 
@@ -135,18 +166,9 @@ export class PublicProductsComponent implements OnInit {
       store: null,
       sort: null
     };
-
-    const queryParams: any = {
-      searchable: this.searchable || null,
-      category: this.filters.category || null,
-      minPrice: this.filters.minPrice || null,
-      maxPrice: this.filters.maxPrice || null,
-      store: this.filters.store || null,
-      sort: this.filters.sort || null
-    };
-    this.currentPage = 0
-
-    this.router.navigate([], { queryParams });
+    this.searchable = '';
+    this.currentPage = 0;
+    this.router.navigate([], { queryParams: {} });
   }
 
   handlePageEvent(event: any) {
@@ -155,10 +177,42 @@ export class PublicProductsComponent implements OnInit {
     this.loadProducts();
   }
 
+  // UI Helpers
+  toggleSection(section: string) {
+    this.collapsedSections[section] = !this.collapsedSections[section];
+  }
+
+  toggleMobileFilters() {
+    this.mobileFiltersOpen = !this.mobileFiltersOpen;
+    document.body.style.overflow = this.mobileFiltersOpen ? 'hidden' : '';
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(this.searchable || this.filters.category || this.filters.minPrice || this.filters.maxPrice || this.filters.store);
+  }
+
+  get activeFiltersCount(): number {
+    let count = 0;
+    if (this.searchable) count++;
+    if (this.filters.category) count++;
+    if (this.filters.minPrice || this.filters.maxPrice) count++;
+    if (this.filters.store) count++;
+    return count;
+  }
+
+  getCategoryName(categoryId: number): string {
+    const cat = this.flatCategories.find(c => c.id === categoryId);
+    return cat ? cat.name.trim() : '';
+  }
+
+  getStoreName(storeId: any): string {
+    const store = this.stores.find(s => s.id === storeId);
+    return store ? store.name : '';
+  }
+
   addToCart(product: any) {
     if (this.authService.isLoggedIn()) {
       this.productService.addToCart(product.id, 1).subscribe(res => {
-        // Optional: Show success message/toast
         console.log('Added to cart (server)');
       });
     } else {

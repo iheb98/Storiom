@@ -1,80 +1,212 @@
 <div class="store-details-container" *ngIf="store">
-    <!-- Store Header -->
-    <div class="store-header">
-        <div class="header-content">
-            <div class="logo">
-                <img [src]="store.logo ? environment.backend + '/' + store.logo : 'assets/default_store.png'"
-                    alt="Logo">
-            </div>
-            <div class="info">
-                <h1>{{ store.name }}</h1>
-                <p class="desc">{{ store.description }}</p>
-                <div class="contact-info">
-                    <span *ngIf="store.address"><i class="fa fa-map-marker-alt"></i> {{ store.address.city }}, {{
-                        store.address.country }}</span>
-                    <span *ngIf="store.email"><i class="fa fa-envelope"></i> {{ store.email }}</span>
-                    <span *ngIf="store.phone"><i class="fa fa-phone"></i> {{ store.phone }}</span>
+    <!-- Store Hero Banner -->
+    <div class="store-hero"
+        [style.backgroundImage]="'url(' + (store.images?.length ? environment.backend + '/' + store.images[0] : 'assets/store-cover-default.jpg') + ')'">
+        <div class="hero-overlay">
+            <div class="hero-content">
+                <div class="store-logo">
+                    <img [src]="store.logo ? environment.backend + '/' + store.logo : 'assets/default_store.png'"
+                        alt="Logo">
+                </div>
+                <div class="store-info">
+                    <h1>{{ store.name }}</h1>
+                    <div class="store-badges">
+                        <span class="badge delivery" *ngIf="store.isSupportingDeliveries">
+                            <i class="fa fa-truck"></i> Livraison disponible
+                        </span>
+                        <span class="badge no-delivery" *ngIf="!store.isSupportingDeliveries">
+                            <i class="fa fa-times-circle"></i> Pas de livraison
+                        </span>
+                    </div>
+                    <div class="store-contact">
+                        <a *ngIf="store.address" class="contact-item">
+                            <i class="fa fa-map-marker-alt"></i>
+                            <span>{{ store.address.city }}, {{ store.address.country }}</span>
+                        </a>
+                        <a *ngIf="store.email" [href]="'mailto:' + store.email" class="contact-item">
+                            <i class="fa fa-envelope"></i>
+                            <span>{{ store.email }}</span>
+                        </a>
+                        <a *ngIf="store.phone" [href]="'tel:' + store.phone" class="contact-item">
+                            <i class="fa fa-phone"></i>
+                            <span>{{ store.phone }}</span>
+                        </a>
+                        <a *ngIf="store.site" [href]="store.site" target="_blank" class="contact-item">
+                            <i class="fa fa-globe"></i>
+                            <span>Site web</span>
+                        </a>
+                    </div>
+                    <p class="store-desc" *ngIf="store.description">{{ store.description }}</p>
+
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Mobile Filter Toggle -->
+    <button class="mobile-filter-toggle" (click)="toggleMobileFilters()">
+        <i class="fa fa-filter"></i> Filtrer
+        <span class="active-filters-count" *ngIf="activeFiltersCount > 0">{{ activeFiltersCount }}</span>
+    </button>
+
     <div class="content-layout">
         <!-- Sidebar Filters -->
-        <aside class="filters-sidebar">
-            <div class="filter-group start-group">
-                <h3>Rechercher</h3>
-                <div class="search-box">
-                    <input type="text" placeholder="Produit..." [(ngModel)]="searchText">
-                    <button (click)="applyFilters()"><i class="fa fa-search"></i></button>
+        <aside class="filters-sidebar" [class.open]="mobileFiltersOpen">
+            <div class="sidebar-header">
+                <h2><i class="fa fa-sliders-h"></i> Filtres</h2>
+                <button class="close-filters" (click)="toggleMobileFilters()">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Search -->
+            <div class="filter-section" [class.collapsed]="collapsedSections.search">
+                <div class="section-header" (click)="toggleSection('search')">
+                    <h3><i class="fa fa-search"></i> Rechercher</h3>
+                    <i class="fa" [class.fa-chevron-down]="collapsedSections.search"
+                        [class.fa-chevron-up]="!collapsedSections.search"></i>
+                </div>
+                <div class="section-content">
+                    <div class="search-box">
+                        <input type="text" placeholder="Nom du produit..." [(ngModel)]="searchText"
+                            (keyup.enter)="applyFilters()">
+                        <button (click)="applyFilters()"><i class="fa fa-search"></i></button>
+                    </div>
                 </div>
             </div>
 
-            <div class="filter-group">
-                <h3>Catégories</h3>
-                <ng-select [items]="categories" bindLabel="name" bindValue="id" placeholder="Toutes les catégories"
-                    [(ngModel)]="selectedCategory" (change)="applyFilters()">
-                </ng-select>
-            </div>
-
-            <div class="filter-group">
-                <h3>Prix (TND)</h3>
-                <div class="price-inputs">
-                    <input type="number" placeholder="Min" [(ngModel)]="minPrice">
-                    <span>-</span>
-                    <input type="number" placeholder="Max" [(ngModel)]="maxPrice">
+            <!-- Categories -->
+            <div class="filter-section" [class.collapsed]="collapsedSections.category">
+                <div class="section-header" (click)="toggleSection('category')">
+                    <h3><i class="fa fa-tags"></i> Catégories</h3>
+                    <i class="fa" [class.fa-chevron-down]="collapsedSections.category"
+                        [class.fa-chevron-up]="!collapsedSections.category"></i>
+                </div>
+                <div class="section-content">
+                    <ng-select [items]="categories" bindLabel="name" bindValue="id" placeholder="Toutes les catégories"
+                        [(ngModel)]="selectedCategory" (change)="applyFilters()" [clearable]="true">
+                    </ng-select>
                 </div>
             </div>
 
+            <!-- Price Range -->
+            <div class="filter-section" [class.collapsed]="collapsedSections.price">
+                <div class="section-header" (click)="toggleSection('price')">
+                    <h3><i class="fa fa-money-bill-wave"></i> Prix (TND)</h3>
+                    <i class="fa" [class.fa-chevron-down]="collapsedSections.price"
+                        [class.fa-chevron-up]="!collapsedSections.price"></i>
+                </div>
+                <div class="section-content">
+                    <div class="price-inputs">
+                        <div class="price-field">
+                            <label>Min</label>
+                            <input type="number" placeholder="0" [(ngModel)]="minPrice">
+                        </div>
+                        <span class="price-separator">—</span>
+                        <div class="price-field">
+                            <label>Max</label>
+                            <input type="number" placeholder="∞" [(ngModel)]="maxPrice">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rating Filter -->
+            <!--<div class="filter-section" [class.collapsed]="collapsedSections.rating">
+                <div class="section-header" (click)="toggleSection('rating')">
+                    <h3><i class="fa fa-star"></i> Note minimum</h3>
+                    <i class="fa" [class.fa-chevron-down]="collapsedSections.rating"
+                        [class.fa-chevron-up]="!collapsedSections.rating"></i>
+                </div>
+                <div class="section-content">
+                    <div class="rating-options">
+                        <label *ngFor="let r of [4, 3, 2, 1]" class="rating-option" [class.selected]="minRating === r">
+                            <input type="radio" name="minRating" [value]="r" [(ngModel)]="minRating"
+                                (change)="applyFilters()">
+                            <span class="stars">
+                                <i *ngFor="let s of [1,2,3,4,5]" class="fa" [class.fa-star]="s <= r"
+                                    [class.fa-star-o]="s > r"></i>
+                            </span>
+                            <span class="label">& plus</span>
+                        </label>
+                        <label class="rating-option" [class.selected]="!minRating">
+                            <input type="radio" name="minRating" [value]="null" [(ngModel)]="minRating"
+                                (change)="applyFilters()">
+                            <span class="label">Toutes les notes</span>
+                        </label>
+                    </div>
+                </div>
+            </div>-->
+
+            <!-- Filter Actions -->
             <div class="filter-actions">
-                <button class="apply-btn" (click)="applyFilters()">Appliquer</button>
-                <button class="reset-btn" (click)="resetFilters()">Réinitialiser</button>
+                <button class="btn-apply" (click)="applyFilters(); mobileFiltersOpen = false">
+                    <i class="fa fa-check"></i> Appliquer
+                </button>
+                <button class="btn-reset" (click)="resetFilters()">
+                    <i class="fa fa-undo"></i> Réinitialiser
+                </button>
             </div>
         </aside>
 
-        <!-- Products Grid -->
+        <!-- Mobile Overlay -->
+        <div class="mobile-overlay" *ngIf="mobileFiltersOpen" (click)="toggleMobileFilters()"></div>
+
+        <!-- Products Area -->
         <div class="products-area">
-            <div class="sort-bar">
-                <span>{{ totalProducts }} produits trouvés</span>
-                <select [(ngModel)]="sortBy" (change)="applyFilters()">
-                    <option value="createdAtDesc">Plus récents</option>
-                    <option value="priceAsc">Prix croissant</option>
-                    <option value="priceDesc">Prix décroissant</option>
-                </select>
+            <!-- Sort & Results Bar -->
+            <div class="results-bar">
+                <div class="results-count">
+                    <span class="count">{{ totalProducts }}</span> produits trouvés
+                </div>
+                <div class="sort-options">
+                    <label>Trier par:</label>
+                    <select [(ngModel)]="sortBy" (change)="applyFilters()">
+                        <option value="createdAtDesc">Plus récents</option>
+                        <option value="priceAsc">Prix croissant</option>
+                        <option value="priceDesc">Prix décroissant</option>
+                    </select>
+                </div>
             </div>
 
+            <!-- Active Filters Tags -->
+            <div class="active-filters" *ngIf="hasActiveFilters()">
+                <span class="filter-tag" *ngIf="searchText">
+                    Recherche: "{{ searchText }}"
+                    <i class="fa fa-times" (click)="searchText = ''; applyFilters()"></i>
+                </span>
+                <span class="filter-tag" *ngIf="selectedCategory">
+                    Catégorie: {{ getCategoryName(selectedCategory) }}
+                    <i class="fa fa-times" (click)="selectedCategory = null; applyFilters()"></i>
+                </span>
+                <span class="filter-tag" *ngIf="minPrice || maxPrice">
+                    Prix: {{ minPrice || 0 }} - {{ maxPrice || '∞' }} TND
+                    <i class="fa fa-times" (click)="minPrice = null; maxPrice = null; applyFilters()"></i>
+                </span>
+                <span class="filter-tag" *ngIf="minRating">
+                    Note: {{ minRating }}+ étoiles
+                    <i class="fa fa-times" (click)="minRating = null; applyFilters()"></i>
+                </span>
+                <button class="clear-all" (click)="resetFilters()">Effacer tout</button>
+            </div>
+
+            <!-- Products Grid -->
             <div class="products-grid" *ngIf="products.length > 0; else noProducts">
                 <app-product-card *ngFor="let product of products" [product]="product"></app-product-card>
             </div>
 
             <ng-template #noProducts>
                 <div class="no-products">
-                    <p>Aucun produit trouvé dans ce magasin.</p>
+                    <i class="fa fa-box-open"></i>
+                    <h3>Aucun produit trouvé</h3>
+                    <p>Essayez de modifier vos filtres ou recherchez autre chose.</p>
+                    <button (click)="resetFilters()">Réinitialiser les filtres</button>
                 </div>
             </ng-template>
 
+            <!-- Pagination -->
             <mat-paginator [length]="totalProducts" [pageSize]="pageSize" [pageSizeOptions]="[12, 24, 48]"
-                (page)="onPageChange($event)" *ngIf="totalProducts > 0">
+                (page)="onPageChange($event)" *ngIf="totalProducts > 0" class="custom-paginator">
             </mat-paginator>
         </div>
     </div>

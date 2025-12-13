@@ -205,10 +205,7 @@ router.get('/allStores/products', async (req, res) => {
             const searchable = req.query.searchable;
             whereClause = {
                 ...whereClause,
-                [Op.or]: [
-                    { name: { [Op.iLike]: `%${searchable}%` } },
-                    { '$category.name$': { [Op.iLike]: `%${searchable}%` } }
-                ]
+                name: { [Op.iLike]: `%${searchable}%` }
             };
         }
 
@@ -274,10 +271,7 @@ router.get('/allStores/products/count', async (req, res) => {
             const searchable = req.query.searchable;
             whereClause = {
                 ...whereClause,
-                [Op.or]: [
-                    { name: { [Op.iLike]: `%${searchable}%` } },
-                    { '$category.name$': { [Op.iLike]: `%${searchable}%` } }
-                ]
+                name: { [Op.iLike]: `%${searchable}%` }
             };
         }
 
