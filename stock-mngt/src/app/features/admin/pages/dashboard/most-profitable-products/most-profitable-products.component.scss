@@ -1,0 +1,198 @@
+// Variables
+$primary: #3f51b5;
+$primary-light: rgba(63, 81, 181, 0.1);
+$success: #2e7d32;
+$success-light: rgba(46, 125, 50, 0.1);
+$warning: #f57c00;
+$info: #0288d1;
+$info-light: rgba(2, 136, 209, 0.1);
+$gold: #ffd700;
+$silver: #c0c0c0;
+$bronze: #cd7f32;
+$text-primary: #2c3e50;
+$text-secondary: #7f8c8d;
+$border-color: #e8ecef;
+$background: #f5f7fa;
+$white: #ffffff;
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 20px rgba(0, 0, 0, 0.1);
+$radius-sm: 8px;
+$radius-md: 12px;
+
+.profitable-products-container {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+// ============================================
+// PRODUCTS LIST
+// ============================================
+.products-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: $white;
+    border-radius: $radius-md;
+    border: 1px solid $border-color;
+    transition: all 0.2s ease;
+
+    &:hover {
+        border-color: $primary;
+        box-shadow: $shadow-sm;
+    }
+
+    @media (max-width: 576px) {
+        flex-wrap: wrap;
+    }
+}
+
+.product-rank {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    background: $background;
+    color: $text-secondary;
+    flex-shrink: 0;
+
+    &.gold {
+        background: linear-gradient(135deg, $gold 0%, darken($gold, 15%) 100%);
+        color: #333;
+        box-shadow: 0 2px 8px rgba($gold, 0.4);
+    }
+
+    &.silver {
+        background: linear-gradient(135deg, $silver 0%, darken($silver, 15%) 100%);
+        color: #333;
+        box-shadow: 0 2px 8px rgba($silver, 0.4);
+    }
+
+    &.bronze {
+        background: linear-gradient(135deg, $bronze 0%, darken($bronze, 15%) 100%);
+        color: $white;
+        box-shadow: 0 2px 8px rgba($bronze, 0.4);
+    }
+}
+
+.product-info {
+    flex: 1;
+    min-width: 0;
+
+    .product-name {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0 0 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .product-price {
+        font-size: 0.85rem;
+        color: $text-secondary;
+    }
+}
+
+.product-stats {
+    display: flex;
+    gap: 15px;
+
+    @media (max-width: 576px) {
+        width: 100%;
+        padding-top: 10px;
+        border-top: 1px solid $border-color;
+        margin-top: 5px;
+    }
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 15px;
+    border-radius: $radius-sm;
+    background: $background;
+    min-width: 80px;
+
+    i {
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+    }
+
+    .value {
+        font-size: 0.95rem;
+        font-weight: 700;
+    }
+
+    .label {
+        font-size: 0.7rem;
+        color: $text-secondary;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    &.profit {
+        background: $success-light;
+
+        i,
+        .value {
+            color: $success;
+        }
+    }
+
+    &.quantity {
+        background: $info-light;
+
+        i,
+        .value {
+            color: $info;
+        }
+    }
+}
+
+// ============================================
+// EMPTY STATE
+// ============================================
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 20px;
+    text-align: center;
+    background: $background;
+    border-radius: $radius-md;
+    border: 2px dashed $border-color;
+
+    i {
+        font-size: 2.5rem;
+        color: $text-secondary;
+        margin-bottom: 15px;
+        opacity: 0.5;
+    }
+
+    h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0 0 8px;
+    }
+
+    p {
+        font-size: 0.85rem;
+        color: $text-secondary;
+        margin: 0;
+    }
+}

@@ -1,51 +1,72 @@
-<div class="row">
-    <div class="col-12 col-md-3 p-2">
-        <select class="form-control" [(ngModel)]="selectedDateType" (change)="updateOperationStats()">
-            <option *ngFor="let type of typesOfDate" [value]="type">{{type}}</option>
-        </select>
-    </div>
-    <div class="col-12 col-md-9 p-2">
-        <input *ngIf="selectedDateType=='Quotidien'" class="form-control" type="date" id="day" name="day"
-            [(ngModel)]="dayFilter" (change)="updateOperationStats()">
-
-        <input *ngIf="selectedDateType=='WEEKLY'" class="form-control" type="week" id="week" name="week"
-            [(ngModel)]="weekFilter" (change)="updateOperationStats()">
-
-        <input *ngIf="selectedDateType=='Mensuel'" class="form-control" type="month" id="month" name="month"
-            [(ngModel)]="monthFilter" (change)="updateOperationStats()">
-
-        <select class="form-control" *ngIf="selectedDateType=='Annuel'" [(ngModel)]="yearFilter"
-            (change)="updateOperationStats()">
-            <option *ngFor="let year of years" [value]="year">{{year}}</option>
-        </select>
-    </div>
-</div>
-<div class="row d-flex justify-content-between">
-    <div class="col-12 col-md-5">
-        <div class="col-12">
-            <h4>Total des ventes</h4>
+<div class="category-stats-container">
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <div class="filter-group">
+            <label><i class="fa fa-calendar-alt"></i> Période</label>
+            <select class="filter-select" [(ngModel)]="selectedDateType" (change)="updateOperationStats()">
+                <option *ngFor="let type of typesOfDate" [value]="type">{{ type }}</option>
+            </select>
         </div>
-        <p-chart type="pie" [data]="totalSoldData" [options]="pieChartOptions" class="small-chart"></p-chart>
-    </div>
-    <div class="col-12 col-md-5">
-        <div class="col-12">
-            <h4>Net des ventes</h4>
-        </div>
-        <p-chart type="pie" [data]="totalSoldNetData" [options]="pieChartOptions" class="small-chart"></p-chart>
-    </div>
-</div>
 
-<div class="row">
-    <div class="col-12 col-md-6">
-        <div class="col-12">
-            <h4>Catégories les plus profitables</h4>
+        <div class="filter-group date-filter">
+            <label><i class="fa fa-clock"></i> Date</label>
+            <input *ngIf="selectedDateType === 'Quotidien'" type="date" class="filter-input" [(ngModel)]="dayFilter"
+                (change)="updateOperationStats()">
+
+            <input *ngIf="selectedDateType === 'WEEKLY'" type="week" class="filter-input" [(ngModel)]="weekFilter"
+                (change)="updateOperationStats()">
+
+            <input *ngIf="selectedDateType === 'Mensuel'" type="month" class="filter-input" [(ngModel)]="monthFilter"
+                (change)="updateOperationStats()">
+
+            <select *ngIf="selectedDateType === 'Annuel'" class="filter-select" [(ngModel)]="yearFilter"
+                (change)="updateOperationStats()">
+                <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+            </select>
         </div>
-        <p-chart type="bar" [data]="operationsData" [options]="operationsOptions"></p-chart>
     </div>
-    <div class="col-12 col-md-6">
-        <div class="col-12">
-            <h4>Catégories les plus vendues</h4>
+
+    <!-- Pie Charts Section -->
+    <div class="charts-row pie-charts">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="fa fa-chart-pie"></i> Total des ventes</h3>
+                <span class="chart-badge sales">Par catégorie</span>
+            </div>
+            <div class="chart-body">
+                <p-chart type="pie" [data]="totalSoldData" [options]="pieChartOptions"></p-chart>
+            </div>
         </div>
-        <p-chart type="bar" [data]="operationsItemsData" [options]="operationsOptions"></p-chart>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="fa fa-chart-pie"></i> Net des ventes</h3>
+                <span class="chart-badge profit">Bénéfice net</span>
+            </div>
+            <div class="chart-body">
+                <p-chart type="pie" [data]="totalSoldNetData" [options]="pieChartOptions"></p-chart>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bar Charts Section -->
+    <div class="charts-row bar-charts">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="fa fa-coins"></i> Catégories les plus rentables</h3>
+            </div>
+            <div class="chart-body bar-chart-body">
+                <p-chart type="bar" [data]="operationsData" [options]="operationsOptions"></p-chart>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="fa fa-fire"></i> Catégories les plus vendues</h3>
+            </div>
+            <div class="chart-body bar-chart-body">
+                <p-chart type="bar" [data]="operationsItemsData" [options]="operationsOptions"></p-chart>
+            </div>
+        </div>
     </div>
 </div>

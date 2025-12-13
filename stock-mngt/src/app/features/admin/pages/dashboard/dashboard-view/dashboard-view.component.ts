@@ -16,8 +16,9 @@ export class DashboardViewComponent implements OnInit {
     faBill = faMoneyBill
     faHand = faHandHoldingUsd
     user;
-    widgets
-    widgetsList
+    widgets;
+    widgetsList;
+    currentDate = new Date();
     constructor(
         private authService: AuthService,
         private statService: StatService,

@@ -1,57 +1,52 @@
-<div class="row">
-    <div class="col-12 table-bloc">
-        <table class="table table-responsive table-hover">
-            <thead>
-                <tr>
-                    <th>
-                        Catégorie
-                    </th>
-                    <th>
-                        Valeur de fond
-                    </th>
-                    <th>
-                        Valeur du vente
-                    </th>
-                    <th>
-                        Valeur Net
-                    </th>
-                    <th>
-                        Total des ventes
-                    </th>
+<div class="parent-categories-container">
+    <!-- Category Cards Grid -->
+    <div class="categories-grid" *ngIf="stats?.length > 0">
+        <div class="category-card" *ngFor="let stat of stats; let i = index">
+            <div class="card-header">
+                <div class="category-rank">{{ i + 1 }}</div>
+                <h3 class="category-name">{{ stat?.categoryName }}</h3>
+            </div>
 
-                    <th>
-                        Net des ventes
-                    </th>
+            <div class="card-body">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Valeur de fond</span>
+                        <span class="stat-value stock">{{ stat?.stockValue ? (stat?.stockValue | number:'1.2-2') + ' DT'
+                            : '--' }}</span>
+                    </div>
 
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let stat of stats">
-                    <td>
-                        {{ stat?.categoryName }}
-                    </td>
-                    <td>
-                        {{ (stat?.stockValue ? stat?.stockValue : "--") + " DT" }}
-                    </td>
-                    <td>
-                        {{ (stat?.stockSellingValue ? stat?.stockSellingValue : "--") + " DT" }}
-                    </td>
-                    <td>
-                        {{ (stat?.stockNetValue ? stat?.stockNetValue : "--") + " DT" }}
-                    </td>
-                    <td>
-                        {{ (stat?.totalSold ? stat?.totalSold : "--") + " DT" }}
-                    </td>
-                    <td>
-                        {{ (stat?.totalSoldNet ? stat?.totalSoldNet : "--") + " DT" }}
-                    </td>
+                    <div class="stat-item">
+                        <span class="stat-label">Valeur de vente</span>
+                        <span class="stat-value selling">{{ stat?.stockSellingValue ? (stat?.stockSellingValue |
+                            number:'1.2-2') + ' DT' : '--' }}</span>
+                    </div>
 
-                </tr>
-                <tr *ngIf="stats?.length == 0">
-                    <td colspan="4">Pas de resultat trouvé</td>
-                </tr>
-            </tbody>
+                    <div class="stat-item">
+                        <span class="stat-label">Valeur nette</span>
+                        <span class="stat-value net">{{ stat?.stockNetValue ? (stat?.stockNetValue | number:'1.2-2') + '
+                            DT' : '--' }}</span>
+                    </div>
 
-        </table>
+                    <div class="stat-item highlight">
+                        <span class="stat-label">Total des ventes</span>
+                        <span class="stat-value total">{{ stat?.totalSold ? (stat?.totalSold | number:'1.2-2') + ' DT' :
+                            '--' }}</span>
+                    </div>
+
+                    <div class="stat-item highlight">
+                        <span class="stat-label">Net des ventes</span>
+                        <span class="stat-value profit">{{ stat?.totalSoldNet ? (stat?.totalSoldNet | number:'1.2-2') +
+                            ' DT' : '--' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="stats?.length === 0">
+        <i class="fa fa-folder-open"></i>
+        <h4>Aucune catégorie trouvée</h4>
+        <p>Les statistiques de vos catégories apparaîtront ici</p>
     </div>
 </div>

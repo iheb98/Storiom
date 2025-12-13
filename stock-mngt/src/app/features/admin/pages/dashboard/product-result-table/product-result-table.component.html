@@ -1,44 +1,36 @@
-<div class="row">
-    <div class="col-12 table-bloc">
-        <table class="table table-responsive table-hover">
-            <thead>
-                <tr>
-                    <th>
-                        Nom
-                    </th>
-                    <th>
-                        Prix d'achat
-                    </th>
-                    <th>
-                        Prix de vente
-                    </th>
-                    <th>
-                        Quantité
-                    </th>
+<div class="critical-products-container">
+    <!-- Products List -->
+    <div class="products-list" *ngIf="products?.length > 0">
+        <div class="product-item" *ngFor="let product of products">
+            <div class="product-indicator" [class.critical]="product?.quantity <= 5"
+                [class.warning]="product?.quantity > 5 && product?.quantity <= 10">
+                <i class="fa fa-exclamation-triangle"></i>
+            </div>
 
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let product of products">
-                    <td>
-                        {{ product?.name }}
-                    </td>
-                    <td>
-                        {{ (product?.buyingPrice ? product?.buyingPrice : "--" )+ ' DT' }}
-                    </td>
-                    <td>
-                        {{ (product?.sellingPrice ? product?.sellingPrice : "--" ) + ' DT' }}
-                    </td>
-                    <td>
-                        {{ product?.quantity }}
-                    </td>
+            <div class="product-info">
+                <h4 class="product-name">{{ product?.name }}</h4>
+                <div class="product-prices">
+                    <span class="price buying">
+                        <i class="fa fa-arrow-down"></i> {{ product?.buyingPrice | number:'1.2-2' }} DT
+                    </span>
+                    <span class="price selling">
+                        <i class="fa fa-arrow-up"></i> {{ product?.sellingPrice | number:'1.2-2' }} DT
+                    </span>
+                </div>
+            </div>
 
-                </tr>
-                <tr *ngIf="products?.length == 0">
-                    <td colspan="4">Pas de resultat trouvé</td>
-                </tr>
-            </tbody>
+            <div class="product-quantity" [class.critical]="product?.quantity <= 5"
+                [class.warning]="product?.quantity > 5 && product?.quantity <= 10">
+                <span class="qty-value">{{ product?.quantity }}</span>
+                <span class="qty-label">en stock</span>
+            </div>
+        </div>
+    </div>
 
-        </table>
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="products?.length === 0">
+        <i class="fa fa-check-circle"></i>
+        <h4>Aucun produit en stock critique</h4>
+        <p>Tous vos produits ont un stock suffisant</p>
     </div>
 </div>

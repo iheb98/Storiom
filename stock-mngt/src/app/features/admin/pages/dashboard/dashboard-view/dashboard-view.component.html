@@ -1,97 +1,104 @@
-<div class="padding-page">
-    <div class="row">
-        <div class="col-12 title-bloc">
-            <h3 class="title">Dashboard</h3>
+<div class="dashboard-container">
+    <!-- Welcome Header -->
+    <header class="dashboard-header">
+        <div class="header-content">
+            <h1>Tableau de bord</h1>
+            <p>Bienvenue, voici un aperçu de votre activité</p>
         </div>
-    </div>
+        <div class="header-date">
+            <i class="fa fa-calendar-alt"></i>
+            <span>{{ currentDate | date:'EEEE, d MMMM yyyy' }}</span>
+        </div>
+    </header>
 
-    <div class="row widget-container g-3 m-3">
-        <div class="col-3 col-sm-6 col-md-4 col-lg-3 widget" *ngFor="let w of widgetsList">
-            <div class="content d-flex align-items-center gap-3 p-3 shadow-sm rounded">
-                <div class="icon-box" [ngClass]="w.class">
+    <!-- Stats Cards -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card" *ngFor="let w of widgetsList">
+                <div class="stat-icon" [ngClass]="w.class">
                     <fa-icon [icon]="w.icon"></fa-icon>
                 </div>
-                <div class="value-box">
-                    <div class="label text-muted small">
-                        {{ w.label }}
-                    </div>
-                    <div class="value">
-                        {{ w.value }}
-                    </div>
+                <div class="stat-content">
+                    <span class="stat-label">{{ w.label }}</span>
+                    <span class="stat-value">{{ w.value }}</span>
+                </div>
+                <div class="stat-trend" *ngIf="w.trend">
+                    <i class="fa" [class.fa-arrow-up]="w.trend > 0" [class.fa-arrow-down]="w.trend < 0"
+                        [class.positive]="w.trend > 0" [class.negative]="w.trend < 0"></i>
+                    <span>{{ w.trend }}%</span>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div class="row">
-        <div class="col-12 col-md-12 fixed-height">
-            <div class="row">
-                <div class="col-12">
-                    <span class="subtitle">Détails sur les Catégories</span>
-                </div>
-                <div class="col-12">
-                    <app-parent-categories-stats></app-parent-categories-stats>
-                </div>
+    <!-- Main Content Grid -->
+    <section class="content-grid">
+        <!-- Category Stats -->
+        <div class="dashboard-card full-width">
+            <div class="card-header">
+                <h2><i class="fa fa-chart-pie"></i> Détails sur les Catégories</h2>
             </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12 col-md-6 fixed-height">
-            <div class="row">
-                <div class="col-12">
-                    <span class="subtitle">Dernieres Factures</span>
-                </div>
-                <div class="col-12">
-                    <app-receipt-result-table></app-receipt-result-table>
-                </div>
+            <div class="card-body">
+                <app-parent-categories-stats></app-parent-categories-stats>
             </div>
         </div>
 
-        <div class="col-12 col-md-6 fixed-height">
-            <div class="row">
-                <div class="col-12">
-                    <span class="subtitle">Produits avec stock ciritque</span>
-                </div>
-                <div class="col-12">
-                    <app-product-result-table></app-product-result-table>
-                </div>
+        <!-- Two Column Layout -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2><i class="fa fa-receipt"></i> Dernières Factures</h2>
+                <a routerLink="/admin/receipts" class="view-all">Voir tout <i class="fa fa-arrow-right"></i></a>
+            </div>
+            <div class="card-body">
+                <app-receipt-result-table></app-receipt-result-table>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-12 col-md-6 fixed-height">
-                <div class="row">
-                    <div class="col-12">
-                        <span class="subtitle">Produits les plus vendues</span>
-                    </div>
-                    <app-most-sold-products></app-most-sold-products>
-                </div>
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2><i class="fa fa-exclamation-triangle"></i> Stock Critique</h2>
+                <a routerLink="/admin/products" class="view-all">Voir tout <i class="fa fa-arrow-right"></i></a>
             </div>
-            <div class="col-12 col-md-6 fixed-height">
-                <div class="row">
-                    <div class="col-12">
-                        <span class="subtitle">Produits les plus profitable</span>
-                    </div>
-                    <app-most-profitable-products></app-most-profitable-products>
-                </div>
+            <div class="card-body">
+                <app-product-result-table></app-product-result-table>
             </div>
         </div>
 
-        <div class="row mb-4">
-            <div class="col-12">
-                <h3>Statistiques sur les operations</h3>
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2><i class="fa fa-fire"></i> Produits les plus vendus</h2>
             </div>
-            <div class="col-12 col-md-12">
+            <div class="card-body">
+                <app-most-sold-products></app-most-sold-products>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2><i class="fa fa-coins"></i> Produits les plus rentables</h2>
+            </div>
+            <div class="card-body">
+                <app-most-profitable-products></app-most-profitable-products>
+            </div>
+        </div>
+
+        <!-- Full Width Charts -->
+        <div class="dashboard-card full-width">
+            <div class="card-header">
+                <h2><i class="fa fa-chart-line"></i> Statistiques des Opérations</h2>
+            </div>
+            <div class="card-body chart-container">
                 <app-operation-stats></app-operation-stats>
             </div>
         </div>
-        <div class="row mb-4">
-            <div class="col-12">
-                <h3>Statistiques sur les catégories</h3>
+
+        <div class="dashboard-card full-width">
+            <div class="card-header">
+                <h2><i class="fa fa-chart-bar"></i> Statistiques par Catégorie</h2>
             </div>
-            <div class="col-12 col-md-12">
+            <div class="card-body chart-container">
                 <app-category-stats></app-category-stats>
             </div>
         </div>
-    </div>
+    </section>
 </div>

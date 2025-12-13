@@ -1,48 +1,42 @@
-<div class="row">
-    <div class="col-12 table-bloc">
-        <table class="table table-responsive table-hover">
-            <thead>
-                <tr>
-                    <th>
-                        Code
-                    </th>
-                    <th>
-                        Type
-                    </th>
-                    <th>
-                        Client / Fournisseur
-                    </th>
-                    <th>
-                        Total
-                    </th>
-                    <th>
-                        Date
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let receipt of receipts">
-                    <td>
-                        {{ receipt?.code }}
-                    </td>
-                    <td>
-                        {{ receipt?.type == "LOADED" ? "Chargement" : "Vente" }}
-                    </td>
-                    <td>
-                        {{ receipt?.name }}
-                    </td>
-                    <td>
-                        {{ (receipt?.total ? receipt?.total : "--" ) + ' DT' }}
-                    </td>
-                    <td>
-                        {{ receipt?.date | date:'short' }}
-                    </td>
-                </tr>
-                <tr *ngIf="receipts?.length == 0">
-                    <td colspan="5">Pas de resultat trouvé</td>
-                </tr>
-            </tbody>
+<div class="receipts-container">
+    <!-- Receipts List -->
+    <div class="receipts-list" *ngIf="receipts?.length > 0">
+        <div class="receipt-item" *ngFor="let receipt of receipts">
+            <div class="receipt-type" [class.sale]="receipt?.type === 'SOLD'" [class.load]="receipt?.type === 'LOADED'">
+                <i class="fa" [class.fa-shopping-cart]="receipt?.type === 'SOLD'"
+                    [class.fa-truck]="receipt?.type === 'LOADED'"></i>
+            </div>
 
-        </table>
+            <div class="receipt-info">
+                <div class="receipt-header">
+                    <span class="receipt-code">#{{ receipt?.code }}</span>
+                    <span class="receipt-badge" [class.sale]="receipt?.type === 'SOLD'"
+                        [class.load]="receipt?.type === 'LOADED'">
+                        {{ receipt?.type === 'LOADED' ? 'Chargement' : 'Vente' }}
+                    </span>
+                </div>
+                <div class="receipt-details">
+                    <span class="receipt-name">
+                        <i class="fa fa-user"></i> {{ receipt?.name || 'Client anonyme' }}
+                    </span>
+                    <span class="receipt-date">
+                        <i class="fa fa-clock"></i> {{ receipt?.date | date:'dd/MM/yyyy HH:mm' }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="receipt-total" [class.sale]="receipt?.type === 'SOLD'"
+                [class.load]="receipt?.type === 'LOADED'">
+                <span class="total-value">{{ receipt?.total | number:'1.2-2' }}</span>
+                <span class="total-currency">DT</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="receipts?.length === 0">
+        <i class="fa fa-receipt"></i>
+        <h4>Aucune facture récente</h4>
+        <p>Vos dernières factures apparaîtront ici</p>
     </div>
 </div>
