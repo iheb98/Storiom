@@ -47,6 +47,8 @@ export class StoreAddComponent implements OnInit {
           this.form.get('street').setValue(response?.address?.street)
           this.form.get('postalCode').setValue(response?.address?.postalCode)
           this.form.get('logo').setValue(response?.logo)
+          this.form.get('isVisibleToPublic').setValue(response?.isVisibleToPublic)
+          this.form.get('isSupportingDeliveries').setValue(response?.isSupportingDeliveries)
         })
     }
   }
@@ -64,7 +66,9 @@ export class StoreAddComponent implements OnInit {
       city: [''],
       street: [''],
       postalCode: [''],
-      logo: [null]
+      logo: [null],
+      isVisibleToPublic: [true],
+      isSupportingDeliveries: [false]
     });
   }
 

@@ -68,6 +68,33 @@
                     <input #fileInput type="file" class="form-control">
                 </div>
 
+            </div>
+
+            <div class="col-lg-12">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-check form-switch" style="padding-left: 2.5em;">
+                            <input class="form-check-input" type="checkbox" id="isVisibleToPublic"
+                                formControlName="isVisibleToPublic" style="width: 3em; height: 1.5em;">
+                            <label class="form-check-label ms-2" for="isVisibleToPublic"
+                                style="font-size: 1.1em; padding-top: 2px;">Visible au public</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-check form-switch" style="padding-left: 2.5em;">
+                            <input class="form-check-input" type="checkbox" id="isSupportingDeliveries"
+                                formControlName="isSupportingDeliveries" style="width: 3em; height: 1.5em;">
+                            <label class="form-check-label ms-2" for="isSupportingDeliveries"
+                                style="font-size: 1.1em; padding-top: 2px;">Supporte la livraison</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12">
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
                     <textarea maxlength="50000" rows="10" resize="none" class="form-control"
