@@ -7,12 +7,12 @@ import { LoadingService } from 'src/app/core/services/loading.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CartService } from 'src/app/core/services/cart.service';
 import { ToastService } from 'src/app/core/services/toast.service';
-
-interface CartItem {
-  id: number;
-  product: any;
-  quantity: number;
-}
+import {
+  faChevronRight, faChevronLeft, faSearchPlus, faStar, faStarHalfAlt,
+  faCheck, faTimes, faMinus, faPlus, faShoppingCart, faTruck, faShieldAlt,
+  faStore, faInfoCircle, faComments
+} from '@fortawesome/free-solid-svg-icons';
+import { faStar as faStarEmpty } from '@fortawesome/free-regular-svg-icons';
 
 @Component({
   selector: 'app-public-view-product',
@@ -25,9 +25,28 @@ export class PublicViewProductComponent implements OnInit {
   product: any;
   id: string | null = null;
   selectedImage: string | null = null;
+  selectedImageIndex: number = 0;
   userReview: any;
+  quantity: number = 1;
+  lightboxOpen: boolean = false;
 
-  quantity: number = 1; // ✅ default quantity
+  // Icons
+  faChevronRight = faChevronRight;
+  faChevronLeft = faChevronLeft;
+  faSearchPlus = faSearchPlus;
+  faStar = faStar;
+  faStarHalfAlt = faStarHalfAlt;
+  faStarEmpty = faStarEmpty;
+  faCheck = faCheck;
+  faTimes = faTimes;
+  faMinus = faMinus;
+  faPlus = faPlus;
+  faShoppingCart = faShoppingCart;
+  faTruck = faTruck;
+  faShieldAlt = faShieldAlt;
+  faStore = faStore;
+  faInfoCircle = faInfoCircle;
+  faComments = faComments;
 
   constructor(
     private route: ActivatedRoute,
@@ -54,15 +73,18 @@ export class PublicViewProductComponent implements OnInit {
       this.calculateAverageRating();
 
       const currentUser = this.authService.getConnectedUser();
-      console.log('[DEBUG] Current User:', currentUser);
       if (currentUser && this.product.reviews) {
         this.userReview = this.product.reviews.find((r: any) => r.userId === currentUser.id);
-        console.log('[DEBUG] User Review Found:', this.userReview);
       }
 
       if (this.product.images) {
-        this.product.images = JSON.parse(this.product.images);
-        this.selectedImage = environment.backend + '/' + this.product.images[0];
+        if (typeof this.product.images === 'string') {
+          this.product.images = JSON.parse(this.product.images);
+        }
+        if (this.product.images.length > 0) {
+          this.selectedImage = environment.backend + '/' + this.product.images[0];
+          this.selectedImageIndex = 0;
+        }
       }
     }, () => {
       this.loadingService.screenLoaded();
@@ -71,13 +93,11 @@ export class PublicViewProductComponent implements OnInit {
 
   calculateAverageRating() {
     if (this.product && this.product.reviews && this.product.reviews.length > 0) {
-      const total = this.product.reviews.reduce((acc, review) => acc + Number(review.rating), 0);
+      const total = this.product.reviews.reduce((acc: number, review: any) => acc + Number(review.rating), 0);
       this.product.averageRating = total / this.product.reviews.length;
     } else {
       this.product.averageRating = 0;
     }
-    console.log('Product Reviews:', this.product.reviews);
-    console.log('Calculated Rating:', this.product.averageRating);
   }
 
   onReviewSubmitted(review: any) {
@@ -87,14 +107,11 @@ export class PublicViewProductComponent implements OnInit {
 
     const existingIndex = this.product.reviews.findIndex((r: any) => r.id === review.id);
     if (existingIndex !== -1) {
-      // Update existing review
       this.product.reviews[existingIndex] = review;
     } else {
-      // Prepend new review
       this.product.reviews.unshift(review);
     }
 
-    // Update userReview tracking
     const currentUser = this.authService.getConnectedUser();
     if (currentUser && review.userId === currentUser.id) {
       this.userReview = review;
@@ -103,11 +120,41 @@ export class PublicViewProductComponent implements OnInit {
     this.calculateAverageRating();
   }
 
-  // ----------------------------
-  // Quantity management
-  // ----------------------------
+  // Image Gallery
+  selectImage(index: number) {
+    this.selectedImageIndex = index;
+    this.selectedImage = environment.backend + '/' + this.product.images[index];
+  }
+
+  openImage(image: string) {
+    this.lightboxOpen = true;
+  }
+
+  closeLightbox() {
+    this.lightboxOpen = false;
+  }
+
+  prevImage(event: Event) {
+    event.stopPropagation();
+    if (this.selectedImageIndex > 0) {
+      this.selectImage(this.selectedImageIndex - 1);
+    } else {
+      this.selectImage(this.product.images.length - 1);
+    }
+  }
+
+  nextImage(event: Event) {
+    event.stopPropagation();
+    if (this.selectedImageIndex < this.product.images.length - 1) {
+      this.selectImage(this.selectedImageIndex + 1);
+    } else {
+      this.selectImage(0);
+    }
+  }
+
+  // Quantity
   increaseQuantity() {
-    if (this.product?.quantity) {
+    if (this.quantity < this.product?.quantity) {
       this.quantity++;
     }
   }
@@ -118,10 +165,17 @@ export class PublicViewProductComponent implements OnInit {
     }
   }
 
-  addToCart(product: any) {
+  // Price
+  getOriginalPrice(): number {
+    if (this.product?.discount && this.product?.sellingPrice) {
+      return this.product.sellingPrice / (1 - this.product.discount / 100);
+    }
+    return this.product?.sellingPrice || 0;
+  }
 
+  // Cart
+  addToCart(product: any) {
     if (this.authService.isLoggedIn()) {
-      // User is logged in → use API
       this.productService.addToCart(product.id, this.quantity).subscribe({
         next: () => {
           this.toastService.showSuccess('Produit ajouté au panier');
@@ -131,17 +185,8 @@ export class PublicViewProductComponent implements OnInit {
         }
       });
     } else {
-      // User NOT logged in → use localStorage
       this.cartService.addToCart(product, this.quantity);
-      this.toastService.showSuccess('Produit ajouté au panier (Local)');
+      this.toastService.showSuccess('Produit ajouté au panier');
     }
-  }
-
-  openImage(image: string) {
-    this.selectedImage = image;
-  }
-
-  closeImage() {
-    this.selectedImage = null;
   }
 }

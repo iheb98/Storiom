@@ -4,8 +4,12 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { CartService } from 'src/app/core/services/cart.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { OrderService } from 'src/app/core/services/order.service';
-import { environment } from 'src/environments/environment.prod';
+import { environment } from 'src/environments/environment';
 import { ToastService } from 'src/app/core/services/toast.service';
+import {
+  faShoppingCart, faStore, faCheck, faTimes, faMinus, faPlus,
+  faTrash, faLock, faShieldAlt, faArrowLeft, faShoppingBag
+} from '@fortawesome/free-solid-svg-icons';
 
 interface CartItem {
   id: number;
@@ -19,10 +23,23 @@ interface CartItem {
   styleUrls: ['./cart.component.scss']
 })
 export class CartComponent implements OnInit {
-  environment = environment
+  environment = environment;
   cart: CartItem[] = [];
   totalItems = 0;
   totalPrice = 0;
+
+  // Icons
+  faShoppingCart = faShoppingCart;
+  faStore = faStore;
+  faCheck = faCheck;
+  faTimes = faTimes;
+  faMinus = faMinus;
+  faPlus = faPlus;
+  faTrash = faTrash;
+  faLock = faLock;
+  faShieldAlt = faShieldAlt;
+  faArrowLeft = faArrowLeft;
+  faShoppingBag = faShoppingBag;
 
   constructor(
     private router: Router,
@@ -44,28 +61,54 @@ export class CartComponent implements OnInit {
   loadCartFromLocalStorage() {
     const data = localStorage.getItem('cart');
     this.cart = data ? JSON.parse(data) : [];
+    this.parseProductImages();
     this.calculateTotals();
   }
 
   loadCartFromApi() {
     this.productService.getCart().subscribe((res: any) => {
-      // Backend returns a list of items which contains 'product' object and 'quantity'
-      // Mapping might be needed if structure is slightly different, but assuming standard response for now based on routes/products.js
       this.cart = res;
+      this.parseProductImages();
       this.calculateTotals();
     }, (error) => {
       console.error('Error fetching cart', error);
-      // Fallback or error handling
     });
   }
 
-  // saveCart method is less relevant for API flow since we do singular updates, 
-  // but we can keep it for purely local storage bulk updates if needed.
-  // We will refactor usage of saveCart in increase/decrease/remove.
+  parseProductImages() {
+    this.cart.forEach(item => {
+      if (item.product?.images && typeof item.product.images === 'string') {
+        try {
+          item.product.images = JSON.parse(item.product.images);
+        } catch {
+          item.product.images = [];
+        }
+      }
+    });
+  }
+
+  getProductImage(product: any): string {
+    if (!product?.images) return 'assets/default_product.png';
+
+    let images = product.images;
+
+    if (typeof images === 'string') {
+      try {
+        images = JSON.parse(images);
+      } catch {
+        return 'assets/default_product.png';
+      }
+    }
+
+    if (Array.isArray(images) && images.length > 0) {
+      return this.environment.backend + '/' + images[0];
+    }
+
+    return 'assets/default_product.png';
+  }
 
   increaseQty(item: CartItem) {
     if (this.authService.isLoggedIn()) {
-      // When logged in, we update directly via API
       const newQty = item.quantity + 1;
       this.productService.updateCart(item.product.id, newQty).subscribe(res => {
         if (res.success) {
@@ -102,11 +145,13 @@ export class CartComponent implements OnInit {
         if (res.success) {
           this.cart = this.cart.filter(i => i.id !== item.id);
           this.calculateTotals();
+          this.toastService.showSuccess('Produit retiré du panier');
         }
       });
     } else {
       this.cart = this.cart.filter(i => i.id !== item.id);
       this.saveLocalCart();
+      this.toastService.showSuccess('Produit retiré du panier');
     }
   }
 
@@ -126,7 +171,6 @@ export class CartComponent implements OnInit {
 
   checkout() {
     if (!this.authService.isLoggedIn()) {
-      // Redirect to login or show message
       this.toastService.showWarning("Veuillez vous connecter pour commander.");
       this.router.navigate(['/login']);
       return;
@@ -138,10 +182,9 @@ export class CartComponent implements OnInit {
       (res) => {
         if (res.success) {
           this.toastService.showSuccess("Commande passée avec succès !");
-          this.cart = []; // Clear local view
+          this.cart = [];
           this.calculateTotals();
-          // Optionally navigate to orders page
-          this.router.navigate(['/profile']); // or wherever "My Orders" is
+          this.router.navigate(['/profile']);
         }
       },
       (err) => {
