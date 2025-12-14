@@ -11,25 +11,24 @@
                 <h1>{{ store?.name }}</h1>
                 <div class="store-badges">
                     <span class="badge" [class.active]="store?.active" [class.inactive]="!store?.active">
-                        <i class="fa" [class.fa-check-circle]="store?.active"
-                            [class.fa-times-circle]="!store?.active"></i>
+                        <fa-icon [icon]="store?.active ? checkIcon : timesIcon"></fa-icon>
                         {{ store?.active ? 'Actif' : 'Inactif' }}
                     </span>
                     <span class="badge delivery" *ngIf="store?.isSupportingDeliveries">
-                        <i class="fa fa-truck"></i> Livraison disponible
+                        <fa-icon [icon]="truckIcon"></fa-icon> Livraison disponible
                     </span>
                     <span class="badge no-delivery" *ngIf="!store?.isSupportingDeliveries">
-                        <i class="fa fa-times-circle"></i> Pas de livraison
+                        <fa-icon [icon]="timesIcon"></fa-icon> Pas de livraison
                     </span>
                     <span class="badge visibility" *ngIf="store?.isVisibleToPublic">
-                        <i class="fa fa-eye"></i> Visible au public
+                        <fa-icon [icon]="eyeIcon"></fa-icon> Visible au public
                     </span>
                 </div>
                 <p class="store-description" *ngIf="store?.description">{{ store?.description }}</p>
             </div>
             <div class="header-actions">
                 <button class="btn-edit" [routerLink]="['/admin/stores/edit/' + store?.id]">
-                    <i class="fa fa-edit"></i> Modifier
+                    <fa-icon [icon]="editIcon"></fa-icon> Modifier
                 </button>
             </div>
         </div>
@@ -39,7 +38,7 @@
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon products">
-                <i class="fa fa-box"></i>
+                <fa-icon [icon]="boxIcon"></fa-icon>
             </div>
             <div class="stat-content">
                 <span class="stat-number">{{ productsCount }}</span>
@@ -48,7 +47,7 @@
         </div>
         <div class="stat-card">
             <div class="stat-icon orders">
-                <i class="fa fa-shopping-cart"></i>
+                <fa-icon [icon]="cartIcon"></fa-icon>
             </div>
             <div class="stat-content">
                 <span class="stat-number">{{ ordersCount }}</span>
@@ -56,21 +55,21 @@
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon reviews">
-                <i class="fa fa-star"></i>
+            <div class="stat-icon categories">
+                <fa-icon [icon]="folderIcon"></fa-icon>
             </div>
             <div class="stat-content">
-                <span class="stat-number">{{ averageRating | number:'1.1-1' }}</span>
-                <span class="stat-label">Note moyenne</span>
+                <span class="stat-number">{{ categoriesCount }}</span>
+                <span class="stat-label">Catégories</span>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon views">
-                <i class="fa fa-eye"></i>
+            <div class="stat-icon suppliers">
+                <fa-icon [icon]="truckIcon"></fa-icon>
             </div>
             <div class="stat-content">
-                <span class="stat-number">{{ totalViews }}</span>
-                <span class="stat-label">Vues</span>
+                <span class="stat-number">{{ suppliersCount }}</span>
+                <span class="stat-label">Fournisseurs</span>
             </div>
         </div>
     </div>
@@ -80,26 +79,26 @@
         <!-- Contact Information -->
         <div class="info-card">
             <div class="card-header">
-                <i class="fa fa-phone-alt"></i>
+                <fa-icon [icon]="phoneHeaderIcon"></fa-icon>
                 <h3>Coordonnées</h3>
             </div>
             <div class="card-body">
                 <div class="info-row">
-                    <div class="info-icon"><i class="fa fa-phone"></i></div>
+                    <div class="info-icon"><fa-icon [icon]="phoneIcon"></fa-icon></div>
                     <div class="info-content">
                         <span class="info-label">Téléphone</span>
                         <span class="info-value">{{ store?.phone || 'Non renseigné' }}</span>
                     </div>
                 </div>
                 <div class="info-row">
-                    <div class="info-icon"><i class="fa fa-envelope"></i></div>
+                    <div class="info-icon"><fa-icon [icon]="envelopeIcon"></fa-icon></div>
                     <div class="info-content">
                         <span class="info-label">Email</span>
                         <span class="info-value">{{ store?.email || 'Non renseigné' }}</span>
                     </div>
                 </div>
                 <div class="info-row">
-                    <div class="info-icon"><i class="fa fa-globe"></i></div>
+                    <div class="info-icon"><fa-icon [icon]="globeIcon"></fa-icon></div>
                     <div class="info-content">
                         <span class="info-label">Site web</span>
                         <a *ngIf="store?.site" [href]="storeWebsite" target="_blank" class="info-link">
@@ -114,26 +113,26 @@
         <!-- Address Information -->
         <div class="info-card">
             <div class="card-header">
-                <i class="fa fa-map-marker-alt"></i>
+                <fa-icon [icon]="mapMarkerIcon"></fa-icon>
                 <h3>Adresse</h3>
             </div>
             <div class="card-body">
                 <div class="info-row">
-                    <div class="info-icon"><i class="fa fa-road"></i></div>
+                    <div class="info-icon"><fa-icon [icon]="roadIcon"></fa-icon></div>
                     <div class="info-content">
                         <span class="info-label">Rue</span>
                         <span class="info-value">{{ store?.address?.street || 'Non renseigné' }}</span>
                     </div>
                 </div>
                 <div class="info-row">
-                    <div class="info-icon"><i class="fa fa-city"></i></div>
+                    <div class="info-icon"><fa-icon [icon]="cityIcon"></fa-icon></div>
                     <div class="info-content">
                         <span class="info-label">Ville</span>
                         <span class="info-value">{{ store?.address?.city || 'Non renseigné' }}</span>
                     </div>
                 </div>
                 <div class="info-row">
-                    <div class="info-icon"><i class="fa fa-map"></i></div>
+                    <div class="info-icon"><fa-icon [icon]="mapIcon"></fa-icon></div>
                     <div class="info-content">
                         <span class="info-label">État/Région</span>
                         <span class="info-value">{{ store?.address?.state || 'Non renseigné' }}</span>
@@ -145,25 +144,25 @@
         <!-- Quick Actions -->
         <div class="info-card actions-card">
             <div class="card-header">
-                <i class="fa fa-bolt"></i>
+                <fa-icon [icon]="boltIcon"></fa-icon>
                 <h3>Actions rapides</h3>
             </div>
             <div class="card-body">
                 <div class="quick-actions">
                     <a [routerLink]="['/admin/products/add']" class="action-btn">
-                        <i class="fa fa-plus"></i>
+                        <fa-icon [icon]="plusIcon"></fa-icon>
                         <span>Ajouter un produit</span>
                     </a>
                     <a [routerLink]="['/admin/products']" class="action-btn">
-                        <i class="fa fa-box"></i>
+                        <fa-icon [icon]="boxIcon"></fa-icon>
                         <span>Voir les produits</span>
                     </a>
                     <a [routerLink]="['/admin/orders']" class="action-btn">
-                        <i class="fa fa-shopping-cart"></i>
+                        <fa-icon [icon]="cartIcon"></fa-icon>
                         <span>Voir les commandes</span>
                     </a>
                     <a [routerLink]="['/store', store?.id]" target="_blank" class="action-btn">
-                        <i class="fa fa-external-link-alt"></i>
+                        <fa-icon [icon]="externalLinkIcon"></fa-icon>
                         <span>Voir la boutique</span>
                     </a>
                 </div>

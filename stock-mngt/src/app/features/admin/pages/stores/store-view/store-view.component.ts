@@ -1,9 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { faEdit, faInfo } from '@fortawesome/free-solid-svg-icons';
+import {
+  faEdit, faInfo, faBox, faShoppingCart, faFolder, faTruck,
+  faCheckCircle, faTimesCircle, faEye, faPhoneAlt, faPhone,
+  faEnvelope, faGlobe, faMapMarkerAlt, faRoad, faCity, faMap,
+  faBolt, faPlus, faExternalLinkAlt
+} from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { StoreService } from 'src/app/core/services/store.service';
 import { ProductService } from 'src/app/core/services/product.service';
+import { CategoryService } from 'src/app/core/services/category.service';
+import { SupplierService } from 'src/app/core/services/supplier.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 
@@ -16,20 +23,43 @@ export class StoreViewComponent implements OnInit {
   store: any;
   storeWebsite: string;
   backend_URL = environment.backend;
+
+  // Icons
   editIcon = faEdit;
   infoIcon = faInfo;
+  boxIcon = faBox;
+  cartIcon = faShoppingCart;
+  folderIcon = faFolder;
+  truckIcon = faTruck;
+  checkIcon = faCheckCircle;
+  timesIcon = faTimesCircle;
+  eyeIcon = faEye;
+  phoneHeaderIcon = faPhoneAlt;
+  phoneIcon = faPhone;
+  envelopeIcon = faEnvelope;
+  globeIcon = faGlobe;
+  mapMarkerIcon = faMapMarkerAlt;
+  roadIcon = faRoad;
+  cityIcon = faCity;
+  mapIcon = faMap;
+  boltIcon = faBolt;
+  plusIcon = faPlus;
+  externalLinkIcon = faExternalLinkAlt;
+
   selectedImage: string | null = null;
 
   // Stats
   productsCount = 0;
   ordersCount = 0;
-  averageRating = 0;
-  totalViews = 0;
+  categoriesCount = 0;
+  suppliersCount = 0;
 
   constructor(
     private authService: AuthService,
     private storeService: StoreService,
     private productService: ProductService,
+    private categoryService: CategoryService,
+    private supplierService: SupplierService,
     private loadingService: LoadingService
   ) { }
 
@@ -72,14 +102,19 @@ export class StoreViewComponent implements OnInit {
     // For now, we'll set it to 0
     this.ordersCount = 0;
 
-    // Calculate average rating from store reviews if available
-    if (this.store?.reviews && this.store.reviews.length > 0) {
-      const sum = this.store.reviews.reduce((acc: number, r: any) => acc + (r.rating || 0), 0);
-      this.averageRating = sum / this.store.reviews.length;
-    }
+    // Load categories count
+    this.categoryService.getCategoriesByStoreId(storeId).subscribe(
+      res => {
+        this.categoriesCount = res?.length || 0;
+      }
+    );
 
-    // Views would need tracking - for now set to 0
-    this.totalViews = 0;
+    // Load suppliers count
+    this.supplierService.getAllSuppliersByStoreId(storeId).subscribe(
+      res => {
+        this.suppliersCount = res?.length || 0;
+      }
+    );
   }
 
   fillLink(link: string): string {

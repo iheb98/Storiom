@@ -113,4 +113,8 @@ export class ProductService {
   deleteProduct(id): Observable<any> {
     return this.http.delete<any>(this.baseUrl + id);
   }
+
+  bulkUpdateVisibility(body: { ids: number[], toDisplay: boolean, updateAll?: boolean, storeId?: number }): Observable<any> {
+    return this.http.put<any>(this.baseUrl + 'bulk-visibility', body);
+  }
 }

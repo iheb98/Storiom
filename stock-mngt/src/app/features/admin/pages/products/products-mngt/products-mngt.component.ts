@@ -277,4 +277,89 @@ export class ProductsMngtComponent implements OnInit {
       this.count = response;
     })
   }
+
+  // ========================================
+  // Bulk Visibility Actions
+  // ========================================
+  selectedIds: number[] = [];
+
+  toggleSelection(id: number) {
+    const index = this.selectedIds.indexOf(id);
+    if (index === -1) {
+      this.selectedIds.push(id);
+    } else {
+      this.selectedIds.splice(index, 1);
+    }
+  }
+
+  isSelected(id: number): boolean {
+    return this.selectedIds.includes(id);
+  }
+
+  toggleSelectAll(checked: boolean) {
+    if (checked) {
+      this.selectedIds = this.products.map(p => p.id);
+    } else {
+      this.selectedIds = [];
+    }
+  }
+
+  get isAllSelected(): boolean {
+    return this.products.length > 0 && this.selectedIds.length === this.products.length;
+  }
+
+  bulkUpdateDisplay(toDisplay: boolean, updateAll: boolean = false) {
+    if (!updateAll && this.selectedIds.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Aucun produit sélectionné',
+        text: 'Veuillez sélectionner au moins un produit.'
+      });
+      return;
+    }
+
+    const action = toDisplay ? 'afficher' : 'masquer';
+    const scope = updateAll ? 'TOUS les produits' : `${this.selectedIds.length} produit(s) sélectionné(s)`;
+
+    Swal.fire({
+      title: `${toDisplay ? 'Afficher' : 'Masquer'} les produits`,
+      text: `Voulez-vous ${action} ${scope} sur le marketplace ?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Oui, confirmer',
+      cancelButtonText: 'Annuler',
+      confirmButtonColor: toDisplay ? '#28a745' : '#dc3545'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.loadingService.screenLoading();
+
+        this.productService.bulkUpdateVisibility({
+          ids: this.selectedIds,
+          toDisplay: toDisplay,
+          updateAll: updateAll,
+          storeId: this.authService.getConnectedUser()?.store
+        }).subscribe(
+          response => {
+            this.loadingService.screenLoaded();
+            Swal.fire({
+              icon: 'success',
+              title: response.message || 'Mise à jour réussie!',
+              showConfirmButton: false,
+              timer: 1500
+            });
+            this.selectedIds = [];
+            this.getProducts(this.currentPage, this.currentSize);
+          },
+          error => {
+            this.loadingService.screenLoaded();
+            Swal.fire({
+              icon: 'error',
+              title: 'Erreur',
+              text: error?.error?.message || 'Une erreur est survenue'
+            });
+          }
+        );
+      }
+    });
+  }
 }

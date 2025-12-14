@@ -159,6 +159,45 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
     })
 })
 
+// Bulk update toDisplay for selected products or all products
+router.put('/bulk-visibility', utility.authenticate, checkSubscription, async (req, res) => {
+    try {
+        const { ids, toDisplay, updateAll, storeId } = req.body;
+        const userId = req.user.id;
+
+        let whereClause = {
+            creatorUserId: userId,
+            isVisible: true
+        };
+
+        if (storeId) {
+            whereClause.store_id = storeId;
+        }
+
+        if (!updateAll) {
+            if (!ids || ids.length === 0) {
+                return res.status(400).json({ success: false, message: "Aucun produit sélectionné" });
+            }
+            whereClause.id = { [Op.in]: ids };
+        }
+
+        const [affectedCount] = await Product.update(
+            { toDisplay: toDisplay },
+            { where: whereClause }
+        );
+
+        res.json({
+            success: true,
+            message: `${affectedCount} produit(s) mis à jour`,
+            affectedCount
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.toString() });
+    }
+});
+
 router.get('/all', (req, res, next) => {
     const id = req.params.id;
     Product.findAll({

@@ -21,7 +21,13 @@ router.get('/products/random', async (req, res) => {
             order: Sequelize.literal('RANDOM()'), // This works for PostgreSQL and SQLite
             limit: limit,
             include: [
-                { model: Store, as: 'store', attributes: ['name'] },
+                {
+                    model: Store,
+                    as: 'store',
+                    attributes: ['name', 'isSupportingDeliveries'],
+                    where: { isVisibleToPublic: true, active: true },
+                    required: true
+                },
                 { model: Review, as: 'reviews', attributes: ['rating'] }
             ]
         });
@@ -87,7 +93,14 @@ router.get('/products/search', async (req, res) => {
             },
             limit: 20, // Limit search results
             include: [
-                { model: Review, as: 'reviews', attributes: ['rating'] }
+                { model: Review, as: 'reviews', attributes: ['rating'] },
+                {
+                    model: Store,
+                    as: 'store',
+                    attributes: ['name', 'isSupportingDeliveries'],
+                    where: { isVisibleToPublic: true, active: true },
+                    required: true
+                }
             ]
         });
         res.json(products);
@@ -187,6 +200,7 @@ router.get('/allStores/products', async (req, res) => {
         // -------------------------------
         let whereClause = {
             isVisible: true,
+            toDisplay: true,
             ...utility.buildQuery(rawQuery)
         };
 
@@ -218,7 +232,13 @@ router.get('/allStores/products', async (req, res) => {
                 include: [
                     { model: Supplier, as: 'supplier', required: false },
                     { model: Category, as: 'category', required: false },
-                    { model: Store, as: 'store', attributes: ['name', 'isSupportingDeliveries'], required: false },
+                    {
+                        model: Store,
+                        as: 'store',
+                        attributes: ['id', 'name', 'isSupportingDeliveries'],
+                        where: { isVisibleToPublic: true, active: true },
+                        required: true
+                    },
                     { model: Review, as: 'reviews', attributes: ['rating'], required: false }
                 ],
                 order
@@ -253,6 +273,7 @@ router.get('/allStores/products/count', async (req, res) => {
         // -------------------------------
         let whereClause = {
             isVisible: true,
+            toDisplay: true,
             ...utility.buildQuery(rawQuery)
         };
 
@@ -281,7 +302,13 @@ router.get('/allStores/products/count', async (req, res) => {
         const total = await Product.count({
             where: whereClause,
             include: [
-                { model: Category, as: 'category', required: false }
+                { model: Category, as: 'category', required: false },
+                {
+                    model: Store,
+                    as: 'store',
+                    where: { isVisibleToPublic: true, active: true },
+                    required: true
+                }
             ]
         });
 

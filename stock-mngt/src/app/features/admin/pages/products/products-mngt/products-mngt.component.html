@@ -29,6 +29,43 @@
         </div>
     </div>
 
+    <!-- Bulk Actions Bar -->
+    <div class="bulk-actions-bar" *ngIf="products?.length > 0">
+        <div class="bulk-left">
+            <label class="select-all-checkbox">
+                <input type="checkbox" [checked]="isAllSelected"
+                    (change)="toggleSelectAll($any($event.target).checked)">
+                <span>Tout sélectionner</span>
+            </label>
+            <span class="selection-count" *ngIf="selectedIds.length > 0">
+                {{ selectedIds.length }} produit(s) sélectionné(s)
+            </span>
+        </div>
+        <div class="bulk-right">
+            <button class="btn-bulk show" (click)="bulkUpdateDisplay(true)" [disabled]="selectedIds.length === 0"
+                title="Afficher les produits sélectionnés">
+                <i class="fa fa-eye"></i>
+                <span>Afficher</span>
+            </button>
+            <button class="btn-bulk hide" (click)="bulkUpdateDisplay(false)" [disabled]="selectedIds.length === 0"
+                title="Masquer les produits sélectionnés">
+                <i class="fa fa-eye-slash"></i>
+                <span>Masquer</span>
+            </button>
+            <div class="bulk-divider"></div>
+            <button class="btn-bulk show-all" (click)="bulkUpdateDisplay(true, true)"
+                title="Afficher tous les produits">
+                <i class="fa fa-globe"></i>
+                <span>Tout afficher</span>
+            </button>
+            <button class="btn-bulk hide-all" (click)="bulkUpdateDisplay(false, true)"
+                title="Masquer tous les produits">
+                <i class="fa fa-lock"></i>
+                <span>Tout masquer</span>
+            </button>
+        </div>
+    </div>
+
     <!-- Filters Panel -->
     <div class="filters-panel" [class.collapsed]="filtersCollapsed">
         <div class="filters-grid">
@@ -97,7 +134,17 @@
 
     <!-- Products Grid -->
     <div class="products-grid" *ngIf="products?.length > 0">
-        <div class="product-card" *ngFor="let item of products">
+        <div class="product-card" *ngFor="let item of products" [class.selected]="isSelected(item?.id)">
+            <!-- Selection Checkbox -->
+            <label class="product-checkbox" (click)="$event.stopPropagation()">
+                <input type="checkbox" [checked]="isSelected(item?.id)" (change)="toggleSelection(item?.id)">
+                <span class="checkmark"></span>
+            </label>
+
+            <!-- Visibility Badge -->
+            <span class="visibility-badge" [class.visible]="item?.toDisplay" [class.hidden]="!item?.toDisplay">
+                <i class="fa" [class.fa-eye]="item?.toDisplay" [class.fa-eye-slash]="!item?.toDisplay"></i>
+            </span>
             <!-- Product Image -->
             <div class="product-image"
                 (click)="openImage(item?.images[0] ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png')">
