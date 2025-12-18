@@ -1,6 +1,7 @@
 // Variables
 $primary: #3f51b5;
 $primary-dark: #303f9f;
+$primary-light: rgba(63, 81, 181, 0.1);
 $success: #2e7d32;
 $danger: #c62828;
 $text-primary: #2c3e50;
@@ -13,6 +14,114 @@ $shadow-md: 0 4px 20px rgba(0, 0, 0, 0.1);
 $radius-sm: 8px;
 $radius-md: 12px;
 $radius-lg: 16px;
+
+// ng-select custom styling
+ng-select {
+    width: 100%;
+
+    ::ng-deep {
+        .ng-select-container {
+            min-height: 44px;
+            border: 1px solid $border-color;
+            border-radius: $radius-sm;
+            background: $white;
+            transition: all 0.2s;
+
+            &:hover {
+                border-color: darken($border-color, 10%);
+            }
+
+            .ng-value-container {
+                padding: 0 14px;
+
+                .ng-placeholder {
+                    color: $text-secondary;
+                    font-size: 0.9rem;
+                }
+
+                .ng-value {
+                    font-size: 0.9rem;
+                    color: $text-primary;
+                }
+
+                .ng-input {
+                    padding: 0;
+
+                    input {
+                        padding: 0;
+                        border: none;
+                        box-shadow: none;
+
+                        &:focus {
+                            box-shadow: none;
+                        }
+                    }
+                }
+            }
+
+            .ng-arrow-wrapper {
+                padding-right: 10px;
+
+                .ng-arrow {
+                    border-color: $text-secondary transparent transparent;
+                }
+            }
+
+            .ng-clear-wrapper {
+                color: $text-secondary;
+
+                &:hover {
+                    color: $danger;
+                }
+            }
+        }
+
+        &.ng-select-focused {
+            .ng-select-container {
+                border-color: $primary;
+                box-shadow: 0 0 0 3px $primary-light;
+            }
+        }
+
+        &.ng-select-opened {
+            .ng-select-container {
+                border-color: $primary;
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+        }
+
+        .ng-dropdown-panel {
+            border: 1px solid $primary;
+            border-top: none;
+            border-radius: 0 0 $radius-sm $radius-sm;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+            .ng-dropdown-panel-items {
+                .ng-option {
+                    padding: 10px 14px;
+                    font-size: 0.9rem;
+                    color: $text-primary;
+                    transition: all 0.15s;
+
+                    &.ng-option-marked {
+                        background: $primary-light;
+                        color: $primary;
+                    }
+
+                    &.ng-option-selected {
+                        background: $primary;
+                        color: $white;
+
+                        &.ng-option-marked {
+                            background: $primary-dark;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 .store-details-container {
     max-width: 1440px;

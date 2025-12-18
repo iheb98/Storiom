@@ -166,7 +166,7 @@ export class CartComponent implements OnInit {
   }
 
   goToMarketplace() {
-    this.router.navigate(['/marketplace']);
+    this.router.navigate(['/publicProducts']);
   }
 
   checkout() {

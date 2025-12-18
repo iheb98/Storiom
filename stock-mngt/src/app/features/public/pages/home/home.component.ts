@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { faSearch, faShoppingCart, faUser, faStore, faBoxOpen, faShieldAlt, faTruck, faGem } from '@fortawesome/free-solid-svg-icons';
+import {
+  faSearch, faShoppingCart, faUser, faStore, faBoxOpen, faShieldAlt, faTruck, faGem,
+  faShoppingBag, faChevronDown, faTag, faArrowRight, faTimesCircle, faCartPlus, faCreditCard, faBox
+} from '@fortawesome/free-solid-svg-icons';
 import { CategoryService } from 'src/app/core/services/category.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { PublicService } from 'src/app/core/services/public.service';
@@ -28,10 +31,18 @@ export class HomeComponent implements OnInit {
   cartIcon = faShoppingCart;
   userIcon = faUser;
   storeIcon = faStore;
-  boxOpenIcon = faBoxOpen;
+  boxOpenIcon = faBoxOpen; // Kept for compatibility if used elsewhere, but we'll use boxIcon for fa-box
   shieldIcon = faShieldAlt;
   truckIcon = faTruck;
   gemIcon = faGem;
+  shoppingBagIcon = faShoppingBag;
+  chevronDownIcon = faChevronDown;
+  tagIcon = faTag;
+  arrowRightIcon = faArrowRight;
+  timesCircleIcon = faTimesCircle;
+  cartPlusIcon = faCartPlus;
+  creditCardIcon = faCreditCard;
+  boxIcon = faBox;
 
   constructor(
     private categoryService: CategoryService,

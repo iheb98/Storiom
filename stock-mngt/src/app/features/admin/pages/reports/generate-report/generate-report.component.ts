@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { faDownload, faFileDownload } from '@fortawesome/free-solid-svg-icons';
+import {
+  faDownload, faFileDownload, faChartBar, faCalendarAlt, faArrowRight,
+  faSearch, faSpinner, faExclamationTriangle, faChartPie, faCoins,
+  faReceipt, faBox, faList, faFilePdf, faChartLine
+} from '@fortawesome/free-solid-svg-icons';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -17,7 +21,22 @@ export class GenerateReportComponent implements OnInit {
   reportData: any = null;
   loading = false;
   errorMessage: string | null = null;
-  downloadIcon = faFileDownload
+
+  // Icons
+  downloadIcon = faFileDownload;
+  chartBarIcon = faChartBar;
+  calendarIcon = faCalendarAlt;
+  arrowRightIcon = faArrowRight;
+  searchIcon = faSearch;
+  spinnerIcon = faSpinner;
+  warningIcon = faExclamationTriangle;
+  chartPieIcon = faChartPie;
+  coinsIcon = faCoins;
+  receiptIcon = faReceipt;
+  boxIcon = faBox;
+  listIcon = faList;
+  pdfIcon = faFilePdf;
+  chartLineIcon = faChartLine;
   constructor(
     private statService: StatService,
     private authService: AuthService

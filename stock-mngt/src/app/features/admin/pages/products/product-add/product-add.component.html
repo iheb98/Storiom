@@ -66,6 +66,22 @@
                             </ng-select>
                         </div>
 
+                        <div class="settings-grid">
+                            <div class="toggle-setting">
+                                <div class="toggle-info">
+                                    <i class="fa fa-eye setting-icon"></i>
+                                    <div class="toggle-text">
+                                        <span class="toggle-title">Visible au public</span>
+                                        <span class="toggle-desc">Le produit sera visible sur le marketplace</span>
+                                    </div>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" formControlName="toDisplay">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <label for="description"><i class="fa fa-align-left"></i> Description</label>
                             <textarea id="description" formControlName="description" rows="5"

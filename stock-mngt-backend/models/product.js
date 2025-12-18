@@ -82,7 +82,8 @@ module.exports = (sequelize, DataTypes) => {
       field: 'critical_stock_indicator'
     },
     toDisplay: {
-      type: DataTypes.BOOLEAN
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     },
     discount: {
       type: DataTypes.FLOAT

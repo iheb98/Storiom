@@ -14,6 +14,8 @@ import { SupplierService } from 'src/app/core/services/supplier.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 
+import { OrderService } from 'src/app/core/services/order.service';
+
 @Component({
   selector: 'app-store-view',
   templateUrl: './store-view.component.html',
@@ -58,6 +60,7 @@ export class StoreViewComponent implements OnInit {
     private authService: AuthService,
     private storeService: StoreService,
     private productService: ProductService,
+    private orderService: OrderService,
     private categoryService: CategoryService,
     private supplierService: SupplierService,
     private loadingService: LoadingService
@@ -91,16 +94,19 @@ export class StoreViewComponent implements OnInit {
   }
 
   loadStats(storeId: number) {
-    // Load products count
+    // Load products count (Backend returns a raw number)
     this.productService.countProductsByStoreId(storeId, {}).subscribe(
       res => {
-        this.productsCount = res?.count || 0;
+        this.productsCount = typeof res === 'object' ? (res?.count || 0) : (res || 0);
       }
     );
 
-    // Load orders count - this would need a backend endpoint
-    // For now, we'll set it to 0
-    this.ordersCount = 0;
+    // Load orders count
+    this.orderService.getStoreOrders(storeId).subscribe(
+      res => {
+        this.ordersCount = res?.length || 0;
+      }
+    );
 
     // Load categories count
     this.categoryService.getCategoriesByStoreId(storeId).subscribe(

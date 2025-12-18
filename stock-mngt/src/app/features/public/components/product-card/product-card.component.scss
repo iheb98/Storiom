@@ -183,6 +183,19 @@ h3 {
   font-weight: 500;
   margin-bottom: 12px;
 
+  .store-link {
+    color: #3f51b5;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #303f9f;
+      text-decoration: underline;
+    }
+  }
+
   .delivery-badge {
     padding: 2px 6px;
     border-radius: 4px;

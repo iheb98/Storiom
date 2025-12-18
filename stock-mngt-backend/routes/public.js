@@ -24,7 +24,7 @@ router.get('/products/random', async (req, res) => {
                 {
                     model: Store,
                     as: 'store',
-                    attributes: ['name', 'isSupportingDeliveries'],
+                    attributes: ['name', 'isSupportingDeliveries', 'id'],
                     where: { isVisibleToPublic: true, active: true },
                     required: true
                 },

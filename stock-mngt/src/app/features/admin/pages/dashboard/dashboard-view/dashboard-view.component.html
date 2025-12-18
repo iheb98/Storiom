@@ -57,7 +57,8 @@
         <div class="dashboard-card">
             <div class="card-header">
                 <h2><i class="fa fa-exclamation-triangle"></i> Stock Critique</h2>
-                <a routerLink="/admin/products" class="view-all">Voir tout <i class="fa fa-arrow-right"></i></a>
+                <a [routerLink]="['/admin/products']" [queryParams]="{filter: 'critical'}" class="view-all">Voir tout <i
+                        class="fa fa-arrow-right"></i></a>
             </div>
             <div class="card-body">
                 <app-product-result-table></app-product-result-table>

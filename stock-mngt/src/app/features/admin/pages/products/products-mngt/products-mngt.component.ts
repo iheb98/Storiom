@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { faEdit, faTrash, faEye, faArrowUp, faArrowDown, faPen, } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CategoryService } from 'src/app/core/services/category.service';
@@ -45,6 +45,7 @@ export class ProductsMngtComponent implements OnInit {
 
   filtersCollapsed = true;
   searchable;
+  isCriticalFilter = false;
 
   editIcon = faEdit
   deleteIcon = faTrash
@@ -68,15 +69,20 @@ export class ProductsMngtComponent implements OnInit {
     private authService: AuthService,
     private loadingService: LoadingService,
     private router: Router,
+    private route: ActivatedRoute,
     private queryService: QueryService,
     public dialog: MatDialog) { }
 
   ngOnInit(): void {
-    this.getSuppliers();
-    this.getCategories();
-    this.queryService.buildQuery(this.nameFilter, this.descriptionFilter, this.supplierFilter, this.minBuyingPriceFilter, this.maxBuyingPriceFilter)
-    this.getProducts(this.currentPage, this.currentSize)
-    this.countProducts();
+    this.route.queryParams.subscribe(params => {
+      this.isCriticalFilter = params['filter'] === 'critical';
+
+      this.getSuppliers();
+      this.getCategories();
+      this.queryService.buildQuery(this.nameFilter, this.descriptionFilter, this.supplierFilter, this.minBuyingPriceFilter, this.maxBuyingPriceFilter)
+      this.getProducts(this.currentPage, this.currentSize)
+      this.countProducts();
+    });
   }
 
   buildQuery() {
@@ -138,6 +144,7 @@ export class ProductsMngtComponent implements OnInit {
       page,
       size,
       query: this.buildQuery(),
+      critical: this.isCriticalFilter
     }).subscribe(
       response => {
         this.loadingService.screenLoaded()
@@ -152,7 +159,8 @@ export class ProductsMngtComponent implements OnInit {
   countProducts() {
     //this.loadingService.screenLoading()
     this.productService.countProductsByStoreId(this.authService.getConnectedUser()?.store, {
-      query: this.buildQuery()
+      query: this.buildQuery(),
+      critical: this.isCriticalFilter
     }).subscribe(response => {
       //this.loadingService.screenLoaded()
       this.count = response;

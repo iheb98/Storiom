@@ -99,8 +99,8 @@ router.delete('/cart/:productId', utility.authenticate, async (req, res) => {
 });
 
 router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
-    const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, quantity, unit, storeId, supplierId, categoryId, brandId, criticalStockIndicator } = req.body
-    Product.create({ name, code, buyingPrice, sellingPrice, currency, color, size, description, images: JSON.stringify(images), quantity, unit, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id, criticalStockIndicator }).then(createdProduct => {
+    const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, quantity, unit, storeId, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay } = req.body
+    Product.create({ name, code, buyingPrice, sellingPrice, currency, color, size, description, images: JSON.stringify(images), quantity, unit, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id, criticalStockIndicator, toDisplay }).then(createdProduct => {
         console.log(quantity)
         if (quantity > 0) {
             Operation.create({ receiptId: null, type: "LOADED", productId: createdProduct.id, amount: quantity, price: createdProduct.buyingPrice, date: new Date(), creatorUserId: req.user.id })
@@ -124,7 +124,7 @@ router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
 })
 
 router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
-    const { id, name, color, quantity, unit, images, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId, criticalStockIndicator } = req.body
+    const { id, name, color, quantity, unit, images, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay } = req.body
     Product.findOne(
         {
             where: {
@@ -144,6 +144,7 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
         product.description = description
         product.sellingPrice = sellingPrice
         product.buyingPrice = buyingPrice
+        product.toDisplay = toDisplay
         product.criticalStockIndicator = criticalStockIndicator
         product.size = size
         product.save().then(
@@ -226,15 +227,23 @@ router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, nex
     // Common ordering clause: newest first
     const order = [['createdAt', 'DESC']];
 
+    const whereClause = {
+        store_id: id,
+        ...utility.buildQuery(req.query.query),
+        creatorUserId: req.user.id,
+        isVisible: true
+    };
+
+    if (req.query.critical === 'true') {
+        whereClause[Op.and] = [
+            literal('"quantity" <= "critical_stock_indicator"')
+        ];
+    }
+
     if (!req.query.searchable) {
         Product.findAll(
             utility.paginate({
-                where: {
-                    store_id: id,
-                    ...utility.buildQuery(req.query.query),
-                    creatorUserId: req.user.id,
-                    isVisible: true
-                },
+                where: whereClause,
                 include: ['supplier', 'category'],
                 order
             }, pagination)
@@ -281,13 +290,22 @@ router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, nex
 router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     if (!req.query.searchable) {
         const id = req.params.id;
+
+        const whereClause = {
+            store_id: id,
+            ...utility.buildQuery(req.query.query),
+            isVisible: true,
+            creatorUserId: req.user.id
+        };
+
+        if (req.query.critical === 'true') {
+            whereClause[Op.and] = [
+                literal('"quantity" <= "critical_stock_indicator"')
+            ];
+        }
+
         Product.count({
-            where: {
-                store_id: id,
-                ...utility.buildQuery(req.query.query),
-                isVisible: true,
-                creatorUserId: req.user.id
-            }
+            where: whereClause
         }).then(countProducts => {
             res.json(countProducts)
         }).catch(err => {

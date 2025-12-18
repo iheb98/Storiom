@@ -94,6 +94,7 @@ export class ProductAddComponent implements OnInit {
           this.form.get('color').setValue(response?.color)
           this.form.get('supplierId').setValue(response?.supplier?.id)
           this.form.get('size').setValue(response?.size)
+          this.form.get('toDisplay').setValue(response?.toDisplay)
           //this.findParentCategories(response?.category?.id)
 
           this.images = response?.images
@@ -147,6 +148,7 @@ export class ProductAddComponent implements OnInit {
       description: [''],
       buyingPrice: [null],
       sellingPrice: [null],
+      toDisplay: [true],
       images: [null],
       date: [(new Date()).toISOString().substring(0, 16)]
     });

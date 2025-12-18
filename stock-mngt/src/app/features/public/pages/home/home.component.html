@@ -3,7 +3,7 @@
     <section class="hero-section">
         <div class="hero-background"></div>
         <div class="hero-content">
-            <span class="hero-badge">🛍️ Marketplace Tunisien</span>
+            <!--<span class="hero-badge">🛍️ Marketplace Tunisien</span>-->
             <h1>Découvrez des Produits<br><span class="highlight">Uniques & Locaux</span></h1>
             <p class="hero-subtitle">
                 Soutenez les commerces indépendants tunisiens et trouvez des produits de qualité,
@@ -11,10 +11,10 @@
             </p>
             <div class="hero-buttons">
                 <a routerLink="/publicProducts" class="btn btn-primary">
-                    <i class="fa fa-shopping-bag"></i> Explorer les Produits
+                    <fa-icon [icon]="shoppingBagIcon"></fa-icon> Explorer les Produits
                 </a>
                 <a routerLink="/stores" class="btn btn-secondary">
-                    <i class="fa fa-store"></i> Voir les Boutiques
+                    <fa-icon [icon]="storeIcon"></fa-icon> Voir les Boutiques
                 </a>
             </div>
             <div class="hero-stats">
@@ -33,7 +33,7 @@
             </div>
         </div>
         <div class="scroll-indicator" (click)="scrollToCategories()">
-            <i class="fa fa-chevron-down"></i>
+            <fa-icon [icon]="chevronDownIcon"></fa-icon>
         </div>
     </section>
 
@@ -50,7 +50,7 @@
                 <div class="category-card" *ngFor="let category of categories" [routerLink]="['/publicProducts']"
                     [queryParams]="{ category: category.id }">
                     <div class="category-icon">
-                        <i class="fa fa-tag"></i>
+                        <fa-icon [icon]="tagIcon"></fa-icon>
                     </div>
                     <h3>{{ category.name }}</h3>
                     <!--<span class="category-count">{{ category.productCount || 0 }} produits</span>-->
@@ -79,7 +79,7 @@
 
             <div class="section-cta">
                 <a routerLink="/publicProducts" class="btn btn-outline">
-                    Voir tous les produits <i class="fa fa-arrow-right"></i>
+                    Voir tous les produits <fa-icon [icon]="arrowRightIcon"></fa-icon>
                 </a>
             </div>
         </div>
@@ -95,7 +95,7 @@
             </div>
 
             <div class="stores-grid">
-                <div class="store-card" *ngFor="let store of featuredStores" [routerLink]="['/store', store.id]">
+                <div class="store-card" *ngFor="let store of featuredStores" [routerLink]="['/stores', store.id]">
                     <div class="store-logo">
                         <img [src]="store.logo ? environment.backend + '/' + store.logo : 'assets/default_store.png'"
                             [alt]="store.name">
@@ -103,10 +103,10 @@
                     <div class="store-info">
                         <h3>{{ store.name }}</h3>
                         <span class="store-badge delivery" *ngIf="store.isSupportingDeliveries">
-                            <i class="fa fa-truck"></i> Livraison
+                            <fa-icon [icon]="truckIcon"></fa-icon> Livraison
                         </span>
                         <span class="store-badge no-delivery" *ngIf="!store.isSupportingDeliveries">
-                            <i class="fa fa-times-circle"></i> Pas de livraison
+                            <fa-icon [icon]="timesCircleIcon"></fa-icon> Pas de livraison
                         </span>
                     </div>
                 </div>
@@ -114,7 +114,7 @@
 
             <div class="section-cta">
                 <a routerLink="/stores" class="btn btn-outline">
-                    Voir toutes les boutiques <i class="fa fa-arrow-right"></i>
+                    Voir toutes les boutiques <fa-icon [icon]="arrowRightIcon"></fa-icon>
                 </a>
             </div>
         </div>
@@ -131,7 +131,7 @@
             <div class="benefits-grid">
                 <div class="benefit-card">
                     <div class="benefit-icon">
-                        <i class="fa fa-store"></i>
+                        <fa-icon [icon]="storeIcon"></fa-icon>
                     </div>
                     <h3>Commerce Local</h3>
                     <p>Soutenez directement les commerces indépendants tunisiens et contribuez à l'économie locale.</p>
@@ -139,7 +139,7 @@
 
                 <div class="benefit-card">
                     <div class="benefit-icon">
-                        <i class="fa fa-truck"></i>
+                        <fa-icon [icon]="truckIcon"></fa-icon>
                     </div>
                     <h3>Livraison Rapide</h3>
                     <p>Recevez vos produits rapidement grâce à nos partenaires de livraison fiables.</p>
@@ -147,7 +147,7 @@
 
                 <div class="benefit-card">
                     <div class="benefit-icon">
-                        <i class="fa fa-gem"></i>
+                        <fa-icon [icon]="gemIcon"></fa-icon>
                     </div>
                     <h3>Produits Uniques</h3>
                     <p>Découvrez une sélection soignée de produits que vous ne trouverez pas ailleurs.</p>
@@ -155,7 +155,7 @@
 
                 <div class="benefit-card">
                     <div class="benefit-icon">
-                        <i class="fa fa-shield-alt"></i>
+                        <fa-icon [icon]="shieldIcon"></fa-icon>
                     </div>
                     <h3>Paiement Sécurisé</h3>
                     <p>Profitez d'une expérience d'achat sûre avec le paiement à la livraison.</p>
@@ -175,7 +175,7 @@
             <div class="steps-grid">
                 <div class="step-card">
                     <div class="step-number">1</div>
-                    <div class="step-icon"><i class="fa fa-search"></i></div>
+                    <div class="step-icon"><fa-icon [icon]="searchIcon"></fa-icon></div>
                     <h3>Explorez</h3>
                     <p>Parcourez notre catalogue de produits et trouvez ce qui vous plaît.</p>
                 </div>
@@ -184,7 +184,7 @@
 
                 <div class="step-card">
                     <div class="step-number">2</div>
-                    <div class="step-icon"><i class="fa fa-cart-plus"></i></div>
+                    <div class="step-icon"><fa-icon [icon]="cartPlusIcon"></fa-icon></div>
                     <h3>Ajoutez au Panier</h3>
                     <p>Sélectionnez vos articles et ajoutez-les à votre panier.</p>
                 </div>
@@ -193,7 +193,7 @@
 
                 <div class="step-card">
                     <div class="step-number">3</div>
-                    <div class="step-icon"><i class="fa fa-credit-card"></i></div>
+                    <div class="step-icon"><fa-icon [icon]="creditCardIcon"></fa-icon></div>
                     <h3>Commandez</h3>
                     <p>Validez votre commande et choisissez le paiement à la livraison.</p>
                 </div>
@@ -202,7 +202,7 @@
 
                 <div class="step-card">
                     <div class="step-number">4</div>
-                    <div class="step-icon"><i class="fa fa-box"></i></div>
+                    <div class="step-icon"><fa-icon [icon]="boxIcon"></fa-icon></div>
                     <h3>Recevez</h3>
                     <p>Recevez vos produits directement chez vous.</p>
                 </div>
@@ -217,10 +217,10 @@
             <p>Rejoignez des milliers de clients satisfaits et explorez notre marketplace dès maintenant.</p>
             <div class="cta-buttons">
                 <a routerLink="/publicProducts" class="btn btn-white">
-                    <i class="fa fa-shopping-bag"></i> Commencer vos Achats
+                    <fa-icon [icon]="shoppingBagIcon"></fa-icon> Commencer vos Achats
                 </a>
                 <a routerLink="/seller-onboarding" class="btn btn-outline-white">
-                    <i class="fa fa-store"></i> Devenir Vendeur
+                    <fa-icon [icon]="storeIcon"></fa-icon> Devenir Vendeur
                 </a>
             </div>
         </div>

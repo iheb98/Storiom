@@ -64,4 +64,14 @@ export class ProductCardComponent {
     // Logic to check if product is new (e.g. created in last 7 days)
     return false;
   }
+
+  goToStore(event: Event) {
+    event.stopPropagation();
+    console.log("test")
+    if (this.product?.store?.id) {
+      console.log("test 3")
+      console.log(this.product.store.id)
+      this.router.navigate(['/stores', this.product.store.id]);
+    }
+  }
 }

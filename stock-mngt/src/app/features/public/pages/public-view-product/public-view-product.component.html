@@ -72,9 +72,9 @@
                     <fa-icon [icon]="product?.quantity > 0 ? faCheck : faTimes"></fa-icon>
                     {{ product?.quantity > 0 ? 'En Stock' : 'Rupture de Stock' }}
                 </span>
-                <span class="quantity-left" *ngIf="product?.quantity > 0 && product?.quantity <= 10">
+                <!--<span class="quantity-left" *ngIf="product?.quantity > 0 && product?.quantity <= 10">
                     Plus que {{ product?.quantity }} en stock !
-                </span>
+                </span>-->
             </div>
 
             <!-- Quantity & Add to Cart -->
@@ -101,10 +101,10 @@
                     <fa-icon [icon]="faTruck"></fa-icon>
                     <span>Livraison disponible</span>
                 </div>
-                <div class="info-item">
+                <!--<div class="info-item">
                     <fa-icon [icon]="faShieldAlt"></fa-icon>
                     <span>Transaction sécurisée</span>
-                </div>
+                </div>-->
             </div>
 
             <!-- Seller Card -->
