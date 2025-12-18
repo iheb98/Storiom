@@ -1008,7 +1008,16 @@ router.get('/store/:id/total-sold-pie', utility.authenticate, async (req, res) =
         } else if (type === 'Mensuel') {
             const [year, month] = value.split('-');
             dateFilter[Op.gte] = new Date(`${year}-${month}-01`);
-            dateFilter[Op.lt] = new Date(`${year}-${parseInt(month) + 1}-01`);
+
+            let nextMonth = parseInt(month) + 1;
+            let nextYear = parseInt(year);
+
+            if (nextMonth > 12) {
+                nextMonth = 1;
+                nextYear += 1;
+            }
+
+            dateFilter[Op.lt] = new Date(`${nextYear}-${nextMonth.toString().padStart(2, '0')}-01`);
         } else if (type === 'Annuel') {
             dateFilter[Op.gte] = new Date(`${value}-01-01`);
             dateFilter[Op.lt] = new Date(`${parseInt(value) + 1}-01-01`);
@@ -1115,7 +1124,16 @@ router.get('/store/:id/net-sold-pie', utility.authenticate, async (req, res) => 
         } else if (type === 'Mensuel') {
             const [year, month] = value.split('-');
             dateFilter[Op.gte] = new Date(`${year}-${month}-01`);
-            dateFilter[Op.lt] = new Date(`${year}-${parseInt(month) + 1}-01`);
+
+            let nextMonth = parseInt(month) + 1;
+            let nextYear = parseInt(year);
+
+            if (nextMonth > 12) {
+                nextMonth = 1;
+                nextYear += 1;
+            }
+
+            dateFilter[Op.lt] = new Date(`${nextYear}-${nextMonth.toString().padStart(2, '0')}-01`);
         } else if (type === 'Annuel') {
             dateFilter[Op.gte] = new Date(`${value}-01-01`);
             dateFilter[Op.lt] = new Date(`${parseInt(value) + 1}-01-01`);
