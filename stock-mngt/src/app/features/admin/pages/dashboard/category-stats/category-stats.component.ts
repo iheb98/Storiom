@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import {
+  faCalendarAlt, faClock, faChartPie, faCoins, faFire
+} from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StatService } from 'src/app/core/services/stat.service';
 
@@ -8,21 +11,28 @@ import { StatService } from 'src/app/core/services/stat.service';
   styleUrls: ['./category-stats.component.scss']
 })
 export class CategoryStatsComponent implements OnInit {
+  // Icons
+  faCalendarAlt = faCalendarAlt;
+  faClock = faClock;
+  faChartPie = faChartPie;
+  faCoins = faCoins;
+  faFire = faFire;
+
   user;
   years = [];
 
   operationsData;
   operationsItemsData;
-  soldOperationsData: any = []
-  loadedOperationsData: any = []
+  soldOperationsData: any = [];
+  loadedOperationsData: any = [];
   operationsLabels: any = [];
   operationsOptions: any;
 
-  pieChartOptions
+  pieChartOptions;
 
   operations: any = [];
-  typesOfDate = ["Quotidien", "Mensuel", "Annuel"]
-  selectedDateType = 'Mensuel'
+  typesOfDate = ["Quotidien", "Mensuel", "Annuel"];
+  selectedDateType = 'Mensuel';
 
   dayFilter;
   weekFilter;
@@ -32,18 +42,21 @@ export class CategoryStatsComponent implements OnInit {
   totalSoldData;
   totalSoldNetData;
 
+  // Loading States
+  isLoading = true;
 
   hoursLabels = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
 
-  constructor(private statService: StatService,
+  constructor(
+    private statService: StatService,
     private authService: AuthService
   ) { }
 
   ngOnInit(): void {
-    this.user = this.authService.getConnectedUser()
+    this.user = this.authService.getConnectedUser();
 
     for (let i = 2000; i <= new Date().getFullYear(); i++) {
-      this.years.push(i)
+      this.years.push(i);
     }
     this.dayFilter = new Date().getFullYear() + "-" +
       ((new Date().getMonth() + 1) < 10 ? "0" + (new Date().getMonth() + 1) : (new Date().getMonth() + 1)) + "-" +
@@ -54,17 +67,15 @@ export class CategoryStatsComponent implements OnInit {
 
     this.yearFilter = new Date().getFullYear();
 
-
     /// ------------ Chart init ------------------
     const documentStyle = getComputedStyle(document.documentElement);
     const textColor = documentStyle.getPropertyValue('--text-color');
     const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-    const surfaceBorder = 'lightgray'
+    const surfaceBorder = 'lightgray';
     this.operationsOptions = {
       plugins: {
         legend: {
           display: false
-
         }
       },
       scales: {
@@ -91,10 +102,7 @@ export class CategoryStatsComponent implements OnInit {
     };
 
     this.pieChartOptions = {
-
-      //display labels on data elements in graph
       plugins: {
-
         datalabels: {
           align: 'end',
           anchor: 'end',
@@ -105,7 +113,6 @@ export class CategoryStatsComponent implements OnInit {
             weight: 'bold',
           },
         },
-        // display chart title
         title: {
           display: true,
           fontSize: 10,
@@ -116,10 +123,8 @@ export class CategoryStatsComponent implements OnInit {
       },
     };
 
-    this.updateOperationStats()
+    this.updateOperationStats();
   }
-
-
 
   updateChart() {
     this.operationsData = {
@@ -143,117 +148,144 @@ export class CategoryStatsComponent implements OnInit {
     };
   }
 
-  getOperationStats() {
-    let filterValue;
-    let month;
-    let year;
-    let day;
-    switch (this.selectedDateType) {
-      case 'Quotidien':
-        day = new Date(this.dayFilter).getDate();
-        month = new Date(this.dayFilter).getMonth() + 1;
-        year = new Date(this.dayFilter).getFullYear();
-        filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day
-        break;
-      case 'Annuel':
-        year = this.yearFilter
-        filterValue = year
-        break;
-      default:
-        month = new Date(this.monthFilter).getMonth() + 1;
-        year = new Date(this.monthFilter).getFullYear();
-        filterValue = year + '-' + month
-        break;
-    }
-    this.statService.getOperationStatsByCategory(this.user.id, this.selectedDateType, filterValue).subscribe(
-      response => {
-        this.operationsData = response
+  getOperationStats(): Promise<void> {
+    return new Promise((resolve) => {
+      let filterValue;
+      let month;
+      let year;
+      let day;
+      switch (this.selectedDateType) {
+        case 'Quotidien':
+          day = new Date(this.dayFilter).getDate();
+          month = new Date(this.dayFilter).getMonth() + 1;
+          year = new Date(this.dayFilter).getFullYear();
+          filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day;
+          break;
+        case 'Annuel':
+          year = this.yearFilter;
+          filterValue = year;
+          break;
+        default:
+          month = new Date(this.monthFilter).getMonth() + 1;
+          year = new Date(this.monthFilter).getFullYear();
+          filterValue = year + '-' + month;
+          break;
       }
-    )
+      this.statService.getOperationStatsByCategory(this.user.id, this.selectedDateType, filterValue).subscribe(
+        response => {
+          this.operationsData = response;
+          resolve();
+        },
+        error => {
+          resolve();
+        }
+      );
+    });
   }
 
-  getCategoriesTotalNetSold() {
-    let filterValue;
-    let month;
-    let year;
-    let day;
-    switch (this.selectedDateType) {
-      case 'Quotidien':
-        day = new Date(this.dayFilter).getDate();
-        month = new Date(this.dayFilter).getMonth() + 1;
-        year = new Date(this.dayFilter).getFullYear();
-        filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day
-        break;
-      case 'Annuel':
-        year = this.yearFilter
-        filterValue = year
-        break;
-      default:
-        month = new Date(this.monthFilter).getMonth() + 1;
-        year = new Date(this.monthFilter).getFullYear();
-        filterValue = year + '-' + month
-        break;
-    }
-    this.statService.getCategoriesTotalNetSold(this.user.id, this.selectedDateType, filterValue).subscribe(response => {
-      this.totalSoldNetData = response
-    })
-  }
-
-   getCategoriesTotalSold() {
-    let filterValue;
-    let month;
-    let year;
-    let day;
-    switch (this.selectedDateType) {
-      case 'Quotidien':
-        day = new Date(this.dayFilter).getDate();
-        month = new Date(this.dayFilter).getMonth() + 1;
-        year = new Date(this.dayFilter).getFullYear();
-        filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day
-        break;
-      case 'Annuel':
-        year = this.yearFilter
-        filterValue = year
-        break;
-      default:
-        month = new Date(this.monthFilter).getMonth() + 1;
-        year = new Date(this.monthFilter).getFullYear();
-        filterValue = year + '-' + month
-        break;
-    }
-    this.statService.getCategoriesTotalSold(this.user.id, this.selectedDateType, filterValue).subscribe(response => {
-      this.totalSoldData = response
-    })
-  }
-
-  getOperationItemsStats() {
-    let filterValue;
-    let month;
-    let year;
-    let day;
-    switch (this.selectedDateType) {
-      case 'Quotidien':
-        day = new Date(this.dayFilter).getDate();
-        month = new Date(this.dayFilter).getMonth() + 1;
-        year = new Date(this.dayFilter).getFullYear();
-        filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day
-        break;
-      case 'Annuel':
-        year = this.yearFilter;
-        filterValue = year
-        break;
-      default:
-        month = new Date(this.monthFilter).getMonth() + 1;
-        year = new Date(this.monthFilter).getFullYear();
-        filterValue = year + '-' + month
-        break;
-    }
-    this.statService.getOperationStatsByCategoryItems(this.user.id, this.selectedDateType, filterValue).subscribe(
-      response => {
-        this.operationsItemsData = response
-
+  getCategoriesTotalNetSold(): Promise<void> {
+    return new Promise((resolve) => {
+      let filterValue;
+      let month;
+      let year;
+      let day;
+      switch (this.selectedDateType) {
+        case 'Quotidien':
+          day = new Date(this.dayFilter).getDate();
+          month = new Date(this.dayFilter).getMonth() + 1;
+          year = new Date(this.dayFilter).getFullYear();
+          filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day;
+          break;
+        case 'Annuel':
+          year = this.yearFilter;
+          filterValue = year;
+          break;
+        default:
+          month = new Date(this.monthFilter).getMonth() + 1;
+          year = new Date(this.monthFilter).getFullYear();
+          filterValue = year + '-' + month;
+          break;
       }
-    )
+      this.statService.getCategoriesTotalNetSold(this.user.id, this.selectedDateType, filterValue).subscribe(
+        response => {
+          this.totalSoldNetData = response;
+          resolve();
+        },
+        error => {
+          resolve();
+        }
+      );
+    });
+  }
+
+  getCategoriesTotalSold(): Promise<void> {
+    return new Promise((resolve) => {
+      let filterValue;
+      let month;
+      let year;
+      let day;
+      switch (this.selectedDateType) {
+        case 'Quotidien':
+          day = new Date(this.dayFilter).getDate();
+          month = new Date(this.dayFilter).getMonth() + 1;
+          year = new Date(this.dayFilter).getFullYear();
+          filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day;
+          break;
+        case 'Annuel':
+          year = this.yearFilter;
+          filterValue = year;
+          break;
+        default:
+          month = new Date(this.monthFilter).getMonth() + 1;
+          year = new Date(this.monthFilter).getFullYear();
+          filterValue = year + '-' + month;
+          break;
+      }
+      this.statService.getCategoriesTotalSold(this.user.id, this.selectedDateType, filterValue).subscribe(
+        response => {
+          this.totalSoldData = response;
+          resolve();
+        },
+        error => {
+          resolve();
+        }
+      );
+    });
+  }
+
+  getOperationItemsStats(): Promise<void> {
+    return new Promise((resolve) => {
+      let filterValue;
+      let month;
+      let year;
+      let day;
+      switch (this.selectedDateType) {
+        case 'Quotidien':
+          day = new Date(this.dayFilter).getDate();
+          month = new Date(this.dayFilter).getMonth() + 1;
+          year = new Date(this.dayFilter).getFullYear();
+          filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day;
+          break;
+        case 'Annuel':
+          year = this.yearFilter;
+          filterValue = year;
+          break;
+        default:
+          month = new Date(this.monthFilter).getMonth() + 1;
+          year = new Date(this.monthFilter).getFullYear();
+          filterValue = year + '-' + month;
+          break;
+      }
+      this.statService.getOperationStatsByCategoryItems(this.user.id, this.selectedDateType, filterValue).subscribe(
+        response => {
+          this.operationsItemsData = response;
+          resolve();
+        },
+        error => {
+          resolve();
+        }
+      );
+    });
   }
 
   lastDay(y, m) {
@@ -266,10 +298,14 @@ export class CategoryStatsComponent implements OnInit {
   }
 
   updateOperationStats() {
-    this.getOperationStats();
-    this.getOperationItemsStats()
-    this.getCategoriesTotalNetSold()
-    this.getCategoriesTotalSold()
+    this.isLoading = true;
+    Promise.all([
+      this.getOperationStats(),
+      this.getOperationItemsStats(),
+      this.getCategoriesTotalNetSold(),
+      this.getCategoriesTotalSold()
+    ]).then(() => {
+      this.isLoading = false;
+    });
   }
-
 }

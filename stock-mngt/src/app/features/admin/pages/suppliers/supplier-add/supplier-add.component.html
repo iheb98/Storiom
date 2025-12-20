@@ -1,98 +1,123 @@
 <div class="supplier-form-page">
-    <!-- Page Header -->
-    <header class="page-header">
-        <a class="back-link" (click)="navigateTo('/suppliers')">
-            <i class="fa fa-arrow-left"></i>
-            <span>Retour aux fournisseurs</span>
-        </a>
-        <h1>{{ supplierId ? 'Modifier' : 'Ajouter' }} un fournisseur</h1>
-    </header>
 
-    <form [formGroup]="form" (ngSubmit)="supplierId ? edit() : create()">
-        <div class="form-card">
-            <!-- Personal Info Section -->
-            <div class="form-section">
-                <h3 class="section-title"><i class="fa fa-user"></i> Informations personnelles</h3>
+    <!-- Loading Skeleton -->
+    <div class="loading-skeleton" *ngIf="isLoading">
+        <div class="skeleton-nav"></div>
+        <div class="skeleton-header"></div>
+        <div class="skeleton-form"></div>
+    </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="firstName">
-                            <i class="fa fa-user"></i> Prénom <span class="required">*</span>
-                        </label>
-                        <input type="text" id="firstName" formControlName="firstName" placeholder="Entrez le prénom..."
-                            [class.invalid]="submitted && !form.get('firstName').value">
-                        <span class="error-message" *ngIf="submitted && !form.get('firstName').value">
-                            Le prénom est obligatoire
-                        </span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="lastName">
-                            <i class="fa fa-user"></i> Nom <span class="required">*</span>
-                        </label>
-                        <input type="text" id="lastName" formControlName="lastName" placeholder="Entrez le nom..."
-                            [class.invalid]="submitted && !form.get('lastName').value">
-                        <span class="error-message" *ngIf="submitted && !form.get('lastName').value">
-                            Le nom est obligatoire
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Contact Section -->
-            <div class="form-section">
-                <h3 class="section-title"><i class="fa fa-address-book"></i> Coordonnées</h3>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="email"><i class="fa fa-envelope"></i> Email</label>
-                        <input type="email" id="email" formControlName="email" placeholder="exemple@email.com"
-                            [class.invalid]="submitted && form.get('email').errors?.pattern">
-                        <span class="error-message" *ngIf="submitted && form.get('email').errors?.pattern">
-                            Format d'email invalide
-                        </span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="phone"><i class="fa fa-phone"></i> Téléphone</label>
-                        <input type="tel" id="phone" formControlName="phone" placeholder="+216 XX XXX XXX">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Financial Section -->
-            <div class="form-section">
-                <h3 class="section-title"><i class="fa fa-coins"></i> Crédit</h3>
-
-                <div class="form-group">
-                    <label for="credit"><i class="fa fa-wallet"></i> Montant du crédit</label>
-                    <div class="input-with-suffix">
-                        <input type="number" id="credit" formControlName="credit" placeholder="0.00">
-                        <span class="suffix">DT</span>
-                    </div>
-                    <span class="input-hint">Montant que vous devez à ce fournisseur</span>
-                </div>
-            </div>
-
-            <!-- Description Section -->
-            <div class="form-section">
-                <div class="form-group">
-                    <label for="description"><i class="fa fa-align-left"></i> Notes / Description</label>
-                    <textarea id="description" formControlName="description" rows="4"
-                        placeholder="Ajoutez des notes sur ce fournisseur..."></textarea>
-                </div>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="form-actions">
-                <button type="button" class="btn-cancel" (click)="navigateTo('/suppliers')">Annuler</button>
-                <button type="submit" class="btn-submit" [disabled]="loading">
-                    <i class="fa" [class.fa-plus]="!supplierId && !loading" [class.fa-save]="supplierId && !loading"
-                        [class.fa-spinner]="loading" [class.fa-spin]="loading"></i>
-                    {{ loading ? 'Enregistrement...' : (supplierId ? 'Enregistrer les modifications' : 'Ajouter le
-                    fournisseur') }}
-                </button>
-            </div>
+    <!-- Submitting Overlay -->
+    <div class="action-overlay" *ngIf="isSubmitting">
+        <div class="action-spinner">
+            <div class="spinner"></div>
+            <span>Enregistrement en cours...</span>
         </div>
-    </form>
+    </div>
+
+    <!-- Main Content -->
+    <div class="page-content" *ngIf="!isLoading">
+
+        <!-- Page Header -->
+        <header class="page-header">
+            <a class="back-link" (click)="navigateTo('/suppliers')">
+                <fa-icon [icon]="faArrowLeft"></fa-icon>
+                <span>Retour aux fournisseurs</span>
+            </a>
+            <div class="header-row">
+                <div class="header-icon">
+                    <fa-icon [icon]="faTruck"></fa-icon>
+                </div>
+                <h1>{{ supplierId ? 'Modifier' : 'Ajouter' }} un fournisseur</h1>
+            </div>
+        </header>
+
+        <form [formGroup]="form" (ngSubmit)="supplierId ? edit() : create()">
+            <div class="form-card">
+                <!-- Personal Info Section -->
+                <div class="form-section">
+                    <h3 class="section-title"><fa-icon [icon]="faUser"></fa-icon> Informations personnelles</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">
+                                <fa-icon [icon]="faUser"></fa-icon> Prénom <span class="required">*</span>
+                            </label>
+                            <input type="text" id="firstName" formControlName="firstName"
+                                placeholder="Entrez le prénom..."
+                                [class.invalid]="submitted && !form.get('firstName').value">
+                            <span class="error-message" *ngIf="submitted && !form.get('firstName').value">
+                                Le prénom est obligatoire
+                            </span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lastName">
+                                <fa-icon [icon]="faUser"></fa-icon> Nom <span class="required">*</span>
+                            </label>
+                            <input type="text" id="lastName" formControlName="lastName" placeholder="Entrez le nom..."
+                                [class.invalid]="submitted && !form.get('lastName').value">
+                            <span class="error-message" *ngIf="submitted && !form.get('lastName').value">
+                                Le nom est obligatoire
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Section -->
+                <div class="form-section">
+                    <h3 class="section-title"><fa-icon [icon]="faAddressBook"></fa-icon> Coordonnées</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email"><fa-icon [icon]="faEnvelope"></fa-icon> Email</label>
+                            <input type="email" id="email" formControlName="email" placeholder="exemple@email.com"
+                                [class.invalid]="submitted && form.get('email').errors?.pattern">
+                            <span class="error-message" *ngIf="submitted && form.get('email').errors?.pattern">
+                                Format d'email invalide
+                            </span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone"><fa-icon [icon]="faPhone"></fa-icon> Téléphone</label>
+                            <input type="tel" id="phone" formControlName="phone" placeholder="+216 XX XXX XXX">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial Section -->
+                <div class="form-section">
+                    <h3 class="section-title"><fa-icon [icon]="faCoins"></fa-icon> Crédit</h3>
+
+                    <div class="form-group">
+                        <label for="credit"><fa-icon [icon]="faWallet"></fa-icon> Montant du crédit</label>
+                        <div class="input-with-suffix">
+                            <input type="number" id="credit" formControlName="credit" placeholder="0.00">
+                            <span class="suffix">DT</span>
+                        </div>
+                        <span class="input-hint">Montant que vous devez à ce fournisseur</span>
+                    </div>
+                </div>
+
+                <!-- Description Section -->
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="description"><fa-icon [icon]="faAlignLeft"></fa-icon> Notes / Description</label>
+                        <textarea id="description" formControlName="description" rows="4"
+                            placeholder="Ajoutez des notes sur ce fournisseur..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" (click)="navigateTo('/suppliers')">Annuler</button>
+                    <button type="submit" class="btn-submit" [disabled]="isSubmitting">
+                        <fa-icon [icon]="supplierId ? faSave : faPlus"></fa-icon>
+                        {{ isSubmitting ? 'Enregistrement...' : (supplierId ? 'Enregistrer les modifications' : 'Ajouter
+                        le fournisseur') }}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>

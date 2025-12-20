@@ -24,6 +24,65 @@ $radius-md: 12px;
 
 .sold-products-container {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    position: relative;
+    min-height: 200px;
+}
+
+// ============================================
+// LOADING SKELETON
+// ============================================
+.loading-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.skeleton-item {
+    height: 70px;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+// ============================================
+// PAGE CONTENT ANIMATION
+// ============================================
+.page-content {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 // ============================================
@@ -129,7 +188,7 @@ $radius-md: 12px;
     background: $background;
     min-width: 80px;
 
-    i {
+    fa-icon {
         font-size: 0.9rem;
         margin-bottom: 2px;
     }
@@ -149,7 +208,7 @@ $radius-md: 12px;
     &.sold {
         background: $warning-light;
 
-        i,
+        fa-icon,
         .value {
             color: $warning;
         }
@@ -158,7 +217,7 @@ $radius-md: 12px;
     &.stock {
         background: $info-light;
 
-        i,
+        fa-icon,
         .value {
             color: $info;
         }
@@ -166,7 +225,7 @@ $radius-md: 12px;
         &.low-stock {
             background: $danger-light;
 
-            i,
+            fa-icon,
             .value {
                 color: $danger;
             }
@@ -188,7 +247,7 @@ $radius-md: 12px;
     border-radius: $radius-md;
     border: 2px dashed $border-color;
 
-    i {
+    fa-icon {
         font-size: 2.5rem;
         color: $text-secondary;
         margin-bottom: 15px;

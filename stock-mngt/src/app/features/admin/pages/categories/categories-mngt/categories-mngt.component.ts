@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CategoryService } from 'src/app/core/services/category.service';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { AddCategoryComponent } from '../add-category/add-category.component';
-import { faICursor, faMousePointer, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { faEdit } from '@fortawesome/free-regular-svg-icons';
-import { SPINNER } from 'ngx-loading-x';
+import {
+  faMousePointer, faTrash, faFolderOpen, faFolder, faHome, faChevronRight,
+  faPlus, faPen, faEdit, faLayerGroup
+} from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 
 @Component({
@@ -15,48 +16,63 @@ import Swal from 'sweetalert2/dist/sweetalert2.js';
 })
 export class CategoriesMngtComponent implements OnInit {
 
-  mode;
-
-  loading;
-  spinnerType = SPINNER.threeStrings;
-
-  categories;
-
-  selectedCategory;
-  selectedSubCategory1;
-  selectedSubCategory2;
-  selectedSubCategory3;
-  selectedSubCategory4;
-
-  storeId;
-
+  // Icons
+  faMousePointer = faMousePointer;
   faTrash = faTrash;
   faEdit = faEdit;
-  faSelect = faMousePointer;
+  faFolderOpen = faFolderOpen;
+  faFolder = faFolder;
+  faHome = faHome;
+  faChevronRight = faChevronRight;
+  faPlus = faPlus;
+  faPen = faPen;
+  faLayerGroup = faLayerGroup;
 
-  connectedUserRole
+  // State
+  mode: 'SELECT' | 'EDIT' | 'DELETE' = 'SELECT';
+  isLoading = true;
+  isActionLoading = false;
+
+  categories: any[] = [];
+
+  selectedCategory: any = null;
+  selectedSubCategory1: any = null;
+  selectedSubCategory2: any = null;
+  selectedSubCategory3: any = null;
+  selectedSubCategory4: any = null;
+
+  storeId: number;
+  connectedUserRole: string;
 
   constructor(
     private categoryService: CategoryService,
     private authService: AuthService,
-    public dialog: MatDialog) { }
+    public dialog: MatDialog
+  ) { }
 
   ngOnInit(): void {
-    this.mode = 'SELECT'
-    this.storeId = this.authService.getConnectedUser()?.store
-    this.loading = false;
+    this.storeId = this.authService.getConnectedUser()?.store;
+    this.connectedUserRole = this.authService.getConnectedUser()?.role;
     this.getCategories();
-    this.connectedUserRole = this.authService.getConnectedUser()?.role
-    console.log(this.connectedUserRole)
-
   }
 
   getCategories() {
+    this.isLoading = true;
     this.categoryService.getCategoriesByStoreId(this.storeId).subscribe(
       response => {
         this.categories = response;
+        this.isLoading = false;
+      },
+      error => {
+        this.isLoading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur lors du chargement des catégories',
+          showConfirmButton: false,
+          timer: 2000
+        });
       }
-    )
+    );
   }
 
   addCategory() {
@@ -65,189 +81,203 @@ export class CategoriesMngtComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       let inputCategory = result;
       if (result) {
-        this.loading = true;
+        this.isActionLoading = true;
         this.categoryService.addCategory({
           name: inputCategory,
           storeId: this.storeId
         }).subscribe(
           response => {
-            this.loading = false;
-            this.getCategories()
+            this.isActionLoading = false;
+            this.getCategories();
+            Swal.fire({
+              icon: 'success',
+              title: 'Catégorie créée !',
+              showConfirmButton: false,
+              timer: 1500
+            });
           }, error => {
-            this.loading = false;
+            this.isActionLoading = false;
             Swal.fire({
               icon: 'error',
               title: 'Une erreur est survenue ! Merci de réessayer plus tard',
               showConfirmButton: false,
               timer: 1500
-            })
+            });
           }
-        )
+        );
       }
-
     });
   }
 
 
-  addSubCategory(parentCategory) {
+  addSubCategory(parentCategory: any) {
     const dialogRef = this.dialog.open(AddCategoryComponent);
 
     dialogRef.afterClosed().subscribe(result => {
       let inputCategory = result;
       if (result) {
-        this.loading = true;
+        this.isActionLoading = true;
         this.categoryService.addCategory({
           name: inputCategory,
           parentCategoryId: parentCategory.id
         }).subscribe(
           response => {
-            parentCategory.subCategories.push({ ...response, subCategories: [] })
-            this.loading = false;
-            this.getCategories()
+            parentCategory.subCategories.push({ ...response, subCategories: [] });
+            this.isActionLoading = false;
+            this.getCategories();
+            Swal.fire({
+              icon: 'success',
+              title: 'Sous-catégorie créée !',
+              showConfirmButton: false,
+              timer: 1500
+            });
           }, error => {
-            this.loading = false;
+            this.isActionLoading = false;
             Swal.fire({
               icon: 'error',
               title: 'Une erreur est survenue ! Merci de réessayer plus tard',
               showConfirmButton: false,
               timer: 1500
-            })
+            });
           }
-        )
+        );
       }
-
     });
   }
 
 
-  selectCategory(category) {
+  selectCategory(category: any) {
     if (this.mode == 'SELECT') {
-      this.selectedCategory = category
-      this.selectedSubCategory1 = null
-      this.selectedSubCategory2 = null
-      this.selectedSubCategory3 = null
-      this.selectedSubCategory4 = null
+      this.selectedCategory = category;
+      this.selectedSubCategory1 = null;
+      this.selectedSubCategory2 = null;
+      this.selectedSubCategory3 = null;
+      this.selectedSubCategory4 = null;
     } else if (this.mode == 'DELETE') {
-      this.deleteCategory(category)
+      this.deleteCategory(category);
     } else if (this.mode == 'EDIT') {
-      this.updateCategory(category)
-    }
-
-  }
-
-  selectSubCategory1(category) {
-    if (this.mode == 'SELECT') {
-      this.selectedSubCategory1 = category
-      this.selectedSubCategory2 = null
-      this.selectedSubCategory3 = null
-      this.selectedSubCategory4 = null
-    } else if (this.mode == 'DELETE') {
-      this.deleteCategory(category)
-    } else if (this.mode == 'EDIT') {
-      this.updateCategory(category)
+      this.updateCategory(category);
     }
   }
 
-  selectSubCategory2(category) {
+  selectSubCategory1(category: any) {
     if (this.mode == 'SELECT') {
-      this.selectedSubCategory2 = category
-      this.selectedSubCategory3 = null
-      this.selectedSubCategory4 = null
+      this.selectedSubCategory1 = category;
+      this.selectedSubCategory2 = null;
+      this.selectedSubCategory3 = null;
+      this.selectedSubCategory4 = null;
     } else if (this.mode == 'DELETE') {
-      this.deleteCategory(category)
+      this.deleteCategory(category);
     } else if (this.mode == 'EDIT') {
-      this.updateCategory(category)
+      this.updateCategory(category);
     }
   }
 
-  selectSubCategory3(category) {
+  selectSubCategory2(category: any) {
     if (this.mode == 'SELECT') {
-      this.selectedSubCategory3 = category
-      this.selectedSubCategory4 = null
+      this.selectedSubCategory2 = category;
+      this.selectedSubCategory3 = null;
+      this.selectedSubCategory4 = null;
     } else if (this.mode == 'DELETE') {
-      this.deleteCategory(category)
+      this.deleteCategory(category);
     } else if (this.mode == 'EDIT') {
-      this.updateCategory(category)
+      this.updateCategory(category);
     }
   }
 
-  selectSubCategory4(category) {
+  selectSubCategory3(category: any) {
     if (this.mode == 'SELECT') {
-      this.selectedSubCategory4 = category
+      this.selectedSubCategory3 = category;
+      this.selectedSubCategory4 = null;
     } else if (this.mode == 'DELETE') {
-      this.deleteCategory(category)
+      this.deleteCategory(category);
     } else if (this.mode == 'EDIT') {
-      this.updateCategory(category)
+      this.updateCategory(category);
     }
   }
 
-  showSuccessMessage(
-    title, message, icon = null,
-    showCancelButton = true) {
-    return Swal.fire({
-      title: title,
-      text: message,
-      icon: icon,
-      showCancelButton: showCancelButton
-    })
+  selectSubCategory4(category: any) {
+    if (this.mode == 'SELECT') {
+      this.selectedSubCategory4 = category;
+    } else if (this.mode == 'DELETE') {
+      this.deleteCategory(category);
+    } else if (this.mode == 'EDIT') {
+      this.updateCategory(category);
+    }
   }
 
-
-  deleteCategory(category) {
+  deleteCategory(category: any) {
     Swal.fire({
       title: 'Etes vous sûr de vouloir supprimer la catégorie "' + category.name + '" et tous ses sous-catégories ?',
       denyButtonText: `Annuler`,
       showDenyButton: true,
       confirmButtonText: 'Supprimer',
-    }).then((result) => {
+      confirmButtonColor: '#c62828',
+    }).then((result: any) => {
       if (result.isConfirmed) {
-        this.loading = true;
+        this.isActionLoading = true;
         this.categoryService.deleteCategory(category.id).subscribe(response => {
-          this.loading = false;
+          this.isActionLoading = false;
           Swal.fire({
             icon: 'success',
             title: 'Catégorie supprimée !',
             showConfirmButton: false,
             timer: 1500
-          })
-          this.getCategories()
+          });
+          this.getCategories();
+          // Reset selections if deleted category was selected
+          if (this.selectedCategory?.id === category.id) {
+            this.selectedCategory = null;
+            this.selectedSubCategory1 = null;
+            this.selectedSubCategory2 = null;
+            this.selectedSubCategory3 = null;
+            this.selectedSubCategory4 = null;
+          }
         }, error => {
-          this.loading = false;
+          this.isActionLoading = false;
           Swal.fire({
             icon: 'error',
-            title: error.error.message,
+            title: error.error?.message || 'Erreur lors de la suppression',
             showConfirmButton: false,
             timer: 1500
-          })
-        })
+          });
+        });
       }
-    })
+    });
   }
 
-  updateCategory(category) {
+  updateCategory(category: any) {
     const dialogRef = this.dialog.open(AddCategoryComponent, { data: category.name });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.loading = true;
+        this.isActionLoading = true;
         this.categoryService.updateCategory({ name: result, id: category.id }).subscribe(response => {
-          this.loading = false;
+          this.isActionLoading = false;
           Swal.fire({
             icon: 'success',
             title: 'Catégorie modifiée !',
             showConfirmButton: false,
             timer: 1500
-          })
-          this.getCategories()
+          });
+          this.getCategories();
         }, error => {
-          this.loading = false;
+          this.isActionLoading = false;
           Swal.fire({
             icon: 'error',
-            title: error.error.message,
+            title: error.error?.message || 'Erreur lors de la modification',
             showConfirmButton: false,
             timer: 1500
-          })
-        })
+          });
+        });
       }
     });
+  }
+
+  resetBreadcrumb() {
+    this.selectedCategory = null;
+    this.selectedSubCategory1 = null;
+    this.selectedSubCategory2 = null;
+    this.selectedSubCategory3 = null;
+    this.selectedSubCategory4 = null;
   }
 }

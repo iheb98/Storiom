@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
 import {
     faBox, faBoxOpen, faCheckCircle, faClock, faTimesCircle, faTruck,
     faCalendar, faChevronDown, faChevronUp, faUser, faEnvelope, faPhone,
-    faShoppingBag, faCog, faList, faFilter, faTimes
+    faShoppingBag, faCog, faList, faFilter, faTimes, faShoppingCart
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -17,11 +17,18 @@ import {
 })
 export class OrdersMngtComponent implements OnInit {
 
+    // Data
     orders: any[] = [];
     filteredOrders: any[] = [];
     store: any;
+
+    // UI State
     activeFilter: string = '';
     expandedOrderId: number | null = null;
+
+    // Loading States
+    isLoading = true;
+    isActionLoading = false;
 
     backend_URL = environment.backend;
 
@@ -43,25 +50,36 @@ export class OrdersMngtComponent implements OnInit {
     faList = faList;
     faFilter = faFilter;
     faTimes = faTimes;
+    faShoppingCart = faShoppingCart;
 
     constructor(
         private orderService: OrderService,
         private authService: AuthService,
         private storeService: StoreService,
-
     ) { }
 
     ngOnInit(): void {
-
+        this.isLoading = true;
         const user = this.authService.getConnectedUser();
 
         if (user?.store) {
-            this.storeService.getStore(user.store).subscribe(store => {
-                this.store = store;
-                this.loadOrders();
-            });
+            this.storeService.getStore(user.store).subscribe(
+                store => {
+                    this.store = store;
+                    this.loadOrders();
+                },
+                error => {
+                    this.isLoading = false;
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erreur lors du chargement de la boutique',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                }
+            );
         } else {
-
+            this.isLoading = false;
         }
     }
 
@@ -70,11 +88,17 @@ export class OrdersMngtComponent implements OnInit {
             (res) => {
                 this.orders = res;
                 this.applyFilter();
-
+                this.isLoading = false;
             },
             (err) => {
                 console.error(err);
-
+                this.isLoading = false;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur lors du chargement des commandes',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
             }
         );
     }
@@ -116,9 +140,10 @@ export class OrdersMngtComponent implements OnInit {
             confirmButtonColor: this.getStatusHexColor(status)
         }).then((result) => {
             if (result.isConfirmed) {
-
+                this.isActionLoading = true;
                 this.orderService.updateOrderStatus(order.id, status).subscribe(
                     (res) => {
+                        this.isActionLoading = false;
                         if (res.success) {
                             order.status = res.order.status;
                             this.applyFilter();
@@ -130,16 +155,15 @@ export class OrdersMngtComponent implements OnInit {
                                 timer: 1500
                             });
                         }
-
                     },
                     (err) => {
+                        this.isActionLoading = false;
                         console.error(err);
                         Swal.fire({
                             icon: 'error',
                             title: 'Erreur',
                             text: 'Impossible de mettre à jour le statut'
                         });
-
                     }
                 );
             }

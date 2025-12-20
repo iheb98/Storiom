@@ -1,6 +1,12 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import {
+  faStore, faEdit, faInfoCircle, faPhone, faEnvelope, faGlobe,
+  faMapMarkerAlt, faMap, faCity, faRoad, faCog, faImage,
+  faCloudUploadAlt, faEye, faTruck, faAlignLeft, faTimes,
+  faPlus, faSave, faChevronDown, faExclamationCircle
+} from '@fortawesome/free-solid-svg-icons';
 import { Store } from 'src/app/models/store';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { FileService } from 'src/app/core/services/file.service';
@@ -8,6 +14,7 @@ import { FileService } from 'src/app/core/services/file.service';
 import { StoreService } from 'src/app/core/services/store.service';
 import { environment } from 'src/environments/environment';
 import { getAllGovernorates, getCitiesForGovernorate, getAllCities } from 'src/app/shared/data/tunisia-locations';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-store-add',
@@ -20,6 +27,29 @@ export class StoreAddComponent implements OnInit {
   storeId: string;
   storeTypes = ['Boutique', 'Quincaillerie'];
   backend_URL = environment.backend;
+
+  // Icons
+  faStore = faStore;
+  faEdit = faEdit;
+  faInfoCircle = faInfoCircle;
+  faPhone = faPhone;
+  faEnvelope = faEnvelope;
+  faGlobe = faGlobe;
+  faMapMarkerAlt = faMapMarkerAlt;
+  faMap = faMap;
+  faCity = faCity;
+  faRoad = faRoad;
+  faCog = faCog;
+  faImage = faImage;
+  faCloudUploadAlt = faCloudUploadAlt;
+  faEye = faEye;
+  faTruck = faTruck;
+  faAlignLeft = faAlignLeft;
+  faTimes = faTimes;
+  faPlus = faPlus;
+  faSave = faSave;
+  faChevronDown = faChevronDown;
+  faExclamationCircle = faExclamationCircle;
 
   // File upload
   selectedFileName: string = '';
@@ -34,6 +64,10 @@ export class StoreAddComponent implements OnInit {
   filteredCities: string[] = [];
   showGovernorateSuggestions = false;
   showCitySuggestions = false;
+
+  // Loading States
+  isLoading = false;
+  isSubmitting = false;
 
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
 
@@ -53,11 +87,10 @@ export class StoreAddComponent implements OnInit {
 
     this.route.paramMap.subscribe(paramMap => {
       this.storeId = paramMap.get('id');
+      if (this.storeId) {
+        this.loadStore();
+      }
     });
-
-    if (this.storeId) {
-      this.loadStore();
-    }
   }
 
   initLocationData() {
@@ -68,34 +101,47 @@ export class StoreAddComponent implements OnInit {
   }
 
   loadStore() {
-    this.service.getStore(this.storeId).subscribe(response => {
-      this.store = response;
-      this.form.patchValue({
-        name: response?.name,
-        description: response?.description,
-        phone: response?.phone,
-        email: response?.email,
-        site: response?.site,
-        country: response?.address?.country,
-        state: response?.address?.state,
-        city: response?.address?.city,
-        street: response?.address?.street,
-        postalCode: response?.address?.postalCode,
-        logo: response?.logo,
-        isVisibleToPublic: response?.isVisibleToPublic,
-        isSupportingDeliveries: response?.isSupportingDeliveries
-      });
+    this.isLoading = true;
+    this.service.getStore(this.storeId).subscribe(
+      response => {
+        this.store = response;
+        this.form.patchValue({
+          name: response?.name,
+          description: response?.description,
+          phone: response?.phone,
+          email: response?.email,
+          site: response?.site,
+          country: response?.address?.country,
+          state: response?.address?.state,
+          city: response?.address?.city,
+          street: response?.address?.street,
+          postalCode: response?.address?.postalCode,
+          logo: response?.logo,
+          isVisibleToPublic: response?.isVisibleToPublic,
+          isSupportingDeliveries: response?.isSupportingDeliveries
+        });
 
-      // Set autocomplete text values
-      this.governorateSearchText = response?.address?.state || '';
-      this.citySearchText = response?.address?.city || '';
+        // Set autocomplete text values
+        this.governorateSearchText = response?.address?.state || '';
+        this.citySearchText = response?.address?.city || '';
 
-      // Update available cities based on governorate
-      if (this.governorateSearchText) {
-        this.availableCities = getCitiesForGovernorate(this.governorateSearchText);
-        this.filteredCities = [...this.availableCities];
+        // Update available cities based on governorate
+        if (this.governorateSearchText) {
+          this.availableCities = getCitiesForGovernorate(this.governorateSearchText);
+          this.filteredCities = [...this.availableCities];
+        }
+        this.isLoading = false;
+      },
+      error => {
+        this.isLoading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur lors du chargement de la boutique',
+          showConfirmButton: false,
+          timer: 2000
+        });
       }
-    });
+    );
   }
 
   initForm() {
@@ -229,39 +275,85 @@ export class StoreAddComponent implements OnInit {
     }
 
     if (this.form.valid) {
+      this.isSubmitting = true;
 
       if (this.fileInput.nativeElement.files[0]) {
-        this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(response => {
-          const logo = response.fileUrl.split('/').pop();
-          this.service.addStore({
-            ...this.form.getRawValue(),
-            logo: logo,
-            userId: this.authService.getConnectedUser().id
-          }).subscribe(response => {
-            this.authService.refreshToken().subscribe(response => {
-              localStorage.setItem('accessToken', response.accessToken);
-
-              this.authService.loggedIn.next();
-              setTimeout(() => {
-                this.router.navigate(['admin/stores/view']);
-              }, 1000);
+        this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(
+          response => {
+            const logo = response.fileUrl.split('/').pop();
+            this.service.addStore({
+              ...this.form.getRawValue(),
+              logo: logo,
+              userId: this.authService.getConnectedUser().id
+            }).subscribe(
+              response => {
+                this.authService.refreshToken().subscribe(response => {
+                  localStorage.setItem('accessToken', response.accessToken);
+                  this.authService.loggedIn.next();
+                  this.isSubmitting = false;
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Boutique créée !',
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                  setTimeout(() => {
+                    this.router.navigate(['admin/stores/view']);
+                  }, 1000);
+                });
+              },
+              error => {
+                this.isSubmitting = false;
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Erreur lors de la création',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              }
+            );
+          },
+          error => {
+            this.isSubmitting = false;
+            Swal.fire({
+              icon: 'error',
+              title: 'Erreur lors de l\'upload du logo',
+              showConfirmButton: false,
+              timer: 1500
             });
-          });
-        });
+          }
+        );
       } else {
         this.service.addStore({
           ...this.form.getRawValue(),
           userId: this.authService.getConnectedUser().id
-        }).subscribe(response => {
-          this.authService.refreshToken().subscribe(response => {
-            localStorage.setItem('accessToken', response.accessToken);
-
-            this.authService.loggedIn.next();
-            setTimeout(() => {
-              this.router.navigate(['admin/stores/view']);
-            }, 1000);
-          });
-        });
+        }).subscribe(
+          response => {
+            this.authService.refreshToken().subscribe(response => {
+              localStorage.setItem('accessToken', response.accessToken);
+              this.authService.loggedIn.next();
+              this.isSubmitting = false;
+              Swal.fire({
+                icon: 'success',
+                title: 'Boutique créée !',
+                showConfirmButton: false,
+                timer: 1500
+              });
+              setTimeout(() => {
+                this.router.navigate(['admin/stores/view']);
+              }, 1000);
+            });
+          },
+          error => {
+            this.isSubmitting = false;
+            Swal.fire({
+              icon: 'error',
+              title: 'Erreur lors de la création',
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        );
       }
     }
   }
@@ -276,29 +368,75 @@ export class StoreAddComponent implements OnInit {
     }
 
     if (this.form.valid) {
+      this.isSubmitting = true;
 
       if (this.fileInput.nativeElement.files[0]) {
-        this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(response => {
-          const logo = response.fileUrl.split('/').pop();
-          this.service.updateStore({
-            ...this.form.getRawValue(),
-            id: this.store.id,
-            logo: logo,
-            userId: this.authService.getConnectedUser().id
-          }).subscribe(response => {
-
-            this.router.navigate(['admin/stores/view']);
-          });
-        });
+        this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(
+          response => {
+            const logo = response.fileUrl.split('/').pop();
+            this.service.updateStore({
+              ...this.form.getRawValue(),
+              id: this.store.id,
+              logo: logo,
+              userId: this.authService.getConnectedUser().id
+            }).subscribe(
+              response => {
+                this.isSubmitting = false;
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Boutique modifiée !',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+                this.router.navigate(['admin/stores/view']);
+              },
+              error => {
+                this.isSubmitting = false;
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Erreur lors de la modification',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              }
+            );
+          },
+          error => {
+            this.isSubmitting = false;
+            Swal.fire({
+              icon: 'error',
+              title: 'Erreur lors de l\'upload du logo',
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        );
       } else {
         this.service.updateStore({
           ...this.form.getRawValue(),
           id: this.store.id,
           userId: this.authService.getConnectedUser().id
-        }).subscribe(response => {
-
-          this.router.navigate(['admin/stores/view']);
-        });
+        }).subscribe(
+          response => {
+            this.isSubmitting = false;
+            Swal.fire({
+              icon: 'success',
+              title: 'Boutique modifiée !',
+              showConfirmButton: false,
+              timer: 1500
+            });
+            this.router.navigate(['admin/stores/view']);
+          },
+          error => {
+            this.isSubmitting = false;
+            Swal.fire({
+              icon: 'error',
+              title: 'Erreur lors de la modification',
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        );
       }
     }
   }

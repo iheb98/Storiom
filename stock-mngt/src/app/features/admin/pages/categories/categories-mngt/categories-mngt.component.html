@@ -1,246 +1,276 @@
 <div class="categories-page">
-    <!-- Page Header -->
-    <header class="page-header">
-        <div class="header-content">
-            <div class="header-icon">
-                <i class="fa fa-folder-open"></i>
-            </div>
-            <div class="header-text">
-                <h1>Gestion des Catégories</h1>
-                <p>{{ categories?.length || 0 }} catégories principales</p>
+
+    <!-- Loading Skeleton -->
+    <div class="loading-skeleton" *ngIf="isLoading">
+        <div class="skeleton-header">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-text">
+                <div class="skeleton-title"></div>
+                <div class="skeleton-subtitle"></div>
             </div>
         </div>
-    </header>
+        <div class="skeleton-toolbar"></div>
+        <div class="skeleton-section">
+            <div class="skeleton-section-title"></div>
+            <div class="skeleton-grid">
+                <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
+            </div>
+        </div>
+    </div>
 
-    <!-- Mode Toolbar (Admin Only) -->
-    <div class="mode-toolbar" *ngIf="connectedUserRole == 'Admin'">
-        <div class="mode-buttons">
-            <button class="mode-btn" [class.active]="mode == 'SELECT'" (click)="mode = 'SELECT'">
-                <fa-icon [icon]="faSelect"></fa-icon>
-                <span>Sélectionner</span>
-            </button>
-            <button class="mode-btn edit" [class.active]="mode == 'EDIT'" (click)="mode = 'EDIT'">
-                <fa-icon [icon]="faEdit"></fa-icon>
-                <span>Modifier</span>
-            </button>
-            <button class="mode-btn delete" [class.active]="mode == 'DELETE'" (click)="mode = 'DELETE'">
-                <fa-icon [icon]="faTrash"></fa-icon>
-                <span>Supprimer</span>
-            </button>
+    <!-- Action Loading Overlay -->
+    <div class="action-overlay" *ngIf="isActionLoading">
+        <div class="action-spinner">
+            <div class="spinner"></div>
+            <span>Traitement en cours...</span>
+        </div>
+    </div>
+
+    <!-- Main Content (shown only when data is loaded) -->
+    <div class="page-content" *ngIf="!isLoading">
+
+        <!-- Page Header -->
+        <header class="page-header">
+            <div class="header-content">
+                <div class="header-icon">
+                    <fa-icon [icon]="faLayerGroup"></fa-icon>
+                </div>
+                <div class="header-text">
+                    <h1>Gestion des Catégories</h1>
+                    <p>{{ categories?.length || 0 }} catégories principales</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Mode Toolbar (Admin Only) -->
+        <div class="mode-toolbar" *ngIf="connectedUserRole == 'Admin'">
+            <div class="mode-buttons">
+                <button class="mode-btn" [class.active]="mode == 'SELECT'" (click)="mode = 'SELECT'">
+                    <fa-icon [icon]="faMousePointer"></fa-icon>
+                    <span>Sélectionner</span>
+                </button>
+                <button class="mode-btn edit" [class.active]="mode == 'EDIT'" (click)="mode = 'EDIT'">
+                    <fa-icon [icon]="faEdit"></fa-icon>
+                    <span>Modifier</span>
+                </button>
+                <button class="mode-btn delete" [class.active]="mode == 'DELETE'" (click)="mode = 'DELETE'">
+                    <fa-icon [icon]="faTrash"></fa-icon>
+                    <span>Supprimer</span>
+                </button>
+            </div>
+
+            <div class="mode-indicator">
+                <span class="mode-label">Mode:</span>
+                <span class="mode-value" [class.select]="mode == 'SELECT'" [class.edit]="mode == 'EDIT'"
+                    [class.delete]="mode == 'DELETE'">
+                    {{ mode == 'SELECT' ? 'Sélection' : (mode == 'EDIT' ? 'Modification' : 'Suppression') }}
+                </span>
+            </div>
         </div>
 
-        <div class="mode-indicator">
-            <span class="mode-label">Mode:</span>
-            <span class="mode-value" [class.select]="mode == 'SELECT'" [class.edit]="mode == 'EDIT'"
-                [class.delete]="mode == 'DELETE'">
-                {{ mode == 'SELECT' ? 'Sélection' : (mode == 'EDIT' ? 'Modification' : 'Suppression') }}
+        <!-- Breadcrumb -->
+        <div class="breadcrumb" *ngIf="selectedCategory">
+            <span class="breadcrumb-item" (click)="resetBreadcrumb()">
+                <fa-icon [icon]="faHome"></fa-icon>
             </span>
-        </div>
-    </div>
-
-    <!-- Breadcrumb -->
-    <div class="breadcrumb" *ngIf="selectedCategory">
-        <span class="breadcrumb-item"
-            (click)="selectedCategory = null; selectedSubCategory1 = null; selectedSubCategory2 = null; selectedSubCategory3 = null; selectedSubCategory4 = null">
-            <i class="fa fa-home"></i>
-        </span>
-        <i class="fa fa-chevron-right separator"></i>
-        <span class="breadcrumb-item active" *ngIf="selectedCategory">{{ selectedCategory?.name }}</span>
-        <ng-container *ngIf="selectedSubCategory1">
-            <i class="fa fa-chevron-right separator"></i>
-            <span class="breadcrumb-item active">{{ selectedSubCategory1?.name }}</span>
-        </ng-container>
-        <ng-container *ngIf="selectedSubCategory2">
-            <i class="fa fa-chevron-right separator"></i>
-            <span class="breadcrumb-item active">{{ selectedSubCategory2?.name }}</span>
-        </ng-container>
-        <ng-container *ngIf="selectedSubCategory3">
-            <i class="fa fa-chevron-right separator"></i>
-            <span class="breadcrumb-item active">{{ selectedSubCategory3?.name }}</span>
-        </ng-container>
-    </div>
-
-    <!-- Parent Categories -->
-    <div class="category-section">
-        <div class="section-header">
-            <h3><i class="fa fa-folder"></i> Catégories principales</h3>
-            <span class="hint-text" *ngIf="mode == 'DELETE'">Cliquez pour supprimer</span>
-            <span class="hint-text" *ngIf="mode == 'EDIT'">Cliquez pour modifier</span>
+            <fa-icon [icon]="faChevronRight" class="separator"></fa-icon>
+            <span class="breadcrumb-item active" *ngIf="selectedCategory">{{ selectedCategory?.name }}</span>
+            <ng-container *ngIf="selectedSubCategory1">
+                <fa-icon [icon]="faChevronRight" class="separator"></fa-icon>
+                <span class="breadcrumb-item active">{{ selectedSubCategory1?.name }}</span>
+            </ng-container>
+            <ng-container *ngIf="selectedSubCategory2">
+                <fa-icon [icon]="faChevronRight" class="separator"></fa-icon>
+                <span class="breadcrumb-item active">{{ selectedSubCategory2?.name }}</span>
+            </ng-container>
+            <ng-container *ngIf="selectedSubCategory3">
+                <fa-icon [icon]="faChevronRight" class="separator"></fa-icon>
+                <span class="breadcrumb-item active">{{ selectedSubCategory3?.name }}</span>
+            </ng-container>
         </div>
 
-        <div class="categories-grid">
-            <div class="category-card" *ngFor="let item of categories"
-                [class.selected]="item?.id == selectedCategory?.id" [class.delete-mode]="mode == 'DELETE'"
-                [class.edit-mode]="mode == 'EDIT'" (click)="selectCategory(item)">
-                <div class="category-icon">
-                    <i class="fa fa-folder"></i>
-                </div>
-                <span class="category-name">{{ item?.name }}</span>
-                <span class="sub-count" *ngIf="item?.subCategories?.length">
-                    {{ item?.subCategories?.length }} sous-cat.
-                </span>
-                <div class="card-action" *ngIf="mode == 'DELETE'">
-                    <i class="fa fa-trash"></i>
-                </div>
-                <div class="card-action edit" *ngIf="mode == 'EDIT'">
-                    <i class="fa fa-pen"></i>
-                </div>
+        <!-- Parent Categories -->
+        <div class="category-section">
+            <div class="section-header">
+                <h3><fa-icon [icon]="faFolder"></fa-icon> Catégories principales</h3>
+                <span class="hint-text" *ngIf="mode == 'DELETE'">Cliquez pour supprimer</span>
+                <span class="hint-text" *ngIf="mode == 'EDIT'">Cliquez pour modifier</span>
             </div>
 
-            <div class="category-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'"
-                (click)="addCategory()">
-                <div class="add-icon">
-                    <i class="fa fa-plus"></i>
+            <div class="categories-grid">
+                <div class="category-card" *ngFor="let item of categories"
+                    [class.selected]="item?.id == selectedCategory?.id" [class.delete-mode]="mode == 'DELETE'"
+                    [class.edit-mode]="mode == 'EDIT'" (click)="selectCategory(item)">
+                    <div class="category-icon">
+                        <fa-icon [icon]="faFolder"></fa-icon>
+                    </div>
+                    <span class="category-name">{{ item?.name }}</span>
+                    <span class="sub-count" *ngIf="item?.subCategories?.length">
+                        {{ item?.subCategories?.length }} sous-cat.
+                    </span>
+                    <div class="card-action" *ngIf="mode == 'DELETE'">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                    </div>
+                    <div class="card-action edit" *ngIf="mode == 'EDIT'">
+                        <fa-icon [icon]="faPen"></fa-icon>
+                    </div>
                 </div>
-                <span class="add-text">Nouvelle catégorie</span>
+
+                <div class="category-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'"
+                    (click)="addCategory()">
+                    <div class="add-icon">
+                        <fa-icon [icon]="faPlus"></fa-icon>
+                    </div>
+                    <span class="add-text">Nouvelle catégorie</span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Sub-Categories Level 1 -->
-    <div class="category-section subcategory level-1" *ngIf="selectedCategory">
-        <div class="section-header">
-            <h3><i class="fa fa-folder-open"></i> Sous-catégories de "{{ selectedCategory?.name }}"</h3>
-        </div>
-
-        <div class="categories-grid">
-            <div class="category-card" *ngFor="let item of selectedCategory?.subCategories"
-                [class.selected]="item?.id == selectedSubCategory1?.id" [class.delete-mode]="mode == 'DELETE'"
-                [class.edit-mode]="mode == 'EDIT'" (click)="selectSubCategory1(item)">
-                <div class="category-icon">
-                    <i class="fa fa-folder"></i>
-                </div>
-                <span class="category-name">{{ item?.name }}</span>
-                <span class="sub-count" *ngIf="item?.subCategories?.length">
-                    {{ item?.subCategories?.length }} sous-cat.
-                </span>
-                <div class="card-action" *ngIf="mode == 'DELETE'">
-                    <i class="fa fa-trash"></i>
-                </div>
-                <div class="card-action edit" *ngIf="mode == 'EDIT'">
-                    <i class="fa fa-pen"></i>
-                </div>
+        <!-- Sub-Categories Level 1 -->
+        <div class="category-section subcategory level-1" *ngIf="selectedCategory">
+            <div class="section-header">
+                <h3><fa-icon [icon]="faFolderOpen"></fa-icon> Sous-catégories de "{{ selectedCategory?.name }}"</h3>
             </div>
 
-            <div class="category-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'"
-                (click)="addSubCategory(selectedCategory)">
-                <div class="add-icon">
-                    <i class="fa fa-plus"></i>
+            <div class="categories-grid">
+                <div class="category-card" *ngFor="let item of selectedCategory?.subCategories"
+                    [class.selected]="item?.id == selectedSubCategory1?.id" [class.delete-mode]="mode == 'DELETE'"
+                    [class.edit-mode]="mode == 'EDIT'" (click)="selectSubCategory1(item)">
+                    <div class="category-icon">
+                        <fa-icon [icon]="faFolder"></fa-icon>
+                    </div>
+                    <span class="category-name">{{ item?.name }}</span>
+                    <span class="sub-count" *ngIf="item?.subCategories?.length">
+                        {{ item?.subCategories?.length }} sous-cat.
+                    </span>
+                    <div class="card-action" *ngIf="mode == 'DELETE'">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                    </div>
+                    <div class="card-action edit" *ngIf="mode == 'EDIT'">
+                        <fa-icon [icon]="faPen"></fa-icon>
+                    </div>
                 </div>
-                <span class="add-text">Ajouter</span>
+
+                <div class="category-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'"
+                    (click)="addSubCategory(selectedCategory)">
+                    <div class="add-icon">
+                        <fa-icon [icon]="faPlus"></fa-icon>
+                    </div>
+                    <span class="add-text">Ajouter</span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Sub-Categories Level 2 -->
-    <div class="category-section subcategory level-2" *ngIf="selectedSubCategory1">
-        <div class="section-header">
-            <h3><i class="fa fa-folder-open"></i> Sous-catégories de "{{ selectedSubCategory1?.name }}"</h3>
-        </div>
-
-        <div class="categories-grid">
-            <div class="category-card" *ngFor="let item of selectedSubCategory1?.subCategories"
-                [class.selected]="item?.id == selectedSubCategory2?.id" [class.delete-mode]="mode == 'DELETE'"
-                [class.edit-mode]="mode == 'EDIT'" (click)="selectSubCategory2(item)">
-                <div class="category-icon">
-                    <i class="fa fa-folder"></i>
-                </div>
-                <span class="category-name">{{ item?.name }}</span>
-                <span class="sub-count" *ngIf="item?.subCategories?.length">
-                    {{ item?.subCategories?.length }} sous-cat.
-                </span>
-                <div class="card-action" *ngIf="mode == 'DELETE'">
-                    <i class="fa fa-trash"></i>
-                </div>
-                <div class="card-action edit" *ngIf="mode == 'EDIT'">
-                    <i class="fa fa-pen"></i>
-                </div>
+        <!-- Sub-Categories Level 2 -->
+        <div class="category-section subcategory level-2" *ngIf="selectedSubCategory1">
+            <div class="section-header">
+                <h3><fa-icon [icon]="faFolderOpen"></fa-icon> Sous-catégories de "{{ selectedSubCategory1?.name }}"</h3>
             </div>
 
-            <div class="category-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'"
-                (click)="addSubCategory(selectedSubCategory1)">
-                <div class="add-icon">
-                    <i class="fa fa-plus"></i>
+            <div class="categories-grid">
+                <div class="category-card" *ngFor="let item of selectedSubCategory1?.subCategories"
+                    [class.selected]="item?.id == selectedSubCategory2?.id" [class.delete-mode]="mode == 'DELETE'"
+                    [class.edit-mode]="mode == 'EDIT'" (click)="selectSubCategory2(item)">
+                    <div class="category-icon">
+                        <fa-icon [icon]="faFolder"></fa-icon>
+                    </div>
+                    <span class="category-name">{{ item?.name }}</span>
+                    <span class="sub-count" *ngIf="item?.subCategories?.length">
+                        {{ item?.subCategories?.length }} sous-cat.
+                    </span>
+                    <div class="card-action" *ngIf="mode == 'DELETE'">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                    </div>
+                    <div class="card-action edit" *ngIf="mode == 'EDIT'">
+                        <fa-icon [icon]="faPen"></fa-icon>
+                    </div>
                 </div>
-                <span class="add-text">Ajouter</span>
+
+                <div class="category-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'"
+                    (click)="addSubCategory(selectedSubCategory1)">
+                    <div class="add-icon">
+                        <fa-icon [icon]="faPlus"></fa-icon>
+                    </div>
+                    <span class="add-text">Ajouter</span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Sub-Categories Level 3 -->
-    <div class="category-section subcategory level-3" *ngIf="selectedSubCategory2">
-        <div class="section-header">
-            <h3><i class="fa fa-folder-open"></i> Sous-catégories de "{{ selectedSubCategory2?.name }}"</h3>
-        </div>
-
-        <div class="categories-grid">
-            <div class="category-card" *ngFor="let item of selectedSubCategory2?.subCategories"
-                [class.selected]="item?.id == selectedSubCategory3?.id" [class.delete-mode]="mode == 'DELETE'"
-                [class.edit-mode]="mode == 'EDIT'" (click)="selectSubCategory3(item)">
-                <div class="category-icon">
-                    <i class="fa fa-folder"></i>
-                </div>
-                <span class="category-name">{{ item?.name }}</span>
-                <span class="sub-count" *ngIf="item?.subCategories?.length">
-                    {{ item?.subCategories?.length }} sous-cat.
-                </span>
-                <div class="card-action" *ngIf="mode == 'DELETE'">
-                    <i class="fa fa-trash"></i>
-                </div>
-                <div class="card-action edit" *ngIf="mode == 'EDIT'">
-                    <i class="fa fa-pen"></i>
-                </div>
+        <!-- Sub-Categories Level 3 -->
+        <div class="category-section subcategory level-3" *ngIf="selectedSubCategory2">
+            <div class="section-header">
+                <h3><fa-icon [icon]="faFolderOpen"></fa-icon> Sous-catégories de "{{ selectedSubCategory2?.name }}"</h3>
             </div>
 
-            <div class="category-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'"
-                (click)="addSubCategory(selectedSubCategory2)">
-                <div class="add-icon">
-                    <i class="fa fa-plus"></i>
+            <div class="categories-grid">
+                <div class="category-card" *ngFor="let item of selectedSubCategory2?.subCategories"
+                    [class.selected]="item?.id == selectedSubCategory3?.id" [class.delete-mode]="mode == 'DELETE'"
+                    [class.edit-mode]="mode == 'EDIT'" (click)="selectSubCategory3(item)">
+                    <div class="category-icon">
+                        <fa-icon [icon]="faFolder"></fa-icon>
+                    </div>
+                    <span class="category-name">{{ item?.name }}</span>
+                    <span class="sub-count" *ngIf="item?.subCategories?.length">
+                        {{ item?.subCategories?.length }} sous-cat.
+                    </span>
+                    <div class="card-action" *ngIf="mode == 'DELETE'">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                    </div>
+                    <div class="card-action edit" *ngIf="mode == 'EDIT'">
+                        <fa-icon [icon]="faPen"></fa-icon>
+                    </div>
                 </div>
-                <span class="add-text">Ajouter</span>
+
+                <div class="category-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'"
+                    (click)="addSubCategory(selectedSubCategory2)">
+                    <div class="add-icon">
+                        <fa-icon [icon]="faPlus"></fa-icon>
+                    </div>
+                    <span class="add-text">Ajouter</span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Sub-Categories Level 4 -->
-    <div class="category-section subcategory level-4" *ngIf="selectedSubCategory3">
-        <div class="section-header">
-            <h3><i class="fa fa-folder-open"></i> Sous-catégories de "{{ selectedSubCategory3?.name }}"</h3>
-        </div>
-
-        <div class="categories-grid">
-            <div class="category-card" *ngFor="let item of selectedSubCategory3?.subCategories"
-                [class.selected]="item?.id == selectedSubCategory4?.id" [class.delete-mode]="mode == 'DELETE'"
-                [class.edit-mode]="mode == 'EDIT'" (click)="selectSubCategory4(item)">
-                <div class="category-icon">
-                    <i class="fa fa-folder"></i>
-                </div>
-                <span class="category-name">{{ item?.name }}</span>
-                <div class="card-action" *ngIf="mode == 'DELETE'">
-                    <i class="fa fa-trash"></i>
-                </div>
-                <div class="card-action edit" *ngIf="mode == 'EDIT'">
-                    <i class="fa fa-pen"></i>
-                </div>
+        <!-- Sub-Categories Level 4 -->
+        <div class="category-section subcategory level-4" *ngIf="selectedSubCategory3">
+            <div class="section-header">
+                <h3><fa-icon [icon]="faFolderOpen"></fa-icon> Sous-catégories de "{{ selectedSubCategory3?.name }}"</h3>
             </div>
 
-            <div class="category-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'"
-                (click)="addSubCategory(selectedSubCategory3)">
-                <div class="add-icon">
-                    <i class="fa fa-plus"></i>
+            <div class="categories-grid">
+                <div class="category-card" *ngFor="let item of selectedSubCategory3?.subCategories"
+                    [class.selected]="item?.id == selectedSubCategory4?.id" [class.delete-mode]="mode == 'DELETE'"
+                    [class.edit-mode]="mode == 'EDIT'" (click)="selectSubCategory4(item)">
+                    <div class="category-icon">
+                        <fa-icon [icon]="faFolder"></fa-icon>
+                    </div>
+                    <span class="category-name">{{ item?.name }}</span>
+                    <div class="card-action" *ngIf="mode == 'DELETE'">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                    </div>
+                    <div class="card-action edit" *ngIf="mode == 'EDIT'">
+                        <fa-icon [icon]="faPen"></fa-icon>
+                    </div>
                 </div>
-                <span class="add-text">Ajouter</span>
+
+                <div class="category-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'"
+                    (click)="addSubCategory(selectedSubCategory3)">
+                    <div class="add-icon">
+                        <fa-icon [icon]="faPlus"></fa-icon>
+                    </div>
+                    <span class="add-text">Ajouter</span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Empty State -->
-    <div class="empty-state" *ngIf="!categories?.length">
-        <i class="fa fa-folder-open"></i>
-        <h3>Aucune catégorie disponible</h3>
-        <p>Commencez par créer votre première catégorie</p>
-        <button class="btn-add" (click)="addCategory()" *ngIf="connectedUserRole == 'Admin'">
-            <i class="fa fa-plus"></i> Créer une catégorie
-        </button>
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="!categories?.length">
+            <fa-icon [icon]="faFolderOpen"></fa-icon>
+            <h3>Aucune catégorie disponible</h3>
+            <p>Commencez par créer votre première catégorie</p>
+            <button class="btn-add" (click)="addCategory()" *ngIf="connectedUserRole == 'Admin'">
+                <fa-icon [icon]="faPlus"></fa-icon> Créer une catégorie
+            </button>
+        </div>
     </div>
 </div>

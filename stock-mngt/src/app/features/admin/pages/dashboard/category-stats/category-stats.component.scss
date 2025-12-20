@@ -21,6 +21,86 @@ $radius-md: 12px;
 .category-stats-container {
   padding: 10px 0;
   font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  position: relative;
+  min-height: 300px;
+}
+
+// ============================================
+// LOADING SKELETON
+// ============================================
+.loading-skeleton {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.skeleton-filters {
+  height: 70px;
+  border-radius: $radius-sm;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  margin-bottom: 25px;
+}
+
+.skeleton-charts-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25px;
+  margin-bottom: 25px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.skeleton-chart {
+  height: 300px;
+  border-radius: $radius-md;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+
+  &.tall {
+    height: 350px;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+// ============================================
+// PAGE CONTENT ANIMATION
+// ============================================
+.page-content {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 // ============================================
@@ -52,8 +132,9 @@ $radius-md: 12px;
     font-weight: 600;
     color: $text-secondary;
 
-    i {
+    fa-icon {
       color: $primary;
+      font-size: 0.85rem;
     }
   }
 
@@ -104,6 +185,12 @@ $radius-md: 12px;
   border-radius: $radius-md;
   border: 1px solid $border-color;
   overflow: hidden;
+  box-shadow: $shadow-sm;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
 }
 
 .chart-header {
@@ -123,7 +210,7 @@ $radius-md: 12px;
     color: $text-primary;
     margin: 0;
 
-    i {
+    fa-icon {
       color: $primary;
       font-size: 0.9rem;
     }

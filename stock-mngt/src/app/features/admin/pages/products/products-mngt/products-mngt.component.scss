@@ -26,9 +26,171 @@ $radius-lg: 16px;
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
     max-width: 1600px;
     margin: 0 auto;
+    position: relative;
+    min-height: 400px;
 
     @media (max-width: 768px) {
         padding: 20px 15px;
+    }
+}
+
+// ============================================
+// LOADING SKELETON
+// ============================================
+.loading-skeleton {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.skeleton-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+
+    .skeleton-text {
+        .skeleton-title {
+            width: 280px;
+            height: 32px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            margin-bottom: 8px;
+        }
+
+        .skeleton-subtitle {
+            width: 150px;
+            height: 18px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+    }
+
+    .skeleton-button {
+        width: 160px;
+        height: 48px;
+        border-radius: $radius-md;
+        background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+}
+
+.skeleton-search {
+    height: 52px;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: 20px;
+}
+
+.skeleton-bulk {
+    height: 56px;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: 20px;
+}
+
+.skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.skeleton-card {
+    height: 380px;
+    border-radius: $radius-lg;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+// ============================================
+// ACTION OVERLAY
+// ============================================
+.action-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.action-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid $border-color;
+        border-top-color: $primary;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    span {
+        font-size: 1rem;
+        color: $text-secondary;
+        font-weight: 500;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// ============================================
+// PAGE CONTENT ANIMATION
+// ============================================
+.page-content {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -44,17 +206,42 @@ $radius-lg: 16px;
     gap: 15px;
 
     .header-content {
-        h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: $text-primary;
-            margin: 0 0 5px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+
+        .header-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+            border-radius: $radius-md;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            fa-icon {
+                font-size: 1.5rem;
+                color: $white;
+            }
         }
 
-        p {
-            font-size: 0.9rem;
-            color: $text-secondary;
-            margin: 0;
+        .header-text {
+            h1 {
+                font-size: 1.8rem;
+                font-weight: 700;
+                color: $text-primary;
+                margin: 0 0 5px;
+
+                @media (max-width: 576px) {
+                    font-size: 1.4rem;
+                }
+            }
+
+            p {
+                font-size: 0.9rem;
+                color: $text-secondary;
+                margin: 0;
+            }
         }
     }
 
@@ -76,6 +263,11 @@ $radius-lg: 16px;
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba($primary, 0.4);
         }
+
+        @media (max-width: 576px) {
+            width: 100%;
+            justify-content: center;
+        }
     }
 }
 
@@ -93,7 +285,7 @@ $radius-lg: 16px;
         min-width: 250px;
         position: relative;
 
-        i {
+        fa-icon {
             position: absolute;
             left: 16px;
             top: 50%;
@@ -116,6 +308,10 @@ $radius-lg: 16px;
                 border-color: $primary;
                 box-shadow: 0 0 0 3px $primary-light;
             }
+        }
+
+        @media (max-width: 576px) {
+            min-width: 100%;
         }
     }
 
@@ -166,6 +362,7 @@ $radius-lg: 16px;
     padding: 25px;
     margin-bottom: 25px;
     transition: all 0.3s ease;
+    box-shadow: $shadow-sm;
 
     &.collapsed {
         display: none;
@@ -189,7 +386,7 @@ $radius-lg: 16px;
         color: $text-secondary;
         margin-bottom: 8px;
 
-        i {
+        fa-icon {
             color: $primary;
             font-size: 0.8rem;
         }
@@ -370,9 +567,15 @@ $radius-lg: 16px;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 25px;
     margin-bottom: 30px;
+
+    @media (max-width: 576px) {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
 }
 
 .product-card {
+    position: relative;
     background: $white;
     border-radius: $radius-lg;
     border: 1px solid $border-color;
@@ -387,6 +590,69 @@ $radius-lg: 16px;
             opacity: 1;
         }
     }
+
+    &.selected {
+        border-color: $primary;
+        box-shadow: 0 0 0 2px rgba($primary, 0.2);
+    }
+
+    .product-checkbox {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background: $white;
+        border: 2px solid $border-color;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: $primary;
+        }
+
+        input[type="checkbox"] {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            accent-color: $primary;
+            margin: 0;
+        }
+
+        .checkmark {
+            display: none;
+        }
+    }
+
+    .visibility-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        font-size: 0.8rem;
+        transition: all 0.2s;
+
+        &.visible {
+            background: $success;
+            color: $white;
+        }
+
+        &.hidden {
+            background: $text-secondary;
+            color: $white;
+        }
+    }
 }
 
 .product-image {
@@ -394,6 +660,10 @@ $radius-lg: 16px;
     height: 220px;
     overflow: hidden;
     cursor: pointer;
+
+    @media (max-width: 576px) {
+        height: 150px;
+    }
 
     img {
         width: 100%;
@@ -416,7 +686,7 @@ $radius-lg: 16px;
         opacity: 0;
         transition: opacity 0.3s;
 
-        i {
+        fa-icon {
             color: $white;
             font-size: 2rem;
         }
@@ -451,6 +721,10 @@ $radius-lg: 16px;
 .product-info {
     padding: 20px;
 
+    @media (max-width: 576px) {
+        padding: 12px;
+    }
+
     .product-name {
         font-size: 1.05rem;
         font-weight: 600;
@@ -459,6 +733,10 @@ $radius-lg: 16px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+
+        @media (max-width: 576px) {
+            font-size: 0.9rem;
+        }
     }
 
     .product-category {
@@ -486,6 +764,10 @@ $radius-lg: 16px;
                 font-size: 1.2rem;
                 font-weight: 700;
                 color: $success;
+
+                @media (max-width: 576px) {
+                    font-size: 1rem;
+                }
             }
         }
     }
@@ -506,6 +788,10 @@ $radius-lg: 16px;
         color: $text-secondary;
         cursor: pointer;
         transition: all 0.2s;
+
+        @media (max-width: 576px) {
+            padding: 10px;
+        }
 
         &:not(:last-child) {
             border-right: 1px solid $border-color;
@@ -547,13 +833,14 @@ $radius-lg: 16px;
     justify-content: center;
     padding: 80px 20px;
     text-align: center;
-    background: $background;
+    background: $white;
     border-radius: $radius-lg;
     border: 2px dashed $border-color;
+    animation: fadeInUp 0.4s ease-out;
 
-    i {
+    fa-icon {
         font-size: 4rem;
-        color: $text-secondary;
+        color: $primary;
         margin-bottom: 20px;
         opacity: 0.4;
     }
@@ -637,57 +924,13 @@ $radius-lg: 16px;
         font-size: 1.5rem;
         cursor: pointer;
         transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         &:hover {
             background: rgba(255, 255, 255, 0.2);
         }
-    }
-}
-
-// ============================================
-// RESPONSIVE
-// ============================================
-@media (max-width: 576px) {
-    .page-header {
-        .header-content h1 {
-            font-size: 1.4rem;
-        }
-
-        .btn-add {
-            width: 100%;
-            justify-content: center;
-        }
-    }
-
-    .search-bar {
-        .search-input-wrapper {
-            min-width: 100%;
-        }
-    }
-
-    .products-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-
-    .product-image {
-        height: 150px;
-    }
-
-    .product-info {
-        padding: 12px;
-
-        .product-name {
-            font-size: 0.9rem;
-        }
-
-        .product-prices .price .price-value {
-            font-size: 1rem;
-        }
-    }
-
-    .product-actions .btn-action {
-        padding: 10px;
     }
 }
 
@@ -705,6 +948,7 @@ $radius-lg: 16px;
     margin-bottom: 20px;
     flex-wrap: wrap;
     gap: 15px;
+    box-shadow: $shadow-sm;
 
     .bulk-left {
         display: flex;
@@ -820,76 +1064,6 @@ $radius-lg: 16px;
 
         .bulk-divider {
             display: none;
-        }
-    }
-}
-
-// ============================================
-// PRODUCT CARD SELECTION
-// ============================================
-.product-card {
-    position: relative;
-
-    &.selected {
-        border-color: $primary;
-        box-shadow: 0 0 0 2px rgba($primary, 0.2);
-    }
-
-    .product-checkbox {
-        position: absolute;
-        top: 12px;
-        left: 12px;
-        z-index: 10;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 24px;
-        height: 24px;
-        background: $white;
-        border: 2px solid $border-color;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s;
-
-        &:hover {
-            border-color: $primary;
-        }
-
-        input[type="checkbox"] {
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-            accent-color: $primary;
-            margin: 0;
-        }
-
-        .checkmark {
-            display: none;
-        }
-    }
-
-    .visibility-badge {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        z-index: 10;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        font-size: 0.8rem;
-        transition: all 0.2s;
-
-        &.visible {
-            background: $success;
-            color: $white;
-        }
-
-        &.hidden {
-            background: $text-secondary;
-            color: $white;
         }
     }
 }

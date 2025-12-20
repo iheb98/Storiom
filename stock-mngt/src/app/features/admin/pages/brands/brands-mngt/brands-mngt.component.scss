@@ -26,9 +26,179 @@ $radius-lg: 16px;
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
     max-width: 1400px;
     margin: 0 auto;
+    position: relative;
+    min-height: 400px;
 
     @media (max-width: 768px) {
         padding: 20px 15px;
+    }
+}
+
+// ============================================
+// LOADING SKELETON
+// ============================================
+.loading-skeleton {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.skeleton-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+
+    .skeleton-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: $radius-md;
+        background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+
+    .skeleton-text {
+        .skeleton-title {
+            width: 220px;
+            height: 28px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            margin-bottom: 8px;
+        }
+
+        .skeleton-subtitle {
+            width: 140px;
+            height: 18px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+    }
+}
+
+.skeleton-toolbar {
+    height: 70px;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: 25px;
+}
+
+.skeleton-section {
+    background: $white;
+    border-radius: $radius-lg;
+    border: 1px solid $border-color;
+    padding: 25px;
+
+    .skeleton-section-title {
+        width: 150px;
+        height: 24px;
+        border-radius: 4px;
+        background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        margin-bottom: 20px;
+    }
+}
+
+.skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
+}
+
+.skeleton-card {
+    height: 130px;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+// ============================================
+// ACTION OVERLAY
+// ============================================
+.action-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.action-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid $border-color;
+        border-top-color: $primary;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    span {
+        font-size: 1rem;
+        color: $text-secondary;
+        font-weight: 500;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// ============================================
+// PAGE CONTENT ANIMATION
+// ============================================
+.page-content {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -53,7 +223,7 @@ $radius-lg: 16px;
         align-items: center;
         justify-content: center;
 
-        i {
+        fa-icon {
             font-size: 1.5rem;
             color: $white;
         }
@@ -65,6 +235,10 @@ $radius-lg: 16px;
             font-weight: 700;
             color: $text-primary;
             margin: 0 0 5px;
+
+            @media (max-width: 576px) {
+                font-size: 1.4rem;
+            }
         }
 
         p {
@@ -89,12 +263,22 @@ $radius-lg: 16px;
     border-radius: $radius-md;
     border: 1px solid $border-color;
     margin-bottom: 25px;
+    box-shadow: $shadow-sm;
+
+    @media (max-width: 576px) {
+        padding: 15px;
+    }
 }
 
 .mode-buttons {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+
+    @media (max-width: 576px) {
+        width: 100%;
+        justify-content: center;
+    }
 }
 
 .mode-btn {
@@ -111,15 +295,22 @@ $radius-lg: 16px;
     cursor: pointer;
     transition: all 0.2s;
 
+    @media (max-width: 576px) {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+    }
+
     &:hover {
         border-color: $primary;
         color: $primary;
+        transform: translateY(-2px);
     }
 
     &.active {
         background: $primary-light;
         border-color: $primary;
         color: $primary;
+        box-shadow: 0 2px 8px rgba($primary, 0.2);
     }
 
     &.edit {
@@ -132,6 +323,7 @@ $radius-lg: 16px;
 
         &.active {
             background: $blue-light;
+            box-shadow: 0 2px 8px rgba($blue, 0.2);
         }
     }
 
@@ -145,6 +337,7 @@ $radius-lg: 16px;
 
         &.active {
             background: $danger-light;
+            box-shadow: 0 2px 8px rgba($danger, 0.2);
         }
     }
 }
@@ -153,6 +346,11 @@ $radius-lg: 16px;
     display: flex;
     align-items: center;
     gap: 10px;
+
+    @media (max-width: 576px) {
+        width: 100%;
+        justify-content: center;
+    }
 
     .mode-label {
         font-size: 0.85rem;
@@ -190,6 +388,12 @@ $radius-lg: 16px;
     border-radius: $radius-lg;
     border: 1px solid $border-color;
     padding: 25px;
+    box-shadow: $shadow-sm;
+    animation: fadeInUp 0.3s ease-out;
+
+    @media (max-width: 576px) {
+        padding: 20px 15px;
+    }
 }
 
 .section-header {
@@ -209,7 +413,7 @@ $radius-lg: 16px;
         color: $text-primary;
         margin: 0;
 
-        i {
+        fa-icon {
             color: $primary;
         }
     }
@@ -218,6 +422,9 @@ $radius-lg: 16px;
         font-size: 0.85rem;
         color: $text-secondary;
         font-style: italic;
+        padding: 4px 12px;
+        background: $background;
+        border-radius: 20px;
     }
 }
 
@@ -228,6 +435,11 @@ $radius-lg: 16px;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 15px;
+
+    @media (max-width: 576px) {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
 }
 
 .brand-card {
@@ -243,6 +455,10 @@ $radius-lg: 16px;
     cursor: pointer;
     transition: all 0.3s ease;
 
+    @media (max-width: 576px) {
+        padding: 20px 15px;
+    }
+
     &:hover {
         transform: translateY(-4px);
         box-shadow: $shadow-md;
@@ -255,7 +471,10 @@ $radius-lg: 16px;
 
         .brand-icon {
             background: $primary;
-            color: $white;
+
+            fa-icon {
+                color: $white;
+            }
         }
 
         .brand-name {
@@ -269,7 +488,10 @@ $radius-lg: 16px;
 
         .brand-icon {
             background: $blue;
-            color: $white;
+
+            fa-icon {
+                color: $white;
+            }
         }
     }
 
@@ -279,7 +501,10 @@ $radius-lg: 16px;
 
         .brand-icon {
             background: $danger;
-            color: $white;
+
+            fa-icon {
+                color: $white;
+            }
         }
     }
 }
@@ -294,7 +519,7 @@ $radius-lg: 16px;
     justify-content: center;
     transition: all 0.3s;
 
-    i {
+    fa-icon {
         font-size: 1.1rem;
         color: $primary;
     }
@@ -306,6 +531,7 @@ $radius-lg: 16px;
     color: $text-primary;
     text-align: center;
     transition: color 0.3s;
+    word-break: break-word;
 }
 
 .brand-action {
@@ -322,7 +548,7 @@ $radius-lg: 16px;
     opacity: 0;
     transition: opacity 0.2s;
 
-    i {
+    fa-icon {
         font-size: 0.7rem;
         color: $white;
     }
@@ -347,7 +573,10 @@ $radius-lg: 16px;
 
         .add-icon {
             background: $primary;
-            color: $white;
+
+            fa-icon {
+                color: $white;
+            }
         }
 
         .add-text {
@@ -366,7 +595,7 @@ $radius-lg: 16px;
     justify-content: center;
     transition: all 0.3s;
 
-    i {
+    fa-icon {
         font-size: 1.2rem;
         color: $text-secondary;
     }
@@ -387,10 +616,11 @@ $radius-lg: 16px;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 60px 20px;
+    padding: 80px 20px;
     text-align: center;
+    animation: fadeInUp 0.4s ease-out;
 
-    i {
+    fa-icon {
         font-size: 4rem;
         color: $primary;
         margin-bottom: 20px;

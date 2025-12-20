@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { BrandService } from 'src/app/core/services/brand.service';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { BrandAddComponent } from '../brand-add/brand-add.component';
-import { faICursor, faMousePointer, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { faEdit } from '@fortawesome/free-regular-svg-icons';
-import { SPINNER } from 'ngx-loading-x';
+import {
+  faMousePointer, faTrash, faTags, faTag, faBookmark, faPlus, faPen, faEdit
+} from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 
 @Component({
@@ -15,40 +15,56 @@ import Swal from 'sweetalert2/dist/sweetalert2.js';
 })
 export class BrandsMngtComponent implements OnInit {
 
-  mode;
-
-  loading;
-  spinnerType = SPINNER.threeStrings;
-
-  brands;
-
-  selectedBrand;
-
-  storeId;
-
+  // Icons
+  faMousePointer = faMousePointer;
   faTrash = faTrash;
   faEdit = faEdit;
-  faSelect = faMousePointer;
-  connectedUserRole
+  faTags = faTags;
+  faTag = faTag;
+  faBookmark = faBookmark;
+  faPlus = faPlus;
+  faPen = faPen;
+
+  // State
+  mode: 'SELECT' | 'EDIT' | 'DELETE' = 'SELECT';
+  isLoading = true;
+  isActionLoading = false;
+
+  brands: any[] = [];
+  selectedBrand: any = null;
+
+  storeId: number;
+  connectedUserRole: string;
+
   constructor(
     private brandService: BrandService,
     private authService: AuthService,
-    public dialog: MatDialog) { }
+    public dialog: MatDialog
+  ) { }
 
   ngOnInit(): void {
-    this.mode = 'SELECT'
-    this.storeId = this.authService.getConnectedUser()?.store
-    this.loading = false;
+    this.storeId = this.authService.getConnectedUser()?.store;
+    this.connectedUserRole = this.authService.getConnectedUser()?.role;
     this.getBrands();
-    this.connectedUserRole = this.authService.getConnectedUser()?.role
   }
 
   getBrands() {
+    this.isLoading = true;
     this.brandService.getBrandsByStoreId(this.storeId).subscribe(
       response => {
         this.brands = response;
+        this.isLoading = false;
+      },
+      error => {
+        this.isLoading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur lors du chargement des marques',
+          showConfirmButton: false,
+          timer: 2000
+        });
       }
-    )
+    );
   }
 
   addBrand() {
@@ -57,105 +73,111 @@ export class BrandsMngtComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       let inputBrand = result;
       if (result) {
-        this.loading = true;
+        this.isActionLoading = true;
         this.brandService.addBrand({
           name: inputBrand,
           storeId: this.storeId
         }).subscribe(
           response => {
-            this.loading = false;
-            this.getBrands()
+            this.isActionLoading = false;
+            this.getBrands();
+            Swal.fire({
+              icon: 'success',
+              title: 'Marque créée !',
+              showConfirmButton: false,
+              timer: 1500
+            });
+          },
+          error => {
+            this.isActionLoading = false;
+            Swal.fire({
+              icon: 'error',
+              title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+              showConfirmButton: false,
+              timer: 1500
+            });
           }
-        )
-      }
-
-    });
-  }
-
-
-  addSubBrand(parentBrand) {
-    const dialogRef = this.dialog.open(BrandAddComponent);
-
-    dialogRef.afterClosed().subscribe(result => {
-      let inputBrand = result;
-      if (result) {
-        this.loading = true;
-        this.brandService.addBrand({
-          name: inputBrand
-        }).subscribe(
-          response => {
-            this.loading = false;
-            this.getBrands()
-          }
-        )
+        );
       }
     });
   }
 
-
-  selectBrand(brand) {
+  selectBrand(brand: any) {
     if (this.mode == 'SELECT') {
-      this.selectedBrand = brand
+      this.selectedBrand = brand;
     } else if (this.mode == 'DELETE') {
-      this.deleteBrand(brand)
+      this.deleteBrand(brand);
     } else if (this.mode == 'EDIT') {
-      this.updateBrand(brand)
+      this.updateBrand(brand);
     }
-
   }
 
-  showSuccessMessage(
-    title, message, icon = null,
-    showCancelButton = true) {
-    return Swal.fire({
-      title: title,
-      text: message,
-      icon: icon,
-      showCancelButton: showCancelButton
-    })
-  }
-
-
-  deleteBrand(brand) {
+  deleteBrand(brand: any) {
     Swal.fire({
       title: 'Etes vous sûr de vouloir supprimer la marque "' + brand.name + '" ?',
       denyButtonText: `Annuler`,
       showDenyButton: true,
       confirmButtonText: 'Supprimer',
-    }).then((result) => {
+      confirmButtonColor: '#c62828',
+    }).then((result: any) => {
       if (result.isConfirmed) {
-        this.loading = true;
-        this.brandService.deleteBrand(brand.id).subscribe(response => {
-          this.loading = false;
-          Swal.fire({
-            icon: 'success',
-            title: 'Marque supprimée !',
-            showConfirmButton: false,
-            timer: 1500
-          })
-          this.getBrands()
-        })
-      }
-    })
-  }
-
-  updateBrand(brand) {
-    const dialogRef = this.dialog.open(BrandAddComponent, { data: brand.name });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loading = true;
-        this.brandService.updateBrand({ name: result, id: brand.id }).subscribe(response => {
-          this.loading = false;
-          Swal.fire({
-            icon: 'success',
-            title: 'Catégorie modifiée !',
-            showConfirmButton: false,
-            timer: 1500
-          })
-          this.getBrands()
-        })
+        this.isActionLoading = true;
+        this.brandService.deleteBrand(brand.id).subscribe(
+          response => {
+            this.isActionLoading = false;
+            Swal.fire({
+              icon: 'success',
+              title: 'Marque supprimée !',
+              showConfirmButton: false,
+              timer: 1500
+            });
+            this.getBrands();
+            // Reset selection if deleted brand was selected
+            if (this.selectedBrand?.id === brand.id) {
+              this.selectedBrand = null;
+            }
+          },
+          error => {
+            this.isActionLoading = false;
+            Swal.fire({
+              icon: 'error',
+              title: error.error?.message || 'Erreur lors de la suppression',
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        );
       }
     });
   }
 
+  updateBrand(brand: any) {
+    const dialogRef = this.dialog.open(BrandAddComponent, { data: brand.name });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.isActionLoading = true;
+        this.brandService.updateBrand({ name: result, id: brand.id }).subscribe(
+          response => {
+            this.isActionLoading = false;
+            Swal.fire({
+              icon: 'success',
+              title: 'Marque modifiée !',
+              showConfirmButton: false,
+              timer: 1500
+            });
+            this.getBrands();
+          },
+          error => {
+            this.isActionLoading = false;
+            Swal.fire({
+              icon: 'error',
+              title: error.error?.message || 'Erreur lors de la modification',
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        );
+      }
+    });
+  }
 }

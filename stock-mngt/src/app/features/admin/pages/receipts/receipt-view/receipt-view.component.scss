@@ -1,3 +1,14 @@
+// Variables
+$primary: #3f51b5;
+$primary-light: rgba(63, 81, 181, 0.1);
+$text-primary: #2c3e50;
+$text-secondary: #7f8c8d;
+$border-color: #e8ecef;
+$background: #f5f7fa;
+$white: #ffffff;
+$radius-sm: 8px;
+$radius-md: 12px;
+
 .receipt-page-wrapper {
     background-color: #f5f7fa;
     min-height: 100vh;
@@ -5,33 +16,117 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    position: relative;
 
     @media print {
         padding: 0;
         background-color: white;
-        display: block; // Reset flex for print
-    }
-
-    // Mobile responsiveness
-    @media (max-width: 768px) {
-        padding: 1rem 0.5rem;
-        align-items: flex-start;
     }
 }
 
+// ============================================
+// LOADING SKELETON
+// ============================================
+.loading-skeleton {
+    width: 100%;
+    max-width: 900px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.skeleton-actions {
+    height: 50px;
+    border-radius: $radius-sm;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: 20px;
+}
+
+.skeleton-header {
+    height: 100px;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: 30px;
+}
+
+.skeleton-info {
+    height: 150px;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: 30px;
+}
+
+.skeleton-table {
+    height: 250px;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: 30px;
+}
+
+.skeleton-totals {
+    height: 120px;
+    width: 300px;
+    margin-left: auto;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+// ============================================
+// RECEIPT CONTAINER
+// ============================================
 .receipt-container {
     width: 100%;
-    max-width: 210mm; // A4 width
-    margin: 0 auto;
-    background: #fff;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    max-width: 900px;
+    background: $white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
-    overflow: hidden; // Ensure simple border-radius clipping
+    overflow: hidden;
+    animation: fadeInUp 0.4s ease-out;
 
     @media print {
         box-shadow: none;
         max-width: 100%;
         border-radius: 0;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -48,8 +143,8 @@
         display: none !important;
     }
 
-    @media (max-width: 576px) {
-        padding: 0.75rem 1rem;
+    @media (max-width: 480px) {
+        flex-wrap: wrap;
         gap: 0.5rem;
 
         .btn-action {
@@ -57,7 +152,7 @@
             padding: 0.4rem 0.75rem;
 
             fa-icon {
-                display: none; // Hide icons on very small screens to save space
+                display: none;
             }
         }
     }
@@ -71,25 +166,26 @@
         font-weight: 500;
         border-radius: 6px;
         transition: all 0.2s;
-        border: 1px solid transparent;
         cursor: pointer;
+        border: 1px solid transparent;
 
         &.btn-back {
-            margin-right: auto; // Push to left
-            color: #6c757d;
+            color: #475569;
+            background-color: #fff;
+            border-color: #cbd5e1;
 
             &:hover {
-                background-color: #e9ecef;
-                color: #495057;
+                background-color: #f1f5f9;
             }
         }
 
         &.btn-print {
-            color: #fff;
-            background-color: #0d6efd;
+            color: #16a34a;
+            background-color: #fff;
+            border-color: #16a34a;
 
             &:hover {
-                background-color: #0b5ed7;
+                background-color: #f0fff4;
             }
         }
 
@@ -130,8 +226,6 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 1.5rem;
-        margin-bottom: 2rem;
-        padding-bottom: 1.5rem;
     }
 
     .store-info {
@@ -159,19 +253,16 @@
         .invoice-title {
             font-size: 2rem;
             font-weight: 800;
-            color: #e2e8f0; // Subtle text color for visual hierarchy
-            text-transform: uppercase;
-            margin: 0;
-            line-height: 1;
+            color: $primary;
+            margin: 0 0 10px;
         }
 
         .invoice-number-block {
-            margin-top: 1rem;
+            margin-bottom: 5px;
 
             .label {
-                font-size: 0.75rem;
-                color: #64748b;
-                text-transform: uppercase;
+                color: #94a3b8;
+                font-size: 0.85rem;
                 font-weight: 600;
                 display: block;
             }
@@ -201,32 +292,31 @@
         flex: 1;
 
         h5 {
-            font-size: 0.85rem;
-            text-transform: uppercase;
             color: #94a3b8;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            letter-spacing: 0.05em;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin: 0 0 10px;
+            letter-spacing: 0.5px;
         }
 
         .info-content {
-            font-size: 0.95rem;
-            color: #334155;
-            line-height: 1.6;
-
             strong {
                 display: block;
                 font-size: 1.1rem;
-                color: #0f172a;
-                margin-bottom: 0.5rem;
+                color: #1e293b;
+                margin-bottom: 5px;
             }
 
             .contact-line {
-                margin-bottom: 0.25rem; // Add slight spacing between lines
+                font-size: 0.9rem;
+                color: #64748b;
+                margin-bottom: 3px;
+                line-height: 1.5;
 
                 .contact-label {
-                    margin-right: 0.5rem;
-                    font-weight: 500; // Match previous look if needed
+                    font-weight: 500;
+                    color: #64748b;
                 }
 
                 .contact-value {
@@ -243,26 +333,26 @@
 // Table
 .items-table-container {
     margin-bottom: 2rem;
-    overflow-x: auto; // Allow horizontal scroll on mobile
+    overflow-x: auto;
 
     table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 600px; // Force table to keep structure, scroll if needed
+        min-width: 600px;
 
         thead {
-            th {
-                text-align: left;
-                padding: 1rem;
+            tr {
                 background-color: #f8fafc;
-                color: #475569;
-                font-weight: 600;
-                font-size: 0.85rem;
-                text-transform: uppercase;
-                border-bottom: 1px solid #e2e8f0;
 
-                &:last-child {
-                    text-align: right;
+                th {
+                    padding: 12px 15px;
+                    text-align: left;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                    color: #64748b;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    border-bottom: 2px solid #e2e8f0;
                 }
             }
         }
@@ -271,14 +361,18 @@
             tr {
                 border-bottom: 1px solid #f1f5f9;
 
-                td {
-                    padding: 1rem;
-                    color: #334155;
-                    vertical-align: top;
+                &:last-child {
+                    border-bottom: none;
+                }
 
-                    &:last-child {
-                        text-align: right;
-                        font-weight: 600;
+                td {
+                    padding: 15px;
+                    font-size: 0.95rem;
+                    color: #475569;
+                    vertical-align: middle;
+
+                    &:first-child {
+                        font-weight: 500;
                     }
 
                     .item-desc {
@@ -299,43 +393,47 @@
     page-break-inside: avoid;
 
     @media (max-width: 576px) {
-        justify-content: flex-start; // Align left on small screens
+        justify-content: flex-start;
         margin-top: 1.5rem;
     }
 
     .totals-box {
-        width: 300px;
-
-        @media (max-width: 576px) {
-            width: 100%; // Full width on mobile
-        }
+        min-width: 280px;
+        background-color: #f8fafc;
+        border-radius: 8px;
+        padding: 20px;
 
         .total-row {
             display: flex;
             justify-content: space-between;
-            padding: 0.5rem 0;
-            color: #64748b;
+            padding: 10px 0;
             font-size: 0.95rem;
+            color: #64748b;
+            border-bottom: 1px dashed #e2e8f0;
+
+            &:last-child {
+                border-bottom: none;
+            }
 
             &.final {
-                border-top: 2px solid #cbd5e1;
-                margin-top: 0.5rem;
-                padding-top: 1rem;
-                color: #0f172a;
                 font-weight: 700;
-                font-size: 1.25rem;
+                color: #1e293b;
+                font-size: 1.1rem;
+                padding-top: 15px;
+                margin-top: 5px;
+                border-top: 2px solid #3f51b5;
+                border-bottom: none;
 
                 .currency {
-                    color: #0d6efd; // Brand color accent
+                    color: $primary;
                 }
             }
         }
     }
 }
 
-// Footer
 .footer-section {
-    margin-top: 4rem;
+    margin-top: 3rem;
     padding-top: 2rem;
     border-top: 1px solid #f1f5f9;
     text-align: center;
@@ -363,14 +461,11 @@
     }
 
     .receipt-page-wrapper {
-        background-color: white !important;
-        height: auto;
-        padding: 20px !important;
+        display: block;
+        padding: 0;
     }
 
     .receipt-container {
-        box-shadow: none !important;
-        border: none !important;
         width: 100% !important;
         max-width: 100% !important;
     }

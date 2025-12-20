@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { faShoppingCart, faTruck, faUser, faClock, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { ReceiptService } from 'src/app/core/services/receipt.service';
@@ -9,8 +10,19 @@ import { ReceiptService } from 'src/app/core/services/receipt.service';
   styleUrls: ['./receipt-result-table.component.scss']
 })
 export class ReceiptResultTableComponent implements OnInit {
+  // Icons
+  faShoppingCart = faShoppingCart;
+  faTruck = faTruck;
+  faUser = faUser;
+  faClock = faClock;
+  faReceipt = faReceipt;
+
   user;
-  receipts = []
+  receipts = [];
+
+  // Loading States
+  isLoading = true;
+
   constructor(
     private receiptService: ReceiptService,
     private productService: ProductService,
@@ -18,17 +30,20 @@ export class ReceiptResultTableComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.user = this.authService.getConnectedUser()
-    this.getLastOperations()
+    this.user = this.authService.getConnectedUser();
+    this.getLastOperations();
   }
-
 
   getLastOperations() {
+    this.isLoading = true;
     this.receiptService.getLastOperationsByStoreId(this.user?.store).subscribe(
       response => {
-        this.receipts = response.slice(0, 5)
+        this.receipts = response.slice(0, 5);
+        this.isLoading = false;
+      },
+      error => {
+        this.isLoading = false;
       }
-    )
+    );
   }
-
 }

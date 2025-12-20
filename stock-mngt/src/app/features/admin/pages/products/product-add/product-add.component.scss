@@ -28,9 +28,153 @@ $radius-lg: 16px;
   font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  min-height: 400px;
 
   @media (max-width: 768px) {
     padding: 20px 15px;
+  }
+}
+
+// ============================================
+// LOADING SKELETON
+// ============================================
+.loading-skeleton {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.skeleton-nav {
+  height: 44px;
+  width: 200px;
+  border-radius: $radius-md;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  margin-bottom: 25px;
+}
+
+.skeleton-header {
+  height: 80px;
+  border-radius: $radius-md;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  margin-bottom: 30px;
+}
+
+.skeleton-form-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.skeleton-section {
+  height: 500px;
+  border-radius: $radius-lg;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-section-right {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.skeleton-card {
+  height: 230px;
+  border-radius: $radius-lg;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+// ============================================
+// ACTION OVERLAY
+// ============================================
+.action-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.action-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid $border-color;
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  span {
+    font-size: 1rem;
+    color: $text-secondary;
+    font-weight: 500;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ============================================
+// PAGE CONTENT ANIMATION
+// ============================================
+.page-content {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -54,8 +198,6 @@ $radius-lg: 16px;
     border-radius: $radius-md;
     transition: all 0.2s;
     text-decoration: none;
-
-    // Default: Back button (outline style like Annuler)
     background: $white;
     border: 1px solid $border-color;
     color: $text-primary;
@@ -66,7 +208,6 @@ $radius-lg: 16px;
       background: $primary-light;
     }
 
-    // Consulter button (info/primary style)
     &:nth-child(2) {
       background: $info-light;
       border: 1px solid $info;
@@ -86,19 +227,44 @@ $radius-lg: 16px;
 // PAGE HEADER
 // ============================================
 .page-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
   margin-bottom: 30px;
 
-  h1 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: $text-primary;
-    margin: 0 0 8px;
+  .header-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    fa-icon {
+      font-size: 1.5rem;
+      color: $white;
+    }
   }
 
-  p {
-    font-size: 0.95rem;
-    color: $text-secondary;
-    margin: 0;
+  .header-text {
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: $text-primary;
+      margin: 0 0 8px;
+
+      @media (max-width: 576px) {
+        font-size: 1.4rem;
+      }
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: $text-secondary;
+      margin: 0;
+    }
   }
 }
 
@@ -127,6 +293,7 @@ $radius-lg: 16px;
   border-radius: $radius-lg;
   border: 1px solid $border-color;
   overflow: hidden;
+  box-shadow: $shadow-sm;
 }
 
 .section-header {
@@ -146,7 +313,7 @@ $radius-lg: 16px;
     color: $text-primary;
     margin: 0;
 
-    i {
+    fa-icon {
       color: $primary;
     }
   }
@@ -175,14 +342,16 @@ $radius-lg: 16px;
   }
 
   label {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 6px;
     font-size: 0.85rem;
     font-weight: 600;
     color: $text-secondary;
     margin-bottom: 8px;
 
-    i {
-      margin-right: 6px;
+    fa-icon {
+      font-size: 0.8rem;
     }
 
     .required {
@@ -199,6 +368,10 @@ $radius-lg: 16px;
 
     .text-warning {
       color: $warning;
+    }
+
+    .text-info {
+      color: $info;
     }
   }
 
@@ -229,7 +402,6 @@ $radius-lg: 16px;
     }
   }
 
-  // ng-select custom styling
   ng-select {
     width: 100%;
 
@@ -387,7 +559,7 @@ $radius-lg: 16px;
   border-radius: $radius-sm;
   margin-bottom: 20px;
 
-  i {
+  fa-icon {
     color: $purple;
   }
 
@@ -409,6 +581,10 @@ $radius-lg: 16px;
   grid-template-columns: repeat(3, 1fr);
   gap: 15px;
   margin-bottom: 20px;
+
+  @media (max-width: 576px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .image-preview {
@@ -480,7 +656,7 @@ $radius-lg: 16px;
       background: $primary-light;
     }
 
-    i {
+    fa-icon {
       font-size: 2.5rem;
       color: $primary;
       margin-bottom: 15px;
@@ -499,10 +675,6 @@ $radius-lg: 16px;
     }
   }
 }
-
-// ============================================
-// FORM ACTIONS
-// ============================================
 
 // ============================================
 // TOGGLE SETTINGS
@@ -605,6 +777,9 @@ $radius-lg: 16px;
   }
 }
 
+// ============================================
+// FORM ACTIONS
+// ============================================
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -642,9 +817,14 @@ $radius-lg: 16px;
     cursor: pointer;
     transition: all 0.3s;
 
-    &:hover {
+    &:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 4px 15px rgba($primary, 0.4);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
     }
   }
 

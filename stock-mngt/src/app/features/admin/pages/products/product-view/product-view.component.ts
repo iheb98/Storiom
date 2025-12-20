@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { faPagelines } from '@fortawesome/free-brands-svg-icons';
 import { faChartBar } from '@fortawesome/free-regular-svg-icons';
 import {
-  faEdit, faFile, faGripLines, faInfo, faInfoCircle, faTextWidth, faTimes,
-  faArrowDown, faArrowUp, faCoins, faExclamationTriangle, faImages, faSearchPlus, faImage
+  faEdit, faFile, faTimes, faArrowDown, faArrowUp, faCoins, faExclamationTriangle,
+  faImages, faSearchPlus, faImage, faArrowLeft, faCube, faTag, faAlignLeft,
+  faCalendarAlt, faClock, faBox
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
-
 import { ProductService } from 'src/app/core/services/product.service';
 import { StatService } from 'src/app/core/services/stat.service';
 import { environment } from 'src/environments/environment';
@@ -20,8 +19,8 @@ import Swal from 'sweetalert2';
 })
 export class ProductViewComponent implements OnInit {
 
-  // ----------- ICONS 
-  faEdit = faEdit
+  // Icons
+  faEdit = faEdit;
   faArrowDown = faArrowDown;
   faArrowUp = faArrowUp;
   faCoins = faCoins;
@@ -29,72 +28,90 @@ export class ProductViewComponent implements OnInit {
   faImages = faImages;
   faSearchPlus = faSearchPlus;
   faImage = faImage;
-  environment = environment
-  years = [];
-  operationsData;
-  soldOperationsData: any = []
-  loadedOperationsData: any = []
-  operationsLabels: any = [];
+  faArrowLeft = faArrowLeft;
+  faCube = faCube;
+  faTag = faTag;
+  faAlignLeft = faAlignLeft;
+  faCalendarAlt = faCalendarAlt;
+  faClock = faClock;
+  faTimes = faTimes;
+  faBox = faBox;
+  textIcon = faFile;
+  chartIcon = faChartBar;
+
+  environment = environment;
+
+  // Loading States
+  isLoading = true;
+  isStatsLoading = false;
+
+  // Data
+  years: number[] = [];
+  operationsData: any;
+  soldOperationsData: any[] = [];
+  loadedOperationsData: any[] = [];
+  operationsLabels: any[] = [];
   operationsOptions: any;
+  operations: any[] = [];
 
-  operations: any;
-  typesOfDate = ["Quotidien", "Mensuel", "Annuel"]
-  selectedDateType = 'Mensuel'
+  // Filters
+  typesOfDate = ["Quotidien", "Mensuel", "Annuel"];
+  selectedDateType = 'Mensuel';
+  dayFilter: string;
+  weekFilter: string;
+  monthFilter: string;
+  yearFilter: number;
 
-  dayFilter;
-  weekFilter;
-  monthFilter;
-  yearFilter;
-
-  user;
-  id
-  product
-  timesIcon = faTimes
-  infoIcon = faInfoCircle
-  chartIcon = faChartBar
-  textIcon = faFile
-  hoursLabels = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
-
-  basicData: any;
-
-  basicOptions: any;
-
+  // Product
+  user: any;
+  id: string;
+  product: any;
   selectedImage: string | null = null;
+
+  hoursLabels = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
 
   constructor(
     private productService: ProductService,
     private statService: StatService,
-
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
   ) { }
 
   ngOnInit(): void {
-    this.user = this.authService.getConnectedUser()
+    this.user = this.authService.getConnectedUser();
 
     this.route.paramMap.subscribe(paramMap => {
       this.id = paramMap.get('id');
-    })
+      this.initializeFilters();
+      this.getProduct(this.id);
+    });
+  }
 
+  initializeFilters() {
+    // Build years array
     for (let i = 2000; i <= new Date().getFullYear(); i++) {
-      this.years.push(i)
+      this.years.push(i);
     }
-    this.dayFilter = new Date().getFullYear() + "-" +
-      ((new Date().getMonth() + 1) < 10 ? "0" + (new Date().getMonth() + 1) : (new Date().getMonth() + 1)) + "-" +
-      ((new Date().getDate()) < 10 ? "0" + (new Date().getDate()) : (new Date().getDate()));
 
-    this.monthFilter = new Date().getFullYear() + "-" +
-      ((new Date().getMonth() + 1) < 10 ? "0" + (new Date().getMonth() + 1) : (new Date().getMonth() + 1));
+    // Set default filters
+    const now = new Date();
+    const month = (now.getMonth() + 1) < 10 ? "0" + (now.getMonth() + 1) : (now.getMonth() + 1);
+    const day = now.getDate() < 10 ? "0" + now.getDate() : now.getDate();
 
-    this.yearFilter = new Date().getFullYear();
-    this.getProduct(this.id)
+    this.dayFilter = `${now.getFullYear()}-${month}-${day}`;
+    this.monthFilter = `${now.getFullYear()}-${month}`;
+    this.yearFilter = now.getFullYear();
 
+    // Initialize chart options
+    this.initChartOptions();
+  }
+
+  initChartOptions() {
     const documentStyle = getComputedStyle(document.documentElement);
-    const textColor = documentStyle.getPropertyValue('--text-color');
-    const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
-    // const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
-    const surfaceBorder = 'lightgray'
+    const textColor = documentStyle.getPropertyValue('--text-color') || '#2c3e50';
+    const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary') || '#7f8c8d';
+    const surfaceBorder = 'lightgray';
 
     this.operationsOptions = {
       plugins: {
@@ -126,22 +143,30 @@ export class ProductViewComponent implements OnInit {
         }
       }
     };
-
-    this.getOperationStats()
   }
 
-  getProduct(id) {
-    console.log(id)
+  getProduct(id: string) {
+    this.isLoading = true;
     this.productService.getProduct(id).subscribe(
       response => {
-        this.product = response
-        console.log(this.product)
+        this.product = response;
+        this.isLoading = false;
+        this.getOperationStats();
+      },
+      error => {
+        this.isLoading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur lors du chargement du produit',
+          showConfirmButton: false,
+          timer: 2000
+        });
       }
-    )
+    );
   }
 
-  navigateTo(link) {
-    this.router.navigate([link])
+  navigateTo(link: string) {
+    this.router.navigate([link]);
   }
 
   getMensuel() {
@@ -153,26 +178,25 @@ export class ProductViewComponent implements OnInit {
       this.loadedOperationsData.push(0);
       days.push(i + 1);
     }
-    this.operationsLabels = days
+    this.operationsLabels = days;
     if (this.operations) {
       for (let operation of this.operations) {
         if (operation.type == "SOLD") {
           this.soldOperationsData[new Date(operation.date).getDate() - 1] +=
-            (operation?.price && operation?.amount) ?
-              operation?.price * operation?.amount : 0
+            (operation?.price && operation?.amount) ? operation?.price * operation?.amount : 0;
         } else if (operation.type == "LOADED") {
           this.loadedOperationsData[new Date(operation.date).getDate() - 1] +=
-            (operation?.price && operation?.amount) ?
-              operation?.price * operation?.amount : 0
+            (operation?.price && operation?.amount) ? operation?.price * operation?.amount : 0;
         }
       }
     }
     this.updateChart();
   }
+
   getQuotidien() {
     this.soldOperationsData = [];
     this.loadedOperationsData = [];
-    this.operationsLabels = this.hoursLabels
+    this.operationsLabels = this.hoursLabels;
     for (let i = 0; i < 24; i++) {
       this.soldOperationsData.push(0);
       this.loadedOperationsData.push(0);
@@ -181,18 +205,16 @@ export class ProductViewComponent implements OnInit {
       for (let operation of this.operations) {
         if (operation.type == "SOLD") {
           this.soldOperationsData[new Date(operation.date).getHours()] +=
-            (operation?.price && operation?.amount) ?
-              operation?.price * operation?.amount : 0
+            (operation?.price && operation?.amount) ? operation?.price * operation?.amount : 0;
         } else if (operation.type == "LOADED") {
           this.loadedOperationsData[new Date(operation.date).getHours()] +=
-            (operation?.price && operation?.amount) ?
-              operation?.price * operation?.amount : 0
+            (operation?.price && operation?.amount) ? operation?.price * operation?.amount : 0;
         }
-
       }
     }
     this.updateChart();
   }
+
   getAnnuel() {
     let months = [];
     this.soldOperationsData = [];
@@ -200,21 +222,18 @@ export class ProductViewComponent implements OnInit {
     for (let i = 1; i <= 12; i++) {
       this.soldOperationsData.push(0);
       this.loadedOperationsData.push(0);
-      months.push(i + 1);
+      months.push(i);
     }
-    this.operationsLabels = months
+    this.operationsLabels = months;
     if (this.operations) {
       for (let operation of this.operations) {
         if (operation.type == "SOLD") {
-          this.soldOperationsData[new Date(operation.date).getMonth() - 1] +=
-            (operation?.price && operation?.amount) ?
-              operation?.price * operation?.amount : 0
+          this.soldOperationsData[new Date(operation.date).getMonth()] +=
+            (operation?.price && operation?.amount) ? operation?.price * operation?.amount : 0;
         } else if (operation.type == "LOADED") {
-          this.loadedOperationsData[new Date(operation.date).getMonth() - 1] +=
-            (operation?.price && operation?.amount) ?
-              operation?.price * operation?.amount : 0
+          this.loadedOperationsData[new Date(operation.date).getMonth()] +=
+            (operation?.price && operation?.amount) ? operation?.price * operation?.amount : 0;
         }
-
       }
     }
     this.updateChart();
@@ -238,34 +257,36 @@ export class ProductViewComponent implements OnInit {
         }
       ]
     };
+    this.isStatsLoading = false;
   }
 
   getOperationStats() {
-    let filterValue;
-    let month;
-    let year;
-    let day;
+    let filterValue: string;
+    let month: number;
+    let year: number;
+    let day: number;
+
     switch (this.selectedDateType) {
       case 'Quotidien':
         day = new Date(this.dayFilter).getDate();
         month = new Date(this.dayFilter).getMonth() + 1;
         year = new Date(this.dayFilter).getFullYear();
-        filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day
+        filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day;
         break;
       case 'Annuel':
         year = this.yearFilter;
-        filterValue = year
+        filterValue = String(year);
         break;
       default:
         month = new Date(this.monthFilter).getMonth() + 1;
         year = new Date(this.monthFilter).getFullYear();
-        filterValue = year + '-' + month
+        filterValue = year + '-' + month;
         break;
     }
 
+    this.isStatsLoading = true;
     this.statService.getOperationStatsPerProduct(this.user?.store, this.selectedDateType, filterValue, this.id).subscribe(
       response => {
-
         this.operations = response;
         if (this.selectedDateType == "Quotidien") {
           this.getQuotidien();
@@ -274,22 +295,22 @@ export class ProductViewComponent implements OnInit {
         } else {
           this.getMensuel();
         }
-      }, error => {
-
+      },
+      error => {
+        this.isStatsLoading = false;
         Swal.fire({
           icon: 'error',
           title: 'Une erreur est survenue ! Merci de réessayer plus tard',
           showConfirmButton: false,
           timer: 1500
-        })
+        });
       }
-    )
+    );
   }
 
-  lastDay(y, m) {
+  lastDay(y: number, m: number): number {
     return new Date(y, m + 1, 0).getDate();
   }
-
 
   openImage(image: string) {
     this.selectedImage = image;

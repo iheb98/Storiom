@@ -1,36 +1,46 @@
 <div class="critical-products-container">
-    <!-- Products List -->
-    <div class="products-list" *ngIf="products?.length > 0">
-        <div class="product-item" *ngFor="let product of products">
-            <div class="product-indicator" [class.critical]="product?.quantity <= 5"
-                [class.warning]="product?.quantity > 5 && product?.quantity <= 10">
-                <i class="fa fa-exclamation-triangle"></i>
-            </div>
 
-            <div class="product-info">
-                <h4 class="product-name">{{ product?.name }}</h4>
-                <div class="product-prices">
-                    <span class="price buying">
-                        <i class="fa fa-arrow-down"></i> {{ product?.buyingPrice | number:'1.2-2' }} DT
-                    </span>
-                    <span class="price selling">
-                        <i class="fa fa-arrow-up"></i> {{ product?.sellingPrice | number:'1.2-2' }} DT
-                    </span>
-                </div>
-            </div>
-
-            <div class="product-quantity" [class.critical]="product?.quantity <= 5"
-                [class.warning]="product?.quantity > 5 && product?.quantity <= 10">
-                <span class="qty-value">{{ product?.quantity }}</span>
-                <span class="qty-label">en stock</span>
-            </div>
-        </div>
+    <!-- Loading Skeleton -->
+    <div class="loading-skeleton" *ngIf="isLoading">
+        <div class="skeleton-item" *ngFor="let i of [1,2,3,4,5]"></div>
     </div>
 
-    <!-- Empty State -->
-    <div class="empty-state" *ngIf="products?.length === 0">
-        <i class="fa fa-check-circle"></i>
-        <h4>Aucun produit en stock critique</h4>
-        <p>Tous vos produits ont un stock suffisant</p>
+    <!-- Main Content -->
+    <div class="page-content" *ngIf="!isLoading">
+
+        <!-- Products List -->
+        <div class="products-list" *ngIf="products?.length > 0">
+            <div class="product-item" *ngFor="let product of products">
+                <div class="product-indicator" [class.critical]="product?.quantity <= 5"
+                    [class.warning]="product?.quantity > 5 && product?.quantity <= 10">
+                    <fa-icon [icon]="faExclamationTriangle"></fa-icon>
+                </div>
+
+                <div class="product-info">
+                    <h4 class="product-name">{{ product?.name }}</h4>
+                    <div class="product-prices">
+                        <span class="price buying">
+                            <fa-icon [icon]="faArrowDown"></fa-icon> {{ product?.buyingPrice | number:'1.2-2' }} DT
+                        </span>
+                        <span class="price selling">
+                            <fa-icon [icon]="faArrowUp"></fa-icon> {{ product?.sellingPrice | number:'1.2-2' }} DT
+                        </span>
+                    </div>
+                </div>
+
+                <div class="product-quantity" [class.critical]="product?.quantity <= 5"
+                    [class.warning]="product?.quantity > 5 && product?.quantity <= 10">
+                    <span class="qty-value">{{ product?.quantity }}</span>
+                    <span class="qty-label">en stock</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="products?.length === 0">
+            <fa-icon [icon]="faCheckCircle"></fa-icon>
+            <h4>Aucun produit en stock critique</h4>
+            <p>Tous vos produits ont un stock suffisant</p>
+        </div>
     </div>
 </div>

@@ -16,14 +16,134 @@ $radius-sm: 8px;
 $radius-md: 12px;
 $radius-lg: 16px;
 
-.store-form-container {
+.store-form-page {
     max-width: 900px;
     margin: 0 auto;
     padding: 30px 20px 60px;
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    position: relative;
+    min-height: 400px;
 
     @media (max-width: 768px) {
         padding: 20px 15px 40px;
+    }
+}
+
+// ============================================
+// LOADING SKELETON
+// ============================================
+.loading-skeleton {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.skeleton-header {
+    height: 130px;
+    border-radius: $radius-lg;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: 30px;
+}
+
+.skeleton-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.skeleton-card {
+    height: 280px;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+
+    &.short {
+        height: 200px;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+// ============================================
+// ACTION OVERLAY
+// ============================================
+.action-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.action-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid $border-color;
+        border-top-color: $primary;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    span {
+        font-size: 1rem;
+        color: $text-secondary;
+        font-weight: 500;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// ============================================
+// PAGE CONTENT ANIMATION
+// ============================================
+.page-content {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -36,6 +156,7 @@ $radius-lg: 16px;
     padding: 35px;
     margin-bottom: 30px;
     color: $white;
+    box-shadow: $shadow-md;
 
     .header-content {
         display: flex;
@@ -56,8 +177,11 @@ $radius-lg: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.8rem;
         flex-shrink: 0;
+
+        fa-icon {
+            font-size: 1.8rem;
+        }
     }
 
     .header-text {
@@ -93,6 +217,7 @@ $radius-lg: 16px;
     border-radius: $radius-md;
     border: 1px solid $border-color;
     overflow: visible;
+    box-shadow: $shadow-sm;
 
     .card-header {
         display: flex;
@@ -102,7 +227,7 @@ $radius-lg: 16px;
         background: $background;
         border-bottom: 1px solid $border-color;
 
-        i {
+        fa-icon {
             font-size: 1.1rem;
             color: $primary;
         }
@@ -160,7 +285,7 @@ $radius-lg: 16px;
         color: $text-primary;
         margin-bottom: 10px;
 
-        i {
+        fa-icon {
             color: $primary;
             font-size: 0.85rem;
         }
@@ -208,7 +333,7 @@ $radius-lg: 16px;
         font-size: 0.85rem;
         color: $danger;
 
-        i {
+        fa-icon {
             font-size: 0.8rem;
         }
     }
@@ -487,13 +612,12 @@ $radius-lg: 16px;
     }
 
     .btn-submit {
-        background: $primary;
+        background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
         color: $white;
 
         &:hover:not(:disabled) {
-            background: $primary-dark;
             transform: translateY(-2px);
-            box-shadow: $shadow-md;
+            box-shadow: 0 4px 15px rgba($primary, 0.4);
         }
 
         &:disabled {

@@ -1,105 +1,133 @@
 <div class="dashboard-container">
-    <!-- Welcome Header -->
-    <header class="dashboard-header">
-        <div class="header-content">
-            <h1>Tableau de bord</h1>
-            <p>Bienvenue, voici un aperçu de votre activité</p>
-        </div>
-        <div class="header-date">
-            <i class="fa fa-calendar-alt"></i>
-            <span>{{ currentDate | date:'EEEE, d MMMM yyyy' }}</span>
-        </div>
-    </header>
 
-    <!-- Stats Cards -->
-    <section class="stats-section">
-        <div class="stats-grid">
-            <div class="stat-card" *ngFor="let w of widgetsList">
-                <div class="stat-icon" [ngClass]="w.class">
-                    <fa-icon [icon]="w.icon"></fa-icon>
+    <!-- Loading Skeleton -->
+    <div class="loading-skeleton" *ngIf="isLoading">
+        <div class="skeleton-header"></div>
+        <div class="skeleton-stats">
+            <div class="skeleton-stat" *ngFor="let i of [1,2,3,4,5]"></div>
+        </div>
+        <div class="skeleton-content">
+            <div class="skeleton-card full-width"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="page-content" *ngIf="!isLoading">
+
+        <!-- Welcome Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-icon">
+                    <fa-icon [icon]="faTachometerAlt"></fa-icon>
                 </div>
-                <div class="stat-content">
-                    <span class="stat-label">{{ w.label }}</span>
-                    <span class="stat-value">{{ w.value }}</span>
-                </div>
-                <div class="stat-trend" *ngIf="w.trend">
-                    <i class="fa" [class.fa-arrow-up]="w.trend > 0" [class.fa-arrow-down]="w.trend < 0"
-                        [class.positive]="w.trend > 0" [class.negative]="w.trend < 0"></i>
-                    <span>{{ w.trend }}%</span>
+                <div class="header-text">
+                    <h1>Tableau de bord</h1>
+                    <p>Bienvenue, voici un aperçu de votre activité</p>
                 </div>
             </div>
-        </div>
-    </section>
+            <div class="header-date">
+                <fa-icon [icon]="faCalendarAlt"></fa-icon>
+                <span>{{ currentDate | date:'EEEE, d MMMM yyyy' }}</span>
+            </div>
+        </header>
 
-    <!-- Main Content Grid -->
-    <section class="content-grid">
-        <!-- Category Stats -->
-        <div class="dashboard-card full-width">
-            <div class="card-header">
-                <h2><i class="fa fa-chart-pie"></i> Détails sur les Catégories</h2>
+        <!-- Stats Cards -->
+        <section class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card" *ngFor="let w of widgetsList">
+                    <div class="stat-icon" [ngClass]="w.class">
+                        <fa-icon [icon]="w.icon"></fa-icon>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">{{ w.label }}</span>
+                        <span class="stat-value">{{ w.value }}</span>
+                    </div>
+                    <div class="stat-trend" *ngIf="w.trend" [class.positive]="w.trend > 0"
+                        [class.negative]="w.trend < 0">
+                        <fa-icon [icon]="w.trend > 0 ? faArrowUp : faArrowDown"></fa-icon>
+                        <span>{{ w.trend }}%</span>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <app-parent-categories-stats></app-parent-categories-stats>
-            </div>
-        </div>
+        </section>
 
-        <!-- Two Column Layout -->
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h2><i class="fa fa-receipt"></i> Dernières Factures</h2>
-                <a routerLink="/admin/receipts" class="view-all">Voir tout <i class="fa fa-arrow-right"></i></a>
+        <!-- Main Content Grid -->
+        <section class="content-grid">
+            <!-- Category Stats -->
+            <div class="dashboard-card full-width">
+                <div class="card-header">
+                    <h2><fa-icon [icon]="faChartPie"></fa-icon> Détails sur les Catégories</h2>
+                </div>
+                <div class="card-body">
+                    <app-parent-categories-stats></app-parent-categories-stats>
+                </div>
             </div>
-            <div class="card-body">
-                <app-receipt-result-table></app-receipt-result-table>
-            </div>
-        </div>
 
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h2><i class="fa fa-exclamation-triangle"></i> Stock Critique</h2>
-                <a [routerLink]="['/admin/products']" [queryParams]="{filter: 'critical'}" class="view-all">Voir tout <i
-                        class="fa fa-arrow-right"></i></a>
+            <!-- Two Column Layout -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2><fa-icon [icon]="faReceipt"></fa-icon> Dernières Factures</h2>
+                    <a routerLink="/admin/receipts" class="view-all">
+                        Voir tout <fa-icon [icon]="faArrowRight"></fa-icon>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <app-receipt-result-table></app-receipt-result-table>
+                </div>
             </div>
-            <div class="card-body">
-                <app-product-result-table></app-product-result-table>
-            </div>
-        </div>
 
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h2><i class="fa fa-fire"></i> Produits les plus vendus</h2>
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2><fa-icon [icon]="faExclamationTriangle"></fa-icon> Stock Critique</h2>
+                    <a [routerLink]="['/admin/products']" [queryParams]="{filter: 'critical'}" class="view-all">
+                        Voir tout <fa-icon [icon]="faArrowRight"></fa-icon>
+                    </a>
+                </div>
+                <div class="card-body">
+                    <app-product-result-table></app-product-result-table>
+                </div>
             </div>
-            <div class="card-body">
-                <app-most-sold-products></app-most-sold-products>
-            </div>
-        </div>
 
-        <div class="dashboard-card">
-            <div class="card-header">
-                <h2><i class="fa fa-coins"></i> Produits les plus rentables</h2>
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2><fa-icon [icon]="faFire"></fa-icon> Produits les plus vendus</h2>
+                </div>
+                <div class="card-body">
+                    <app-most-sold-products></app-most-sold-products>
+                </div>
             </div>
-            <div class="card-body">
-                <app-most-profitable-products></app-most-profitable-products>
-            </div>
-        </div>
 
-        <!-- Full Width Charts -->
-        <div class="dashboard-card full-width">
-            <div class="card-header">
-                <h2><i class="fa fa-chart-line"></i> Statistiques des Opérations</h2>
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h2><fa-icon [icon]="faCoins"></fa-icon> Produits les plus rentables</h2>
+                </div>
+                <div class="card-body">
+                    <app-most-profitable-products></app-most-profitable-products>
+                </div>
             </div>
-            <div class="card-body chart-container">
-                <app-operation-stats></app-operation-stats>
-            </div>
-        </div>
 
-        <div class="dashboard-card full-width">
-            <div class="card-header">
-                <h2><i class="fa fa-chart-bar"></i> Statistiques par Catégorie</h2>
+            <!-- Full Width Charts -->
+            <div class="dashboard-card full-width">
+                <div class="card-header">
+                    <h2><fa-icon [icon]="faChartLine"></fa-icon> Statistiques des Opérations</h2>
+                </div>
+                <div class="card-body chart-container">
+                    <app-operation-stats></app-operation-stats>
+                </div>
             </div>
-            <div class="card-body chart-container">
-                <app-category-stats></app-category-stats>
+
+            <div class="dashboard-card full-width">
+                <div class="card-header">
+                    <h2><fa-icon [icon]="faChartBar"></fa-icon> Statistiques par Catégorie</h2>
+                </div>
+                <div class="card-body chart-container">
+                    <app-category-stats></app-category-stats>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 </div>

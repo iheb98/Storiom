@@ -1,7 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { faArrowDown, faBox, faBoxes, faBoxOpen, faHandHolding, faHandHoldingUsd, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
+import {
+    faArrowDown, faBoxes, faBoxOpen, faHandHoldingUsd, faMoneyBill,
+    faCalendarAlt, faChartPie, faReceipt, faArrowRight, faExclamationTriangle,
+    faFire, faCoins, faChartLine, faChartBar, faTachometerAlt, faArrowUp
+} from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StatService } from 'src/app/core/services/stat.service';
+import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-dashboard-view',
@@ -9,30 +14,48 @@ import { StatService } from 'src/app/core/services/stat.service';
     styleUrls: ['./dashboard-view.component.scss']
 })
 export class DashboardViewComponent implements OnInit {
-    faBoxOpen = faBoxOpen
-    faArrowDown = faArrowDown
-    faBill = faMoneyBill
-    faHand = faHandHoldingUsd
+    // Icons
+    faBoxOpen = faBoxOpen;
+    faBoxes = faBoxes;
+    faArrowDown = faArrowDown;
+    faArrowUp = faArrowUp;
+    faBill = faMoneyBill;
+    faHand = faHandHoldingUsd;
+    faCalendarAlt = faCalendarAlt;
+    faChartPie = faChartPie;
+    faReceipt = faReceipt;
+    faArrowRight = faArrowRight;
+    faExclamationTriangle = faExclamationTriangle;
+    faFire = faFire;
+    faCoins = faCoins;
+    faChartLine = faChartLine;
+    faChartBar = faChartBar;
+    faTachometerAlt = faTachometerAlt;
+
+    // Data
     user;
     widgets;
-    widgetsList;
+    widgetsList = [];
     currentDate = new Date();
+
+    // Loading States
+    isLoading = true;
+
     constructor(
         private authService: AuthService,
         private statService: StatService,
-
     ) { }
 
     ngOnInit(): void {
         this.user = this.authService.getConnectedUser();
-        this.getWidgets()
+        this.getWidgets();
     }
 
     getWidgets() {
-
+        this.isLoading = true;
         this.statService.getWidgets(this.user.store).subscribe(
             response => {
-                this.widgets = response
+                this.widgets = response;
                 this.widgetsList = [
                     {
                         label: 'Fond de commerce',
@@ -65,10 +88,17 @@ export class DashboardViewComponent implements OnInit {
                         class: 'credit'
                     }
                 ];
-
-                console.log(response)
+                this.isLoading = false;
+            },
+            error => {
+                this.isLoading = false;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur lors du chargement des statistiques',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
             }
-        )
+        );
     }
-
 }

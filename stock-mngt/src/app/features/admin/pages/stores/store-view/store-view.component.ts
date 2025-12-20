@@ -3,7 +3,7 @@ import {
   faEdit, faInfo, faBox, faShoppingCart, faFolder, faTruck,
   faCheckCircle, faTimesCircle, faEye, faPhoneAlt, faPhone,
   faEnvelope, faGlobe, faMapMarkerAlt, faRoad, faCity, faMap,
-  faBolt, faPlus, faExternalLinkAlt
+  faBolt, faPlus, faExternalLinkAlt, faStore
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 
@@ -47,6 +47,7 @@ export class StoreViewComponent implements OnInit {
   boltIcon = faBolt;
   plusIcon = faPlus;
   externalLinkIcon = faExternalLinkAlt;
+  storeIcon = faStore;
 
   selectedImage: string | null = null;
 
@@ -55,6 +56,9 @@ export class StoreViewComponent implements OnInit {
   ordersCount = 0;
   categoriesCount = 0;
   suppliersCount = 0;
+
+  // Loading States
+  isLoading = true;
 
   constructor(
     private authService: AuthService,
@@ -67,27 +71,27 @@ export class StoreViewComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.loadStore();
+    this.loadData();
   }
 
-  loadStore() {
-
+  loadData() {
+    this.isLoading = true;
     const storeId = this.authService.getConnectedUser()?.store;
 
     this.storeService.getStore(storeId).subscribe(
       store => {
         this.store = store;
         this.storeWebsite = this.fillLink(this.store?.site);
-
         this.loadStats(storeId);
+        this.isLoading = false;
       },
       error => {
-
+        this.isLoading = false;
         Swal.fire({
           icon: 'error',
-          title: error?.error?.message || 'Une erreur est survenue ! Merci de réessayer plus tard',
+          title: error?.error?.message || 'Erreur lors du chargement du magasin',
           showConfirmButton: false,
-          timer: 1500
+          timer: 2000
         });
       }
     );

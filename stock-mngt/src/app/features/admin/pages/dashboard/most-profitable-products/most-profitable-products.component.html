@@ -1,35 +1,45 @@
 <div class="profitable-products-container">
-    <!-- Products List -->
-    <div class="products-list" *ngIf="operations?.length > 0">
-        <div class="product-item" *ngFor="let operation of operations; let i = index">
-            <div class="product-rank" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
-                <span>{{ i + 1 }}</span>
-            </div>
 
-            <div class="product-info">
-                <h4 class="product-name">{{ operation?.product?.name }}</h4>
-                <span class="product-price">{{ operation?.product?.sellingPrice | number:'1.2-2' }} DT</span>
-            </div>
+    <!-- Loading Skeleton -->
+    <div class="loading-skeleton" *ngIf="isLoading">
+        <div class="skeleton-item" *ngFor="let i of [1,2,3,4,5]"></div>
+    </div>
 
-            <div class="product-stats">
-                <div class="stat profit">
-                    <i class="fa fa-coins"></i>
-                    <span class="value">{{ operation?.total_profit | number:'1.2-2' }} DT</span>
-                    <span class="label">Profit</span>
+    <!-- Main Content -->
+    <div class="page-content" *ngIf="!isLoading">
+
+        <!-- Products List -->
+        <div class="products-list" *ngIf="operations?.length > 0">
+            <div class="product-item" *ngFor="let operation of operations; let i = index">
+                <div class="product-rank" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
+                    <span>{{ i + 1 }}</span>
                 </div>
-                <div class="stat quantity">
-                    <i class="fa fa-box"></i>
-                    <span class="value">{{ operation?.product?.quantity }}</span>
-                    <span class="label">En stock</span>
+
+                <div class="product-info">
+                    <h4 class="product-name">{{ operation?.product?.name }}</h4>
+                    <span class="product-price">{{ operation?.product?.sellingPrice | number:'1.2-2' }} DT</span>
+                </div>
+
+                <div class="product-stats">
+                    <div class="stat profit">
+                        <fa-icon [icon]="faCoins"></fa-icon>
+                        <span class="value">{{ operation?.total_profit | number:'1.2-2' }} DT</span>
+                        <span class="label">Profit</span>
+                    </div>
+                    <div class="stat quantity">
+                        <fa-icon [icon]="faBox"></fa-icon>
+                        <span class="value">{{ operation?.product?.quantity }}</span>
+                        <span class="label">En stock</span>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Empty State -->
-    <div class="empty-state" *ngIf="operations?.length === 0">
-        <i class="fa fa-chart-line"></i>
-        <h4>Aucun produit trouvé</h4>
-        <p>Les produits les plus rentables apparaîtront ici</p>
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="operations?.length === 0">
+            <fa-icon [icon]="faChartLine"></fa-icon>
+            <h4>Aucun produit trouvé</h4>
+            <p>Les produits les plus rentables apparaîtront ici</p>
+        </div>
     </div>
 </div>

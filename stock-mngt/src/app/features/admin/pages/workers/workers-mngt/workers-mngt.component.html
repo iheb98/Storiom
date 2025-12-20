@@ -1,120 +1,149 @@
 <div class="workers-page">
-    <!-- Page Header -->
-    <header class="page-header">
-        <div class="header-content">
-            <h1>Gestion des Travailleurs</h1>
-            <p>{{ count || 0 }} travailleurs au total</p>
-        </div>
-        <button class="btn-add" (click)="create()">
-            <i class="fa fa-plus"></i>
-            <span>Nouveau Travailleur</span>
-        </button>
-    </header>
 
-    <!-- Actions Bar -->
-    <div class="actions-bar">
-        <button class="btn-filter" [class.active]="!filtersCollapsed" (click)="toggleFilters()">
-            <i class="fa fa-filter"></i>
-            <span>Filtres</span>
-        </button>
-        <button class="btn-reset" (click)="reset()">
-            <i class="fa fa-undo"></i>
-        </button>
+    <!-- Loading Skeleton -->
+    <div class="loading-skeleton" *ngIf="isLoading">
+        <div class="skeleton-header"></div>
+        <div class="skeleton-actions"></div>
+        <div class="skeleton-list">
+            <div class="skeleton-item"></div>
+            <div class="skeleton-item"></div>
+            <div class="skeleton-item"></div>
+            <div class="skeleton-item"></div>
+        </div>
     </div>
 
-    <!-- Filters Panel -->
-    <div class="filters-panel" [class.collapsed]="filtersCollapsed">
-        <div class="filters-grid">
-            <div class="filter-group">
-                <label><i class="fa fa-user"></i> Prénom</label>
-                <input type="text" [(ngModel)]="firstNameFilter" placeholder="Rechercher...">
-            </div>
+    <!-- Action Loading Overlay -->
+    <div class="action-overlay" *ngIf="isActionLoading">
+        <div class="action-spinner">
+            <div class="spinner"></div>
+            <span>Traitement en cours...</span>
+        </div>
+    </div>
 
-            <div class="filter-group">
-                <label><i class="fa fa-user"></i> Nom</label>
-                <input type="text" [(ngModel)]="lastNameFilter" placeholder="Rechercher...">
-            </div>
+    <!-- Main Content -->
+    <div class="page-content" *ngIf="!isLoading">
 
-            <div class="filter-group">
-                <label><i class="fa fa-phone"></i> Téléphone</label>
-                <input type="text" [(ngModel)]="phoneFilter" placeholder="Rechercher...">
-            </div>
-
-            <div class="filter-group">
-                <label><i class="fa fa-envelope"></i> Email</label>
-                <input type="text" [(ngModel)]="emailFilter" placeholder="Rechercher...">
-            </div>
-
-            <div class="filter-group range-group">
-                <label><i class="fa fa-calendar"></i> Date d'entrée</label>
-                <div class="range-inputs">
-                    <input type="date" [(ngModel)]="fromEntryDateFilter">
-                    <span class="range-separator">—</span>
-                    <input type="date" [(ngModel)]="toEntryDateFilter">
+        <!-- Page Header -->
+        <header class="page-header">
+            <div class="header-left">
+                <div class="header-icon">
+                    <fa-icon [icon]="faHardHat"></fa-icon>
+                </div>
+                <div class="header-content">
+                    <h1>Gestion des Travailleurs</h1>
+                    <p>{{ count || 0 }} travailleurs au total</p>
                 </div>
             </div>
-        </div>
+            <button class="btn-add" (click)="create()">
+                <fa-icon [icon]="faPlus"></fa-icon>
+                <span>Nouveau Travailleur</span>
+            </button>
+        </header>
 
-        <div class="filters-actions">
-            <button class="btn-apply" (click)="filter()">
-                <i class="fa fa-search"></i> Appliquer les filtres
+        <!-- Actions Bar -->
+        <div class="actions-bar">
+            <button class="btn-filter" [class.active]="!filtersCollapsed" (click)="toggleFilters()">
+                <fa-icon [icon]="faFilter"></fa-icon>
+                <span>Filtres</span>
+            </button>
+            <button class="btn-reset" (click)="reset()" title="Réinitialiser les filtres">
+                <fa-icon [icon]="faUndo"></fa-icon>
             </button>
         </div>
-    </div>
 
-    <!-- Workers List -->
-    <div class="workers-list" *ngIf="workers?.length > 0">
-        <div class="worker-item" *ngFor="let worker of workers">
-            <div class="worker-avatar">
-                <span>{{ (worker?.firstName?.charAt(0) || '') + (worker?.lastName?.charAt(0) || '') }}</span>
-            </div>
-
-            <div class="worker-info">
-                <div class="worker-header">
-                    <span class="worker-name">{{ worker?.firstName }} {{ worker?.lastName }}</span>
+        <!-- Filters Panel -->
+        <div class="filters-panel" [class.collapsed]="filtersCollapsed">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label><fa-icon [icon]="faUser"></fa-icon> Prénom</label>
+                    <input type="text" [(ngModel)]="firstNameFilter" placeholder="Rechercher...">
                 </div>
-                <div class="worker-details">
-                    <span class="detail-item" *ngIf="worker?.phone">
-                        <i class="fa fa-phone"></i>
-                        {{ worker?.phone }}
-                    </span>
-                    <span class="detail-item" *ngIf="worker?.email">
-                        <i class="fa fa-envelope"></i>
-                        {{ worker?.email }}
-                    </span>
+
+                <div class="filter-group">
+                    <label><fa-icon [icon]="faUser"></fa-icon> Nom</label>
+                    <input type="text" [(ngModel)]="lastNameFilter" placeholder="Rechercher...">
+                </div>
+
+                <div class="filter-group">
+                    <label><fa-icon [icon]="faPhone"></fa-icon> Téléphone</label>
+                    <input type="text" [(ngModel)]="phoneFilter" placeholder="Rechercher...">
+                </div>
+
+                <div class="filter-group">
+                    <label><fa-icon [icon]="faEnvelope"></fa-icon> Email</label>
+                    <input type="text" [(ngModel)]="emailFilter" placeholder="Rechercher...">
+                </div>
+
+                <div class="filter-group range-group">
+                    <label><fa-icon [icon]="faCalendar"></fa-icon> Date d'entrée</label>
+                    <div class="range-inputs">
+                        <input type="date" [(ngModel)]="fromEntryDateFilter">
+                        <span class="range-separator">—</span>
+                        <input type="date" [(ngModel)]="toEntryDateFilter">
+                    </div>
                 </div>
             </div>
 
-            <div class="worker-date">
-                <span class="date-label">Entrée</span>
-                <span class="date-value">{{ worker?.entryDate | date:'dd/MM/yyyy' }}</span>
-            </div>
-
-            <div class="worker-actions">
-                <button class="btn-action edit" (click)="editWorker(worker)" title="Modifier">
-                    <fa-icon [icon]="faEdit"></fa-icon>
-                </button>
-                <button class="btn-action delete" (click)="deleteWorker(worker)" title="Supprimer">
-                    <fa-icon [icon]="faTrash"></fa-icon>
+            <div class="filters-actions">
+                <button class="btn-apply" (click)="filter()">
+                    <fa-icon [icon]="faSearch"></fa-icon> Appliquer les filtres
                 </button>
             </div>
         </div>
-    </div>
 
-    <!-- Empty State -->
-    <div class="empty-state" *ngIf="count === 0">
-        <i class="fa fa-users"></i>
-        <h3>Aucun travailleur trouvé</h3>
-        <p>Essayez de modifier vos critères de recherche ou ajoutez un nouveau travailleur</p>
-        <!--<button class="btn-add-empty" (click)="create()">
-            <i class="fa fa-plus"></i> Ajouter un travailleur
-        </button>-->
-    </div>
+        <!-- Workers List -->
+        <div class="workers-list" *ngIf="workers?.length > 0">
+            <div class="worker-item" *ngFor="let worker of workers">
+                <div class="worker-avatar">
+                    <span>{{ (worker?.firstName?.charAt(0) || '') + (worker?.lastName?.charAt(0) || '') }}</span>
+                </div>
 
-    <!-- Pagination -->
-    <div class="pagination-wrapper" *ngIf="workers?.length > 0">
-        <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
-            [showFirstLastButtons]="true" [pageSizeOptions]="[5, 10, 20]" [pageIndex]="0">
-        </mat-paginator>
+                <div class="worker-info">
+                    <div class="worker-header">
+                        <span class="worker-name">{{ worker?.firstName }} {{ worker?.lastName }}</span>
+                    </div>
+                    <div class="worker-details">
+                        <span class="detail-item" *ngIf="worker?.phone">
+                            <fa-icon [icon]="faPhone"></fa-icon>
+                            {{ worker?.phone }}
+                        </span>
+                        <span class="detail-item" *ngIf="worker?.email">
+                            <fa-icon [icon]="faEnvelope"></fa-icon>
+                            {{ worker?.email }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="worker-date">
+                    <span class="date-label">Entrée</span>
+                    <span class="date-value">{{ worker?.entryDate | date:'dd/MM/yyyy' }}</span>
+                </div>
+
+                <div class="worker-actions">
+                    <button class="btn-action edit" (click)="editWorker(worker)" title="Modifier">
+                        <fa-icon [icon]="faEdit"></fa-icon>
+                    </button>
+                    <button class="btn-action delete" (click)="deleteWorker(worker)" title="Supprimer">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="count === 0">
+            <div class="empty-icon">
+                <fa-icon [icon]="faUsers"></fa-icon>
+            </div>
+            <h3>Aucun travailleur trouvé</h3>
+            <p>Essayez de modifier vos critères de recherche ou ajoutez un nouveau travailleur</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-wrapper" *ngIf="workers?.length > 0">
+            <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
+                [showFirstLastButtons]="true" [pageSizeOptions]="[5, 10, 20]" [pageIndex]="0">
+            </mat-paginator>
+        </div>
     </div>
 </div>

@@ -1,85 +1,117 @@
 <div class="brands-page">
-    <!-- Page Header -->
-    <header class="page-header">
-        <div class="header-content">
-            <div class="header-icon">
-                <i class="fa fa-tags"></i>
-            </div>
-            <div class="header-text">
-                <h1>Gestion des Marques</h1>
-                <p>{{ brands?.length || 0 }} marques disponibles</p>
+
+    <!-- Loading Skeleton -->
+    <div class="loading-skeleton" *ngIf="isLoading">
+        <div class="skeleton-header">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-text">
+                <div class="skeleton-title"></div>
+                <div class="skeleton-subtitle"></div>
             </div>
         </div>
-    </header>
-
-    <!-- Mode Toolbar (Admin Only) -->
-    <div class="mode-toolbar" *ngIf="connectedUserRole == 'Admin'">
-        <div class="mode-buttons">
-            <button class="mode-btn" [class.active]="mode == 'SELECT'" (click)="mode = 'SELECT'">
-                <fa-icon [icon]="faSelect"></fa-icon>
-                <span>Sélectionner</span>
-            </button>
-            <button class="mode-btn edit" [class.active]="mode == 'EDIT'" (click)="mode = 'EDIT'">
-                <fa-icon [icon]="faEdit"></fa-icon>
-                <span>Modifier</span>
-            </button>
-            <button class="mode-btn delete" [class.active]="mode == 'DELETE'" (click)="mode = 'DELETE'">
-                <fa-icon [icon]="faTrash"></fa-icon>
-                <span>Supprimer</span>
-            </button>
-        </div>
-
-        <div class="mode-indicator">
-            <span class="mode-label">Mode actuel:</span>
-            <span class="mode-value" [class.select]="mode == 'SELECT'" [class.edit]="mode == 'EDIT'"
-                [class.delete]="mode == 'DELETE'">
-                {{ mode == 'SELECT' ? 'Sélection' : (mode == 'EDIT' ? 'Modification' : 'Suppression') }}
-            </span>
+        <div class="skeleton-toolbar"></div>
+        <div class="skeleton-section">
+            <div class="skeleton-section-title"></div>
+            <div class="skeleton-grid">
+                <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Brands Section -->
-    <div class="brands-section">
-        <div class="section-header">
-            <h3><i class="fa fa-bookmark"></i> Marques</h3>
-            <span class="hint-text" *ngIf="mode == 'DELETE'">Cliquez sur une marque pour la supprimer</span>
-            <span class="hint-text" *ngIf="mode == 'EDIT'">Cliquez sur une marque pour la modifier</span>
+    <!-- Action Loading Overlay -->
+    <div class="action-overlay" *ngIf="isActionLoading">
+        <div class="action-spinner">
+            <div class="spinner"></div>
+            <span>Traitement en cours...</span>
+        </div>
+    </div>
+
+    <!-- Main Content (shown only when data is loaded) -->
+    <div class="page-content" *ngIf="!isLoading">
+
+        <!-- Page Header -->
+        <header class="page-header">
+            <div class="header-content">
+                <div class="header-icon">
+                    <fa-icon [icon]="faTags"></fa-icon>
+                </div>
+                <div class="header-text">
+                    <h1>Gestion des Marques</h1>
+                    <p>{{ brands?.length || 0 }} marques disponibles</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Mode Toolbar (Admin Only) -->
+        <div class="mode-toolbar" *ngIf="connectedUserRole == 'Admin'">
+            <div class="mode-buttons">
+                <button class="mode-btn" [class.active]="mode == 'SELECT'" (click)="mode = 'SELECT'">
+                    <fa-icon [icon]="faMousePointer"></fa-icon>
+                    <span>Sélectionner</span>
+                </button>
+                <button class="mode-btn edit" [class.active]="mode == 'EDIT'" (click)="mode = 'EDIT'">
+                    <fa-icon [icon]="faEdit"></fa-icon>
+                    <span>Modifier</span>
+                </button>
+                <button class="mode-btn delete" [class.active]="mode == 'DELETE'" (click)="mode = 'DELETE'">
+                    <fa-icon [icon]="faTrash"></fa-icon>
+                    <span>Supprimer</span>
+                </button>
+            </div>
+
+            <div class="mode-indicator">
+                <span class="mode-label">Mode:</span>
+                <span class="mode-value" [class.select]="mode == 'SELECT'" [class.edit]="mode == 'EDIT'"
+                    [class.delete]="mode == 'DELETE'">
+                    {{ mode == 'SELECT' ? 'Sélection' : (mode == 'EDIT' ? 'Modification' : 'Suppression') }}
+                </span>
+            </div>
         </div>
 
-        <div class="brands-grid">
-            <!-- Brand Cards -->
-            <div class="brand-card" *ngFor="let item of brands" [class.selected]="item?.id == selectedBrand?.id"
-                [class.delete-mode]="mode == 'DELETE'" [class.edit-mode]="mode == 'EDIT'" (click)="selectBrand(item)">
-                <div class="brand-icon">
-                    <i class="fa fa-tag"></i>
+        <!-- Brands Section -->
+        <div class="brands-section">
+            <div class="section-header">
+                <h3><fa-icon [icon]="faBookmark"></fa-icon> Marques</h3>
+                <span class="hint-text" *ngIf="mode == 'DELETE'">Cliquez sur une marque pour la supprimer</span>
+                <span class="hint-text" *ngIf="mode == 'EDIT'">Cliquez sur une marque pour la modifier</span>
+            </div>
+
+            <div class="brands-grid" *ngIf="brands?.length">
+                <!-- Brand Cards -->
+                <div class="brand-card" *ngFor="let item of brands" [class.selected]="item?.id == selectedBrand?.id"
+                    [class.delete-mode]="mode == 'DELETE'" [class.edit-mode]="mode == 'EDIT'"
+                    (click)="selectBrand(item)">
+                    <div class="brand-icon">
+                        <fa-icon [icon]="faTag"></fa-icon>
+                    </div>
+                    <span class="brand-name">{{ item?.name }}</span>
+                    <div class="brand-action" *ngIf="mode == 'DELETE'">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                    </div>
+                    <div class="brand-action edit" *ngIf="mode == 'EDIT'">
+                        <fa-icon [icon]="faPen"></fa-icon>
+                    </div>
                 </div>
-                <span class="brand-name">{{ item?.name }}</span>
-                <div class="brand-action" *ngIf="mode == 'DELETE'">
-                    <i class="fa fa-trash"></i>
-                </div>
-                <div class="brand-action edit" *ngIf="mode == 'EDIT'">
-                    <i class="fa fa-pen"></i>
+
+                <!-- Add Brand Card -->
+                <div class="brand-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole == 'Admin'"
+                    (click)="addBrand()">
+                    <div class="add-icon">
+                        <fa-icon [icon]="faPlus"></fa-icon>
+                    </div>
+                    <span class="add-text">Ajouter une marque</span>
                 </div>
             </div>
 
-            <!-- Add Brand Card -->
-            <div class="brand-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole == 'Admin'"
-                (click)="addBrand()">
-                <div class="add-icon">
-                    <i class="fa fa-plus"></i>
-                </div>
-                <span class="add-text">Ajouter une marque</span>
+            <!-- Empty State -->
+            <div class="empty-state" *ngIf="!brands?.length">
+                <fa-icon [icon]="faTags"></fa-icon>
+                <h3>Aucune marque disponible</h3>
+                <p>Commencez par ajouter votre première marque</p>
+                <button class="btn-add" (click)="addBrand()" *ngIf="connectedUserRole == 'Admin'">
+                    <fa-icon [icon]="faPlus"></fa-icon> Ajouter une marque
+                </button>
             </div>
-        </div>
-
-        <!-- Empty State -->
-        <div class="empty-state" *ngIf="!brands?.length">
-            <i class="fa fa-tags"></i>
-            <h3>Aucune marque disponible</h3>
-            <p>Commencez par ajouter votre première marque</p>
-            <button class="btn-add" (click)="addBrand()" *ngIf="connectedUserRole == 'Admin'">
-                <i class="fa fa-plus"></i> Ajouter une marque
-            </button>
         </div>
     </div>
 </div>

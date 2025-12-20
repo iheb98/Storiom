@@ -8,11 +8,13 @@ import * as html2pdf from 'html2pdf.js';
 
 import * as pdfMake from "pdfmake/build/pdfmake";
 import * as pdfFonts from "pdfmake/build/vfs_fonts";
-import { faAngleDoubleLeft, faBackward, faFilePdf, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDoubleLeft, faFilePdf, faPrint } from '@fortawesome/free-solid-svg-icons';
 
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StoreService } from 'src/app/core/services/store.service';
 import { environment } from 'src/environments/environment.prod';
+import Swal from 'sweetalert2';
+
 const htmlToPdfmake = require("html-to-pdfmake");
 (pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
@@ -24,43 +26,60 @@ const htmlToPdfmake = require("html-to-pdfmake");
 export class ReceiptViewComponent implements OnInit {
   @ViewChild('receiptSection')
   receiptSection!: ElementRef;
-  pdfIcon = faFilePdf
-  printIcon = faPrint
-  backIcon = faAngleDoubleLeft
-  environment = environment
+
+  // Icons
+  pdfIcon = faFilePdf;
+  printIcon = faPrint;
+  backIcon = faAngleDoubleLeft;
+
+  environment = environment;
   store;
   receiptId;
   receipt;
+
+  // Loading States
+  isLoading = true;
+
   constructor(
     private route: ActivatedRoute,
     private receiptService: ReceiptService,
     private storeService: StoreService,
     private router: Router,
-
     private authService: AuthService
   ) { }
 
-
   ngOnInit(): void {
     this.receiptId = this.route.snapshot.paramMap.get('id');
+    this.loadData();
+  }
+
+  loadData() {
+    this.isLoading = true;
+
+    // Load store
     this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
       response => {
-        this.store = response
-        console.log(this.store)
-
+        this.store = response;
       }
     );
 
-
-
-    this.receiptService.getReceipt(this.receiptId).subscribe(response => {
-      this.receipt = response
-      console.log(this.receipt)
-
-    })
+    // Load receipt
+    this.receiptService.getReceipt(this.receiptId).subscribe(
+      response => {
+        this.receipt = response;
+        this.isLoading = false;
+      },
+      error => {
+        this.isLoading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur lors du chargement de la facture',
+          showConfirmButton: false,
+          timer: 2000
+        });
+      }
+    );
   }
-
-
 
   print() {
     window.print();
@@ -75,11 +94,10 @@ export class ReceiptViewComponent implements OnInit {
       html2canvas: { scale: 2, windowWidth: 1200 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
-    console.log(content)
     html2pdf().from(content).set(options).save();
   }
 
   back() {
-    this.router.navigate(['/receipts'])
+    this.router.navigate(['/receipts']);
   }
 }

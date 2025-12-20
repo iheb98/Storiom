@@ -28,9 +28,135 @@ $radius-lg: 16px;
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
     max-width: 1400px;
     margin: 0 auto;
+    position: relative;
+    min-height: 400px;
 
     @media (max-width: 768px) {
         padding: 20px 15px;
+    }
+}
+
+// ============================================
+// LOADING SKELETON
+// ============================================
+.loading-skeleton {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.skeleton-header {
+    height: 80px;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: 20px;
+}
+
+.skeleton-actions {
+    height: 50px;
+    border-radius: $radius-sm;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: 20px;
+    width: 200px;
+}
+
+.skeleton-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.skeleton-item {
+    height: 90px;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+// ============================================
+// ACTION OVERLAY
+// ============================================
+.action-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.action-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid $border-color;
+        border-top-color: $danger;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    span {
+        font-size: 1rem;
+        color: $text-secondary;
+        font-weight: 500;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+// ============================================
+// PAGE CONTENT ANIMATION
+// ============================================
+.page-content {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
@@ -46,6 +172,27 @@ $radius-lg: 16px;
     gap: 15px;
 
     .header-content {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .header-icon {
+        width: 50px;
+        height: 50px;
+        background: $primary-light;
+        border-radius: $radius-sm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        fa-icon {
+            font-size: 1.3rem;
+            color: $primary;
+        }
+    }
+
+    .header-text {
         h1 {
             font-size: 1.8rem;
             font-weight: 700;
@@ -73,6 +220,7 @@ $radius-lg: 16px;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s;
+        box-shadow: $shadow-sm;
 
         &:hover {
             transform: translateY(-2px);
@@ -131,6 +279,7 @@ $radius-lg: 16px;
     padding: 25px;
     margin-bottom: 25px;
     transition: all 0.3s ease;
+    box-shadow: $shadow-sm;
 
     &.collapsed {
         display: none;
@@ -154,7 +303,7 @@ $radius-lg: 16px;
         color: $text-secondary;
         margin-bottom: 8px;
 
-        i {
+        fa-icon {
             color: $primary;
             font-size: 0.8rem;
         }
@@ -177,7 +326,6 @@ $radius-lg: 16px;
         }
     }
 
-    // ng-select custom styling
     ng-select {
         width: 100%;
 
@@ -346,10 +494,11 @@ $radius-lg: 16px;
     border-radius: $radius-md;
     border: 1px solid $border-color;
     transition: all 0.2s ease;
+    box-shadow: $shadow-sm;
 
     &:hover {
         border-color: $primary;
-        box-shadow: $shadow-sm;
+        box-shadow: $shadow-md;
     }
 
     @media (max-width: 768px) {
@@ -438,7 +587,7 @@ $radius-lg: 16px;
         font-size: 0.85rem;
         color: $text-secondary;
 
-        i {
+        fa-icon {
             font-size: 0.75rem;
             opacity: 0.7;
         }
@@ -542,7 +691,7 @@ $radius-lg: 16px;
     border-radius: $radius-lg;
     border: 2px dashed $border-color;
 
-    i {
+    fa-icon {
         font-size: 4rem;
         color: $text-secondary;
         margin-bottom: 20px;

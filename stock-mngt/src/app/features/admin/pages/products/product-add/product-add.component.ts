@@ -1,7 +1,11 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { faArrowLeft, faEdit, faTimes, faChartLine, faCubes, faExclamationTriangle, faEye, faInfoCircle, faTag } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowLeft, faEdit, faTimes, faChartLine, faCubes, faExclamationTriangle,
+  faEye, faInfoCircle, faTag, faFolder, faTruck, faCoins, faArrowDown,
+  faArrowUp, faAlignLeft, faImages, faCloudUploadAlt, faPlus, faSave, faBox
+} from '@fortawesome/free-solid-svg-icons';
 import { EMPTY } from 'rxjs';
 import { expand, map } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -9,7 +13,6 @@ import { BrandService } from 'src/app/core/services/brand.service';
 import { CategoryService } from 'src/app/core/services/category.service';
 import { CompressorService } from 'src/app/core/services/compressor.service';
 import { FileService } from 'src/app/core/services/file.service';
-
 import { ProductService } from 'src/app/core/services/product.service';
 import { SupplierService } from 'src/app/core/services/supplier.service';
 import { environment } from 'src/environments/environment';
@@ -21,123 +24,176 @@ import Swal from 'sweetalert2';
   styleUrls: ['./product-add.component.scss']
 })
 export class ProductAddComponent implements OnInit {
-  environment = environment
-  form: FormGroup
-  submitted: boolean
-  emailError: boolean
-  user;
-  productId
-  loading;
-  supplier;
-  suppliers = []
-  brands = []
-  colors = []
-  categories = []
-  parentCategory
-  subCategory
-  subCategory2
-  subCategory3
-  subCategory4
-  images
-  compressedImages;
-  data;
-  selectedCategory = ''
-  selectedFiles: { file: File, preview: string }[] = []
-  arrowLeftIcon = faArrowLeft;
+  environment = environment;
 
-  editIcon = faEdit
-  timesIcon = faTimes
+  // Icons
+  faArrowLeft = faArrowLeft;
+  faEdit = faEdit;
+  faTimes = faTimes;
   faChartLine = faChartLine;
   faCubes = faCubes;
   faExclamationTriangle = faExclamationTriangle;
   faEye = faEye;
   faInfoCircle = faInfoCircle;
   faTag = faTag;
+  faFolder = faFolder;
+  faTruck = faTruck;
+  faCoins = faCoins;
+  faArrowDown = faArrowDown;
+  faArrowUp = faArrowUp;
+  faAlignLeft = faAlignLeft;
+  faImages = faImages;
+  faCloudUploadAlt = faCloudUploadAlt;
+  faPlus = faPlus;
+  faSave = faSave;
+  faBox = faBox;
 
+  // Loading States
+  isLoading = true;
+  isSubmitting = false;
 
-  edit
-  editCategory
-  product
+  // Form
+  form: FormGroup;
+  submitted = false;
+  emailError = false;
+
+  // Data
+  user: any;
+  productId: string;
+  product: any;
+  suppliers: any[] = [];
+  brands: any[] = [];
+  colors: any[] = [];
+  categories: any[] = [];
+
+  // Category hierarchy
+  parentCategory: any;
+  subCategory: any;
+  subCategory2: any;
+  subCategory3: any;
+  subCategory4: any;
+
+  // Images
+  images: string[] = [];
+  compressedImages: any[] = [];
+  data: any;
+  selectedCategory = '';
+  selectedFiles: { file: File, preview: string }[] = [];
+
+  // Edit mode
+  edit = false;
+  editCategory = false;
+
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
 
-
-  constructor(private router: Router,
+  constructor(
+    private router: Router,
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private supplierService: SupplierService,
     private categoryService: CategoryService,
     private productService: ProductService,
     private route: ActivatedRoute,
-
     private fileService: FileService,
     private brandService: BrandService,
-    private compressor: CompressorService) { }
+    private compressor: CompressorService
+  ) { }
 
   ngOnInit(): void {
-    this.editCategory = false
-    this.loading = false;
+    this.editCategory = false;
     this.initForm();
-    this.colors = environment.couleurs
+    this.colors = environment.couleurs;
     this.user = this.authService.getConnectedUser();
+
     this.route.paramMap.subscribe(paramMap => {
       this.productId = paramMap.get('id');
-    })
-    this.getSuppliers();
-    this.getBrands();
-    this.getCategories();
-    if (this.productId) {
-      this.edit = true;
-      this.productService.getProduct(this.productId).subscribe(
+      this.loadInitialData();
+    });
+  }
+
+  loadInitialData() {
+    this.isLoading = true;
+
+    // Load all required data
+    Promise.all([
+      this.getSuppliers(),
+      this.getBrands(),
+      this.getCategories()
+    ]).then(() => {
+      if (this.productId) {
+        this.edit = true;
+        this.loadProduct();
+      } else {
+        this.isLoading = false;
+      }
+    });
+  }
+
+  getSuppliers(): Promise<void> {
+    return new Promise((resolve) => {
+      this.supplierService.getAllSuppliersByStoreId(this.authService.getConnectedUser()?.store).subscribe(
         response => {
-          this.product = response
-          this.form.get('name').setValue(response?.name)
-          this.form.get('description').setValue(response?.description)
-          this.form.get('buyingPrice').setValue(response?.buyingPrice)
-          this.form.get('brandId').setValue(response?.brand?.id)
-          this.form.get('categoryId').setValue(response?.category?.id)
-          this.form.get('sellingPrice').setValue(response?.sellingPrice)
-          this.form.get('quantity').setValue(response?.quantity)
-          this.form.get('color').setValue(response?.color)
-          this.form.get('supplierId').setValue(response?.supplier?.id)
-          this.form.get('size').setValue(response?.size)
-          this.form.get('toDisplay').setValue(response?.toDisplay)
-          //this.findParentCategories(response?.category?.id)
-
-          this.images = response?.images
-        })
-    }
-
+          this.suppliers = response;
+          resolve();
+        },
+        error => resolve()
+      );
+    });
   }
 
-  getSuppliers() {
-
-    this.supplierService.getAllSuppliersByStoreId(this.authService.getConnectedUser()?.store).subscribe(
-      response => {
-
-        this.suppliers = response
-      }
-    )
+  getBrands(): Promise<void> {
+    return new Promise((resolve) => {
+      this.brandService.getBrandsByStoreId(this.authService.getConnectedUser()?.store).subscribe(
+        response => {
+          this.brands = response;
+          resolve();
+        },
+        error => resolve()
+      );
+    });
   }
 
-
-  getBrands() {
-
-    this.brandService.getBrandsByStoreId(this.authService.getConnectedUser()?.store).subscribe(
-      response => {
-
-        this.brands = response
-      }
-    )
+  getCategories(): Promise<void> {
+    return new Promise((resolve) => {
+      this.categoryService.getFlatCategoriesByStoreId(this.authService.getConnectedUser()?.store).subscribe(
+        response => {
+          this.categories = response;
+          resolve();
+        },
+        error => resolve()
+      );
+    });
   }
 
-  getCategories() {
-
-    this.categoryService.getFlatCategoriesByStoreId(this.authService.getConnectedUser()?.store).subscribe(
+  loadProduct() {
+    this.productService.getProduct(this.productId).subscribe(
       response => {
-
-        this.categories = response
+        this.product = response;
+        this.form.get('name').setValue(response?.name);
+        this.form.get('description').setValue(response?.description);
+        this.form.get('buyingPrice').setValue(response?.buyingPrice);
+        this.form.get('brandId').setValue(response?.brand?.id);
+        this.form.get('categoryId').setValue(response?.category?.id);
+        this.form.get('sellingPrice').setValue(response?.sellingPrice);
+        this.form.get('quantity').setValue(response?.quantity);
+        this.form.get('color').setValue(response?.color);
+        this.form.get('supplierId').setValue(response?.supplier?.id);
+        this.form.get('size').setValue(response?.size);
+        this.form.get('toDisplay').setValue(response?.toDisplay);
+        this.form.get('criticalStockIndicator').setValue(response?.criticalStockIndicator);
+        this.images = response?.images || [];
+        this.isLoading = false;
+      },
+      error => {
+        this.isLoading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur lors du chargement du produit',
+          showConfirmButton: false,
+          timer: 2000
+        });
       }
-    )
+    );
   }
 
   initForm() {
@@ -167,7 +223,6 @@ export class ProductAddComponent implements OnInit {
     const imageNames = [];
     let counter = 1;
 
-    // Get files from selectedFiles array
     const filesToUpload = this.selectedFiles.map(sf => sf.file);
 
     if ((this.images?.length || 0) + filesToUpload.length > 3) {
@@ -176,42 +231,54 @@ export class ProductAddComponent implements OnInit {
         title: 'Vous pouvez selectionnez seulement 3 images',
         showConfirmButton: false,
         timer: 1500
-      })
-      return
+      });
+      return;
     }
 
     for (let item of filesToUpload) {
-      fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + (counter++) + item?.name.substring(item.name.lastIndexOf('.'))
-      imageNames.push(fileName)
+      fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + (counter++) + item?.name.substring(item.name.lastIndexOf('.'));
+      imageNames.push(fileName);
     }
 
     if (this.form.valid) {
-
+      this.isSubmitting = true;
       this.uploadFilesFromArray(filesToUpload, imageNames).subscribe(
         response => {
           const filenames = response.files.map(file => file.location.split('/').pop());
-          this.form.get('images').setValue(filenames)
+          this.form.get('images').setValue(filenames);
           this.productService.addProduct({ ...this.form.getRawValue(), storeId: this.user?.store })
-            .subscribe(response => {
-
-              Swal.fire({
-                icon: 'success',
-                title: 'Produit ajouté !',
-                showConfirmButton: false,
-                timer: 1500
-              })
-              this.router.navigate(['products'])
-            }, error => {
-
-              Swal.fire({
-                icon: 'error',
-                title: 'Une erreur est survenue ! Merci de réessayer plus tard',
-                showConfirmButton: false,
-                timer: 1500
-              })
-            })
+            .subscribe(
+              response => {
+                this.isSubmitting = false;
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Produit ajouté !',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+                this.router.navigate(['products']);
+              },
+              error => {
+                this.isSubmitting = false;
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              }
+            );
+        },
+        error => {
+          this.isSubmitting = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur lors du téléchargement des images',
+            showConfirmButton: false,
+            timer: 1500
+          });
         }
-      )
+      );
     }
   }
 
@@ -219,9 +286,8 @@ export class ProductAddComponent implements OnInit {
     this.submitted = true;
     this.emailError = false;
 
-    // Get files from selectedFiles array
     const filesToUpload = this.selectedFiles.map(sf => sf.file);
-    const newImageNames = []
+    const newImageNames = [];
     let counter = 1;
     let fileName = null;
 
@@ -231,134 +297,137 @@ export class ProductAddComponent implements OnInit {
         title: 'Vous pouvez selectionnez seulement 3 images',
         showConfirmButton: false,
         timer: 1500
-      })
-      return
+      });
+      return;
     }
 
     for (let item of filesToUpload) {
-      fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + (counter++) + item?.name.substring(item.name.lastIndexOf('.'))
-      newImageNames.push(fileName)
+      fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + (counter++) + item?.name.substring(item.name.lastIndexOf('.'));
+      newImageNames.push(fileName);
     }
 
     if (this.form.valid) {
-
+      this.isSubmitting = true;
       this.uploadFilesFromArray(filesToUpload, newImageNames).subscribe(
         response => {
           const filenames = response.files.map(file => file.location.split('/').pop());
-          this.form.get('images').setValue([...this.images, ...filenames])
+          this.form.get('images').setValue([...this.images, ...filenames]);
           this.productService.updateProduct({ ...this.form.getRawValue(), storeId: this.user?.store, id: this.product?.id })
-            .subscribe(response => {
-
-              Swal.fire({
-                icon: 'success',
-                title: 'Produit modifié !',
-                showConfirmButton: false,
-                timer: 1500
-              })
-              this.router.navigate(['products'])
-            }, error => {
-
-              Swal.fire({
-                icon: 'error',
-                title: 'Une erreur est survenue ! Merci de réessayer plus tard',
-                showConfirmButton: false,
-                timer: 1500
-              })
-            })
+            .subscribe(
+              response => {
+                this.isSubmitting = false;
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Produit modifié !',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+                this.router.navigate(['products']);
+              },
+              error => {
+                this.isSubmitting = false;
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              }
+            );
+        },
+        error => {
+          this.isSubmitting = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur lors du téléchargement des images',
+            showConfirmButton: false,
+            timer: 1500
+          });
         }
-      )
+      );
     }
   }
 
   getLastCategory() {
-    if (this.subCategory4)
-      return this.subCategory4
-    if (this.subCategory3)
-      return this.subCategory3
-    if (this.subCategory2)
-      return this.subCategory2
-    if (this.subCategory)
-      return this.subCategory
-    if (this.parentCategory)
-      return this.parentCategory
+    if (this.subCategory4) return this.subCategory4;
+    if (this.subCategory3) return this.subCategory3;
+    if (this.subCategory2) return this.subCategory2;
+    if (this.subCategory) return this.subCategory;
+    if (this.parentCategory) return this.parentCategory;
   }
 
-  findParentCategories(id) {
+  findParentCategories(id: number) {
     this.categoryService.getParentCategory(id).subscribe(response => {
-      this.getSelectedCategory(response)
-      return response
-    })
+      this.getSelectedCategory(response);
+      return response;
+    });
   }
 
-  getSelectedCategory(category) {
-    this.selectedCategory = category?.name
+  getSelectedCategory(category: any) {
+    this.selectedCategory = category?.name;
     if (category?.parentCategory) {
-      this.selectedCategory = category?.parentCategory?.name + ' > ' + this.selectedCategory
+      this.selectedCategory = category?.parentCategory?.name + ' > ' + this.selectedCategory;
       if (category?.parentCategory?.parentCategory) {
-        this.selectedCategory = category?.parentCategory?.parentCategory?.name + ' > ' + this.selectedCategory
+        this.selectedCategory = category?.parentCategory?.parentCategory?.name + ' > ' + this.selectedCategory;
         if (category?.parentCategory?.parentCategory?.parentCategory) {
-          this.selectedCategory = category?.parentCategory?.parentCategory?.parentCategory?.name + ' > ' + this.selectedCategory
+          this.selectedCategory = category?.parentCategory?.parentCategory?.parentCategory?.name + ' > ' + this.selectedCategory;
           if (category?.parentCategory?.parentCategory?.parentCategory?.parentCategory) {
-            this.selectedCategory = category?.parentCategory?.parentCategory?.parentCategory?.parentCategory?.name + ' > ' + this.selectedCategory
+            this.selectedCategory = category?.parentCategory?.parentCategory?.parentCategory?.parentCategory?.name + ' > ' + this.selectedCategory;
           }
         }
       }
     }
   }
 
-
-  categoryChanged(categoryDepth) {
+  categoryChanged(categoryDepth: number) {
     if (categoryDepth == 0) {
-      this.subCategory = null
-      this.subCategory2 = null
-      this.subCategory3 = null
-      this.subCategory4 = null
+      this.subCategory = null;
+      this.subCategory2 = null;
+      this.subCategory3 = null;
+      this.subCategory4 = null;
     } else if (categoryDepth == 1) {
-      this.subCategory2 = null
-      this.subCategory3 = null
-      this.subCategory4 = null
+      this.subCategory2 = null;
+      this.subCategory3 = null;
+      this.subCategory4 = null;
     } else if (categoryDepth == 2) {
-      this.subCategory3 = null
-      this.subCategory4 = null
+      this.subCategory3 = null;
+      this.subCategory4 = null;
     } else if (categoryDepth == 3) {
-      this.subCategory4 = null
+      this.subCategory4 = null;
     }
-
   }
 
-
-  deleteImage(item) {
-    this.images = this.images.filter(element => element != item)
+  deleteImage(item: string) {
+    this.images = this.images.filter(element => element != item);
   }
 
   removeSelectedFile(index: number) {
-    this.selectedFiles.splice(index, 1)
+    this.selectedFiles.splice(index, 1);
   }
 
-  uploadImages(FilesToUpload, images) {
+  uploadImages(FilesToUpload: File[], images: string[]) {
     const files = new FormData();
     for (let i = 0; i < FilesToUpload?.length; i++) {
-      files.append('file', FilesToUpload[i], images[i])
+      files.append('file', FilesToUpload[i], images[i]);
     }
-    return this.fileService.uploadMultiple(files)
+    return this.fileService.uploadMultiple(files);
   }
 
   uploadFilesFromArray(filesToUpload: File[], imageNames: string[]) {
     const formData = new FormData();
     for (let i = 0; i < filesToUpload.length; i++) {
-      formData.append('file', filesToUpload[i], imageNames[i])
+      formData.append('file', filesToUpload[i], imageNames[i]);
     }
-    return this.fileService.uploadMultiple(formData)
+    return this.fileService.uploadMultiple(formData);
   }
 
-  navigateTo(link) {
-    this.router.navigate([link])
+  navigateTo(link: string) {
+    this.router.navigate([link]);
   }
 
-  recursiveCompress = (image: File, index, array) => {
+  recursiveCompress = (image: File, index: number, array: File[]) => {
     return this.compressor.compress(image).pipe(
       map(response => {
-        console.log('compressed ' + index + image.name);
         this.compressedImages.push(response);
         return {
           data: response,
@@ -369,12 +438,10 @@ export class ProductAddComponent implements OnInit {
     );
   }
 
-  public process(event) {
+  public process(event: any) {
     this.data = event.target.files;
     this.compressedImages = [];
-    console.log('input: ' + this.data);
 
-    // Add files to selectedFiles array with previews
     const currentCount = (this.images?.length || 0) + this.selectedFiles.length;
     const maxAllowed = 3 - currentCount;
 
@@ -399,7 +466,6 @@ export class ProductAddComponent implements OnInit {
       });
     }
 
-    // Reset file input
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
     }
@@ -413,7 +479,7 @@ export class ProductAddComponent implements OnInit {
     );
     compress.subscribe(res => {
       if (res.index > res.array.length - 1) {
-        console.log('Compression successful ' + this.compressedImages);
+        console.log('Compression successful');
       }
     });
   }
