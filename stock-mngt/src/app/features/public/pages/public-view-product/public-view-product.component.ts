@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { ProductService } from 'src/app/core/services/product.service';
 import { PublicService } from 'src/app/core/services/public.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CartService } from 'src/app/core/services/cart.service';
 import { ToastService } from 'src/app/core/services/toast.service';
@@ -52,7 +52,7 @@ export class PublicViewProductComponent implements OnInit {
     private route: ActivatedRoute,
     private productService: ProductService,
     private publicService: PublicService,
-    private loadingService: LoadingService,
+
     private cartService: CartService,
     private authService: AuthService,
     private toastService: ToastService
@@ -66,9 +66,9 @@ export class PublicViewProductComponent implements OnInit {
   }
 
   loadProduct(id: string) {
-    //this.loadingService.screenLoading();
+    //
     this.publicService.getPublicProduct(id).subscribe(res => {
-      //this.loadingService.screenLoaded();
+      //
       this.product = res;
       this.calculateAverageRating();
 
@@ -91,7 +91,7 @@ export class PublicViewProductComponent implements OnInit {
         this.selectedImage = 'assets/default_product.png';
       }
     }, () => {
-      //this.loadingService.screenLoaded();
+      //
     });
   }
 

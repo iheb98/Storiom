@@ -7,7 +7,7 @@ import {
   faArrowDown, faArrowUp, faCoins, faExclamationTriangle, faImages, faSearchPlus, faImage
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { ProductService } from 'src/app/core/services/product.service';
 import { StatService } from 'src/app/core/services/stat.service';
 import { environment } from 'src/environments/environment';
@@ -64,7 +64,7 @@ export class ProductViewComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private statService: StatService,
-    private loadingService: LoadingService,
+
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
@@ -262,10 +262,10 @@ export class ProductViewComponent implements OnInit {
         filterValue = year + '-' + month
         break;
     }
-    this.loadingService.screenLoading();
+
     this.statService.getOperationStatsPerProduct(this.user?.store, this.selectedDateType, filterValue, this.id).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.operations = response;
         if (this.selectedDateType == "Quotidien") {
           this.getQuotidien();
@@ -275,7 +275,7 @@ export class ProductViewComponent implements OnInit {
           this.getMensuel();
         }
       }, error => {
-        this.loadingService.screenLoaded()
+
         Swal.fire({
           icon: 'error',
           title: 'Une erreur est survenue ! Merci de réessayer plus tard',

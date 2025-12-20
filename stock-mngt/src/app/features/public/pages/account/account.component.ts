@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { Router } from '@angular/router';
 
 @Component({
@@ -16,7 +16,7 @@ export class AccountComponent implements OnInit {
 
     constructor(
         private authService: AuthService,
-        private loadingService: LoadingService,
+
         private router: Router
     ) { }
 
@@ -27,16 +27,16 @@ export class AccountComponent implements OnInit {
     loadUserProfile() {
         const connectedUser = this.authService.getConnectedUser();
         if (connectedUser && connectedUser.id) {
-            this.loadingService.screenLoading();
+
             this.authService.getUser(connectedUser.id).subscribe({
                 next: (res) => {
                     this.user = res;
-                    this.loadingService.screenLoaded();
+
                     this.isLoading = false;
                 },
                 error: (err) => {
                     console.error(err);
-                    this.loadingService.screenLoaded();
+
                     this.isLoading = false;
                 }
             });

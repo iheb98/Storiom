@@ -4,7 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { faEdit, faTrash, faEye, faArrowUp, faArrowDown, faPen, } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CategoryService } from 'src/app/core/services/category.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { ProductService } from 'src/app/core/services/product.service';
 import { QueryService } from 'src/app/core/services/query.service';
 import { ReceiptService } from 'src/app/core/services/receipt.service';
@@ -67,7 +67,7 @@ export class ProductsMngtComponent implements OnInit {
     private supplierService: SupplierService,
     private categoryService: CategoryService,
     private authService: AuthService,
-    private loadingService: LoadingService,
+
     private router: Router,
     private route: ActivatedRoute,
     private queryService: QueryService,
@@ -113,33 +113,33 @@ export class ProductsMngtComponent implements OnInit {
   }
 
   getSuppliers() {
-    //this.loadingService.screenLoading()
+    //
     this.supplierService.getAllSuppliersByStoreId(this.authService.getConnectedUser()?.store).subscribe(
       response => {
-        //this.loadingService.screenLoaded()
+        //
         this.suppliers = response
       },
       error => {
-        this.loadingService.screenLoaded()
+
       }
     )
   }
 
   getCategories() {
-    //this.loadingService.screenLoading()
+    //
     this.categoryService.getFlatCategoriesByStoreId(this.authService.getConnectedUser()?.store).subscribe(
       response => {
-        //this.loadingService.screenLoaded()
+        //
         this.categories = response
       },
       error => {
-        this.loadingService.screenLoaded()
+
       }
     )
   }
 
   getProducts(page, size) {
-    this.loadingService.screenLoading()
+
     this.productService.getProductsByStoreId(this.authService.getConnectedUser()?.store, {
       page,
       size,
@@ -147,22 +147,22 @@ export class ProductsMngtComponent implements OnInit {
       critical: this.isCriticalFilter
     }).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.products = response
       },
       error => {
-        this.loadingService.screenLoaded()
+
       }
     )
   }
 
   countProducts() {
-    //this.loadingService.screenLoading()
+    //
     this.productService.countProductsByStoreId(this.authService.getConnectedUser()?.store, {
       query: this.buildQuery(),
       critical: this.isCriticalFilter
     }).subscribe(response => {
-      //this.loadingService.screenLoaded()
+      //
       this.count = response;
     })
   }
@@ -172,7 +172,7 @@ export class ProductsMngtComponent implements OnInit {
   }
 
   reset() {
-    this.loadingService.screenLoaded()
+
   }
 
   filter() {
@@ -237,9 +237,9 @@ export class ProductsMngtComponent implements OnInit {
       confirmButtonText: 'Supprimer',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.loadingService.screenLoading()
+
         this.productService.deleteProduct(product.id).subscribe(response => {
-          this.loadingService.screenLoaded()
+
           Swal.fire({
             icon: 'success',
             title: 'Produit supprimé !',
@@ -263,25 +263,25 @@ export class ProductsMngtComponent implements OnInit {
 
   search() {
     console.log(this.searchable)
-    this.loadingService.screenLoading()
+
     this.productService.getProductsByStoreId(this.authService.getConnectedUser()?.store, {
       page: this.currentPage,
       size: this.currentSize,
       searchable: this.searchable,
     }).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.products = response
       },
       error => {
-        this.loadingService.screenLoaded()
+
       }
     )
-    this.loadingService.screenLoading()
+
     this.productService.countProductsByStoreId(this.authService.getConnectedUser()?.store, {
       searchable: this.searchable,
     }).subscribe(response => {
-      this.loadingService.screenLoaded()
+
       this.count = response;
     })
   }
@@ -339,7 +339,7 @@ export class ProductsMngtComponent implements OnInit {
       confirmButtonColor: toDisplay ? '#28a745' : '#dc3545'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.loadingService.screenLoading();
+
 
         this.productService.bulkUpdateVisibility({
           ids: this.selectedIds,
@@ -348,7 +348,7 @@ export class ProductsMngtComponent implements OnInit {
           storeId: this.authService.getConnectedUser()?.store
         }).subscribe(
           response => {
-            this.loadingService.screenLoaded();
+
             Swal.fire({
               icon: 'success',
               title: response.message || 'Mise à jour réussie!',
@@ -359,7 +359,7 @@ export class ProductsMngtComponent implements OnInit {
             this.getProducts(this.currentPage, this.currentSize);
           },
           error => {
-            this.loadingService.screenLoaded();
+
             Swal.fire({
               icon: 'error',
               title: 'Erreur',

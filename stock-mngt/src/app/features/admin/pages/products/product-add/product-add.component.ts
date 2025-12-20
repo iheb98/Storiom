@@ -9,7 +9,7 @@ import { BrandService } from 'src/app/core/services/brand.service';
 import { CategoryService } from 'src/app/core/services/category.service';
 import { CompressorService } from 'src/app/core/services/compressor.service';
 import { FileService } from 'src/app/core/services/file.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { ProductService } from 'src/app/core/services/product.service';
 import { SupplierService } from 'src/app/core/services/supplier.service';
 import { environment } from 'src/environments/environment';
@@ -68,7 +68,7 @@ export class ProductAddComponent implements OnInit {
     private categoryService: CategoryService,
     private productService: ProductService,
     private route: ActivatedRoute,
-    private loadingService: LoadingService,
+
     private fileService: FileService,
     private brandService: BrandService,
     private compressor: CompressorService) { }
@@ -110,10 +110,10 @@ export class ProductAddComponent implements OnInit {
   }
 
   getSuppliers() {
-    this.loadingService.screenLoading()
+
     this.supplierService.getAllSuppliersByStoreId(this.authService.getConnectedUser()?.store).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.suppliers = response
       }
     )
@@ -121,20 +121,20 @@ export class ProductAddComponent implements OnInit {
 
 
   getBrands() {
-    this.loadingService.screenLoading()
+
     this.brandService.getBrandsByStoreId(this.authService.getConnectedUser()?.store).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.brands = response
       }
     )
   }
 
   getCategories() {
-    this.loadingService.screenLoading()
+
     this.categoryService.getFlatCategoriesByStoreId(this.authService.getConnectedUser()?.store).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.categories = response
       }
     )
@@ -186,14 +186,14 @@ export class ProductAddComponent implements OnInit {
     }
 
     if (this.form.valid) {
-      this.loadingService.screenLoading()
+
       this.uploadFilesFromArray(filesToUpload, imageNames).subscribe(
         response => {
           const filenames = response.files.map(file => file.location.split('/').pop());
           this.form.get('images').setValue(filenames)
           this.productService.addProduct({ ...this.form.getRawValue(), storeId: this.user?.store })
             .subscribe(response => {
-              this.loadingService.screenLoaded()
+
               Swal.fire({
                 icon: 'success',
                 title: 'Produit ajouté !',
@@ -202,7 +202,7 @@ export class ProductAddComponent implements OnInit {
               })
               this.router.navigate(['products'])
             }, error => {
-              this.loadingService.screenLoaded()
+
               Swal.fire({
                 icon: 'error',
                 title: 'Une erreur est survenue ! Merci de réessayer plus tard',
@@ -241,14 +241,14 @@ export class ProductAddComponent implements OnInit {
     }
 
     if (this.form.valid) {
-      this.loadingService.screenLoading()
+
       this.uploadFilesFromArray(filesToUpload, newImageNames).subscribe(
         response => {
           const filenames = response.files.map(file => file.location.split('/').pop());
           this.form.get('images').setValue([...this.images, ...filenames])
           this.productService.updateProduct({ ...this.form.getRawValue(), storeId: this.user?.store, id: this.product?.id })
             .subscribe(response => {
-              this.loadingService.screenLoaded()
+
               Swal.fire({
                 icon: 'success',
                 title: 'Produit modifié !',
@@ -257,7 +257,7 @@ export class ProductAddComponent implements OnInit {
               })
               this.router.navigate(['products'])
             }, error => {
-              this.loadingService.screenLoaded()
+
               Swal.fire({
                 icon: 'error',
                 title: 'Une erreur est survenue ! Merci de réessayer plus tard',

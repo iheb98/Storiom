@@ -10,7 +10,7 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { BrandService } from 'src/app/core/services/brand.service';
 import { CategoryService } from 'src/app/core/services/category.service';
 import { FileService } from 'src/app/core/services/file.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { ProductService } from 'src/app/core/services/product.service';
 import { ReceiptService } from 'src/app/core/services/receipt.service';
 import { SupplierService } from 'src/app/core/services/supplier.service';
@@ -40,7 +40,7 @@ export class ReceiptAddComponent implements OnInit {
   currentSize = 10;
 
   constructor(
-    private loadingService: LoadingService,
+
     private authService: AuthService,
     private supplierService: SupplierService,
     private formBuilder: FormBuilder,
@@ -64,7 +64,7 @@ export class ReceiptAddComponent implements OnInit {
       if (result) {
         this.selectedProducts = result?.selectedProducts
         this.calculateTotal()
-        //this.loadingService.screenLoading()
+        //
       }
     });
   }
@@ -84,7 +84,7 @@ export class ReceiptAddComponent implements OnInit {
       if (result) {
         this.selectedProducts = result?.selectedProducts
         this.calculateTotal()
-        //this.loadingService.screenLoading()
+        //
       }
     });
   }
@@ -102,10 +102,10 @@ export class ReceiptAddComponent implements OnInit {
   }
 
   getSuppliers() {
-    this.loadingService.screenLoading()
+
     this.supplierService.getAllSuppliersByStoreId(this.authService.getConnectedUser()?.store).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.suppliers = response
       }
     )
@@ -123,7 +123,7 @@ export class ReceiptAddComponent implements OnInit {
           confirmButtonText: 'Continuer',
         }).then((result) => {
           if (result.isConfirmed) {
-            this.loadingService.screenLoading()
+
             let form = this.form.getRawValue();
             let newReceipt = {
               type: form.type,
@@ -135,7 +135,7 @@ export class ReceiptAddComponent implements OnInit {
               storeId: this.authService.getConnectedUser()?.store
             }
             this.receiptService.addReceipt(newReceipt).subscribe(response => {
-              this.loadingService.screenLoaded()
+
               Swal.fire({
                 icon: 'success',
                 title: 'Facture créée !',
@@ -147,7 +147,7 @@ export class ReceiptAddComponent implements OnInit {
           }
         })
       else if (this.form.get('type').value == 'SOLD') {
-        this.loadingService.screenLoading()
+
         let form = this.form.getRawValue();
         let newReceipt = {
           type: form.type,
@@ -159,7 +159,7 @@ export class ReceiptAddComponent implements OnInit {
           storeId: this.authService.getConnectedUser()?.store
         }
         this.receiptService.addReceipt(newReceipt).subscribe(response => {
-          this.loadingService.screenLoaded()
+
           Swal.fire({
             icon: 'success',
             title: 'Facture créée !',
@@ -170,7 +170,7 @@ export class ReceiptAddComponent implements OnInit {
         })
       }
       else {
-        this.loadingService.screenLoading()
+
         let form = this.form.getRawValue();
         let newReceipt = {
           type: form.type,
@@ -182,7 +182,7 @@ export class ReceiptAddComponent implements OnInit {
           storeId: this.authService.getConnectedUser()?.store
         }
         this.receiptService.addReceipt(newReceipt).subscribe(response => {
-          this.loadingService.screenLoaded()
+
           Swal.fire({
             icon: 'success',
             title: 'Facture créée !',

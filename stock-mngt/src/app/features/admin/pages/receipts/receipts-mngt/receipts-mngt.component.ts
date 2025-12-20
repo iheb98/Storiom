@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { faEdit, faFilePdf, faEye, faPrint, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { ReceiptService } from 'src/app/core/services/receipt.service';
 import { SupplierService } from 'src/app/core/services/supplier.service';
 import { ElementRef, ViewChild } from '@angular/core';
@@ -58,7 +58,7 @@ export class ReceiptsMngtComponent implements OnInit {
 
   constructor(
     private supplierService: SupplierService,
-    private loadingService: LoadingService,
+
     private authService: AuthService,
     private receiptService: ReceiptService,
     private storeService: StoreService,
@@ -80,45 +80,45 @@ export class ReceiptsMngtComponent implements OnInit {
 
 
   getSuppliers() {
-    this.loadingService.screenLoading()
+
     this.supplierService.getAllSuppliersByStoreId(this.authService.getConnectedUser()?.store).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.suppliers = response
         console.log(this.suppliers)
       },
       error => {
-        this.loadingService.screenLoaded()
+
       }
     )
   }
   getReceipts(page, size) {
-    this.loadingService.screenLoading()
+
     this.receiptService.getReceiptsByStoreId(this.authService.getConnectedUser()?.store, {
       page,
       size,
       query: this.buildQuery(),
     }).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.receipts = response
       },
       error => {
-        this.loadingService.screenLoaded()
+
       }
     )
   }
 
   countReceipts() {
-    this.loadingService.screenLoading()
+
     this.receiptService.countReceiptsByStoreId(this.authService.getConnectedUser()?.store, {
       query: this.buildQuery()
     }).subscribe(response => {
-      this.loadingService.screenLoaded()
+
       this.count = response;
     },
       error => {
-        this.loadingService.screenLoaded()
+
       })
   }
 
@@ -181,9 +181,9 @@ export class ReceiptsMngtComponent implements OnInit {
       confirmButtonText: 'Supprimer',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.loadingService.screenLoading()
+
         this.receiptService.deleteReceipt(receipt.id).subscribe(response => {
-          this.loadingService.screenLoaded();
+
           Swal.fire({
             icon: 'success',
             title: 'Facture supprimée !',
@@ -205,7 +205,7 @@ export class ReceiptsMngtComponent implements OnInit {
   @ViewChild('printingInvoice') printingInvoice!: ElementRef;
 
   downloadAsPDF(id) {
-    //this.loadingService.screenLoading();
+    //
     this.receiptService.getReceipt(id).subscribe(receipt => {
       this.printingReceipt = receipt;
 
@@ -227,24 +227,24 @@ export class ReceiptsMngtComponent implements OnInit {
             .save()
             .then(() => {
               this.printingReceipt = null; // Cleanup
-              this.loadingService.screenLoaded();
+
             })
             .catch((err) => {
               console.error("PDF Generation Error:", err);
               this.printingReceipt = null;
-              this.loadingService.screenLoaded();
+
               Swal.fire('Erreur', 'Erreur lors de la génération du PDF.', 'error');
             });
         } catch (e) {
           console.error("PDF Setup Error:", e);
           this.printingReceipt = null;
-          this.loadingService.screenLoaded();
+
           Swal.fire('Erreur', 'Erreur lors de la préparation du PDF.', 'error');
         }
       }, 500); // 500ms delay to ensure rendering
     }, error => {
       console.error("Receipt Fetch Error:", error);
-      this.loadingService.screenLoaded();
+
       Swal.fire('Erreur', 'Impossible de charger la facture.', 'error');
     })
   }

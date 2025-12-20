@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PublicService } from 'src/app/core/services/public.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { environment } from 'src/environments/environment';
 import { TUNISIA_LOCATIONS, getAllGovernorates, getCitiesForGovernorate, getAllCities } from 'src/app/shared/data/tunisia-locations';
 import {
@@ -64,7 +64,7 @@ export class StoresListComponent implements OnInit {
 
     constructor(
         private publicService: PublicService,
-        private loadingService: LoadingService
+
     ) { }
 
     ngOnInit(): void {
@@ -77,15 +77,15 @@ export class StoresListComponent implements OnInit {
     }
 
     getAllStores() {
-        this.loadingService.screenLoading();
+
         this.publicService.getAllStores().subscribe(res => {
             this.stores = res;
             this.filteredStores = res;
             this.extractAvailableTypes();
-            this.loadingService.screenLoaded();
+
         }, (err) => {
             console.error(err);
-            this.loadingService.screenLoaded();
+
         });
     }
 

@@ -9,7 +9,7 @@ import * as html2pdf from 'html2pdf.js';
 import * as pdfMake from "pdfmake/build/pdfmake";
 import * as pdfFonts from "pdfmake/build/vfs_fonts";
 import { faAngleDoubleLeft, faBackward, faFilePdf, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StoreService } from 'src/app/core/services/store.service';
 import { environment } from 'src/environments/environment.prod';
@@ -36,7 +36,7 @@ export class ReceiptViewComponent implements OnInit {
     private receiptService: ReceiptService,
     private storeService: StoreService,
     private router: Router,
-    private loadingService: LoadingService,
+
     private authService: AuthService
   ) { }
 
@@ -52,11 +52,11 @@ export class ReceiptViewComponent implements OnInit {
     );
 
 
-    this.loadingService.screenLoading()
+
     this.receiptService.getReceipt(this.receiptId).subscribe(response => {
       this.receipt = response
       console.log(this.receipt)
-      this.loadingService.screenLoaded()
+
     })
   }
 

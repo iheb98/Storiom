@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
 import { OrderService } from 'src/app/core/services/order.service';
 import { StoreService } from 'src/app/core/services/store.service';
 import { environment } from 'src/environments/environment';
@@ -49,11 +48,11 @@ export class OrdersMngtComponent implements OnInit {
         private orderService: OrderService,
         private authService: AuthService,
         private storeService: StoreService,
-        private loadingService: LoadingService
+
     ) { }
 
     ngOnInit(): void {
-        this.loadingService.screenLoading();
+
         const user = this.authService.getConnectedUser();
 
         if (user?.store) {
@@ -62,7 +61,7 @@ export class OrdersMngtComponent implements OnInit {
                 this.loadOrders();
             });
         } else {
-            this.loadingService.screenLoaded();
+
         }
     }
 
@@ -71,11 +70,11 @@ export class OrdersMngtComponent implements OnInit {
             (res) => {
                 this.orders = res;
                 this.applyFilter();
-                this.loadingService.screenLoaded();
+
             },
             (err) => {
                 console.error(err);
-                this.loadingService.screenLoaded();
+
             }
         );
     }
@@ -117,7 +116,7 @@ export class OrdersMngtComponent implements OnInit {
             confirmButtonColor: this.getStatusHexColor(status)
         }).then((result) => {
             if (result.isConfirmed) {
-                this.loadingService.screenLoading();
+
                 this.orderService.updateOrderStatus(order.id, status).subscribe(
                     (res) => {
                         if (res.success) {
@@ -131,7 +130,7 @@ export class OrdersMngtComponent implements OnInit {
                                 timer: 1500
                             });
                         }
-                        this.loadingService.screenLoaded();
+
                     },
                     (err) => {
                         console.error(err);
@@ -140,7 +139,7 @@ export class OrdersMngtComponent implements OnInit {
                             title: 'Erreur',
                             text: 'Impossible de mettre à jour le statut'
                         });
-                        this.loadingService.screenLoaded();
+
                     }
                 );
             }

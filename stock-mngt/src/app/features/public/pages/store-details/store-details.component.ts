@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PublicService } from 'src/app/core/services/public.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { environment } from 'src/environments/environment';
 import { ProductService } from 'src/app/core/services/product.service';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -46,7 +46,7 @@ export class StoreDetailsComponent implements OnInit {
     constructor(
         private route: ActivatedRoute,
         private publicService: PublicService,
-        private loadingService: LoadingService,
+
         private productService: ProductService,
         private authService: AuthService,
         private cartService: CartService,
@@ -88,7 +88,7 @@ export class StoreDetailsComponent implements OnInit {
     }
 
     loadProducts() {
-        this.loadingService.screenLoading();
+
 
         // Build query matching public-products component format
         let query = `storeId = '${this.storeId}'`;
@@ -104,10 +104,10 @@ export class StoreDetailsComponent implements OnInit {
             sort: this.sortBy
         }).subscribe(res => {
             this.products = res;
-            this.loadingService.screenLoaded();
+
         }, err => {
             console.error(err);
-            this.loadingService.screenLoaded();
+
         });
 
         // Count for pagination

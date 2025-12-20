@@ -6,7 +6,7 @@ import {
   faBolt, faPlus, faExternalLinkAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { StoreService } from 'src/app/core/services/store.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { CategoryService } from 'src/app/core/services/category.service';
@@ -63,7 +63,7 @@ export class StoreViewComponent implements OnInit {
     private orderService: OrderService,
     private categoryService: CategoryService,
     private supplierService: SupplierService,
-    private loadingService: LoadingService
+
   ) { }
 
   ngOnInit(): void {
@@ -71,18 +71,18 @@ export class StoreViewComponent implements OnInit {
   }
 
   loadStore() {
-    this.loadingService.screenLoading();
+
     const storeId = this.authService.getConnectedUser()?.store;
 
     this.storeService.getStore(storeId).subscribe(
       store => {
         this.store = store;
         this.storeWebsite = this.fillLink(this.store?.site);
-        this.loadingService.screenLoaded();
+
         this.loadStats(storeId);
       },
       error => {
-        this.loadingService.screenLoaded();
+
         Swal.fire({
           icon: 'error',
           title: error?.error?.message || 'Une erreur est survenue ! Merci de réessayer plus tard',

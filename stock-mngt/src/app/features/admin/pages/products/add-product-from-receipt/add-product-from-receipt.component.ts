@@ -10,7 +10,7 @@ import { BrandService } from 'src/app/core/services/brand.service';
 import { CategoryService } from 'src/app/core/services/category.service';
 import { CompressorService } from 'src/app/core/services/compressor.service';
 import { FileService } from 'src/app/core/services/file.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { ProductService } from 'src/app/core/services/product.service';
 import { SupplierService } from 'src/app/core/services/supplier.service';
 import { environment } from 'src/environments/environment';
@@ -63,7 +63,7 @@ export class AddProductFromReceiptComponent implements OnInit {
     private categoryService: CategoryService,
     private productService: ProductService,
     private route: ActivatedRoute,
-    private loadingService: LoadingService,
+
     private fileService: FileService,
     private brandService: BrandService,
     public dialogRef: MatDialogRef<AddProductFromReceiptComponent>,
@@ -104,10 +104,10 @@ export class AddProductFromReceiptComponent implements OnInit {
   }
 
   getSuppliers() {
-    this.loadingService.screenLoading()
+
     this.supplierService.getAllSuppliersByStoreId(this.authService.getConnectedUser()?.store).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.suppliers = response
       }
     )
@@ -115,20 +115,20 @@ export class AddProductFromReceiptComponent implements OnInit {
 
 
   getBrands() {
-    this.loadingService.screenLoading()
+
     this.brandService.getBrandsByStoreId(this.authService.getConnectedUser()?.store).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.brands = response
       }
     )
   }
 
   getCategories() {
-    this.loadingService.screenLoading()
+
     this.categoryService.getCategoriesByStoreId(this.authService.getConnectedUser()?.store).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.categories = response
       }
     )
@@ -172,14 +172,14 @@ export class AddProductFromReceiptComponent implements OnInit {
       }
 
     if (this.form.valid) {
-      this.loadingService.screenLoading()
+
       this.uploadImages(this.fileInput.nativeElement.files, images).subscribe(
         response => {
           const filenames = response.files.map(file => file.location.split('/').pop());
           this.form.get('images').setValue(filenames)
           this.productService.addProduct({ ...this.form.getRawValue(), categoryId: this.getLastCategory()?.id, storeId: this.user?.store })
             .subscribe(response => {
-              this.loadingService.screenLoaded()
+
               Swal.fire({
                 icon: 'success',
                 title: 'Produit ajouté !',
@@ -189,7 +189,7 @@ export class AddProductFromReceiptComponent implements OnInit {
               this.dialogRef.close()
               //this.router.navigate(['products'])
             }, error => {
-              this.loadingService.screenLoaded()
+
               Swal.fire({
                 icon: 'error',
                 title: 'Une erreur est survenue ! Merci de réessayer plus tard',
@@ -229,13 +229,13 @@ export class AddProductFromReceiptComponent implements OnInit {
         newImages.push(fileName)
       }
     if (this.form.valid) {
-      this.loadingService.screenLoading()
+
       this.uploadImages(this.fileInput.nativeElement.files, newImages).subscribe(
         response => {
           const filenames = response.files.map(file => file.location.split('/').pop());
           this.form.get('images').setValue(filenames)
           console.log(filenames)
-          this.loadingService.screenLoaded()
+
           this.productService.updateProduct({ ...this.form.getRawValue(), categoryId: (this.editCategory ? this.getLastCategory()?.id : this.product?.category?.id), storeId: this.user?.store, id: this.product?.id })
             .subscribe(response => {
               Swal.fire({
@@ -245,7 +245,7 @@ export class AddProductFromReceiptComponent implements OnInit {
                 timer: 1500
               })
             }, error => {
-              this.loadingService.screenLoaded()
+
               Swal.fire({
                 icon: 'error',
                 title: 'Une erreur est survenue ! Merci de réessayer plus tard',

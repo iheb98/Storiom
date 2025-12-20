@@ -6,7 +6,6 @@ import { HttpInterceptor, HttpHandler, HttpRequest } from '@angular/common/http'
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { AuthService } from './auth.service';
-import { LoadingService } from './loading.service';
 
 // const TOKEN_HEADER_KEY = 'Authorization';  // for Spring Boot back-end
 const TOKEN_HEADER_KEY = 'x-access-token';    // for Node.js Express back-end
@@ -16,7 +15,7 @@ export class RequestInterceptor implements HttpInterceptor {
   private isRefreshing = false;
   private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-  constructor(private authService: AuthService,private loadingService: LoadingService) { }
+  constructor(private authService: AuthService,) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<Object>> {
     let authReq = req;
@@ -27,7 +26,7 @@ export class RequestInterceptor implements HttpInterceptor {
 
     return next.handle(authReq).pipe(catchError(error => {
       console.log("tes")
-      //this.loadingService.screenLoaded();
+      //
       if (error instanceof HttpErrorResponse && !authReq.url.includes('login') && error.status === 403) {
         return this.handle401Error(authReq, next);
       }

@@ -2,7 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { ProductService } from 'src/app/core/services/product.service';
 import { QueryService } from 'src/app/core/services/query.service';
 import { SupplierService } from 'src/app/core/services/supplier.service';
@@ -46,15 +46,15 @@ export class ProductsSearchReceiptComponent implements OnInit {
   filtersCollapsed = true;
 
   toggleFilters() {
-      this.filtersCollapsed = !this.filtersCollapsed;
+    this.filtersCollapsed = !this.filtersCollapsed;
   }
-  
+
 
   constructor(
     private productService: ProductService,
     private supplierService: SupplierService,
     private authService: AuthService,
-    private loadingService: LoadingService,
+
     private router: Router,
     private queryService: QueryService,
     public dialogRef: MatDialogRef<ProductsSearchReceiptComponent>,
@@ -94,14 +94,14 @@ export class ProductsSearchReceiptComponent implements OnInit {
   }
 
   getSuppliers() {
-    this.loadingService.screenLoading()
+
     this.supplierService.getAllSuppliersByStoreId(this.authService.getConnectedUser()?.store).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.suppliers = response
       },
       error => {
-        this.loadingService.screenLoaded()
+
       }
     )
   }
@@ -110,28 +110,28 @@ export class ProductsSearchReceiptComponent implements OnInit {
     return this.data.selectedProducts.find(element => element?.id == id) != null
   }
   getProducts(page, size) {
-    this.loadingService.screenLoading()
+
     this.productService.getProductsByStoreId(this.authService.getConnectedUser()?.store, {
       page,
       size,
       query: this.buildQuery(),
     }).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.products = response
       },
       error => {
-        this.loadingService.screenLoaded()
+
       }
     )
   }
 
   countProducts() {
-    this.loadingService.screenLoading()
+
     this.productService.countProductsByStoreId(this.authService.getConnectedUser()?.store, {
       query: this.buildQuery()
     }).subscribe(response => {
-      this.loadingService.screenLoaded()
+
       this.count = response;
     })
   }
@@ -149,7 +149,7 @@ export class ProductsSearchReceiptComponent implements OnInit {
   }
 
   reset() {
-    this.loadingService.screenLoaded()
+
   }
 
   filter() {
@@ -180,9 +180,9 @@ export class ProductsSearchReceiptComponent implements OnInit {
       confirmButtonText: 'Supprimer',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.loadingService.screenLoading()
+
         this.productService.deleteProduct(product.id).subscribe(response => {
-          this.loadingService.screenLoaded()
+
           Swal.fire({
             icon: 'success',
             title: 'Produit supprimé !',

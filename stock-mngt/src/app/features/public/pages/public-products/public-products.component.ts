@@ -4,7 +4,7 @@ import { CategoryService } from 'src/app/core/services/category.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { environment } from 'src/environments/environment.prod';
 import { PublicService } from 'src/app/core/services/public.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import { CartService } from 'src/app/core/services/cart.service';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -54,7 +54,7 @@ export class PublicProductsComponent implements OnInit {
     private publicService: PublicService,
     private categoryService: CategoryService,
     private cartService: CartService,
-    private loadingService: LoadingService,
+
     private authService: AuthService
   ) { }
 
@@ -117,13 +117,13 @@ export class PublicProductsComponent implements OnInit {
   }
 
   loadProducts() {
-    this.loadingService.screenLoading();
+
     const query = this.buildQuery();
     this.publicService.getPublicProducts({ page: this.currentPage, size: this.currentSize, query, sort: this.filters.sort, searchable: this.searchable }).subscribe(res => {
       this.products = res;
-      this.loadingService.screenLoaded();
+
     }, (error) => {
-      this.loadingService.screenLoaded();
+
     });
 
     this.publicService.countPublicProducts({ query, searchable: this.searchable }).subscribe(res => {

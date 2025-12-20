@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { faEdit, faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { ReceiptService } from 'src/app/core/services/receipt.service';
 import { StoreService } from 'src/app/core/services/store.service';
 import { SupplierService } from 'src/app/core/services/supplier.service';
@@ -51,7 +51,7 @@ export class OperationsMngtComponent implements OnInit {
 
   constructor(
     private supplierService: SupplierService,
-    private loadingService: LoadingService,
+
     private authService: AuthService,
     private receiptService: ReceiptService,
     private storeService: StoreService,
@@ -73,45 +73,45 @@ export class OperationsMngtComponent implements OnInit {
 
 
   getSuppliers() {
-    this.loadingService.screenLoading()
+
     this.supplierService.getAllSuppliersByStoreId(this.authService.getConnectedUser()?.store).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.suppliers = response
         console.log(this.suppliers)
       },
       error => {
-        this.loadingService.screenLoaded()
+
       }
     )
   }
   getOperations(page, size) {
-    this.loadingService.screenLoading()
+
     this.receiptService.getOperations({
       page,
       size,
       query: this.buildQuery(),
     }).subscribe(
       response => {
-        this.loadingService.screenLoaded()
+
         this.operations = response
       },
       error => {
-        this.loadingService.screenLoaded()
+
       }
     )
   }
 
   countOperations() {
-    this.loadingService.screenLoading()
+
     this.receiptService.countOperationsByStoreId({
       query: this.buildQuery()
     }).subscribe(response => {
-      this.loadingService.screenLoaded()
+
       this.count = response;
     },
       error => {
-        this.loadingService.screenLoaded()
+
       })
   }
 
@@ -184,9 +184,9 @@ export class OperationsMngtComponent implements OnInit {
       confirmButtonText: 'Supprimer',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.loadingService.screenLoading()
+
         this.receiptService.deleteOperation(operation.id).subscribe(response => {
-          this.loadingService.screenLoaded();
+
           Swal.fire({
             icon: 'success',
             title: 'Facture supprimée !',

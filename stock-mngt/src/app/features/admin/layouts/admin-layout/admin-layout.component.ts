@@ -7,7 +7,6 @@ import {
   faCoins, faShuttleVan, faBox, faReceipt, faImage, faFile, faWindowRestore, faInfoCircle, faShoppingCart
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../../../../core/services/auth.service';
-import { LoadingService } from '../../../../core/services/loading.service';
 import { StoreService } from '../../../../core/services/store.service';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
@@ -45,7 +44,6 @@ export class AdminLayoutComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    public loadingService: LoadingService,
     public storeService: StoreService,
     private dialog: MatDialog
   ) {
@@ -57,9 +55,9 @@ export class AdminLayoutComponent implements OnInit {
       this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
         store => {
           this.store = store;
-          this.loadingService.screenLoaded();
+
         },
-        _ => this.loadingService.screenLoaded()
+        _ => { }
       );
     });
 
@@ -87,9 +85,9 @@ export class AdminLayoutComponent implements OnInit {
     this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
       store => {
         this.store = store;
-        this.loadingService.screenLoaded();
+
       },
-      _ => this.loadingService.screenLoaded()
+      _ => { }
     );
 
     this.subscriptionDetails = this.authService.getConnectedUser()?.subscription;

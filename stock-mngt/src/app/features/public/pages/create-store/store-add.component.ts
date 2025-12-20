@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { FileService } from 'src/app/core/services/file.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { StoreService } from 'src/app/core/services/store.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import {
@@ -49,7 +49,7 @@ export class CreateStoreComponent implements OnInit {
     private fileService: FileService,
     private authService: AuthService,
     private router: Router,
-    private loadingService: LoadingService,
+
     private toastService: ToastService
   ) { }
 
@@ -92,7 +92,7 @@ export class CreateStoreComponent implements OnInit {
     if (this.fileInput.nativeElement.files[0])
       fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + this.fileInput.nativeElement.files[0]?.name.substring(this.fileInput.nativeElement.files[0].name.lastIndexOf('.'))
     if (this.form.valid) {
-      this.loadingService.screenLoading()
+
       if (this.fileInput.nativeElement.files[0])
         this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(
           response => {
@@ -101,7 +101,7 @@ export class CreateStoreComponent implements OnInit {
               response => {
                 this.authService.refreshToken().subscribe(response => {
                   localStorage.setItem('accessToken', response.accessToken);
-                  this.loadingService.screenLoaded()
+
                   this.authService.loggedIn.next();
                   this.toastService.showSuccess('Boutique créée avec succès !');
                   setTimeout(() => {
@@ -117,7 +117,7 @@ export class CreateStoreComponent implements OnInit {
           response => {
             this.authService.refreshToken().subscribe(response => {
               localStorage.setItem('accessToken', response.accessToken);
-              this.loadingService.screenLoaded()
+
               this.authService.loggedIn.next();
               this.toastService.showSuccess('Boutique créée avec succès !');
               setTimeout(() => {

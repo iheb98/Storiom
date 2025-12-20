@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { faArrowDown, faBox, faBoxes, faBoxOpen, faHandHolding, faHandHoldingUsd, faMoneyBill } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StatService } from 'src/app/core/services/stat.service';
-import { ChartModule } from 'primeng/chart';
-import { LoadingService } from 'src/app/core/services/loading.service';
 
 @Component({
     selector: 'app-dashboard-view',
@@ -22,7 +20,7 @@ export class DashboardViewComponent implements OnInit {
     constructor(
         private authService: AuthService,
         private statService: StatService,
-        private loadingService: LoadingService
+
     ) { }
 
     ngOnInit(): void {
@@ -31,7 +29,7 @@ export class DashboardViewComponent implements OnInit {
     }
 
     getWidgets() {
-        this.loadingService.screenLoading()
+
         this.statService.getWidgets(this.user.store).subscribe(
             response => {
                 this.widgets = response
@@ -67,7 +65,7 @@ export class DashboardViewComponent implements OnInit {
                         class: 'credit'
                     }
                 ];
-                this.loadingService.screenLoaded()
+
                 console.log(response)
             }
         )

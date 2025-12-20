@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import Swal from 'sweetalert2';
 
 @Component({
@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private formBuilder: FormBuilder,
     private authService: AuthService,
-    private loadingService: LoadingService) { }
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -38,10 +38,10 @@ export class LoginComponent implements OnInit {
     this.emailError = false;
     this.passwordError = false;
     if (this.form.valid) {
-      this.loadingService.screenLoading()
+
       this.authService.login({ email: this.form.get('email').value, password: this.form.get('password').value })
         .subscribe(response => {
-          this.loadingService.screenLoaded()
+
           if (response.errorType == "EMAIL_ERROR")
             this.emailError = true;
           else if (response.errorType == "PASSWORD_ERROR")
@@ -53,7 +53,7 @@ export class LoginComponent implements OnInit {
           }
         },
           error => {
-            this.loadingService.screenLoaded()
+
             Swal.fire({
               icon: 'error',
               title: error.error.message || 'Une erreur est survenue ! Merci de réessayer plus tard',

@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { ReceiptService } from 'src/app/core/services/receipt.service';
 import Swal from 'sweetalert2';
 
@@ -23,7 +23,7 @@ export class SellProductComponent {
     public dialogRef: MatDialogRef<SellProductComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
     private receiptService: ReceiptService,
-    private loadingService: LoadingService
+
   ) { }
 
 
@@ -48,7 +48,7 @@ export class SellProductComponent {
     };
     if (this.data?.operationType == "SOLD") {
       this.receiptService.sellProduct(body).subscribe(response => {
-        this.loadingService.screenLoaded()
+
         Swal.fire({
           icon: 'success',
           title: 'Produit vendu !',
@@ -57,7 +57,7 @@ export class SellProductComponent {
         })
         this.dialogRef.close({ ...body, success: true });
       }, error => {
-        this.loadingService.screenLoaded()
+
         Swal.fire({
           icon: 'error',
           title: 'Une erreur est survenue ! Merci de réessayer plus tard',
@@ -68,7 +68,7 @@ export class SellProductComponent {
       })
     } else {
       this.receiptService.loadProduct(body).subscribe(response => {
-        this.loadingService.screenLoaded()
+
         Swal.fire({
           icon: 'success',
           title: 'Produit chargé !',
@@ -77,7 +77,7 @@ export class SellProductComponent {
         })
         this.dialogRef.close({ ...body, success: true });
       }, error => {
-        this.loadingService.screenLoaded()
+
         Swal.fire({
           icon: 'error',
           title: 'Une erreur est survenue ! Merci de réessayer plus tard',

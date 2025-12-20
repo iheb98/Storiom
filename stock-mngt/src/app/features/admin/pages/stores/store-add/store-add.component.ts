@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from 'src/app/models/store';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { FileService } from 'src/app/core/services/file.service';
-import { LoadingService } from 'src/app/core/services/loading.service';
+
 import { StoreService } from 'src/app/core/services/store.service';
 import { environment } from 'src/environments/environment';
 import { getAllGovernorates, getCitiesForGovernorate, getAllCities } from 'src/app/shared/data/tunisia-locations';
@@ -44,7 +44,7 @@ export class StoreAddComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private loadingService: LoadingService
+
   ) { }
 
   ngOnInit(): void {
@@ -229,7 +229,7 @@ export class StoreAddComponent implements OnInit {
     }
 
     if (this.form.valid) {
-      this.loadingService.screenLoading();
+
       if (this.fileInput.nativeElement.files[0]) {
         this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(response => {
           const logo = response.fileUrl.split('/').pop();
@@ -240,7 +240,7 @@ export class StoreAddComponent implements OnInit {
           }).subscribe(response => {
             this.authService.refreshToken().subscribe(response => {
               localStorage.setItem('accessToken', response.accessToken);
-              this.loadingService.screenLoaded();
+
               this.authService.loggedIn.next();
               setTimeout(() => {
                 this.router.navigate(['admin/stores/view']);
@@ -255,7 +255,7 @@ export class StoreAddComponent implements OnInit {
         }).subscribe(response => {
           this.authService.refreshToken().subscribe(response => {
             localStorage.setItem('accessToken', response.accessToken);
-            this.loadingService.screenLoaded();
+
             this.authService.loggedIn.next();
             setTimeout(() => {
               this.router.navigate(['admin/stores/view']);
@@ -276,7 +276,7 @@ export class StoreAddComponent implements OnInit {
     }
 
     if (this.form.valid) {
-      this.loadingService.screenLoading();
+
       if (this.fileInput.nativeElement.files[0]) {
         this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(response => {
           const logo = response.fileUrl.split('/').pop();
@@ -286,7 +286,7 @@ export class StoreAddComponent implements OnInit {
             logo: logo,
             userId: this.authService.getConnectedUser().id
           }).subscribe(response => {
-            this.loadingService.screenLoaded();
+
             this.router.navigate(['admin/stores/view']);
           });
         });
@@ -296,7 +296,7 @@ export class StoreAddComponent implements OnInit {
           id: this.store.id,
           userId: this.authService.getConnectedUser().id
         }).subscribe(response => {
-          this.loadingService.screenLoaded();
+
           this.router.navigate(['admin/stores/view']);
         });
       }
