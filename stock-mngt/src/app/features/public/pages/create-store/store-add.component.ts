@@ -6,6 +6,11 @@ import { FileService } from 'src/app/core/services/file.service';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { StoreService } from 'src/app/core/services/store.service';
 import { ToastService } from 'src/app/core/services/toast.service';
+import {
+  faStore, faRocket, faChartBar, faBoxes, faPhone, faEnvelope,
+  faGlobe, faMap, faCity, faRoad, faImage, faCheck, faExclamationCircle,
+  faCloudUploadAlt, faCheckCircle, faAlignLeft
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-create-store',
@@ -19,6 +24,24 @@ export class CreateStoreComponent implements OnInit {
   termsAccepted = false;
   showTermsModal = false;
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
+
+  // Icons
+  faStore = faStore;
+  faRocket = faRocket;
+  faChartBar = faChartBar;
+  faBoxes = faBoxes;
+  faPhone = faPhone;
+  faEnvelope = faEnvelope;
+  faGlobe = faGlobe;
+  faMap = faMap;
+  faCity = faCity;
+  faRoad = faRoad;
+  faImage = faImage;
+  faCheck = faCheck;
+  faExclamationCircle = faExclamationCircle;
+  faCloudUploadAlt = faCloudUploadAlt;
+  faCheckCircle = faCheckCircle;
+  faAlignLeft = faAlignLeft;
 
   constructor(
     private formBuilder: FormBuilder,

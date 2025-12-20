@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
+import {
+    faStore, faArrowRight, faBoxOpen, faBolt, faChartLine,
+    faBoxes, faShoppingCart, faChartBar, faTags, faFileInvoice, faRocket
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-seller-onboarding',
@@ -8,6 +12,19 @@ import { AuthService } from 'src/app/core/services/auth.service';
     styleUrls: ['./store-onboarding.component.scss']
 })
 export class SellerOnboardingComponent implements OnInit {
+
+    // Icons
+    faStore = faStore;
+    faArrowRight = faArrowRight;
+    faBoxOpen = faBoxOpen;
+    faBolt = faBolt;
+    faChartLine = faChartLine;
+    faBoxes = faBoxes;
+    faShoppingCart = faShoppingCart;
+    faChartBar = faChartBar;
+    faTags = faTags;
+    faFileInvoice = faFileInvoice;
+    faRocket = faRocket;
 
     constructor(
         private authService: AuthService,
@@ -27,4 +44,3 @@ export class SellerOnboardingComponent implements OnInit {
         this.router.navigate(['/create-store']);
     }
 }
-

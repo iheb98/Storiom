@@ -84,8 +84,7 @@
                         <fa-icon [icon]="faMinus"></fa-icon>
                     </button>
                     <span class="qty-value">{{ quantity }}</span>
-                    <button class="qty-btn plus" (click)="increaseQuantity()"
-                        [disabled]="quantity >= product?.quantity">
+                    <button class="qty-btn plus" (click)="increaseQuantity()">
                         <fa-icon [icon]="faPlus"></fa-icon>
                     </button>
                 </div>

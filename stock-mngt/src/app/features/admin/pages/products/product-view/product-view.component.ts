@@ -2,7 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { faPagelines } from '@fortawesome/free-brands-svg-icons';
 import { faChartBar } from '@fortawesome/free-regular-svg-icons';
-import { faEdit, faFile, faGripLines, faInfo, faInfoCircle, faTextWidth, faTimes } from '@fortawesome/free-solid-svg-icons';
+import {
+  faEdit, faFile, faGripLines, faInfo, faInfoCircle, faTextWidth, faTimes,
+  faArrowDown, faArrowUp, faCoins, faExclamationTriangle, faImages, faSearchPlus, faImage
+} from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { ProductService } from 'src/app/core/services/product.service';
@@ -19,6 +22,13 @@ export class ProductViewComponent implements OnInit {
 
   // ----------- ICONS 
   faEdit = faEdit
+  faArrowDown = faArrowDown;
+  faArrowUp = faArrowUp;
+  faCoins = faCoins;
+  faExclamationTriangle = faExclamationTriangle;
+  faImages = faImages;
+  faSearchPlus = faSearchPlus;
+  faImage = faImage;
   environment = environment
   years = [];
   operationsData;

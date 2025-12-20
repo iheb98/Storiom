@@ -14,6 +14,10 @@ import { CreateStoreComponent } from './pages/create-store/store-add.component';
 import { AuthGuard } from 'src/app/core/services/auth.guard';
 import { LoginComponent } from 'src/app/general/login/login.component';
 import { RegisterComponent } from 'src/app/general/register/register.component';
+import { ConfirmAccountComponent } from 'src/app/general/confirm-account/confirm-account.component';
+import { ForgotPasswordComponent } from 'src/app/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from 'src/app/reset-password/reset-password.component';
+import { TermsComponent } from 'src/app/pages/terms/terms.component';
 
 const routes: Routes = [
   {
@@ -31,6 +35,11 @@ const routes: Routes = [
       { path: 'account', component: AccountComponent },
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
+
+      { path: 'confirm', component: ConfirmAccountComponent },
+      { path: 'forgot-password', component: ForgotPasswordComponent },
+      { path: 'reset-password/:token', component: ResetPasswordComponent },
+      { path: 'terms', component: TermsComponent },
       /*{ path: 'product/:id', component: ProductDetailsComponent },
      { path: 'cart', component: CartComponent },
      { path: 'checkout', component: CheckoutComponent }*/

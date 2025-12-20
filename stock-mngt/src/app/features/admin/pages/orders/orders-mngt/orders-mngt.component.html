@@ -70,6 +70,10 @@
             <div class="order-header" (click)="toggleExpand(order.id)">
                 <div class="order-info">
                     <span class="order-number">#{{ order.id }}</span>
+                    <span class="order-client" *ngIf="order.user">
+                        <fa-icon [icon]="faUser"></fa-icon>
+                        {{ order.user.firstName }} {{ order.user.lastName }}
+                    </span>
                     <span class="order-date">
                         <fa-icon [icon]="faCalendar"></fa-icon>
                         {{ order.createdAt | date:'dd MMM yyyy, HH:mm' }}

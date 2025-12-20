@@ -83,11 +83,12 @@ $radius-lg: 16px;
   background: $white;
   border-radius: $radius-lg;
   border: 1px solid $border-color;
-  overflow: hidden;
+  overflow: visible;
 
   &.products-card {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
 }
 
@@ -347,6 +348,7 @@ $radius-lg: 16px;
         border-top: none;
         border-radius: 0 0 $radius-sm $radius-sm;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 1050;
 
         .ng-dropdown-panel-items {
           .ng-option {

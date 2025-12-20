@@ -108,31 +108,31 @@ $radius-lg: 16px;
                 padding: 6px 14px;
                 border-radius: 20px;
                 font-size: 0.8rem;
-                font-weight: 500;
+                font-weight: 600;
 
                 &.active {
-                    background: rgba($success, 0.2);
-                    color: lighten($success, 30%);
+                    background: rgba($success, 0.15);
+                    color: darken($success, 10%);
                 }
 
                 &.inactive {
-                    background: rgba($danger, 0.2);
-                    color: lighten($danger, 30%);
+                    background: rgba($danger, 0.15);
+                    color: darken($danger, 5%);
                 }
 
                 &.delivery {
-                    background: rgba($success, 0.2);
-                    color: lighten($success, 30%);
+                    background: rgba($success, 0.15);
+                    color: darken($success, 10%);
                 }
 
                 &.no-delivery {
-                    background: rgba($warning, 0.2);
-                    color: lighten($warning, 20%);
+                    background: rgba($warning, 0.15);
+                    color: darken($warning, 10%);
                 }
 
                 &.visibility {
-                    background: rgba($info, 0.2);
-                    color: lighten($info, 20%);
+                    background: rgba($info, 0.15);
+                    color: darken($info, 10%);
                 }
             }
         }

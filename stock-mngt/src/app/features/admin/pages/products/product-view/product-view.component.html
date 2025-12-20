@@ -30,7 +30,7 @@
         <!-- Left Column: Images -->
         <div class="images-section">
             <div class="section-header">
-                <h2><i class="fa fa-images"></i> Galerie Photos</h2>
+                <h2><fa-icon [icon]="faImages"></fa-icon> Galerie Photos</h2>
             </div>
 
             <div class="images-grid" *ngIf="product?.images?.length > 0">
@@ -38,13 +38,13 @@
                     (click)="openImage(environment.backend + '/' + item)">
                     <img [src]="environment.backend + '/' + item" alt="{{ product?.name }}">
                     <div class="image-overlay">
-                        <i class="fa fa-search-plus"></i>
+                        <fa-icon [icon]="faSearchPlus"></fa-icon>
                     </div>
                 </div>
             </div>
 
             <div class="empty-images" *ngIf="product?.images?.length === 0">
-                <i class="fa fa-image"></i>
+                <fa-icon [icon]="faImage"></fa-icon>
                 <p>Aucune image pour ce produit</p>
             </div>
         </div>
@@ -58,7 +58,7 @@
             <div class="info-grid">
                 <div class="info-card">
                     <div class="info-icon buying">
-                        <i class="fa fa-arrow-down"></i>
+                        <fa-icon [icon]="faArrowDown"></fa-icon>
                     </div>
                     <div class="info-content">
                         <span class="info-label">Prix d'achat</span>
@@ -69,7 +69,7 @@
 
                 <div class="info-card">
                     <div class="info-icon selling">
-                        <i class="fa fa-arrow-up"></i>
+                        <fa-icon [icon]="faArrowUp"></fa-icon>
                     </div>
                     <div class="info-content">
                         <span class="info-label">Prix de vente</span>
@@ -80,7 +80,7 @@
 
                 <div class="info-card">
                     <div class="info-icon profit">
-                        <i class="fa fa-coins"></i>
+                        <fa-icon [icon]="faCoins"></fa-icon>
                     </div>
                     <div class="info-content">
                         <span class="info-label">Marge bénéficiaire</span>
@@ -91,7 +91,7 @@
 
                 <div class="info-card">
                     <div class="info-icon stock">
-                        <i class="fa fa-exclamation-triangle"></i>
+                        <fa-icon [icon]="faExclamationTriangle"></fa-icon>
                     </div>
                     <div class="info-content">
                         <span class="info-label">Stock critique</span>

@@ -2,7 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { faArrowLeft, faEdit, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faEdit, faTimes, faChartLine, faAlignLeft } from '@fortawesome/free-solid-svg-icons';
 import { EMPTY } from 'rxjs';
 import { expand, map } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -46,6 +46,8 @@ export class AddProductFromReceiptComponent implements OnInit {
 
   editIcon = faEdit
   timesIcon = faTimes
+  faChartLine = faChartLine;
+  faAlignLeft = faAlignLeft;
 
 
   edit

@@ -6,6 +6,19 @@ import { TermsComponent } from 'src/app/pages/terms/terms.component';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import Swal from 'sweetalert2';
+import {
+  faStore,
+  faRocket,
+  faShieldAlt,
+  faUser,
+  faEnvelope,
+  faPhone,
+  faLock,
+  faArrowRight,
+  faFileContract,
+  faTimes,
+  faCheck
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-register',
@@ -13,6 +26,19 @@ import Swal from 'sweetalert2';
   styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit {
+
+  // Icons
+  faStore = faStore;
+  faRocket = faRocket;
+  faShieldAlt = faShieldAlt;
+  faUser = faUser;
+  faEnvelope = faEnvelope;
+  faPhone = faPhone;
+  faLock = faLock;
+  faArrowRight = faArrowRight;
+  faFileContract = faFileContract;
+  faTimes = faTimes;
+  faCheck = faCheck;
 
   form: FormGroup;
   submitted: boolean;

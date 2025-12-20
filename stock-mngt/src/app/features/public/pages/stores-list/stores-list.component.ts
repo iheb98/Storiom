@@ -3,6 +3,10 @@ import { PublicService } from 'src/app/core/services/public.service';
 import { LoadingService } from 'src/app/core/services/loading.service';
 import { environment } from 'src/environments/environment';
 import { TUNISIA_LOCATIONS, getAllGovernorates, getCitiesForGovernorate, getAllCities } from 'src/app/shared/data/tunisia-locations';
+import {
+    faCity, faChevronDown, faTag, faGlobe, faTruck, faMapMarkerAlt,
+    faFilter, faTimes, faStore, faSearch, faSlidersH, faMap
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-stores-list',
@@ -10,6 +14,20 @@ import { TUNISIA_LOCATIONS, getAllGovernorates, getCitiesForGovernorate, getAllC
     styleUrls: ['./stores-list.component.scss']
 })
 export class StoresListComponent implements OnInit {
+
+    // Icons
+    faCity = faCity;
+    faChevronDown = faChevronDown;
+    faTag = faTag;
+    faGlobe = faGlobe;
+    faTruck = faTruck;
+    faMapMarkerAlt = faMapMarkerAlt;
+    faFilter = faFilter;
+    faTimes = faTimes;
+    faStore = faStore;
+    faSearch = faSearch;
+    faSlidersH = faSlidersH;
+    faMap = faMap;
 
     stores: any[] = [];
     filteredStores: any[] = [];

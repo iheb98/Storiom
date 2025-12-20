@@ -66,9 +66,9 @@ export class PublicViewProductComponent implements OnInit {
   }
 
   loadProduct(id: string) {
-    this.loadingService.screenLoading();
+    //this.loadingService.screenLoading();
     this.publicService.getPublicProduct(id).subscribe(res => {
-      this.loadingService.screenLoaded();
+      //this.loadingService.screenLoaded();
       this.product = res;
       this.calculateAverageRating();
 
@@ -84,10 +84,14 @@ export class PublicViewProductComponent implements OnInit {
         if (this.product.images.length > 0) {
           this.selectedImage = environment.backend + '/' + this.product.images[0];
           this.selectedImageIndex = 0;
+        } else {
+          this.selectedImage = 'assets/default_product.png';
         }
+      } else {
+        this.selectedImage = 'assets/default_product.png';
       }
     }, () => {
-      this.loadingService.screenLoaded();
+      //this.loadingService.screenLoaded();
     });
   }
 
@@ -154,9 +158,9 @@ export class PublicViewProductComponent implements OnInit {
 
   // Quantity
   increaseQuantity() {
-    if (this.quantity < this.product?.quantity) {
-      this.quantity++;
-    }
+    //if (this.quantity < this.product?.quantity) {
+    this.quantity++;
+    //}
   }
 
   decreaseQuantity() {

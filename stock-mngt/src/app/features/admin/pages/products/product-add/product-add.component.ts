@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { faArrowLeft, faEdit, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faEdit, faTimes, faChartLine, faCubes, faExclamationTriangle, faEye, faInfoCircle, faTag } from '@fortawesome/free-solid-svg-icons';
 import { EMPTY } from 'rxjs';
 import { expand, map } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -47,6 +47,12 @@ export class ProductAddComponent implements OnInit {
 
   editIcon = faEdit
   timesIcon = faTimes
+  faChartLine = faChartLine;
+  faCubes = faCubes;
+  faExclamationTriangle = faExclamationTriangle;
+  faEye = faEye;
+  faInfoCircle = faInfoCircle;
+  faTag = faTag;
 
 
   edit

@@ -30,21 +30,22 @@
     <section class="filters-panel" [class.open]="showFilters">
         <div class="filters-container">
             <div class="filters-header">
-                <h3><i class="fa fa-filter"></i> Filtres avancés</h3>
+                <h3><fa-icon [icon]="faFilter"></fa-icon> Filtres avancés</h3>
                 <button class="clear-filters-btn" (click)="clearFilters()" *ngIf="activeFiltersCount > 0">
-                    <i class="fa fa-times"></i> Effacer tout
+                    <fa-icon [icon]="faTimes"></fa-icon> Effacer tout
                 </button>
             </div>
 
             <div class="filters-grid">
                 <!-- Governorate Filter (Autocomplete) -->
                 <div class="filter-group autocomplete-group">
-                    <label><i class="fa fa-map"></i> Gouvernorat</label>
+                    <label><fa-icon [icon]="faMap"></fa-icon> Gouvernorat</label>
                     <div class="autocomplete-wrapper">
                         <input type="text" [(ngModel)]="governorateSearchText" (input)="onGovernorateSearch()"
                             (focus)="showGovernorateSuggestions = true" (blur)="hideGovernorateSuggestionsDelayed()"
                             placeholder="Rechercher un gouvernorat..." autocomplete="off">
-                        <i class="fa fa-chevron-down dropdown-icon" (click)="toggleGovernorateSuggestions()"></i>
+                        <fa-icon [icon]="faChevronDown" class="dropdown-icon"
+                            (click)="toggleGovernorateSuggestions()"></fa-icon>
                         <div class="suggestions-dropdown"
                             *ngIf="showGovernorateSuggestions && filteredGovernorates.length > 0">
                             <div class="suggestion-item" *ngFor="let gov of filteredGovernorates"
@@ -57,12 +58,13 @@
 
                 <!-- City Filter (Autocomplete) -->
                 <div class="filter-group autocomplete-group">
-                    <label><i class="fa fa-city"></i> Ville / Délégation</label>
+                    <label><fa-icon [icon]="faCity"></fa-icon> Ville / Délégation</label>
                     <div class="autocomplete-wrapper">
                         <input type="text" [(ngModel)]="citySearchText" (input)="onCitySearch()"
                             (focus)="showCitySuggestions = true" (blur)="hideCitySuggestionsDelayed()"
                             placeholder="Rechercher une ville..." autocomplete="off">
-                        <i class="fa fa-chevron-down dropdown-icon" (click)="toggleCitySuggestions()"></i>
+                        <fa-icon [icon]="faChevronDown" class="dropdown-icon"
+                            (click)="toggleCitySuggestions()"></fa-icon>
                         <div class="suggestions-dropdown" *ngIf="showCitySuggestions && filteredCities.length > 0">
                             <div class="suggestion-item" *ngFor="let city of filteredCities"
                                 (mousedown)="selectCity(city)">
@@ -74,7 +76,7 @@
 
                 <!-- Type Filter -->
                 <div class="filter-group">
-                    <label><i class="fa fa-tag"></i> Type de boutique</label>
+                    <label><fa-icon [icon]="faTag"></fa-icon> Type de boutique</label>
                     <select [(ngModel)]="selectedType" (change)="filterStores()">
                         <option value="">Tous les types</option>
                         <option *ngFor="let type of availableTypes" [value]="type">{{ type }}</option>
@@ -86,7 +88,7 @@
                     <label class="toggle-label">
                         <input type="checkbox" [(ngModel)]="hasWebsiteOnly" (change)="filterStores()">
                         <span class="toggle-switch"></span>
-                        <span class="toggle-text"><i class="fa fa-globe"></i> Avec site web</span>
+                        <span class="toggle-text"><fa-icon [icon]="faGlobe"></fa-icon> Avec site web</span>
                     </label>
                 </div>
 
@@ -95,7 +97,7 @@
                     <label class="toggle-label">
                         <input type="checkbox" [(ngModel)]="supportsDeliveryOnly" (change)="filterStores()">
                         <span class="toggle-switch"></span>
-                        <span class="toggle-text"><i class="fa fa-truck"></i> Livraison disponible</span>
+                        <span class="toggle-text"><fa-icon [icon]="faTruck"></fa-icon> Livraison disponible</span>
                     </label>
                 </div>
             </div>
@@ -124,7 +126,7 @@
             <article class="store-card" *ngFor="let store of filteredStores" [routerLink]="['/stores', store.id]">
                 <!-- Cover Image / Pattern -->
                 <div class="card-cover"
-                    [ngStyle]="{'background-image': store.coverImage ? 'url(' + environment.backend + '/' + store.coverImage + ')' : 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'}">
+                    [ngStyle]="{'background-image': store.coverImage ? 'url(' + environment.backend + '/' + store.coverImage + ')' : 'linear-gradient(135deg, #5a5a7e 0%, #6a7a9e 50%, #7a8abe 100%)'}">
                     <div class="logo-container">
                         <img *ngIf="store.logo" [src]="environment.backend + '/' + store.logo"
                             [alt]="store.name + ' logo'" class="store-logo">

@@ -6,7 +6,7 @@
             <span>Retour aux produits</span>
         </a>
         <a class="nav-link" *ngIf="productId" (click)="navigateTo('/products/view/' + product?.id)">
-            <i class="fa fa-eye"></i>
+            <fa-icon [icon]="faEye"></fa-icon>
             <span>Consulter</span>
         </a>
     </div>
@@ -24,7 +24,7 @@
             <div class="form-section">
                 <div class="section-card">
                     <div class="section-header">
-                        <h2><i class="fa fa-info-circle"></i> Informations générales</h2>
+                        <h2><fa-icon [icon]="faInfoCircle"></fa-icon> Informations générales</h2>
                     </div>
                     <div class="section-body">
                         <div class="form-group">
@@ -101,7 +101,7 @@
                     <div class="section-body">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="buyingPrice"><i class="fa fa-arrow-down text-danger"></i> Prix
+                                <label for="buyingPrice"><i class="fa fa-arrow-down text-info"></i> Prix
                                     d'achat</label>
                                 <div class="input-with-suffix">
                                     <input type="number" id="buyingPrice" formControlName="buyingPrice"
@@ -123,20 +123,20 @@
 
                         <div class="profit-indicator"
                             *ngIf="form.get('buyingPrice').value && form.get('sellingPrice').value">
-                            <i class="fa fa-chart-line"></i>
+                            <fa-icon [icon]="faChartLine"></fa-icon>
                             <span>Marge: <strong>{{ (form.get('sellingPrice').value - form.get('buyingPrice').value) |
                                     number:'1.2-2' }} DT</strong></span>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group" *ngIf="!productId">
-                                <label for="quantity"><i class="fa fa-cubes"></i> Quantité initiale</label>
+                                <label for="quantity"><fa-icon [icon]="faCubes"></fa-icon> Quantité initiale</label>
                                 <input type="number" id="quantity" formControlName="quantity" placeholder="0">
                             </div>
 
                             <div class="form-group">
-                                <label for="criticalStockIndicator"><i
-                                        class="fa fa-exclamation-triangle text-warning"></i> Seuil critique</label>
+                                <label for="criticalStockIndicator"><fa-icon [icon]="faExclamationTriangle"
+                                        class="text-warning"></fa-icon> Seuil critique</label>
                                 <input type="number" id="criticalStockIndicator"
                                     formControlName="criticalStockIndicator" placeholder="5">
                             </div>

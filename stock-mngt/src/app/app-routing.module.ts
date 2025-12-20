@@ -30,10 +30,6 @@ const routes: Routes = [
 
   // ------------ General Pages ------------
 
-  { path: 'confirm', component: ConfirmAccountComponent },
-  { path: 'forgot-password', component: ForgotPasswordComponent },
-  { path: 'reset-password/:token', component: ResetPasswordComponent },
-  { path: 'terms', component: TermsComponent },
 
   // Wildcard route
   { path: '**', redirectTo: '' }

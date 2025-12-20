@@ -57,9 +57,21 @@
             <input type="text" formControlName="country" placeholder="Pays">
         </div>
 
-        <div class="form-group">
-            <label>Ville</label>
-            <input type="text" formControlName="city" placeholder="Ville">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Gouvernorat</label>
+                <select formControlName="state" (change)="onGovernorateChange()">
+                    <option value="">Sélectionnez un gouvernorat</option>
+                    <option *ngFor="let gov of governorates" [value]="gov">{{ gov }}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ville / Délégation</label>
+                <select formControlName="city">
+                    <option value="">Sélectionnez une ville</option>
+                    <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+                </select>
+            </div>
         </div>
 
         <div class="form-group">

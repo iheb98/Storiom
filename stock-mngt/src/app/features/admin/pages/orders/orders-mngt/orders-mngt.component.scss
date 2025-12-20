@@ -263,6 +263,22 @@ $radius-lg: 16px;
             color: $text-primary;
         }
 
+        .order-client {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: $primary;
+            padding: 4px 10px;
+            background: $primary-light;
+            border-radius: 20px;
+
+            fa-icon {
+                font-size: 0.8rem;
+            }
+        }
+
         .order-date {
             display: flex;
             align-items: center;

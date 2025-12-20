@@ -4,7 +4,7 @@
         <div class="info-section">
             <div class="info-content">
                 <div class="brand-badge">
-                    <i class="fa fa-store"></i>
+                    <fa-icon [icon]="faStore"></fa-icon>
                     <span>Storiom Vendeur</span>
                 </div>
                 <h1>Lancez Votre Boutique</h1>
@@ -13,21 +13,21 @@
 
                 <div class="features">
                     <div class="feature-item">
-                        <div class="feature-icon"><i class="fa fa-rocket"></i></div>
+                        <div class="feature-icon"><fa-icon [icon]="faRocket"></fa-icon></div>
                         <div class="feature-text">
                             <strong>Lancement Rapide</strong>
                             <span>Votre boutique prête en quelques minutes</span>
                         </div>
                     </div>
                     <div class="feature-item">
-                        <div class="feature-icon"><i class="fa fa-chart-bar"></i></div>
+                        <div class="feature-icon"><fa-icon [icon]="faChartBar"></fa-icon></div>
                         <div class="feature-text">
                             <strong>Tableau de Bord</strong>
                             <span>Suivez vos ventes et performances</span>
                         </div>
                     </div>
                     <div class="feature-item">
-                        <div class="feature-icon"><i class="fa fa-boxes"></i></div>
+                        <div class="feature-icon"><fa-icon [icon]="faBoxes"></fa-icon></div>
                         <div class="feature-text">
                             <strong>Gestion Simplifiée</strong>
                             <span>Produits, stocks et commandes en un seul endroit</span>
@@ -49,13 +49,13 @@
                     <!-- Store Name -->
                     <div class="form-group">
                         <label for="name">
-                            <i class="fa fa-store"></i>
+                            <fa-icon [icon]="faStore"></fa-icon>
                             Nom de la boutique <span class="required">*</span>
                         </label>
                         <input type="text" id="name" formControlName="name" placeholder="Ma Super Boutique">
                         <div class="error-message"
                             *ngIf="form.controls['name'].invalid && form.controls['name'].touched">
-                            <i class="fa fa-exclamation-circle"></i> Le nom est obligatoire
+                            <fa-icon [icon]="faExclamationCircle"></fa-icon> Le nom est obligatoire
                         </div>
                     </div>
 
@@ -63,14 +63,14 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="phone">
-                                <i class="fa fa-phone"></i>
+                                <fa-icon [icon]="faPhone"></fa-icon>
                                 Téléphone
                             </label>
                             <input type="tel" id="phone" formControlName="phone" placeholder="+216 XX XXX XXX">
                         </div>
                         <div class="form-group">
                             <label for="email">
-                                <i class="fa fa-envelope"></i>
+                                <fa-icon [icon]="faEnvelope"></fa-icon>
                                 Email
                             </label>
                             <input type="email" id="email" formControlName="email" placeholder="contact@boutique.tn">
@@ -80,7 +80,7 @@
                     <!-- Website -->
                     <div class="form-group">
                         <label for="site">
-                            <i class="fa fa-globe"></i>
+                            <fa-icon [icon]="faGlobe"></fa-icon>
                             Site web
                         </label>
                         <input type="url" id="site" formControlName="site" placeholder="https://www.maboutique.tn">
@@ -90,14 +90,14 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="state">
-                                <i class="fa fa-map"></i>
+                                <fa-icon [icon]="faMap"></fa-icon>
                                 Gouvernorat
                             </label>
                             <input type="text" id="state" formControlName="state" placeholder="Tunis">
                         </div>
                         <div class="form-group">
                             <label for="city">
-                                <i class="fa fa-city"></i>
+                                <fa-icon [icon]="faCity"></fa-icon>
                                 Ville
                             </label>
                             <input type="text" id="city" formControlName="city" placeholder="La Marsa">
@@ -107,7 +107,7 @@
                     <!-- Street -->
                     <div class="form-group">
                         <label for="street">
-                            <i class="fa fa-road"></i>
+                            <fa-icon [icon]="faRoad"></fa-icon>
                             Adresse
                         </label>
                         <input type="text" id="street" formControlName="street" placeholder="Rue de la Liberté, N°123">
@@ -116,18 +116,18 @@
                     <!-- Logo Upload -->
                     <div class="form-group logo-upload">
                         <label>
-                            <i class="fa fa-image"></i>
+                            <fa-icon [icon]="faImage"></fa-icon>
                             Logo de la boutique
                         </label>
                         <div class="upload-area" [class.has-file]="selectedFileName" (click)="fileInput.click()">
                             <input #fileInput type="file" accept="image/*" hidden (change)="onFileSelected($event)">
                             <div class="upload-content" *ngIf="!selectedFileName">
-                                <i class="fa fa-cloud-upload-alt"></i>
+                                <fa-icon [icon]="faCloudUploadAlt"></fa-icon>
                                 <span>Cliquez pour télécharger</span>
                                 <small>PNG, JPG jusqu'à 5MB</small>
                             </div>
                             <div class="upload-content file-selected" *ngIf="selectedFileName">
-                                <i class="fa fa-check-circle"></i>
+                                <fa-icon [icon]="faCheckCircle"></fa-icon>
                                 <span class="file-name">{{ selectedFileName }}</span>
                                 <small>Cliquez pour changer</small>
                             </div>
@@ -137,7 +137,7 @@
                     <!-- Description -->
                     <div class="form-group">
                         <label for="description">
-                            <i class="fa fa-align-left"></i>
+                            <fa-icon [icon]="faAlignLeft"></fa-icon>
                             Description
                         </label>
                         <textarea id="description" formControlName="description" rows="4"
