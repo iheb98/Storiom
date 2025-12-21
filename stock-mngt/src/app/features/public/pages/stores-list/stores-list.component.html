@@ -122,7 +122,12 @@
 
     <!-- Stores Grid -->
     <section class="stores-section">
-        <div class="stores-grid" *ngIf="filteredStores.length > 0">
+        <!-- Stores Grid Skeleton -->
+        <div class="stores-grid-skeleton" *ngIf="isLoading">
+            <div class="skeleton-store" *ngFor="let i of [1,2,3,4,5,6]"></div>
+        </div>
+
+        <div class="stores-grid" *ngIf="!isLoading && filteredStores.length > 0">
             <article class="store-card" *ngFor="let store of filteredStores" [routerLink]="['/stores', store.id]">
                 <!-- Cover Image / Pattern -->
                 <div class="card-cover"
@@ -190,8 +195,8 @@
             </article>
         </div>
 
-        <!-- Empty State -->
-        <div class="empty-state" *ngIf="filteredStores.length === 0">
+        <!-- Empty State (only show when not loading) -->
+        <div class="empty-state" *ngIf="!isLoading && filteredStores.length === 0">
             <div class="empty-icon">
                 <i class="fa fa-store-slash"></i>
             </div>

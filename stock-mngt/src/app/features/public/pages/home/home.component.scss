@@ -704,3 +704,68 @@ $radius-xl: 24px;
     background-position: 200% 0;
   }
 }
+
+// ============================================
+// HERO STATS SKELETON
+// ============================================
+.hero-stats-skeleton {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+
+  @media (max-width: 576px) {
+    gap: 30px;
+  }
+
+  .stat-skeleton {
+    width: 80px;
+    height: 60px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.1) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: $radius-sm;
+  }
+}
+
+// ============================================
+// PRODUCTS SKELETON
+// ============================================
+.products-skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+
+  .skeleton-product {
+    height: 350px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: $radius-md;
+  }
+}
+
+// ============================================
+// STORES SKELETON
+// ============================================
+.stores-skeleton {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+
+  .skeleton-store {
+    height: 180px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: $radius-md;
+  }
+}
+
+// ============================================
+// CATEGORY SKELETON
+// ============================================
+.category-skeleton {
+  .skeleton-card {
+    height: 130px;
+  }
+}

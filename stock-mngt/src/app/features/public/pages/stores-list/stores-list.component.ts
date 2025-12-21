@@ -61,6 +61,7 @@ export class StoresListComponent implements OnInit {
     // UI state
     showFilters = false;
     activeFiltersCount = 0;
+    isLoading = true;
 
     constructor(
         private publicService: PublicService,
@@ -77,15 +78,15 @@ export class StoresListComponent implements OnInit {
     }
 
     getAllStores() {
-
+        this.isLoading = true;
         this.publicService.getAllStores().subscribe(res => {
             this.stores = res;
             this.filteredStores = res;
             this.extractAvailableTypes();
-
+            this.isLoading = false;
         }, (err) => {
             console.error(err);
-
+            this.isLoading = false;
         });
     }
 

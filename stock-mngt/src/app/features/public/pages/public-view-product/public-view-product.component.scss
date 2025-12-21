@@ -554,35 +554,161 @@ $radius-lg: 16px;
 }
 
 // ============================================
-// LOADING STATE
+// LOADING SKELETON
 // ============================================
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 100px 20px;
-  text-align: center;
+.loading-skeleton {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+}
 
-  .spinner {
-    width: 50px;
-    height: 50px;
-    border: 3px solid $border-color;
-    border-top-color: $primary;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 20px;
+.skeleton-breadcrumb {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.skeleton-text {
+  height: 16px;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+
+  &.short {
+    width: 60px;
   }
 
-  p {
-    color: $text-secondary;
-    font-size: 1rem;
+  &.medium {
+    width: 150px;
+  }
+
+  &.long {
+    width: 100%;
+    max-width: 400px;
   }
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+.skeleton-product-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  margin-bottom: 50px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
+
+.skeleton-gallery {
+  .skeleton-main-image {
+    width: 100%;
+    aspect-ratio: 1;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: $radius-lg;
+  }
+}
+
+.skeleton-thumbnails {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.skeleton-thumb {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: $radius-sm;
+}
+
+.skeleton-info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.skeleton-stars {
+  width: 120px;
+  height: 20px;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-price {
+  width: 180px;
+  height: 40px;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: $radius-sm;
+}
+
+.skeleton-purchase {
+  display: flex;
+  gap: 15px;
+}
+
+.skeleton-qty {
+  width: 130px;
+  height: 50px;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: $radius-sm;
+}
+
+.skeleton-btn {
+  flex: 1;
+  height: 50px;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: $radius-sm;
+}
+
+.skeleton-delivery {
+  height: 60px;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: $radius-sm;
+}
+
+.skeleton-seller {
+  height: 80px;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: $radius-sm;
+}
+
+.skeleton-section {
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  padding: 30px;
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
   }
 }
 

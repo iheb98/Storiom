@@ -42,6 +42,8 @@ export class StoreDetailsComponent implements OnInit {
         price: false,
         rating: false
     };
+    isStoreLoading = true;
+    isProductsLoading = true;
 
     constructor(
         private route: ActivatedRoute,
@@ -65,8 +67,12 @@ export class StoreDetailsComponent implements OnInit {
     }
 
     loadStoreDetails() {
+        this.isStoreLoading = true;
         this.publicService.getStoreById(this.storeId).subscribe(res => {
             this.store = res;
+            this.isStoreLoading = false;
+        }, error => {
+            this.isStoreLoading = false;
         });
     }
 
@@ -88,7 +94,7 @@ export class StoreDetailsComponent implements OnInit {
     }
 
     loadProducts() {
-
+        this.isProductsLoading = true;
 
         // Build query matching public-products component format
         let query = `storeId = '${this.storeId}'`;
@@ -104,10 +110,10 @@ export class StoreDetailsComponent implements OnInit {
             sort: this.sortBy
         }).subscribe(res => {
             this.products = res;
-
+            this.isProductsLoading = false;
         }, err => {
             console.error(err);
-
+            this.isProductsLoading = false;
         });
 
         // Count for pagination

@@ -1,3 +1,19 @@
+<!-- Store Hero Skeleton -->
+<div class="store-hero-skeleton" *ngIf="isStoreLoading">
+    <div class="hero-skeleton-content">
+        <div class="skeleton-logo"></div>
+        <div class="skeleton-info">
+            <div class="skeleton-text title"></div>
+            <div class="skeleton-text badge"></div>
+            <div class="skeleton-contacts">
+                <div class="skeleton-text contact"></div>
+                <div class="skeleton-text contact"></div>
+                <div class="skeleton-text contact"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="store-details-container" *ngIf="store">
     <!-- Store Hero Banner -->
     <div class="store-hero"
@@ -111,33 +127,6 @@
                 </div>
             </div>
 
-            <!-- Rating Filter -->
-            <!--<div class="filter-section" [class.collapsed]="collapsedSections.rating">
-                <div class="section-header" (click)="toggleSection('rating')">
-                    <h3><i class="fa fa-star"></i> Note minimum</h3>
-                    <i class="fa" [class.fa-chevron-down]="collapsedSections.rating"
-                        [class.fa-chevron-up]="!collapsedSections.rating"></i>
-                </div>
-                <div class="section-content">
-                    <div class="rating-options">
-                        <label *ngFor="let r of [4, 3, 2, 1]" class="rating-option" [class.selected]="minRating === r">
-                            <input type="radio" name="minRating" [value]="r" [(ngModel)]="minRating"
-                                (change)="applyFilters()">
-                            <span class="stars">
-                                <i *ngFor="let s of [1,2,3,4,5]" class="fa" [class.fa-star]="s <= r"
-                                    [class.fa-star-o]="s > r"></i>
-                            </span>
-                            <span class="label">& plus</span>
-                        </label>
-                        <label class="rating-option" [class.selected]="!minRating">
-                            <input type="radio" name="minRating" [value]="null" [(ngModel)]="minRating"
-                                (change)="applyFilters()">
-                            <span class="label">Toutes les notes</span>
-                        </label>
-                    </div>
-                </div>
-            </div>-->
-
             <!-- Filter Actions -->
             <div class="filter-actions">
                 <button class="btn-apply" (click)="applyFilters(); mobileFiltersOpen = false">
@@ -190,19 +179,23 @@
                 <button class="clear-all" (click)="resetFilters()">Effacer tout</button>
             </div>
 
+            <!-- Products Grid Skeleton -->
+            <div class="products-grid-skeleton" *ngIf="isProductsLoading">
+                <div class="skeleton-product" *ngFor="let i of [1,2,3,4,5,6,7,8]"></div>
+            </div>
+
             <!-- Products Grid -->
-            <div class="products-grid" *ngIf="products.length > 0; else noProducts">
+            <div class="products-grid" *ngIf="!isProductsLoading && products.length > 0">
                 <app-product-card *ngFor="let product of products" [product]="product"></app-product-card>
             </div>
 
-            <ng-template #noProducts>
-                <div class="no-products">
-                    <i class="fa fa-box-open"></i>
-                    <h3>Aucun produit trouvé</h3>
-                    <p>Essayez de modifier vos filtres ou recherchez autre chose.</p>
-                    <button (click)="resetFilters()">Réinitialiser les filtres</button>
-                </div>
-            </ng-template>
+            <!-- No Products (only show when not loading) -->
+            <div class="no-products" *ngIf="!isProductsLoading && products.length === 0">
+                <i class="fa fa-box-open"></i>
+                <h3>Aucun produit trouvé</h3>
+                <p>Essayez de modifier vos filtres ou recherchez autre chose.</p>
+                <button (click)="resetFilters()">Réinitialiser les filtres</button>
+            </div>
 
             <!-- Pagination -->
             <mat-paginator [length]="totalProducts" [pageSize]="pageSize" [pageSizeOptions]="[12, 24, 48]"

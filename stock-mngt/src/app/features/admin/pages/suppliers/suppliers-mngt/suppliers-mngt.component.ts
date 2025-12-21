@@ -188,7 +188,7 @@ export class SuppliersMngtComponent implements OnInit {
   }
 
   editSupplier(supplier: any) {
-    this.router.navigate(['suppliers/' + supplier.id]);
+    this.router.navigate(['suppliers/edit/' + supplier.id]);
   }
 
   handlePageEvent(event: any) {

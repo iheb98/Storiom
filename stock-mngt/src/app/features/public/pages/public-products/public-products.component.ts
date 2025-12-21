@@ -117,13 +117,13 @@ export class PublicProductsComponent implements OnInit {
   }
 
   loadProducts() {
-
+    this.isLoading = true;
     const query = this.buildQuery();
     this.publicService.getPublicProducts({ page: this.currentPage, size: this.currentSize, query, sort: this.filters.sort, searchable: this.searchable }).subscribe(res => {
       this.products = res;
-
+      this.isLoading = false;
     }, (error) => {
-
+      this.isLoading = false;
     });
 
     this.publicService.countPublicProducts({ query, searchable: this.searchable }).subscribe(res => {

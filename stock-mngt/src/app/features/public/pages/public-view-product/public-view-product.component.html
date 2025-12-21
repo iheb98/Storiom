@@ -169,10 +169,47 @@
     </div>
 </div>
 
-<!-- Loading State -->
-<div class="loading-state" *ngIf="!product">
-    <div class="spinner"></div>
-    <p>Chargement du produit...</p>
+<!-- Loading Skeleton -->
+<div class="loading-skeleton" *ngIf="!product">
+    <!-- Breadcrumb Skeleton -->
+    <div class="skeleton-breadcrumb">
+        <div class="skeleton-text short"></div>
+        <div class="skeleton-text short"></div>
+        <div class="skeleton-text medium"></div>
+    </div>
+
+    <!-- Main Product Skeleton -->
+    <div class="skeleton-product-main">
+        <!-- Image Gallery Skeleton -->
+        <div class="skeleton-gallery">
+            <div class="skeleton-main-image"></div>
+            <div class="skeleton-thumbnails">
+                <div class="skeleton-thumb" *ngFor="let i of [1,2,3,4]"></div>
+            </div>
+        </div>
+
+        <!-- Info Section Skeleton -->
+        <div class="skeleton-info">
+            <div class="skeleton-text short"></div>
+            <div class="skeleton-text long"></div>
+            <div class="skeleton-stars"></div>
+            <div class="skeleton-price"></div>
+            <div class="skeleton-text medium"></div>
+            <div class="skeleton-purchase">
+                <div class="skeleton-qty"></div>
+                <div class="skeleton-btn"></div>
+            </div>
+            <div class="skeleton-delivery"></div>
+            <div class="skeleton-seller"></div>
+        </div>
+    </div>
+
+    <!-- Description Skeleton -->
+    <div class="skeleton-section">
+        <div class="skeleton-text medium"></div>
+        <div class="skeleton-text long"></div>
+        <div class="skeleton-text long"></div>
+    </div>
 </div>
 
 <!-- Image Lightbox -->

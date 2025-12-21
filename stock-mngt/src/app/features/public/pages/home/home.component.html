@@ -3,7 +3,6 @@
     <section class="hero-section">
         <div class="hero-background"></div>
         <div class="hero-content">
-            <!--<span class="hero-badge">🛍️ Marketplace Tunisien</span>-->
             <h1>Découvrez des Produits<br><span class="highlight">Uniques & Locaux</span></h1>
             <p class="hero-subtitle">
                 Soutenez les commerces indépendants tunisiens et trouvez des produits de qualité,
@@ -17,7 +16,9 @@
                     <fa-icon [icon]="storeIcon"></fa-icon> Voir les Boutiques
                 </a>
             </div>
-            <div class="hero-stats">
+
+            <!-- Stats with loading skeleton -->
+            <div class="hero-stats" *ngIf="!isStatsLoading && !isStoresLoading">
                 <div class="stat-item">
                     <span class="stat-number">{{ storesCount }}+</span>
                     <span class="stat-label">Boutiques</span>
@@ -30,6 +31,9 @@
                     <span class="stat-number">{{ categoriesCount }}+</span>
                     <span class="stat-label">Catégories</span>
                 </div>
+            </div>
+            <div class="hero-stats-skeleton" *ngIf="isStatsLoading || isStoresLoading">
+                <div class="stat-skeleton" *ngFor="let i of [1,2,3]"></div>
             </div>
         </div>
         <div class="scroll-indicator" (click)="scrollToCategories()">
@@ -46,19 +50,18 @@
                 <p>Trouvez exactement ce que vous cherchez parmi nos différentes catégories.</p>
             </div>
 
-            <div class="category-grid" *ngIf="!isLoading">
+            <div class="category-grid" *ngIf="!isCategoriesLoading">
                 <div class="category-card" *ngFor="let category of categories" [routerLink]="['/publicProducts']"
                     [queryParams]="{ category: category.id }">
                     <div class="category-icon">
                         <fa-icon [icon]="tagIcon"></fa-icon>
                     </div>
                     <h3>{{ category.name }}</h3>
-                    <!--<span class="category-count">{{ category.productCount || 0 }} produits</span>-->
                 </div>
             </div>
 
-            <div class="loading-skeleton" *ngIf="isLoading">
-                <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
+            <div class="loading-skeleton category-skeleton" *ngIf="isCategoriesLoading">
+                <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6,7,8]"></div>
             </div>
         </div>
     </section>
@@ -72,12 +75,16 @@
                 <p>Découvrez les articles les plus appréciés par notre communauté.</p>
             </div>
 
-            <div class="products-grid">
+            <div class="products-grid" *ngIf="!isProductsLoading">
                 <app-product-card *ngFor="let product of featuredProducts" [product]="product">
                 </app-product-card>
             </div>
 
-            <div class="section-cta">
+            <div class="loading-skeleton products-skeleton" *ngIf="isProductsLoading">
+                <div class="skeleton-product" *ngFor="let i of [1,2,3,4,5,6,7,8]"></div>
+            </div>
+
+            <div class="section-cta" *ngIf="!isProductsLoading">
                 <a routerLink="/publicProducts" class="btn btn-outline">
                     Voir tous les produits <fa-icon [icon]="arrowRightIcon"></fa-icon>
                 </a>
@@ -94,7 +101,7 @@
                 <p>Découvrez les boutiques les plus populaires de notre marketplace.</p>
             </div>
 
-            <div class="stores-grid">
+            <div class="stores-grid" *ngIf="!isStoresLoading">
                 <div class="store-card" *ngFor="let store of featuredStores" [routerLink]="['/stores', store.id]">
                     <div class="store-logo">
                         <img [src]="store.logo ? environment.backend + '/' + store.logo : 'assets/default_store.png'"
@@ -112,7 +119,11 @@
                 </div>
             </div>
 
-            <div class="section-cta">
+            <div class="loading-skeleton stores-skeleton" *ngIf="isStoresLoading">
+                <div class="skeleton-store" *ngFor="let i of [1,2,3,4,5,6]"></div>
+            </div>
+
+            <div class="section-cta" *ngIf="!isStoresLoading">
                 <a routerLink="/stores" class="btn btn-outline">
                     Voir toutes les boutiques <fa-icon [icon]="arrowRightIcon"></fa-icon>
                 </a>

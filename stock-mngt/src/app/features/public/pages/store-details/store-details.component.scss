@@ -755,6 +755,25 @@ ng-select {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 24px;
+        animation: fadeIn 0.4s ease-out;
+
+        @media (max-width: 576px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .products-grid-skeleton {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 24px;
+
+        .skeleton-product {
+            height: 350px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: $radius-md;
+        }
 
         @media (max-width: 576px) {
             grid-template-columns: 1fr;
@@ -806,5 +825,124 @@ ng-select {
         background: $white;
         border-radius: $radius-md;
         border: 1px solid $border-color;
+    }
+}
+
+// ============================================
+// STORE HERO SKELETON
+// ============================================
+.store-hero-skeleton {
+    height: 320px;
+    border-radius: $radius-lg;
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, rgba(26, 35, 126, 0.85) 0%, rgba(63, 81, 181, 0.7) 100%);
+    display: flex;
+    align-items: flex-end;
+    padding: 40px;
+    max-width: 1440px;
+    margin: 0 auto 30px;
+
+    .hero-skeleton-content {
+        display: flex;
+        gap: 30px;
+        align-items: flex-end;
+        width: 100%;
+    }
+
+    .skeleton-logo {
+        width: 120px;
+        height: 120px;
+        border-radius: $radius-md;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.1) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+
+    .skeleton-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .skeleton-text {
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.1) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        border-radius: 4px;
+
+        &.title {
+            width: 300px;
+            height: 40px;
+        }
+
+        &.badge {
+            width: 150px;
+            height: 30px;
+            border-radius: 20px;
+        }
+
+        &.contact {
+            width: 120px;
+            height: 20px;
+        }
+    }
+
+    .skeleton-contacts {
+        display: flex;
+        gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+        height: auto;
+        min-height: 280px;
+        padding: 20px;
+
+        .hero-skeleton-content {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .skeleton-logo {
+            width: 80px;
+            height: 80px;
+        }
+
+        .skeleton-info {
+            align-items: center;
+        }
+
+        .skeleton-text.title {
+            width: 200px;
+            height: 30px;
+        }
+
+        .skeleton-contacts {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    }
+}
+
+// ============================================
+// KEYFRAMES
+// ============================================
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
     }
 }

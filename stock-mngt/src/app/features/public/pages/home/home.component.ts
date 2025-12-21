@@ -17,7 +17,6 @@ import { environment } from 'src/environments/environment';
 export class HomeComponent implements OnInit {
   environment = environment;
   categories: any[] = [];
-  isLoading = true;
   featuredProducts: any[] = [];
   featuredStores: any[] = [];
 
@@ -26,12 +25,18 @@ export class HomeComponent implements OnInit {
   productsCount = 0;
   categoriesCount = 0;
 
+  // Loading States
+  isCategoriesLoading = true;
+  isProductsLoading = true;
+  isStoresLoading = true;
+  isStatsLoading = true;
+
   // Icons
   searchIcon = faSearch;
   cartIcon = faShoppingCart;
   userIcon = faUser;
   storeIcon = faStore;
-  boxOpenIcon = faBoxOpen; // Kept for compatibility if used elsewhere, but we'll use boxIcon for fa-box
+  boxOpenIcon = faBoxOpen;
   shieldIcon = faShieldAlt;
   truckIcon = faTruck;
   gemIcon = faGem;
@@ -59,41 +64,56 @@ export class HomeComponent implements OnInit {
   }
 
   loadCategories() {
-    this.isLoading = true;
+    this.isCategoriesLoading = true;
     this.publicService.getCategoryTree().subscribe(
       response => {
-        this.categories = response.slice(0, 8); // Show max 8 categories
+        this.categories = response.slice(0, 8);
         this.categoriesCount = response.length;
-        this.isLoading = false;
+        this.isCategoriesLoading = false;
       },
       error => {
         console.error('Error fetching categories:', error);
-        this.isLoading = false;
+        this.isCategoriesLoading = false;
       }
     );
   }
 
   loadFeaturedProducts() {
+    this.isProductsLoading = true;
     this.publicService.getRandomProducts().subscribe(
       response => {
-        this.featuredProducts = response.slice(0, 8); // Show max 8 products
+        this.featuredProducts = response.slice(0, 8);
+        this.isProductsLoading = false;
+      },
+      error => {
+        this.isProductsLoading = false;
       }
     );
   }
 
   loadFeaturedStores() {
+    this.isStoresLoading = true;
     this.publicService.getAllStores().subscribe(
       response => {
-        this.featuredStores = response.slice(0, 6); // Show max 6 stores
+        this.featuredStores = response.slice(0, 6);
         this.storesCount = response.length;
+        this.isStoresLoading = false;
+      },
+      error => {
+        this.isStoresLoading = false;
       }
     );
   }
 
   loadStats() {
+    this.isStatsLoading = true;
     this.publicService.countPublicProducts({}).subscribe(
       response => {
         this.productsCount = response.count || 0;
+        this.isStatsLoading = false;
+      },
+      error => {
+        this.isStatsLoading = false;
       }
     );
   }
