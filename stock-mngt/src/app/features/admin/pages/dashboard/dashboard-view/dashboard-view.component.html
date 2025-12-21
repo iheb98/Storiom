@@ -1,22 +1,7 @@
 <div class="dashboard-container">
 
-    <!-- Loading Skeleton -->
-    <div class="loading-skeleton" *ngIf="isLoading">
-        <div class="skeleton-header"></div>
-        <div class="skeleton-stats">
-            <div class="skeleton-stat" *ngFor="let i of [1,2,3,4,5]"></div>
-        </div>
-        <div class="skeleton-content">
-            <div class="skeleton-card full-width"></div>
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-            <div class="skeleton-card"></div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="page-content" *ngIf="!isLoading">
+    <!-- Main Content - Always visible -->
+    <div class="page-content">
 
         <!-- Welcome Header -->
         <header class="dashboard-header">
@@ -37,7 +22,12 @@
 
         <!-- Stats Cards -->
         <section class="stats-section">
-            <div class="stats-grid">
+            <!-- Stats Loading Skeleton -->
+            <div class="stats-grid skeleton-grid" *ngIf="isLoading">
+                <div class="skeleton-stat" *ngFor="let i of [1,2,3,4,5]"></div>
+            </div>
+            <!-- Stats Content -->
+            <div class="stats-grid" *ngIf="!isLoading">
                 <div class="stat-card" *ngFor="let w of widgetsList">
                     <div class="stat-icon" [ngClass]="w.class">
                         <fa-icon [icon]="w.icon"></fa-icon>
@@ -56,7 +46,7 @@
         </section>
 
         <!-- Main Content Grid -->
-        <section class="content-grid">
+        <section class="content-grid" *ngIf="!isLoading">
             <!-- Category Stats -->
             <div class="dashboard-card full-width">
                 <div class="card-header">

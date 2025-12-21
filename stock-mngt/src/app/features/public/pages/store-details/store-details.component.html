@@ -16,7 +16,7 @@
 
 <div class="store-details-container" *ngIf="store">
     <!-- Store Hero Banner -->
-    <div class="store-hero"
+    <div class="store-hero" [class.expanded]="isDescriptionExpanded"
         [style.backgroundImage]="'url(' + (store.images?.length ? environment.backend + '/' + store.images[0] : 'assets/store-cover-default.jpg') + ')'">
         <div class="hero-overlay">
             <div class="hero-content">
@@ -52,10 +52,13 @@
                             <span>Site web</span>
                         </a>
                     </div>
-                    <p class="store-desc" *ngIf="store.description">{{ store.description }}</p>
-
+                    <div class="store-desc" *ngIf="store.description" [innerHTML]="store.description | safeHtml"></div>
                 </div>
             </div>
+            <button class="hero-toggle-btn" (click)="isDescriptionExpanded = !isDescriptionExpanded">
+                <i class="fa" [class.fa-chevron-down]="!isDescriptionExpanded"
+                    [class.fa-chevron-up]="isDescriptionExpanded"></i>
+            </button>
         </div>
     </div>
 

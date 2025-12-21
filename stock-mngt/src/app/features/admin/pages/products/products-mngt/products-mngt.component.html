@@ -1,21 +1,5 @@
 <div class="products-page">
 
-    <!-- Loading Skeleton -->
-    <div class="loading-skeleton" *ngIf="isLoading">
-        <div class="skeleton-header">
-            <div class="skeleton-text">
-                <div class="skeleton-title"></div>
-                <div class="skeleton-subtitle"></div>
-            </div>
-            <div class="skeleton-button"></div>
-        </div>
-        <div class="skeleton-search"></div>
-        <div class="skeleton-bulk"></div>
-        <div class="skeleton-grid">
-            <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6,7,8]"></div>
-        </div>
-    </div>
-
     <!-- Action Loading Overlay -->
     <div class="action-overlay" *ngIf="isActionLoading">
         <div class="action-spinner">
@@ -24,8 +8,8 @@
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="page-content" *ngIf="!isLoading">
+    <!-- Main Content - Always visible -->
+    <div class="page-content">
 
         <!-- Page Header -->
         <header class="page-header">
@@ -165,8 +149,13 @@
             </div>
         </div>
 
+        <!-- Products Grid Loading Skeleton -->
+        <div class="products-grid-skeleton" *ngIf="isLoading">
+            <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6,7,8]"></div>
+        </div>
+
         <!-- Products Grid -->
-        <div class="products-grid" *ngIf="products?.length > 0">
+        <div class="products-grid" *ngIf="!isLoading && products?.length > 0">
             <div class="product-card" *ngFor="let item of products" [class.selected]="isSelected(item?.id)">
                 <!-- Selection Checkbox -->
                 <label class="product-checkbox" (click)="$event.stopPropagation()">
@@ -230,14 +219,14 @@
         </div>
 
         <!-- Empty State -->
-        <div class="empty-state" *ngIf="products?.length === 0">
+        <div class="empty-state" *ngIf="!isLoading && products?.length === 0">
             <fa-icon [icon]="faBox"></fa-icon>
             <h3>Aucun produit trouvé</h3>
             <p>Essayez de modifier vos critères de recherche ou ajoutez un nouveau produit</p>
         </div>
 
         <!-- Pagination -->
-        <div class="pagination-wrapper" *ngIf="products?.length > 0">
+        <div class="pagination-wrapper" *ngIf="!isLoading && products?.length > 0">
             <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="24"
                 [showFirstLastButtons]="true" [pageSizeOptions]="[24, 48, 100, 200]" [pageIndex]="0">
             </mat-paginator>

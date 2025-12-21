@@ -20,7 +20,7 @@
     <div class="page-content" *ngIf="!isLoading && store">
 
         <!-- Store Header -->
-        <div class="store-header">
+        <div class="store-header" [class.expanded]="isDescriptionExpanded">
             <div class="header-content">
                 <div class="store-logo"
                     (click)="openImage(store?.logo ? backend_URL + '/' + store?.logo : 'assets/default_store.png')">
@@ -44,7 +44,8 @@
                             <fa-icon [icon]="eyeIcon"></fa-icon> Visible au public
                         </span>
                     </div>
-                    <p class="store-description" *ngIf="store?.description">{{ store?.description }}</p>
+                    <div class="store-description" *ngIf="store?.description"
+                        [innerHTML]="store?.description | safeHtml"></div>
                 </div>
                 <div class="header-actions">
                     <button class="btn-edit" [routerLink]="['/admin/stores/edit/' + store?.id]">
@@ -52,6 +53,10 @@
                     </button>
                 </div>
             </div>
+            <button class="header-toggle-btn" *ngIf="store?.description"
+                (click)="isDescriptionExpanded = !isDescriptionExpanded">
+                <fa-icon [icon]="isDescriptionExpanded ? chevronUpIcon : chevronDownIcon"></fa-icon>
+            </button>
         </div>
 
         <!-- Stats Cards -->

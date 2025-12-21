@@ -229,11 +229,10 @@
                                 <label for="description">
                                     Décrivez votre boutique
                                 </label>
-                                <textarea id="description" formControlName="description" rows="6"
-                                    placeholder="Présentez votre boutique, vos produits, vos valeurs..."></textarea>
-                                <span class="char-count">
-                                    {{ form.get('description').value?.length || 0 }} / 50000 caractères
-                                </span>
+                                <quill-editor formControlName="description" [styles]="{height: '200px'}"
+                                    placeholder="Présentez votre boutique avec du texte enrichi..."
+                                    [modules]="quillModules">
+                                </quill-editor>
                             </div>
                         </div>
                     </div>

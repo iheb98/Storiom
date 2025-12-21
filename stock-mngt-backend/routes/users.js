@@ -217,7 +217,7 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res, next) =>
         user.entryDate = req.body.entryDate
         user.save().then(async savedUser => {
             // Update or Create Address if fields are present
-            const { street, city, state, postalCode, country } = req.body;
+            const { street, city, state, postalCode, country } = req.body.address;
             if (street || city || state || postalCode || country) {
                 const addressData = { street, city, state, postalCode, country, userId: user.id };
 

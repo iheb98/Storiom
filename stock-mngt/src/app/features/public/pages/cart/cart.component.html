@@ -3,11 +3,19 @@
   <!-- Page Header -->
   <header class="page-header">
     <h1><fa-icon [icon]="faShoppingCart"></fa-icon> Mon Panier</h1>
-    <span class="item-count" *ngIf="cart.length > 0">{{ totalItems }} article(s)</span>
+    <span class="item-count" *ngIf="!isLoading && cart.length > 0">{{ totalItems }} article(s)</span>
   </header>
 
+  <!-- Loading Skeleton -->
+  <div class="cart-loading" *ngIf="isLoading">
+    <div class="cart-items-skeleton">
+      <div class="skeleton-item" *ngFor="let i of [1,2,3]"></div>
+    </div>
+    <div class="summary-skeleton"></div>
+  </div>
+
   <!-- Cart Content -->
-  <div class="cart-content" *ngIf="cart.length > 0">
+  <div class="cart-content" *ngIf="!isLoading && cart.length > 0">
 
     <!-- Cart Items -->
     <div class="cart-items-section">
@@ -103,7 +111,7 @@
   </div>
 
   <!-- Empty Cart State -->
-  <div class="empty-cart" *ngIf="cart.length === 0">
+  <div class="empty-cart" *ngIf="!isLoading && cart.length === 0">
     <div class="empty-icon">
       <fa-icon [icon]="faShoppingCart"></fa-icon>
     </div>
@@ -117,7 +125,7 @@
 </div>
 
 <!-- Mobile Sticky Bar -->
-<div class="mobile-sticky-bar" *ngIf="cart.length > 0">
+<div class="mobile-sticky-bar" *ngIf="!isLoading && cart.length > 0">
   <div class="sticky-total">
     <span class="label">Total</span>
     <span class="amount">{{ totalPrice | number:'1.2-2' }} TND</span>

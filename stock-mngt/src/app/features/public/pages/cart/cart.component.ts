@@ -27,6 +27,7 @@ export class CartComponent implements OnInit {
   cart: CartItem[] = [];
   totalItems = 0;
   totalPrice = 0;
+  isLoading = false;
 
   // Icons
   faShoppingCart = faShoppingCart;
@@ -66,12 +67,15 @@ export class CartComponent implements OnInit {
   }
 
   loadCartFromApi() {
+    this.isLoading = true;
     this.productService.getCart().subscribe((res: any) => {
       this.cart = res;
       this.parseProductImages();
       this.calculateTotals();
+      this.isLoading = false;
     }, (error) => {
       console.error('Error fetching cart', error);
+      this.isLoading = false;
     });
   }
 

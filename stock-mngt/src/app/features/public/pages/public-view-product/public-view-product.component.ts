@@ -59,6 +59,9 @@ export class PublicViewProductComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // Scroll to top when navigating to this page
+    window.scrollTo(0, 0);
+
     this.route.paramMap.subscribe(params => {
       this.id = params.get('id');
       if (this.id) this.loadProduct(this.id);

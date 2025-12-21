@@ -345,6 +345,124 @@ $radius-lg: 16px;
         font-size: 0.8rem;
         color: $text-secondary;
     }
+
+    // Quill Editor Styling
+    quill-editor {
+        display: block;
+
+        ::ng-deep {
+            .ql-toolbar {
+                border: 1px solid $border-color;
+                border-bottom: none;
+                border-radius: $radius-sm $radius-sm 0 0;
+                background: $background;
+                padding: 10px;
+
+                .ql-formats {
+                    margin-right: 12px;
+                }
+
+                button {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 4px;
+                    transition: all 0.2s;
+
+                    &:hover {
+                        background: $primary-light;
+                        color: $primary;
+                    }
+
+                    &.ql-active {
+                        background: $primary-light;
+                        color: $primary;
+                    }
+                }
+
+                .ql-picker {
+                    color: $text-secondary;
+
+                    .ql-picker-label {
+                        border: 1px solid transparent;
+                        border-radius: 4px;
+                        padding: 4px 8px;
+                        transition: all 0.2s;
+
+                        &:hover {
+                            background: $primary-light;
+                            color: $primary;
+                        }
+                    }
+
+                    &.ql-expanded .ql-picker-label {
+                        background: $primary-light;
+                        color: $primary;
+                        border-color: $primary;
+                    }
+
+                    .ql-picker-options {
+                        background: $white;
+                        border: 1px solid $border-color;
+                        border-radius: $radius-sm;
+                        box-shadow: $shadow-md;
+                        padding: 8px;
+                    }
+                }
+            }
+
+            .ql-container {
+                border: 1px solid $border-color;
+                border-radius: 0 0 $radius-sm $radius-sm;
+                background: $white;
+                font-family: inherit;
+                font-size: 0.95rem;
+
+                &.ql-snow {
+                    border-top: none;
+                }
+
+                .ql-editor {
+                    min-height: 200px;
+                    padding: 16px;
+                    line-height: 1.7;
+                    color: $text-primary;
+
+                    &.ql-blank::before {
+                        color: lighten($text-secondary, 15%);
+                        font-style: normal;
+                    }
+
+                    p,
+                    ul,
+                    ol {
+                        margin-bottom: 10px;
+                    }
+
+                    h1,
+                    h2,
+                    h3,
+                    h4,
+                    h5,
+                    h6 {
+                        margin-bottom: 12px;
+                        color: $text-primary;
+                    }
+                }
+            }
+
+            // Focus state
+            &:focus-within {
+                .ql-toolbar {
+                    border-color: $primary;
+                }
+
+                .ql-container {
+                    border-color: $primary;
+                    box-shadow: 0 0 0 3px $primary-light;
+                }
+            }
+        }
+    }
 }
 
 // ============================================

@@ -683,6 +683,36 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+
+            // Rich text styling
+            p {
+                margin: 0;
+                display: inline;
+            }
+
+            strong,
+            b {
+                font-weight: 600;
+            }
+
+            em,
+            i {
+                font-style: italic;
+            }
+
+            u {
+                text-decoration: underline;
+            }
+
+            a {
+                color: $accent-purple;
+                text-decoration: none;
+            }
+
+            // Remove background colors for compact list view
+            [style*="background"] {
+                background: none !important;
+            }
         }
 
         .store-contact {

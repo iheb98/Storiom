@@ -1,17 +1,5 @@
 <div class="expenses-page">
 
-    <!-- Loading Skeleton -->
-    <div class="loading-skeleton" *ngIf="isLoading">
-        <div class="skeleton-header"></div>
-        <div class="skeleton-actions"></div>
-        <div class="skeleton-list">
-            <div class="skeleton-item"></div>
-            <div class="skeleton-item"></div>
-            <div class="skeleton-item"></div>
-            <div class="skeleton-item"></div>
-        </div>
-    </div>
-
     <!-- Action Loading Overlay -->
     <div class="action-overlay" *ngIf="isActionLoading">
         <div class="action-spinner">
@@ -20,8 +8,8 @@
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="page-content" *ngIf="!isLoading">
+    <!-- Main Content - Always visible -->
+    <div class="page-content">
 
         <!-- Page Header -->
         <header class="page-header">
@@ -90,8 +78,13 @@
             </div>
         </div>
 
+        <!-- List Loading Skeleton -->
+        <div class="expenses-list-skeleton" *ngIf="isLoading">
+            <div class="skeleton-item" *ngFor="let i of [1,2,3,4,5]"></div>
+        </div>
+
         <!-- Expenses List -->
-        <div class="expenses-list" *ngIf="expenses?.length > 0">
+        <div class="expenses-list" *ngIf="!isLoading && expenses?.length > 0">
             <div class="expense-item" *ngFor="let expense of expenses">
                 <div class="expense-icon">
                     <fa-icon [icon]="faReceipt"></fa-icon>
@@ -130,7 +123,7 @@
         </div>
 
         <!-- Empty State -->
-        <div class="empty-state" *ngIf="count === 0">
+        <div class="empty-state" *ngIf="!isLoading && count === 0">
             <div class="empty-icon">
                 <fa-icon [icon]="faReceipt"></fa-icon>
             </div>
@@ -139,7 +132,7 @@
         </div>
 
         <!-- Pagination -->
-        <div class="pagination-wrapper" *ngIf="expenses?.length > 0">
+        <div class="pagination-wrapper" *ngIf="!isLoading && expenses?.length > 0">
             <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
                 [showFirstLastButtons]="true" [pageSizeOptions]="[5, 10, 20]" [pageIndex]="0">
             </mat-paginator>

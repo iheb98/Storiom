@@ -124,9 +124,9 @@
         <div class="section-header">
             <h2><fa-icon [icon]="faInfoCircle"></fa-icon> Description du produit</h2>
         </div>
-        <div class="description-content">
-            <p>{{ product?.description || 'Aucune description disponible pour ce produit.' }}</p>
+        <div class="description-content" *ngIf="product?.description" [innerHTML]="product?.description | safeHtml">
         </div>
+        <p class="no-description" *ngIf="!product?.description">Aucune description disponible pour ce produit.</p>
 
         <!-- Product Details -->
         <div class="details-grid">

@@ -1,14 +1,5 @@
 <div class="receipts-page">
 
-    <!-- Loading Skeleton -->
-    <div class="loading-skeleton" *ngIf="isLoading">
-        <div class="skeleton-header"></div>
-        <div class="skeleton-actions"></div>
-        <div class="skeleton-list">
-            <div class="skeleton-item" *ngFor="let i of [1,2,3,4,5]"></div>
-        </div>
-    </div>
-
     <!-- Action Overlay -->
     <div class="action-overlay" *ngIf="isActionLoading">
         <div class="action-spinner">
@@ -17,8 +8,8 @@
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="page-content" *ngIf="!isLoading">
+    <!-- Main Content - Always visible -->
+    <div class="page-content">
 
         <!-- Page Header -->
         <header class="page-header">
@@ -105,8 +96,13 @@
             </div>
         </div>
 
+        <!-- List Loading Skeleton -->
+        <div class="receipts-list-skeleton" *ngIf="isLoading">
+            <div class="skeleton-item" *ngFor="let i of [1,2,3,4,5]"></div>
+        </div>
+
         <!-- Receipts List -->
-        <div class="receipts-list" *ngIf="receipts?.length > 0">
+        <div class="receipts-list" *ngIf="!isLoading && receipts?.length > 0">
             <div class="receipt-item" *ngFor="let receipt of receipts">
                 <div class="receipt-type" [class.sold]="receipt?.type === 'SOLD'"
                     [class.loaded]="receipt?.type === 'LOADED'" [class.returned]="receipt?.type === 'RETURNED'">
@@ -157,14 +153,14 @@
         </div>
 
         <!-- Empty State -->
-        <div class="empty-state" *ngIf="count === 0">
+        <div class="empty-state" *ngIf="!isLoading && count === 0">
             <fa-icon [icon]="faReceipt"></fa-icon>
             <h3>Aucune facture trouvée</h3>
             <p>Essayez de modifier vos critères de recherche ou créez une nouvelle facture</p>
         </div>
 
         <!-- Pagination -->
-        <div class="pagination-wrapper" *ngIf="receipts?.length > 0">
+        <div class="pagination-wrapper" *ngIf="!isLoading && receipts?.length > 0">
             <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
                 [showFirstLastButtons]="true" [pageSizeOptions]="[5, 10, 20]" [pageIndex]="0">
             </mat-paginator>

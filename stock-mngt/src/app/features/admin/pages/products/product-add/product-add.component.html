@@ -114,8 +114,10 @@
 
                             <div class="form-group">
                                 <label for="description"><fa-icon [icon]="faAlignLeft"></fa-icon> Description</label>
-                                <textarea id="description" formControlName="description" rows="5"
-                                    placeholder="Décrivez votre produit..."></textarea>
+                                <quill-editor formControlName="description" [styles]="{height: '200px'}"
+                                    placeholder="Décrivez votre produit avec du texte enrichi..."
+                                    [modules]="quillModules">
+                                </quill-editor>
                             </div>
                         </div>
                     </div>

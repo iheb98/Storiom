@@ -3,7 +3,7 @@ import {
   faEdit, faInfo, faBox, faShoppingCart, faFolder, faTruck,
   faCheckCircle, faTimesCircle, faEye, faPhoneAlt, faPhone,
   faEnvelope, faGlobe, faMapMarkerAlt, faRoad, faCity, faMap,
-  faBolt, faPlus, faExternalLinkAlt, faStore
+  faBolt, faPlus, faExternalLinkAlt, faStore, faChevronDown, faChevronUp
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 
@@ -48,6 +48,8 @@ export class StoreViewComponent implements OnInit {
   plusIcon = faPlus;
   externalLinkIcon = faExternalLinkAlt;
   storeIcon = faStore;
+  chevronDownIcon = faChevronDown;
+  chevronUpIcon = faChevronUp;
 
   selectedImage: string | null = null;
 
@@ -59,6 +61,7 @@ export class StoreViewComponent implements OnInit {
 
   // Loading States
   isLoading = true;
+  isDescriptionExpanded = false;
 
   constructor(
     private authService: AuthService,

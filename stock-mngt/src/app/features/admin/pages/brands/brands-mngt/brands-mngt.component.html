@@ -1,23 +1,5 @@
 <div class="brands-page">
 
-    <!-- Loading Skeleton -->
-    <div class="loading-skeleton" *ngIf="isLoading">
-        <div class="skeleton-header">
-            <div class="skeleton-icon"></div>
-            <div class="skeleton-text">
-                <div class="skeleton-title"></div>
-                <div class="skeleton-subtitle"></div>
-            </div>
-        </div>
-        <div class="skeleton-toolbar"></div>
-        <div class="skeleton-section">
-            <div class="skeleton-section-title"></div>
-            <div class="skeleton-grid">
-                <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
-            </div>
-        </div>
-    </div>
-
     <!-- Action Loading Overlay -->
     <div class="action-overlay" *ngIf="isActionLoading">
         <div class="action-spinner">
@@ -26,8 +8,8 @@
         </div>
     </div>
 
-    <!-- Main Content (shown only when data is loaded) -->
-    <div class="page-content" *ngIf="!isLoading">
+    <!-- Main Content - Always visible -->
+    <div class="page-content">
 
         <!-- Page Header -->
         <header class="page-header">
@@ -68,8 +50,18 @@
             </div>
         </div>
 
+        <!-- Brands Loading Skeleton -->
+        <div class="brands-section" *ngIf="isLoading">
+            <div class="section-header">
+                <h3><fa-icon [icon]="faBookmark"></fa-icon> Marques</h3>
+            </div>
+            <div class="brands-grid skeleton-grid">
+                <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
+            </div>
+        </div>
+
         <!-- Brands Section -->
-        <div class="brands-section">
+        <div class="brands-section" *ngIf="!isLoading">
             <div class="section-header">
                 <h3><fa-icon [icon]="faBookmark"></fa-icon> Marques</h3>
                 <span class="hint-text" *ngIf="mode == 'DELETE'">Cliquez sur une marque pour la supprimer</span>
@@ -104,7 +96,7 @@
             </div>
 
             <!-- Empty State -->
-            <div class="empty-state" *ngIf="!brands?.length">
+            <div class="empty-state" *ngIf="!isLoading && !brands?.length">
                 <fa-icon [icon]="faTags"></fa-icon>
                 <h3>Aucune marque disponible</h3>
                 <p>Commencez par ajouter votre première marque</p>

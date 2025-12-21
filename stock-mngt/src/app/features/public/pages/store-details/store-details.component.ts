@@ -36,6 +36,7 @@ export class StoreDetailsComponent implements OnInit {
 
     // UI State
     mobileFiltersOpen = false;
+    isDescriptionExpanded = false;
     collapsedSections = {
         search: false,
         category: false,
@@ -56,6 +57,7 @@ export class StoreDetailsComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
+        window.scrollTo(0, 0);
         this.route.paramMap.subscribe(params => {
             this.storeId = params.get('id');
             if (this.storeId) {

@@ -84,6 +84,19 @@ export class ProductAddComponent implements OnInit {
   edit = false;
   editCategory = false;
 
+  // Quill Editor Config
+  quillModules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }, { 'background': [] }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'align': [] }],
+      ['link'],
+      ['clean']
+    ]
+  };
+
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
 
   constructor(

@@ -1,22 +1,5 @@
 <div class="orders-page">
 
-    <!-- Loading Skeleton -->
-    <div class="loading-skeleton" *ngIf="isLoading">
-        <div class="skeleton-header"></div>
-        <div class="skeleton-stats">
-            <div class="skeleton-stat-card"></div>
-            <div class="skeleton-stat-card"></div>
-            <div class="skeleton-stat-card"></div>
-            <div class="skeleton-stat-card"></div>
-        </div>
-        <div class="skeleton-filter-bar"></div>
-        <div class="skeleton-orders">
-            <div class="skeleton-order-card"></div>
-            <div class="skeleton-order-card"></div>
-            <div class="skeleton-order-card"></div>
-        </div>
-    </div>
-
     <!-- Action Loading Overlay -->
     <div class="action-overlay" *ngIf="isActionLoading">
         <div class="action-spinner">
@@ -25,8 +8,8 @@
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="page-content" *ngIf="!isLoading">
+    <!-- Main Content - Always visible -->
+    <div class="page-content">
 
         <!-- Page Header -->
         <header class="page-header">
@@ -96,8 +79,13 @@
             </button>
         </div>
 
+        <!-- List Loading Skeleton -->
+        <div class="orders-list-skeleton" *ngIf="isLoading">
+            <div class="skeleton-order-card" *ngFor="let i of [1,2,3,4,5]"></div>
+        </div>
+
         <!-- Orders List -->
-        <div class="orders-list" *ngIf="filteredOrders?.length > 0">
+        <div class="orders-list" *ngIf="!isLoading && filteredOrders?.length > 0">
             <div class="order-card" *ngFor="let order of filteredOrders"
                 [class.expanded]="expandedOrderId === order.id">
 
@@ -205,7 +193,7 @@
         </div>
 
         <!-- Empty State -->
-        <div class="empty-state" *ngIf="orders?.length === 0">
+        <div class="empty-state" *ngIf="!isLoading && orders?.length === 0">
             <div class="empty-icon">
                 <fa-icon [icon]="faBoxOpen"></fa-icon>
             </div>
@@ -214,7 +202,7 @@
         </div>
 
         <!-- Filtered Empty State -->
-        <div class="empty-state filtered" *ngIf="orders?.length > 0 && filteredOrders?.length === 0">
+        <div class="empty-state filtered" *ngIf="!isLoading && orders?.length > 0 && filteredOrders?.length === 0">
             <div class="empty-icon">
                 <fa-icon [icon]="faFilter"></fa-icon>
             </div>

@@ -127,7 +127,7 @@
 
                 <div class="description-box" *ngIf="product?.description">
                     <span class="info-label"><fa-icon [icon]="faAlignLeft"></fa-icon> Description</span>
-                    <p>{{ product?.description }}</p>
+                    <div class="description-content" [innerHTML]="product?.description | safeHtml"></div>
                 </div>
             </div>
         </div>

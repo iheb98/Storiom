@@ -39,6 +39,7 @@ import { LoginComponent } from 'src/app/general/login/login.component';
 import { RegisterComponent } from 'src/app/general/register/register.component';
 import { ReviewListComponent } from './components/review-list/review-list.component';
 import { ReviewFormComponent } from './components/review-form/review-form.component';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -98,6 +99,7 @@ import { ReviewFormComponent } from './components/review-form/review-form.compon
     ReactiveFormsModule,
     ChartModule,
     MatMenuModule,
+    SharedModule
   ]
 })
 export class PublicModule { }

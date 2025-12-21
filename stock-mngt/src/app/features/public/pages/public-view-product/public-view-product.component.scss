@@ -478,12 +478,105 @@ $radius-lg: 16px;
 }
 
 .description-content {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: $text-primary;
+
+  // Rich text content styling
   p {
-    font-size: 1rem;
-    line-height: 1.7;
-    color: $text-secondary;
-    margin: 0;
+    margin: 0 0 12px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0 0 12px;
+    color: $text-primary;
+    font-weight: 600;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+  }
+
+  h4 {
+    font-size: 1rem;
+  }
+
+  strong,
+  b {
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  em,
+  i {
+    font-style: italic;
+  }
+
+  u {
+    text-decoration: underline;
+  }
+
+  s {
+    text-decoration: line-through;
+  }
+
+  ul,
+  ol {
+    margin: 0 0 12px;
+    padding-left: 25px;
+
+    li {
+      margin-bottom: 6px;
+    }
+  }
+
+  a {
+    color: $primary;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  blockquote {
+    margin: 12px 0;
+    padding: 12px 18px;
+    border-left: 4px solid $primary;
+    background: $primary-light;
+    border-radius: 0 $radius-sm $radius-sm 0;
+  }
+
+  // Handle inline background styles from Quill
+  [style*="background"] {
+    padding: 2px 4px;
+    border-radius: 3px;
+  }
+}
+
+.no-description {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: $text-secondary;
+  margin: 0;
+  font-style: italic;
 }
 
 .details-grid {

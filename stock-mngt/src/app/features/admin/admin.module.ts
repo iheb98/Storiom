@@ -68,6 +68,8 @@ import { OrdersMngtComponent } from './pages/orders/orders-mngt/orders-mngt.comp
 
 import { ReceiptInvoiceComponent } from './components/receipt-invoice/receipt-invoice.component';
 import { StoreOnboardingComponent } from './pages/stores/store-onboarding/store-onboarding.component';
+import { QuillModule } from 'ngx-quill';
+import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -154,7 +156,9 @@ import { StoreOnboardingComponent } from './pages/stores/store-onboarding/store-
     ReactiveFormsModule,
     FontAwesomeModule,
     ChartModule,
-    MatMenuModule
+    MatMenuModule,
+    QuillModule.forRoot(),
+    SharedModule
   ]
 })
 export class AdminModule { }

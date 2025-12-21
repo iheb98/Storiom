@@ -1,17 +1,5 @@
 <div class="suppliers-page">
 
-    <!-- Loading Skeleton -->
-    <div class="loading-skeleton" *ngIf="isLoading">
-        <div class="skeleton-header"></div>
-        <div class="skeleton-actions"></div>
-        <div class="skeleton-list">
-            <div class="skeleton-item"></div>
-            <div class="skeleton-item"></div>
-            <div class="skeleton-item"></div>
-            <div class="skeleton-item"></div>
-        </div>
-    </div>
-
     <!-- Action Loading Overlay -->
     <div class="action-overlay" *ngIf="isActionLoading">
         <div class="action-spinner">
@@ -20,8 +8,8 @@
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="page-content" *ngIf="!isLoading">
+    <!-- Main Content - Always visible -->
+    <div class="page-content">
 
         <!-- Page Header -->
         <header class="page-header">
@@ -91,8 +79,13 @@
             </div>
         </div>
 
+        <!-- List Loading Skeleton -->
+        <div class="suppliers-list-skeleton" *ngIf="isLoading">
+            <div class="skeleton-item" *ngFor="let i of [1,2,3,4,5]"></div>
+        </div>
+
         <!-- Suppliers List -->
-        <div class="suppliers-list" *ngIf="suppliers?.length > 0">
+        <div class="suppliers-list" *ngIf="!isLoading && suppliers?.length > 0">
             <div class="supplier-item" *ngFor="let supplier of suppliers">
                 <div class="supplier-avatar">
                     <span>{{ (supplier?.firstName?.charAt(0) || '') + (supplier?.lastName?.charAt(0) || '') }}</span>
@@ -131,7 +124,7 @@
         </div>
 
         <!-- Empty State -->
-        <div class="empty-state" *ngIf="count === 0">
+        <div class="empty-state" *ngIf="!isLoading && count === 0">
             <div class="empty-icon">
                 <fa-icon [icon]="faTruck"></fa-icon>
             </div>
@@ -140,7 +133,7 @@
         </div>
 
         <!-- Pagination -->
-        <div class="pagination-wrapper" *ngIf="suppliers?.length > 0">
+        <div class="pagination-wrapper" *ngIf="!isLoading && suppliers?.length > 0">
             <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
                 [showFirstLastButtons]="true" [pageSizeOptions]="[5, 10, 20]" [pageIndex]="0">
             </mat-paginator>

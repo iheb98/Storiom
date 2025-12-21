@@ -76,6 +76,21 @@ $radius-lg: 16px;
     animation: shimmer 1.5s infinite;
 }
 
+.suppliers-list-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 30px;
+
+    .skeleton-item {
+        height: 85px;
+        border-radius: $radius-md;
+        background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+}
+
 @keyframes shimmer {
     0% {
         background-position: 200% 0;
