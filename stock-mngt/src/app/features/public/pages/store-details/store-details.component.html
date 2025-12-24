@@ -52,10 +52,12 @@
                             <span>Site web</span>
                         </a>
                     </div>
-                    <div class="store-desc" *ngIf="store.description" [innerHTML]="store.description | safeHtml"></div>
+                    <div class="store-desc" #descriptionEl *ngIf="store.description"
+                        [innerHTML]="store.description | safeHtml"></div>
                 </div>
             </div>
-            <button class="hero-toggle-btn" (click)="isDescriptionExpanded = !isDescriptionExpanded">
+            <button class="hero-toggle-btn" *ngIf="store.description && isDescriptionOverflowing"
+                (click)="isDescriptionExpanded = !isDescriptionExpanded">
                 <i class="fa" [class.fa-chevron-down]="!isDescriptionExpanded"
                     [class.fa-chevron-up]="isDescriptionExpanded"></i>
             </button>

@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { TermsComponent } from 'src/app/pages/terms/terms.component';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { getAllGovernorates, getCitiesForGovernorate, getAllCities } from 'src/app/shared/data/tunisia-locations';
 
 import Swal from 'sweetalert2';
 import {
@@ -17,7 +18,10 @@ import {
   faArrowRight,
   faFileContract,
   faTimes,
-  faCheck
+  faCheck,
+  faMapMarkerAlt,
+  faChevronDown,
+  faChevronUp
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -39,6 +43,9 @@ export class RegisterComponent implements OnInit {
   faFileContract = faFileContract;
   faTimes = faTimes;
   faCheck = faCheck;
+  faMapMarkerAlt = faMapMarkerAlt;
+  faChevronDown = faChevronDown;
+  faChevronUp = faChevronUp;
 
   form: FormGroup;
   submitted: boolean;
@@ -46,15 +53,28 @@ export class RegisterComponent implements OnInit {
   emailFound: boolean;
   passwordError: boolean;
   confirmPasswordError: boolean;
+  showAddressSection = false;
+
+  // Autocomplete for address
+  governorateSearchText = '';
+  citySearchText = '';
+  availableGovernorates: string[] = [];
+  availableCities: string[] = [];
+  filteredGovernorates: string[] = [];
+  filteredCities: string[] = [];
+  showGovernorateSuggestions = false;
+  showCitySuggestions = false;
+
   constructor(
     private router: Router,
     private formBuilder: FormBuilder,
     private authService: AuthService,
-
-    private dialog: MatDialog) { }
+    private dialog: MatDialog
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
+    this.initLocationData();
   }
 
   initForm() {
@@ -66,11 +86,101 @@ export class RegisterComponent implements OnInit {
       password: ['', Validators.required],
       confirmPassword: ['', Validators.required],
       termsAccepted: [false, Validators.required],
-      country: [''],
+      country: ['Tunisie'],
+      state: [''],
       city: [''],
       street: [''],
       postalCode: ['']
     })
+  }
+
+  initLocationData() {
+    this.availableGovernorates = getAllGovernorates();
+    this.filteredGovernorates = [...this.availableGovernorates];
+    this.availableCities = getAllCities();
+    this.filteredCities = [...this.availableCities];
+  }
+
+  // ========================================
+  // Governorate Autocomplete
+  // ========================================
+  normalizeText(text: string): string {
+    return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  onGovernorateSearch() {
+    const searchTerm = this.normalizeText(this.governorateSearchText.trim());
+    if (!searchTerm) {
+      this.filteredGovernorates = [...this.availableGovernorates];
+      this.form.patchValue({ state: '' });
+      this.availableCities = getAllCities();
+      this.filteredCities = [...this.availableCities];
+    } else {
+      this.filteredGovernorates = this.availableGovernorates.filter(gov =>
+        this.normalizeText(gov).includes(searchTerm)
+      );
+    }
+    this.showGovernorateSuggestions = true;
+  }
+
+  selectGovernorate(governorate: string) {
+    this.governorateSearchText = governorate;
+    this.form.patchValue({ state: governorate });
+    this.showGovernorateSuggestions = false;
+
+    // Update cities based on selected governorate
+    this.availableCities = getCitiesForGovernorate(governorate);
+    this.filteredCities = [...this.availableCities];
+    this.citySearchText = '';
+    this.form.patchValue({ city: '' });
+  }
+
+  toggleGovernorateSuggestions() {
+    this.showGovernorateSuggestions = !this.showGovernorateSuggestions;
+    if (this.showGovernorateSuggestions) {
+      this.filteredGovernorates = [...this.availableGovernorates];
+    }
+  }
+
+  hideGovernorateSuggestionsDelayed() {
+    setTimeout(() => {
+      this.showGovernorateSuggestions = false;
+    }, 200);
+  }
+
+  // ========================================
+  // City Autocomplete
+  // ========================================
+  onCitySearch() {
+    const searchTerm = this.normalizeText(this.citySearchText.trim());
+    if (!searchTerm) {
+      this.filteredCities = [...this.availableCities];
+      this.form.patchValue({ city: '' });
+    } else {
+      this.filteredCities = this.availableCities.filter(city =>
+        this.normalizeText(city).includes(searchTerm)
+      );
+    }
+    this.showCitySuggestions = true;
+  }
+
+  selectCity(city: string) {
+    this.citySearchText = city;
+    this.form.patchValue({ city: city });
+    this.showCitySuggestions = false;
+  }
+
+  toggleCitySuggestions() {
+    this.showCitySuggestions = !this.showCitySuggestions;
+    if (this.showCitySuggestions) {
+      this.filteredCities = [...this.availableCities];
+    }
+  }
+
+  hideCitySuggestionsDelayed() {
+    setTimeout(() => {
+      this.showCitySuggestions = false;
+    }, 200);
   }
 
   register() {
@@ -100,7 +210,7 @@ export class RegisterComponent implements OnInit {
               showConfirmButton: false,
               timer: 6000
             })
-            this.router.navigate(['stores/view'])
+            this.router.navigate([''])
           }
         }, error => {
 
@@ -120,3 +230,4 @@ export class RegisterComponent implements OnInit {
     this.showTermsModal = true;
   }
 }
+

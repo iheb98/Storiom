@@ -362,10 +362,6 @@ ng-select {
         }
     }
 
-    &.expanded .hero-toggle-btn i {
-        transform: rotate(180deg);
-    }
-
     @media (max-width: 768px) {
         .hero-overlay {
             padding: 20px;

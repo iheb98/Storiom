@@ -2,12 +2,12 @@
 
     <!-- Breadcrumb -->
     <nav class="breadcrumb-nav">
-        <a routerLink="/marketplace">Marketplace</a>
+        <a routerLink="/" class="back-link">Accueil</a>
         <span class="separator"><fa-icon [icon]="faChevronRight"></fa-icon></span>
-        <a *ngIf="product?.category" [routerLink]="['/marketplace']" [queryParams]="{category: product.category.id}">
-            {{ product?.category?.name }}
+        <a (click)="goBack()" class="back-link">
+            Produits
         </a>
-        <span class="separator" *ngIf="product?.category"><fa-icon [icon]="faChevronRight"></fa-icon></span>
+        <span class="separator"><fa-icon [icon]="faChevronRight"></fa-icon></span>
         <span class="current">{{ product?.name }}</span>
     </nav>
 
@@ -114,6 +114,13 @@
                 </div>
                 <div class="seller-info">
                     <span class="seller-name">{{ product?.store?.name }}</span>
+                    <span class="seller-location"
+                        *ngIf="product?.store?.address?.state || product?.store?.address?.city">
+                        <fa-icon [icon]="faMapMarker"></fa-icon>
+                        {{ product?.store?.address?.city }}<span
+                            *ngIf="product?.store?.address?.city && product?.store?.address?.state">, </span>{{
+                        product?.store?.address?.state }}
+                    </span>
                 </div>
             </div>
         </div>

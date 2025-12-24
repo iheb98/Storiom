@@ -93,14 +93,43 @@
                                 <fa-icon [icon]="faMap"></fa-icon>
                                 Gouvernorat
                             </label>
-                            <input type="text" id="state" formControlName="state" placeholder="Tunis">
+                            <div class="autocomplete-wrapper">
+                                <input type="text" id="state" [(ngModel)]="governorateSearchText"
+                                    [ngModelOptions]="{standalone: true}" (input)="onGovernorateSearch()"
+                                    (focus)="showGovernorateSuggestions = true"
+                                    (blur)="hideGovernorateSuggestionsDelayed()"
+                                    placeholder="Sélectionner un gouvernorat" autocomplete="off">
+                                <fa-icon [icon]="faChevronDown" class="dropdown-icon"
+                                    (click)="toggleGovernorateSuggestions()"></fa-icon>
+                                <div class="suggestions-dropdown"
+                                    *ngIf="showGovernorateSuggestions && filteredGovernorates.length > 0">
+                                    <div class="suggestion-item" *ngFor="let gov of filteredGovernorates"
+                                        (mousedown)="selectGovernorate(gov)">
+                                        {{ gov }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="city">
                                 <fa-icon [icon]="faCity"></fa-icon>
-                                Ville
+                                Ville / Délégation
                             </label>
-                            <input type="text" id="city" formControlName="city" placeholder="La Marsa">
+                            <div class="autocomplete-wrapper">
+                                <input type="text" id="city" [(ngModel)]="citySearchText"
+                                    [ngModelOptions]="{standalone: true}" (input)="onCitySearch()"
+                                    (focus)="showCitySuggestions = true" (blur)="hideCitySuggestionsDelayed()"
+                                    placeholder="Sélectionner une ville" autocomplete="off">
+                                <fa-icon [icon]="faChevronDown" class="dropdown-icon"
+                                    (click)="toggleCitySuggestions()"></fa-icon>
+                                <div class="suggestions-dropdown"
+                                    *ngIf="showCitySuggestions && filteredCities.length > 0">
+                                    <div class="suggestion-item" *ngFor="let city of filteredCities"
+                                        (mousedown)="selectCity(city)">
+                                        {{ city }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

@@ -67,7 +67,7 @@ export class ProfileDetailsComponent implements OnInit, OnChanges {
             firstName: [this.user.firstName, [Validators.required]],
             lastName: [this.user.lastName, [Validators.required]],
             email: [{ value: this.user.email, disabled: true }],
-            phone: [this.user.phone, [Validators.required]],
+            phone: [this.user.phone],
             // Address Fields
             country: [this.user.address?.country || 'Tunisie'],
             state: [currentGovernorate],

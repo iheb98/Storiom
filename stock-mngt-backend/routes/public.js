@@ -26,7 +26,10 @@ router.get('/products/random', async (req, res) => {
                     as: 'store',
                     attributes: ['name', 'isSupportingDeliveries', 'id'],
                     where: { isVisibleToPublic: true, active: true },
-                    required: true
+                    required: true,
+                    include: [
+                        { model: Address, as: 'address', attributes: ['state', 'city'] }
+                    ]
                 },
                 { model: Review, as: 'reviews', attributes: ['rating'] }
             ]
@@ -224,7 +227,20 @@ router.get('/allStores/products', async (req, res) => {
         }
 
         // -------------------------------
-        // 7. Fetch products
+        // 7. Build store filter for location
+        // -------------------------------
+        const storeWhere = { isVisibleToPublic: true, active: true };
+        const addressWhere = {};
+
+        if (req.query.state && req.query.state !== 'null') {
+            addressWhere.state = req.query.state;
+        }
+        if (req.query.city && req.query.city !== 'null') {
+            addressWhere.city = req.query.city;
+        }
+
+        // -------------------------------
+        // 8. Fetch products
         // -------------------------------
         const products = await Product.findAll(
             utility.paginate({
@@ -236,8 +252,17 @@ router.get('/allStores/products', async (req, res) => {
                         model: Store,
                         as: 'store',
                         attributes: ['id', 'name', 'isSupportingDeliveries'],
-                        where: { isVisibleToPublic: true, active: true },
-                        required: true
+                        where: storeWhere,
+                        required: true,
+                        include: [
+                            {
+                                model: Address,
+                                as: 'address',
+                                attributes: ['state', 'city'],
+                                where: Object.keys(addressWhere).length > 0 ? addressWhere : undefined,
+                                required: Object.keys(addressWhere).length > 0
+                            }
+                        ]
                     },
                     { model: Review, as: 'reviews', attributes: ['rating'], required: false }
                 ],
@@ -297,7 +322,20 @@ router.get('/allStores/products/count', async (req, res) => {
         }
 
         // -------------------------------
-        // 5. Count only
+        // 5. Build location filter
+        // -------------------------------
+        const storeWhere = { isVisibleToPublic: true, active: true };
+        const addressWhere = {};
+
+        if (req.query.state && req.query.state !== 'null') {
+            addressWhere.state = req.query.state;
+        }
+        if (req.query.city && req.query.city !== 'null') {
+            addressWhere.city = req.query.city;
+        }
+
+        // -------------------------------
+        // 6. Count only
         // -------------------------------
         const total = await Product.count({
             where: whereClause,
@@ -306,8 +344,16 @@ router.get('/allStores/products/count', async (req, res) => {
                 {
                     model: Store,
                     as: 'store',
-                    where: { isVisibleToPublic: true, active: true },
-                    required: true
+                    where: storeWhere,
+                    required: true,
+                    include: [
+                        {
+                            model: Address,
+                            as: 'address',
+                            where: Object.keys(addressWhere).length > 0 ? addressWhere : undefined,
+                            required: Object.keys(addressWhere).length > 0
+                        }
+                    ]
                 }
             ]
         });

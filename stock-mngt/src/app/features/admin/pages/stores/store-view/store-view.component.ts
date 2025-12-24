@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import {
   faEdit, faInfo, faBox, faShoppingCart, faFolder, faTruck,
-  faCheckCircle, faTimesCircle, faEye, faPhoneAlt, faPhone,
+  faCheckCircle, faTimesCircle, faEye, faEyeSlash, faPhoneAlt, faPhone,
   faEnvelope, faGlobe, faMapMarkerAlt, faRoad, faCity, faMap,
   faBolt, faPlus, faExternalLinkAlt, faStore, faChevronDown, faChevronUp
 } from '@fortawesome/free-solid-svg-icons';
@@ -21,7 +21,8 @@ import { OrderService } from 'src/app/core/services/order.service';
   templateUrl: './store-view.component.html',
   styleUrls: ['./store-view.component.scss']
 })
-export class StoreViewComponent implements OnInit {
+export class StoreViewComponent implements OnInit, AfterViewChecked {
+  @ViewChild('descriptionEl') descriptionEl: ElementRef;
   store: any;
   storeWebsite: string;
   backend_URL = environment.backend;
@@ -36,6 +37,7 @@ export class StoreViewComponent implements OnInit {
   checkIcon = faCheckCircle;
   timesIcon = faTimesCircle;
   eyeIcon = faEye;
+  eyeSlashIcon = faEyeSlash;
   phoneHeaderIcon = faPhoneAlt;
   phoneIcon = faPhone;
   envelopeIcon = faEnvelope;
@@ -62,6 +64,7 @@ export class StoreViewComponent implements OnInit {
   // Loading States
   isLoading = true;
   isDescriptionExpanded = false;
+  isDescriptionOverflowing = false;
 
   constructor(
     private authService: AuthService,
@@ -75,6 +78,17 @@ export class StoreViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadData();
+  }
+
+  ngAfterViewChecked(): void {
+    this.checkDescriptionOverflow();
+  }
+
+  checkDescriptionOverflow() {
+    if (this.descriptionEl?.nativeElement) {
+      const el = this.descriptionEl.nativeElement;
+      this.isDescriptionOverflowing = el.scrollHeight > el.clientHeight;
+    }
   }
 
   loadData() {

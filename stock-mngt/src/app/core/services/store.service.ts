@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +9,10 @@ import { Observable } from 'rxjs';
 export class StoreService {
   BASE_PATH = environment.BASE_PATH;
   baseUrl: string = this.BASE_PATH + '/stores/';
+
+  // Subject to notify when store is updated
+  private storeUpdatedSource = new Subject<void>();
+  storeUpdated$ = this.storeUpdatedSource.asObservable();
 
   constructor(private http: HttpClient) { }
 
@@ -35,5 +39,10 @@ export class StoreService {
 
   deleteStore(id): Observable<any> {
     return this.http.delete<any>(this.baseUrl + "/" + id);
+  }
+
+  // Notify subscribers that store has been updated
+  notifyStoreUpdate() {
+    this.storeUpdatedSource.next();
   }
 }

@@ -238,6 +238,11 @@ $radius-lg: 16px;
                     background: rgba($info, 0.15);
                     color: darken($info, 10%);
                 }
+
+                &.not-visible {
+                    background: rgba($warning, 0.15);
+                    color: darken($warning, 10%);
+                }
             }
         }
 

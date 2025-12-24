@@ -51,9 +51,73 @@
                         [class.fa-chevron-up]="!collapsedSections.category"></i>
                 </div>
                 <div class="section-content">
-                    <ng-select [items]="flatCategories" bindLabel="name" bindValue="id"
-                        placeholder="Toutes les catégories" [(ngModel)]="filters.category" [clearable]="true">
-                    </ng-select>
+                    <!-- "All Categories" option -->
+                    <div class="category-item root-category" [class.active]="!filters.category"
+                        (click)="filters.category = null; applyFilters()">
+                        <span class="category-name">Toutes les catégories</span>
+                    </div>
+
+                    <!-- Category Tree -->
+                    <div class="category-tree">
+                        <ng-container *ngFor="let cat of categories">
+                            <div class="category-item level-0" [class.active]="filters.category === cat.id"
+                                [class.has-children]="hasSubCategories(cat)">
+                                <span class="expand-icon" *ngIf="hasSubCategories(cat)"
+                                    (click)="toggleCategoryExpand(cat.id, $event)">
+                                    <i class="fa" [class.fa-chevron-right]="!isCategoryExpanded(cat.id)"
+                                        [class.fa-chevron-down]="isCategoryExpanded(cat.id)"></i>
+                                </span>
+                                <span class="category-name" (click)="selectCategory(cat.id)">{{ cat.name }}</span>
+                            </div>
+
+                            <!-- Level 1 subcategories -->
+                            <div class="subcategory-container"
+                                *ngIf="hasSubCategories(cat) && isCategoryExpanded(cat.id)">
+                                <ng-container *ngFor="let sub1 of cat.subCategories">
+                                    <div class="category-item level-1" [class.active]="filters.category === sub1.id"
+                                        [class.has-children]="hasSubCategories(sub1)">
+                                        <span class="expand-icon" *ngIf="hasSubCategories(sub1)"
+                                            (click)="toggleCategoryExpand(sub1.id, $event)">
+                                            <i class="fa" [class.fa-chevron-right]="!isCategoryExpanded(sub1.id)"
+                                                [class.fa-chevron-down]="isCategoryExpanded(sub1.id)"></i>
+                                        </span>
+                                        <span class="category-name" (click)="selectCategory(sub1.id)">{{ sub1.name
+                                            }}</span>
+                                    </div>
+
+                                    <!-- Level 2 subcategories -->
+                                    <div class="subcategory-container"
+                                        *ngIf="hasSubCategories(sub1) && isCategoryExpanded(sub1.id)">
+                                        <ng-container *ngFor="let sub2 of sub1.subCategories">
+                                            <div class="category-item level-2"
+                                                [class.active]="filters.category === sub2.id"
+                                                [class.has-children]="hasSubCategories(sub2)">
+                                                <span class="expand-icon" *ngIf="hasSubCategories(sub2)"
+                                                    (click)="toggleCategoryExpand(sub2.id, $event)">
+                                                    <i class="fa"
+                                                        [class.fa-chevron-right]="!isCategoryExpanded(sub2.id)"
+                                                        [class.fa-chevron-down]="isCategoryExpanded(sub2.id)"></i>
+                                                </span>
+                                                <span class="category-name" (click)="selectCategory(sub2.id)">{{
+                                                    sub2.name }}</span>
+                                            </div>
+
+                                            <!-- Level 3 subcategories -->
+                                            <div class="subcategory-container"
+                                                *ngIf="hasSubCategories(sub2) && isCategoryExpanded(sub2.id)">
+                                                <div class="category-item level-3"
+                                                    *ngFor="let sub3 of sub2.subCategories"
+                                                    [class.active]="filters.category === sub3.id"
+                                                    (click)="selectCategory(sub3.id)">
+                                                    <span class="category-name">{{ sub3.name }}</span>
+                                                </div>
+                                            </div>
+                                        </ng-container>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </ng-container>
+                    </div>
                 </div>
             </div>
 
@@ -79,15 +143,32 @@
                 </div>
             </div>
 
+            <!-- Location Filter -->
+            <div class="filter-section" [class.collapsed]="collapsedSections.location">
+                <div class="section-header" (click)="toggleSection('location')">
+                    <h3><i class="fa fa-map-marker-alt"></i> Localisation</h3>
+                    <i class="fa" [class.fa-chevron-down]="collapsedSections.location"
+                        [class.fa-chevron-up]="!collapsedSections.location"></i>
+                </div>
+                <div class="section-content">
+                    <ng-select [items]="governorates" placeholder="Tous les gouvernorats" [(ngModel)]="filters.state"
+                        [clearable]="true" (change)="onStateChange()">
+                    </ng-select>
+                    <ng-select [items]="cities" placeholder="Toutes les villes" [(ngModel)]="filters.city"
+                        [clearable]="true" [disabled]="!filters.state" class="city-select" (change)="onCityChange()">
+                    </ng-select>
+                </div>
+            </div>
+
             <!-- Store Filter -->
             <div class="filter-section" [class.collapsed]="collapsedSections.store">
                 <div class="section-header" (click)="toggleSection('store')">
-                    <h3><i class="fa fa-store"></i> Magasin</h3>
+                    <h3><i class="fa fa-store"></i> Boutique</h3>
                     <i class="fa" [class.fa-chevron-down]="collapsedSections.store"
                         [class.fa-chevron-up]="!collapsedSections.store"></i>
                 </div>
                 <div class="section-content">
-                    <ng-select [items]="stores" bindLabel="name" bindValue="id" placeholder="Tous les magasins"
+                    <ng-select [items]="stores" bindLabel="name" bindValue="id" placeholder="Toutes les boutiques"
                         [(ngModel)]="filters.store" [clearable]="true">
                     </ng-select>
                 </div>

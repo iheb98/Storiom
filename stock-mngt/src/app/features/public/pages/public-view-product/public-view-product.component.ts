@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 import { environment } from 'src/environments/environment';
 import { ProductService } from 'src/app/core/services/product.service';
 import { PublicService } from 'src/app/core/services/public.service';
@@ -10,7 +11,7 @@ import { ToastService } from 'src/app/core/services/toast.service';
 import {
   faChevronRight, faChevronLeft, faSearchPlus, faStar, faStarHalfAlt,
   faCheck, faTimes, faMinus, faPlus, faShoppingCart, faTruck, faShieldAlt,
-  faStore, faInfoCircle, faComments
+  faStore, faInfoCircle, faComments, faArrowLeft, faMapMarkerAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarEmpty } from '@fortawesome/free-regular-svg-icons';
 
@@ -47,6 +48,8 @@ export class PublicViewProductComponent implements OnInit {
   faStore = faStore;
   faInfoCircle = faInfoCircle;
   faComments = faComments;
+  faArrowLeft = faArrowLeft;
+  faMapMarker = faMapMarkerAlt;
 
   constructor(
     private route: ActivatedRoute,
@@ -55,7 +58,8 @@ export class PublicViewProductComponent implements OnInit {
 
     private cartService: CartService,
     private authService: AuthService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private location: Location
   ) { }
 
   ngOnInit(): void {
@@ -195,5 +199,9 @@ export class PublicViewProductComponent implements OnInit {
       this.cartService.addToCart(product, this.quantity);
       this.toastService.showSuccess('Produit ajouté au panier');
     }
+  }
+
+  goBack() {
+    this.location.back();
   }
 }

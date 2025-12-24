@@ -3,8 +3,11 @@
   <aside class="sidebar">
     <div class="sidebar-header">
       <div class="logo-section">
-        <img [src]="store?.logo ? backend_URL + '/' + store?.logo : 'assets/default_store.png'" alt="Logo"
-          class="store-logo">
+        <div class="store-logo-wrapper">
+          <div class="skeleton-logo" *ngIf="!store"></div>
+          <img *ngIf="store" [src]="store?.logo ? backend_URL + '/' + store?.logo : 'assets/default_store.png'"
+            alt="Logo" class="store-logo loaded">
+        </div>
         <span class="store-name">{{ store?.name || 'Storiom' }}</span>
       </div>
       <button class="collapse-btn desktop-only" (click)="toggleSidebar()">
@@ -70,8 +73,11 @@
 
         <!-- User Profile -->
         <div class="user-profile" (click)="toggleUserMenu()">
-          <img [src]="store?.logo ? backend_URL + '/' + store?.logo : 'assets/default_store.png'" alt="Profile"
-            class="user-avatar">
+          <div class="avatar-wrapper">
+            <div class="skeleton-avatar" *ngIf="!store"></div>
+            <img *ngIf="store" [src]="store?.logo ? backend_URL + '/' + store?.logo : 'assets/default_store.png'"
+              alt="Profile" class="user-avatar loaded">
+          </div>
           <span class="user-name">{{ connectedUser?.name || 'Admin' }}</span>
           <i class="fa fa-chevron-down"></i>
         </div>

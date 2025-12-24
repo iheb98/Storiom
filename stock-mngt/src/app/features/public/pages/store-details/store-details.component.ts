@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PublicService } from 'src/app/core/services/public.service';
 
@@ -13,7 +13,8 @@ import { ToastService } from 'src/app/core/services/toast.service';
     templateUrl: './store-details.component.html',
     styleUrls: ['./store-details.component.scss']
 })
-export class StoreDetailsComponent implements OnInit {
+export class StoreDetailsComponent implements OnInit, AfterViewChecked {
+    @ViewChild('descriptionEl') descriptionEl: ElementRef;
 
     store: any;
     products: any[] = [];
@@ -45,6 +46,7 @@ export class StoreDetailsComponent implements OnInit {
     };
     isStoreLoading = true;
     isProductsLoading = true;
+    isDescriptionOverflowing = false;
 
     constructor(
         private route: ActivatedRoute,
@@ -66,6 +68,17 @@ export class StoreDetailsComponent implements OnInit {
                 this.loadProducts();
             }
         });
+    }
+
+    ngAfterViewChecked(): void {
+        this.checkDescriptionOverflow();
+    }
+
+    checkDescriptionOverflow() {
+        if (this.descriptionEl?.nativeElement) {
+            const el = this.descriptionEl.nativeElement;
+            this.isDescriptionOverflowing = el.scrollHeight > el.clientHeight;
+        }
     }
 
     loadStoreDetails() {
@@ -135,6 +148,7 @@ export class StoreDetailsComponent implements OnInit {
 
     applyFilters() {
         this.pageIndex = 0;
+        window.scrollTo(0, 0);
         this.loadProducts();
     }
 

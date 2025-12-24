@@ -28,19 +28,28 @@ export class PublicService {
   }
 
 
+
   getPublicProducts(query): Observable<any> {
-    return this.http.get<any>(this.apiUrl + '/allStores/products', {
-      params: {
-        ...query
+    const cleanParams: any = {};
+    Object.keys(query).forEach(key => {
+      if (query[key] != null && query[key] !== 'null' && query[key] !== '') {
+        cleanParams[key] = query[key];
       }
+    });
+    return this.http.get<any>(this.apiUrl + '/allStores/products', {
+      params: cleanParams
     });
   }
 
   countPublicProducts(query): Observable<any> {
-    return this.http.get<any>(this.apiUrl + '/allStores/products/count', {
-      params: {
-        ...query
+    const cleanParams: any = {};
+    Object.keys(query).forEach(key => {
+      if (query[key] != null && query[key] !== 'null' && query[key] !== '') {
+        cleanParams[key] = query[key];
       }
+    });
+    return this.http.get<any>(this.apiUrl + '/allStores/products/count', {
+      params: cleanParams
     });
   }
 

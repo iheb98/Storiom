@@ -395,6 +395,7 @@ export class StoreAddComponent implements OnInit {
             }).subscribe(
               response => {
                 this.isSubmitting = false;
+                this.service.notifyStoreUpdate();
                 Swal.fire({
                   icon: 'success',
                   title: 'Boutique modifiée !',
@@ -432,6 +433,7 @@ export class StoreAddComponent implements OnInit {
         }).subscribe(
           response => {
             this.isSubmitting = false;
+            this.service.notifyStoreUpdate();
             Swal.fire({
               icon: 'success',
               title: 'Boutique modifiée !',

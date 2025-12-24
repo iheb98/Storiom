@@ -43,8 +43,11 @@
                         <span class="badge visibility" *ngIf="store?.isVisibleToPublic">
                             <fa-icon [icon]="eyeIcon"></fa-icon> Visible au public
                         </span>
+                        <span class="badge not-visible" *ngIf="!store?.isVisibleToPublic">
+                            <fa-icon [icon]="eyeSlashIcon"></fa-icon> Non visible au public
+                        </span>
                     </div>
-                    <div class="store-description" *ngIf="store?.description"
+                    <div class="store-description" #descriptionEl *ngIf="store?.description"
                         [innerHTML]="store?.description | safeHtml"></div>
                 </div>
                 <div class="header-actions">
@@ -53,7 +56,7 @@
                     </button>
                 </div>
             </div>
-            <button class="header-toggle-btn" *ngIf="store?.description"
+            <button class="header-toggle-btn" *ngIf="store?.description && isDescriptionOverflowing"
                 (click)="isDescriptionExpanded = !isDescriptionExpanded">
                 <fa-icon [icon]="isDescriptionExpanded ? chevronUpIcon : chevronDownIcon"></fa-icon>
             </button>

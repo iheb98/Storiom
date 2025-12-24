@@ -6,10 +6,11 @@ import { FileService } from 'src/app/core/services/file.service';
 
 import { StoreService } from 'src/app/core/services/store.service';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { getAllGovernorates, getCitiesForGovernorate, getAllCities } from 'src/app/shared/data/tunisia-locations';
 import {
   faStore, faRocket, faChartBar, faBoxes, faPhone, faEnvelope,
   faGlobe, faMap, faCity, faRoad, faImage, faCheck, faExclamationCircle,
-  faCloudUploadAlt, faCheckCircle, faAlignLeft
+  faCloudUploadAlt, faCheckCircle, faAlignLeft, faChevronDown
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -42,6 +43,17 @@ export class CreateStoreComponent implements OnInit {
   faCloudUploadAlt = faCloudUploadAlt;
   faCheckCircle = faCheckCircle;
   faAlignLeft = faAlignLeft;
+  faChevronDown = faChevronDown;
+
+  // Autocomplete for address
+  governorateSearchText = '';
+  citySearchText = '';
+  availableGovernorates: string[] = [];
+  availableCities: string[] = [];
+  filteredGovernorates: string[] = [];
+  filteredCities: string[] = [];
+  showGovernorateSuggestions = false;
+  showCitySuggestions = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -61,6 +73,7 @@ export class CreateStoreComponent implements OnInit {
       return;
     }
     this.initForm();
+    this.initLocationData();
   }
 
   initForm() {
@@ -78,6 +91,95 @@ export class CreateStoreComponent implements OnInit {
       postalCode: [''],
       logo: [null]
     });
+  }
+
+  initLocationData() {
+    this.availableGovernorates = getAllGovernorates();
+    this.filteredGovernorates = [...this.availableGovernorates];
+    this.availableCities = getAllCities();
+    this.filteredCities = [...this.availableCities];
+  }
+
+  // ========================================
+  // Governorate Autocomplete
+  // ========================================
+  normalizeText(text: string): string {
+    return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  onGovernorateSearch() {
+    const searchTerm = this.normalizeText(this.governorateSearchText.trim());
+    if (!searchTerm) {
+      this.filteredGovernorates = [...this.availableGovernorates];
+      this.form.patchValue({ state: '' });
+      this.availableCities = getAllCities();
+      this.filteredCities = [...this.availableCities];
+    } else {
+      this.filteredGovernorates = this.availableGovernorates.filter(gov =>
+        this.normalizeText(gov).includes(searchTerm)
+      );
+    }
+    this.showGovernorateSuggestions = true;
+  }
+
+  selectGovernorate(governorate: string) {
+    this.governorateSearchText = governorate;
+    this.form.patchValue({ state: governorate });
+    this.showGovernorateSuggestions = false;
+
+    // Update cities based on selected governorate
+    this.availableCities = getCitiesForGovernorate(governorate);
+    this.filteredCities = [...this.availableCities];
+    this.citySearchText = '';
+    this.form.patchValue({ city: '' });
+  }
+
+  toggleGovernorateSuggestions() {
+    this.showGovernorateSuggestions = !this.showGovernorateSuggestions;
+    if (this.showGovernorateSuggestions) {
+      this.filteredGovernorates = [...this.availableGovernorates];
+    }
+  }
+
+  hideGovernorateSuggestionsDelayed() {
+    setTimeout(() => {
+      this.showGovernorateSuggestions = false;
+    }, 200);
+  }
+
+  // ========================================
+  // City Autocomplete
+  // ========================================
+  onCitySearch() {
+    const searchTerm = this.normalizeText(this.citySearchText.trim());
+    if (!searchTerm) {
+      this.filteredCities = [...this.availableCities];
+      this.form.patchValue({ city: '' });
+    } else {
+      this.filteredCities = this.availableCities.filter(city =>
+        this.normalizeText(city).includes(searchTerm)
+      );
+    }
+    this.showCitySuggestions = true;
+  }
+
+  selectCity(city: string) {
+    this.citySearchText = city;
+    this.form.patchValue({ city: city });
+    this.showCitySuggestions = false;
+  }
+
+  toggleCitySuggestions() {
+    this.showCitySuggestions = !this.showCitySuggestions;
+    if (this.showCitySuggestions) {
+      this.filteredCities = [...this.availableCities];
+    }
+  }
+
+  hideCitySuggestionsDelayed() {
+    setTimeout(() => {
+      this.showCitySuggestions = false;
+    }, 200);
   }
 
   onFileSelected(event: Event) {

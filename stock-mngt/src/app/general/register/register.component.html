@@ -90,18 +90,59 @@
                         </div>
                     </div>
 
-                    <!-- Address Section (Collapsible or just standard fields) -->
-                    <div class="address-section-title">Adresse (Optionnel)</div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <input type="text" class="simple-input" placeholder="Pays" formControlName="country">
-                        </div>
-                        <div class="form-group">
-                            <input type="text" class="simple-input" placeholder="Ville" formControlName="city">
-                        </div>
+                    <!-- Address Section (Collapsible) -->
+                    <div class="address-toggle" (click)="showAddressSection = !showAddressSection">
+                        <span class="toggle-label">
+                            <fa-icon [icon]="faMapMarkerAlt" class="toggle-icon"></fa-icon>
+                            Ajouter une adresse (Optionnel)
+                        </span>
+                        <fa-icon [icon]="showAddressSection ? faChevronUp : faChevronDown"
+                            class="toggle-arrow"></fa-icon>
                     </div>
-                    <div class="form-group">
-                        <input type="text" class="simple-input" placeholder="Rue / Adresse" formControlName="street">
+                    <div class="address-fields" [class.expanded]="showAddressSection">
+                        <div class="form-row">
+                            <!-- Governorate Autocomplete -->
+                            <div class="form-group">
+                                <div class="autocomplete-wrapper">
+                                    <input type="text" class="simple-input" [(ngModel)]="governorateSearchText"
+                                        [ngModelOptions]="{standalone: true}" (input)="onGovernorateSearch()"
+                                        (focus)="showGovernorateSuggestions = true"
+                                        (blur)="hideGovernorateSuggestionsDelayed()" placeholder="Gouvernorat"
+                                        autocomplete="off">
+                                    <fa-icon [icon]="faChevronDown" class="dropdown-icon"
+                                        (click)="toggleGovernorateSuggestions()"></fa-icon>
+                                    <div class="suggestions-dropdown"
+                                        *ngIf="showGovernorateSuggestions && filteredGovernorates.length > 0">
+                                        <div class="suggestion-item" *ngFor="let gov of filteredGovernorates"
+                                            (mousedown)="selectGovernorate(gov)">
+                                            {{ gov }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- City Autocomplete -->
+                            <div class="form-group">
+                                <div class="autocomplete-wrapper">
+                                    <input type="text" class="simple-input" [(ngModel)]="citySearchText"
+                                        [ngModelOptions]="{standalone: true}" (input)="onCitySearch()"
+                                        (focus)="showCitySuggestions = true" (blur)="hideCitySuggestionsDelayed()"
+                                        placeholder="Ville / Délégation" autocomplete="off">
+                                    <fa-icon [icon]="faChevronDown" class="dropdown-icon"
+                                        (click)="toggleCitySuggestions()"></fa-icon>
+                                    <div class="suggestions-dropdown"
+                                        *ngIf="showCitySuggestions && filteredCities.length > 0">
+                                        <div class="suggestion-item" *ngFor="let city of filteredCities"
+                                            (mousedown)="selectCity(city)">
+                                            {{ city }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="simple-input" placeholder="Rue / Adresse"
+                                formControlName="street">
+                        </div>
                     </div>
 
                     <!-- Password Row -->

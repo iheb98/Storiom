@@ -10,6 +10,7 @@ const port = process.env.PORT || 3000;
 const cors = require('cors');
 const multer = require('multer');
 const sendMail = require('./mailService');
+const { expiredLinkEmail, resendConfirmationEmail } = require('./emailTemplates');
 const multerS3 = require('multer-s3');
 const s3 = require('./config/r2');
 
@@ -137,12 +138,8 @@ app.get('/api/confirm', async (req, res) => {
   await user.save();
 
   const confirmUrl = `https://storiom.com/confirm?token=${newToken}`;
-  await sendMail(user.email, 'Nouveau lien de confirmation', `
-    <h2>Votre lien a expiré</h2>
-    <p>Voici un nouveau lien pour confirmer votre compte :</p>
-    <a href="${confirmUrl}">Confirmer mon compte</a>
-    <p>Ce lien est valable pendant 24 heures.</p>
-  `);
+  const emailHtml = expiredLinkEmail(user.firstName || user.email, confirmUrl);
+  await sendMail(user.email, 'Nouveau lien de confirmation - Storiom', emailHtml);
 
   return res.status(500).send("Le lien a expiré. Un nouveau lien de confirmation vous a été envoyé par e-mail.");
 });
@@ -172,12 +169,8 @@ app.get('/api/resendConfirmationMail', async (req, res) => {
   await user.save();
 
   const confirmUrl = `https://storiom.com/confirm?token=${newToken}`;
-  await sendMail(user.email, 'Nouveau lien de confirmation', `
-    <h2>Votre lien a expiré</h2>
-    <p>Voici un nouveau lien pour confirmer votre compte :</p>
-    <a href="${confirmUrl}">Confirmer mon compte</a>
-    <p>Ce lien est valable pendant 24 heures.</p>
-  `);
+  const emailHtml = resendConfirmationEmail(user.firstName || user.email, confirmUrl);
+  await sendMail(user.email, 'Confirmez votre compte - Storiom', emailHtml);
 
   return res.status(200).send("Un nouveau lien de confirmation vous a été envoyé par e-mail.");
 });

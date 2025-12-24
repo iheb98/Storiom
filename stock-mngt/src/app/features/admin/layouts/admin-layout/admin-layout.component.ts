@@ -40,6 +40,8 @@ export class AdminLayoutComponent implements OnInit {
 
   subscriptionStatus: string | null = null;
   subscriptionDetails: any = null;
+  imageLoaded = false;
+  avatarLoaded = false;
 
   constructor(
     private authService: AuthService,
@@ -82,13 +84,12 @@ export class AdminLayoutComponent implements OnInit {
       }
     }, _ => { });
 
-    this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
-      store => {
-        this.store = store;
+    this.loadStore();
 
-      },
-      _ => { }
-    );
+    // Subscribe to store updates
+    this.storeService.storeUpdated$.subscribe(() => {
+      this.loadStore();
+    });
 
     this.subscriptionDetails = this.authService.getConnectedUser()?.subscription;
     if (this.subscriptionDetails) {
@@ -99,6 +100,15 @@ export class AdminLayoutComponent implements OnInit {
     if (window.innerWidth <= 992) {
       this.sidebarCollapsed = true;
     }
+  }
+
+  loadStore() {
+    this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
+      store => {
+        this.store = store;
+      },
+      _ => { }
+    );
   }
 
   // ========================================

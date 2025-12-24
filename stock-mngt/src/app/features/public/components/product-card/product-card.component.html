@@ -37,6 +37,11 @@
 
     <div class="store-name" *ngIf="product.store">
       Vendu par <a class="store-link" (click)="goToStore($event)">{{ product.store.name }}</a>
+      <span class="location" *ngIf="product.store.address?.state || product.store.address?.city">
+        <i class="fa fa-map-marker-alt"></i>
+        {{ product.store.address?.city }}<span *ngIf="product.store.address?.city && product.store.address?.state">,
+        </span>{{ product.store.address?.state }}
+      </span>
       <span class="delivery-badge success" *ngIf="product.store.isSupportingDeliveries">
         <i class="fa fa-truck"></i> Livraison disponible
       </span>

@@ -4,6 +4,7 @@ import { CategoryService } from 'src/app/core/services/category.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { environment } from 'src/environments/environment.prod';
 import { PublicService } from 'src/app/core/services/public.service';
+import { getAllGovernorates, getCitiesForGovernorate } from 'src/app/shared/data/tunisia-locations';
 
 import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import { CartService } from 'src/app/core/services/cart.service';
@@ -35,17 +36,25 @@ export class PublicProductsComponent implements OnInit {
     minPrice: null as number | null,
     maxPrice: null as number | null,
     store: null,
-    sort: null
+    sort: null,
+    state: null as string | null,
+    city: null as string | null
   };
+
+  // Location data
+  governorates: string[] = [];
+  cities: string[] = [];
 
   // UI State
   mobileFiltersOpen = false;
   collapsedSections = {
     search: false,
     category: false,
-    price: false,
-    store: false
+    price: true,
+    store: true,
+    location: true
   };
+  expandedCategories: Set<number> = new Set();
 
   constructor(
     private route: ActivatedRoute,
@@ -61,16 +70,25 @@ export class PublicProductsComponent implements OnInit {
   ngOnInit(): void {
     window.scrollTo(0, 0);
     this.loadCategories();
-    this.loadStores();
+    this.governorates = getAllGovernorates();
 
     this.route.queryParams.subscribe(params => {
       this.searchQuery = params['searchable'] || '';
       this.filters.category = Number(params['category']) || null;
       this.filters.minPrice = params['minPrice'] ? +params['minPrice'] : null;
       this.filters.maxPrice = params['maxPrice'] ? +params['maxPrice'] : null;
-      this.filters.store = params['store'] || null;
+      this.filters.store = params['store'] ? Number(params['store']) : null;
       this.filters.sort = params['sort'] || null;
+      this.filters.state = params['state'] || null;
+      this.filters.city = params['city'] || null;
       this.searchable = params['searchable'] || '';
+
+      if (this.filters.state) {
+        this.cities = getCitiesForGovernorate(this.filters.state);
+      }
+
+      // Load stores with current location filters
+      this.loadStores();
 
       if (this.filters.category) {
         this.loadCategory(this.filters.category);
@@ -78,6 +96,22 @@ export class PublicProductsComponent implements OnInit {
 
       this.loadProducts();
     });
+  }
+
+  onStateChange() {
+    if (this.filters.state) {
+      this.cities = getCitiesForGovernorate(this.filters.state);
+    } else {
+      this.cities = [];
+    }
+    this.filters.city = null;
+    this.filters.store = null;
+    this.loadStores();
+  }
+
+  onCityChange() {
+    this.filters.store = null;
+    this.loadStores();
   }
 
   loadCategories() {
@@ -100,7 +134,23 @@ export class PublicProductsComponent implements OnInit {
 
   loadStores() {
     this.publicService.getAllStores().subscribe(res => {
-      this.stores = res;
+      let filteredStores = res;
+
+      // Filter by state if selected
+      if (this.filters.state && this.filters.state !== 'null') {
+        filteredStores = filteredStores.filter((store: any) =>
+          store.address?.state === this.filters.state
+        );
+      }
+
+      // Filter by city if selected
+      if (this.filters.city && this.filters.city !== 'null') {
+        filteredStores = filteredStores.filter((store: any) =>
+          store.address?.city === this.filters.city
+        );
+      }
+
+      this.stores = filteredStores;
     });
   }
 
@@ -120,14 +170,27 @@ export class PublicProductsComponent implements OnInit {
   loadProducts() {
     this.isLoading = true;
     const query = this.buildQuery();
-    this.publicService.getPublicProducts({ page: this.currentPage, size: this.currentSize, query, sort: this.filters.sort, searchable: this.searchable }).subscribe(res => {
+    this.publicService.getPublicProducts({
+      page: this.currentPage,
+      size: this.currentSize,
+      query,
+      sort: this.filters.sort,
+      searchable: this.searchable,
+      state: this.filters.state,
+      city: this.filters.city
+    }).subscribe(res => {
       this.products = res;
       this.isLoading = false;
     }, (error) => {
       this.isLoading = false;
     });
 
-    this.publicService.countPublicProducts({ query, searchable: this.searchable }).subscribe(res => {
+    this.publicService.countPublicProducts({
+      query,
+      searchable: this.searchable,
+      state: this.filters.state,
+      city: this.filters.city
+    }).subscribe(res => {
       this.count = res.count;
     });
   }
@@ -154,9 +217,16 @@ export class PublicProductsComponent implements OnInit {
     if (this.filters.sort) {
       queryParams.sort = this.filters.sort;
     }
+    if (this.filters.state) {
+      queryParams.state = this.filters.state;
+    }
+    if (this.filters.city) {
+      queryParams.city = this.filters.city;
+    }
 
     this.currentPage = 0;
     this.router.navigate([], { queryParams });
+    window.scrollTo(0, 0);
   }
 
   resetFilters() {
@@ -165,8 +235,11 @@ export class PublicProductsComponent implements OnInit {
       minPrice: null,
       maxPrice: null,
       store: null,
-      sort: null
+      sort: null,
+      state: null,
+      city: null
     };
+    this.cities = [];
     this.searchable = '';
     this.currentPage = 0;
     this.router.navigate([], { queryParams: {} });
@@ -209,6 +282,30 @@ export class PublicProductsComponent implements OnInit {
   getStoreName(storeId: any): string {
     const store = this.stores.find(s => s.id === storeId);
     return store ? store.name : '';
+  }
+
+  // Category Tree Methods
+  toggleCategoryExpand(categoryId: number, event: Event) {
+    event.stopPropagation();
+    if (this.expandedCategories.has(categoryId)) {
+      this.expandedCategories.delete(categoryId);
+    } else {
+      this.expandedCategories.add(categoryId);
+    }
+  }
+
+  isCategoryExpanded(categoryId: number): boolean {
+    return this.expandedCategories.has(categoryId);
+  }
+
+  selectCategory(categoryId: number) {
+    this.filters.category = categoryId;
+    this.applyFilters();
+    this.mobileFiltersOpen = false;
+  }
+
+  hasSubCategories(category: any): boolean {
+    return category.subCategories && category.subCategories.length > 0;
   }
 
   addToCart(product: any) {

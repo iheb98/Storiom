@@ -9,6 +9,7 @@ const Sequelize = require('sequelize');
 const subscription = require('../models/subscription');
 const crypto = require('crypto');
 const sendMail = require('.././mailService');
+const { accountConfirmationEmail } = require('.././emailTemplates');
 const Op = Sequelize.Op;
 
 //Register
@@ -55,12 +56,8 @@ router.post('/register', async (req, res) => {
 
         // Send confirmation email
         const confirmUrl = `https://storiom.com/confirm?token=${confirmationToken}`;
-        await sendMail(email, 'Confirmer votre compte', `
-        <h2>Bienvenue sur Storiom</h2>
-        <p>Veuillez confirmer votre compte en cliquant sur le lien ci-dessous :</p>
-        <a href="${confirmUrl}">Activer mon compte</a>
-
-      `);
+        const emailHtml = accountConfirmationEmail(firstName, confirmUrl);
+        await sendMail(email, 'Bienvenue sur Storiom - Confirmez votre compte', emailHtml);
 
         res.json({
             success: true,
