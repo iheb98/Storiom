@@ -15,6 +15,7 @@ import { CompressorService } from 'src/app/core/services/compressor.service';
 import { FileService } from 'src/app/core/services/file.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { SupplierService } from 'src/app/core/services/supplier.service';
+import { UserSettingsService } from 'src/app/core/services/user-settings.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 
@@ -109,7 +110,8 @@ export class ProductAddComponent implements OnInit {
     private route: ActivatedRoute,
     private fileService: FileService,
     private brandService: BrandService,
-    private compressor: CompressorService
+    private compressor: CompressorService,
+    private userSettingsService: UserSettingsService
   ) { }
 
   ngOnInit(): void {
@@ -210,6 +212,9 @@ export class ProductAddComponent implements OnInit {
   }
 
   initForm() {
+    // Get default visibility from user settings
+    const defaultVisibility = this.userSettingsService.currentSettings?.defaults?.productVisibleToPublic ?? true;
+
     this.form = this.formBuilder.group({
       name: [null, Validators.required],
       criticalStockIndicator: [0],
@@ -223,7 +228,7 @@ export class ProductAddComponent implements OnInit {
       description: [''],
       buyingPrice: [null],
       sellingPrice: [null],
-      toDisplay: [true],
+      toDisplay: [defaultVisibility],
       images: [null],
       date: [(new Date()).toISOString().substring(0, 16)]
     });

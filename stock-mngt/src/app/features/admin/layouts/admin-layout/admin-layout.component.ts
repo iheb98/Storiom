@@ -4,10 +4,11 @@ import { filter } from 'rxjs/operators';
 import { faChartBar } from '@fortawesome/free-regular-svg-icons';
 import {
   faPowerOff, faHome, faStore, faUser, faCodeBranch, faHandHoldingUsd,
-  faCoins, faShuttleVan, faBox, faReceipt, faImage, faFile, faWindowRestore, faInfoCircle, faShoppingCart
+  faCoins, faShuttleVan, faBox, faReceipt, faImage, faFile, faWindowRestore, faInfoCircle, faShoppingCart, faCog
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../../../../core/services/auth.service';
 import { StoreService } from '../../../../core/services/store.service';
+import { UserSettingsService } from '../../../../core/services/user-settings.service';
 import { environment } from 'src/environments/environment';
 import { MatDialog } from '@angular/material/dialog';
 import { SubscriptionComponent } from '../../../../general/subscription/subscription.component';
@@ -47,7 +48,8 @@ export class AdminLayoutComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     public storeService: StoreService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private userSettingsService: UserSettingsService
   ) {
     this.authService.loggedIn.subscribe(() => {
       this.subscriptionDetails = this.authService.getConnectedUser()?.subscription;
@@ -74,6 +76,11 @@ export class AdminLayoutComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Clear redirect flag when tab is closed so it redirects again next time
+    window.addEventListener('beforeunload', () => {
+      sessionStorage.removeItem('defaultScreenRedirected');
+    });
+
     this.connectedUser = this.authService.getConnectedUser();
     this.setMenu();
     this.updatePageTitle();
@@ -100,6 +107,33 @@ export class AdminLayoutComponent implements OnInit {
     if (window.innerWidth <= 992) {
       this.sidebarCollapsed = true;
     }
+
+    // Load user settings and apply theme
+    this.userSettingsService.settings$.subscribe(settings => {
+      this.userSettingsService.applyTheme(settings);
+    });
+
+    // Redirect to default screen on first load of session (after settings are loaded from API)
+    this.userSettingsService.settingsLoaded$.subscribe(isLoaded => {
+      if (isLoaded) {
+        const hasRedirected = sessionStorage.getItem('defaultScreenRedirected');
+        const settings = this.userSettingsService.currentSettings;
+        const defaultScreen = settings.navigation?.defaultScreen;
+
+        // Skip redirect if 'none' or no screen selected
+        if (!hasRedirected && defaultScreen && defaultScreen !== 'none') {
+          sessionStorage.setItem('defaultScreenRedirected', 'true');
+          const screenMap = {
+            'dashboard': '/admin/dashboard',
+            'products': '/admin/products',
+            'orders': '/admin/orders',
+            'stats': '/admin/dashboard'
+          };
+          const targetPath = screenMap[defaultScreen] || '/admin/dashboard';
+          this.router.navigate([targetPath]);
+        }
+      }
+    });
   }
 
   loadStore() {
@@ -160,6 +194,7 @@ export class AdminLayoutComponent implements OnInit {
       this.mobileMenuOpen = false;
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('accessToken');
+      sessionStorage.removeItem('defaultScreenRedirected');
       this.router.navigate(['login']);
     });
   }
@@ -210,7 +245,8 @@ export class AdminLayoutComponent implements OnInit {
       { label: 'Travailleurs', icon: this.userIcon, link: 'admin/workers' },
       { label: 'Dépenses', icon: faCoins, link: 'admin/expenses' },
       { label: 'Crédits', icon: faHandHoldingUsd, link: 'admin/credits' },
-      { label: 'Rapport', icon: faFile, link: 'admin/reports/generate' }
+      { label: 'Rapport', icon: faFile, link: 'admin/reports/generate' },
+      //{ label: 'Paramètres', icon: faCog, link: 'admin/settings' }
     ];
   }
 }

@@ -31,6 +31,7 @@ import { GenerateReportComponent } from 'src/app/features/admin/pages/reports/ge
 import { AdminLayoutComponent } from 'src/app/features/admin/layouts/admin-layout/admin-layout.component';
 import { BrandsMngtComponent } from './pages/brands/brands-mngt/brands-mngt.component';
 import { OrdersMngtComponent } from './pages/orders/orders-mngt/orders-mngt.component';
+import { UserSettingsComponent } from './pages/settings/user-settings/user-settings.component';
 
 const routes: Routes = [
   {
@@ -94,6 +95,9 @@ const routes: Routes = [
 
       // ------------ Orders ------------
       { path: 'orders', component: OrdersMngtComponent },
+
+      // ------------ Settings ------------
+      { path: 'settings', component: UserSettingsComponent },
     ],
   },
 ];

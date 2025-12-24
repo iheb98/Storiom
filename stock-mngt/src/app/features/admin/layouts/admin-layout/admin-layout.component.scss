@@ -1,22 +1,32 @@
-// Variables
+// Variables - Using CSS Custom Properties for theme support
 $primary: #3f51b5;
 $primary-dark: #303f9f;
 $primary-light: rgba(63, 81, 181, 0.1);
+
+// Sidebar colors - fixed for both themes (dark sidebar looks good in both)
 $sidebar-bg: #1a1a2e;
 $sidebar-hover: #16213e;
 $sidebar-active: #0f3460;
 $text-light: #ffffff;
-$text-muted: #a0a0a0;
-$success: #2e7d32;
-$warning: #f57c00;
-$danger: #c62828;
-$text-primary: #2c3e50;
-$text-secondary: #7f8c8d;
-$border-color: #e8ecef;
-$background: #f5f7fa;
-$white: #ffffff;
-$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-$shadow-md: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+// These use CSS custom properties for theme support
+$text-primary: var(--text-primary, #2c3e50);
+$text-secondary: var(--text-secondary, #7f8c8d);
+$text-muted: var(--text-muted, #999999);
+$border-color: var(--border-color, #e8ecef);
+$background: var(--bg-page, #f5f7fa);
+$white: var(--bg-card, #ffffff);
+$header-bg: var(--bg-header, #ffffff);
+
+// Status colors
+$success: var(--success, #2e7d32);
+$warning: var(--warning, #f57c00);
+$danger: var(--danger, #c62828);
+
+// Shadows using CSS variables
+$shadow-sm: var(--shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.06));
+$shadow-md: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.1));
+
 $radius-sm: 8px;
 $radius-md: 12px;
 
@@ -200,13 +210,13 @@ $transition-speed: 0.3s;
     font-weight: 500;
 
     &.active {
-        background: rgba($success, 0.2);
-        color: lighten($success, 30%);
+        background: rgba(46, 125, 50, 0.2);
+        color: #81c784;
     }
 
     &.expired {
-        background: rgba($danger, 0.2);
-        color: lighten($danger, 30%);
+        background: rgba(198, 40, 40, 0.2);
+        color: #ef9a9a;
     }
 
     .sidebar-collapsed & {
@@ -318,7 +328,7 @@ $transition-speed: 0.3s;
         color: $danger !important;
 
         &:hover {
-            background: rgba($danger, 0.2);
+            background: rgba(198, 40, 40, 0.2);
         }
     }
 }
@@ -379,7 +389,7 @@ $transition-speed: 0.3s;
         margin-right: 15px;
 
         &:hover {
-            background: darken($background, 5%);
+            background: var(--bg-hover, #e8ecef);
         }
     }
 
@@ -431,7 +441,7 @@ $transition-speed: 0.3s;
     transition: background $transition-speed;
 
     &:hover {
-        background: darken($background, 5%);
+        background: var(--bg-hover, #e8ecef);
     }
 
     .avatar-wrapper {
@@ -448,7 +458,7 @@ $transition-speed: 0.3s;
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        background: linear-gradient(90deg, $border-color 25%, darken($border-color, 5%) 50%, $border-color 75%);
+        background: linear-gradient(90deg, var(--skeleton-bg, #e0e0e0) 25%, var(--skeleton-shine, #f5f5f5) 50%, var(--skeleton-bg, #e0e0e0) 75%);
         background-size: 200% 100%;
         animation: avatar-shimmer 1.5s infinite;
     }

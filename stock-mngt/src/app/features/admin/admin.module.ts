@@ -70,6 +70,7 @@ import { ReceiptInvoiceComponent } from './components/receipt-invoice/receipt-in
 import { StoreOnboardingComponent } from './pages/stores/store-onboarding/store-onboarding.component';
 import { QuillModule } from 'ngx-quill';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { UserSettingsComponent } from './pages/settings/user-settings/user-settings.component';
 
 @NgModule({
   declarations: [
@@ -119,7 +120,8 @@ import { SharedModule } from 'src/app/shared/shared.module';
     ParentCategoriesStatsComponent,
     OrdersMngtComponent,
     ReceiptInvoiceComponent,
-    StoreOnboardingComponent
+    StoreOnboardingComponent,
+    UserSettingsComponent
   ],
   imports: [
     CommonModule,

@@ -13,6 +13,7 @@ import { FileService } from 'src/app/core/services/file.service';
 
 import { ProductService } from 'src/app/core/services/product.service';
 import { SupplierService } from 'src/app/core/services/supplier.service';
+import { UserSettingsService } from 'src/app/core/services/user-settings.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 @Component({
@@ -67,7 +68,8 @@ export class AddProductFromReceiptComponent implements OnInit {
     private fileService: FileService,
     private brandService: BrandService,
     public dialogRef: MatDialogRef<AddProductFromReceiptComponent>,
-    public compressor: CompressorService
+    public compressor: CompressorService,
+    private userSettingsService: UserSettingsService
   ) { }
 
   ngOnInit(): void {
@@ -135,6 +137,9 @@ export class AddProductFromReceiptComponent implements OnInit {
   }
 
   initForm() {
+    // Get default visibility from user settings
+    const defaultVisibility = this.userSettingsService.currentSettings?.defaults?.productVisibleToPublic ?? true;
+
     this.form = this.formBuilder.group({
       name: [null, Validators.required],
       supplierId: [null],
@@ -146,6 +151,7 @@ export class AddProductFromReceiptComponent implements OnInit {
       description: [null],
       buyingPrice: [null],
       sellingPrice: [null],
+      toDisplay: [defaultVisibility],
       images: [null]
     });
   }

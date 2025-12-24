@@ -90,6 +90,22 @@ module.exports = {
         allowNull: true,
         field: 'terms_accepted_at'
       },
+      settings: {
+        type: DataTypes.JSONB,
+        allowNull: true,
+        defaultValue: {
+          theme: {
+            primaryColor: '#3f51b5',
+            mode: 'light'
+          },
+          defaults: {
+            productVisibleToPublic: false
+          },
+          navigation: {
+            defaultScreen: 'none'
+          }
+        }
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

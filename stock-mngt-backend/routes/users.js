@@ -645,6 +645,93 @@ function comparePassword(candidatePassword, hash, callback) {
     })
 }
 
+// ========================================
+// USER SETTINGS
+// ========================================
+
+/**
+ * @route   GET /api/users/:id/settings
+ * @desc    Get user settings
+ * @access  Private
+ */
+router.get('/:id/settings', utility.authenticate, async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        // Ensure user can only access their own settings
+        if (req.user.id != userId) {
+            return res.status(403).json({ success: false, message: 'Accès non autorisé' });
+        }
+
+        const user = await User.findByPk(userId, {
+            attributes: ['settings']
+        });
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+        }
+
+        // Return default settings if none exist
+        const defaultSettings = {
+            theme: {
+                primaryColor: '#3f51b5',
+                mode: 'light'
+            },
+            defaults: {
+                productVisibleToPublic: true,
+                productToDisplay: true
+            },
+            navigation: {
+                defaultScreen: 'dashboard'
+            }
+        };
+
+        res.json({ success: true, settings: user.settings || defaultSettings });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.toString() });
+    }
+});
+
+/**
+ * @route   PUT /api/users/:id/settings
+ * @desc    Update user settings
+ * @access  Private
+ */
+router.put('/:id/settings', utility.authenticate, async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        // Ensure user can only update their own settings
+        if (req.user.id != userId) {
+            return res.status(403).json({ success: false, message: 'Accès non autorisé' });
+        }
+
+        const user = await User.findByPk(userId);
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+        }
+
+        // Merge new settings with existing settings
+        const currentSettings = user.settings || {};
+        const newSettings = req.body.settings || {};
+
+        const mergedSettings = {
+            theme: { ...currentSettings.theme, ...newSettings.theme },
+            defaults: { ...currentSettings.defaults, ...newSettings.defaults },
+            navigation: { ...currentSettings.navigation, ...newSettings.navigation }
+        };
+
+        user.settings = mergedSettings;
+        await user.save();
+
+        res.json({ success: true, settings: user.settings, message: 'Paramètres mis à jour' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.toString() });
+    }
+});
 
 
 

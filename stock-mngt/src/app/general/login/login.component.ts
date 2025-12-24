@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { UserSettingsService } from 'src/app/core/services/user-settings.service';
 
 import Swal from 'sweetalert2';
 
@@ -19,6 +20,7 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private formBuilder: FormBuilder,
     private authService: AuthService,
+    private userSettingsService: UserSettingsService
   ) { }
 
   ngOnInit(): void {
@@ -49,7 +51,34 @@ export class LoginComponent implements OnInit {
           else {
             this.authService.registerTokens(response.accessToken, response.refreshToken)
             this.authService.loggedIn.next();
-            this.router.navigate([''])
+
+            // Load user settings and redirect to default screen
+            this.userSettingsService.loadSettings();
+
+            // Wait for settings to load then redirect
+            const settingsSub = this.userSettingsService.settingsLoaded$.subscribe(isLoaded => {
+              if (isLoaded) {
+                settingsSub.unsubscribe();
+                const settings = this.userSettingsService.currentSettings;
+                const defaultScreen = settings.navigation?.defaultScreen;
+
+                // Set the redirect flag so layout components don't redirect again
+                sessionStorage.setItem('defaultScreenRedirected', 'true');
+
+                if (defaultScreen && defaultScreen !== 'none') {
+                  const screenMap = {
+                    'dashboard': '/admin/dashboard',
+                    'products': '/admin/products',
+                    'orders': '/admin/orders',
+                    'stats': '/admin/dashboard'
+                  };
+                  const targetPath = screenMap[defaultScreen] || '/admin/dashboard';
+                  this.router.navigate([targetPath]);
+                } else {
+                  this.router.navigate(['']);
+                }
+              }
+            });
           }
         },
           error => {
