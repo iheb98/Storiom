@@ -5,7 +5,7 @@
     "ng": "ng",
     "serve": "cross-env NODE_OPTIONS=--openssl-legacy-provider ng serve --proxy-config proxy.config.json",
     "start": "node server.js",
-    "build": "node --max_old_space_size=4096 ./node_modules/@angular/cli/bin/ng build",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
