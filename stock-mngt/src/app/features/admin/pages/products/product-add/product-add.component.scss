@@ -1,0 +1,958 @@
+// Variables
+$primary: #3f51b5;
+$primary-dark: #303f9f;
+$primary-light: rgba(63, 81, 181, 0.1);
+$success: #2e7d32;
+$success-light: rgba(46, 125, 50, 0.1);
+$warning: #f57c00;
+$warning-light: rgba(245, 124, 0, 0.1);
+$danger: #c62828;
+$danger-light: rgba(198, 40, 40, 0.1);
+$info: #0288d1;
+$info-light: rgba(2, 136, 209, 0.1);
+$purple: #7c3aed;
+$purple-light: rgba(124, 58, 237, 0.1);
+$text-primary: #2c3e50;
+$text-secondary: #7f8c8d;
+$border-color: #e8ecef;
+$background: #f5f7fa;
+$white: #ffffff;
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 20px rgba(0, 0, 0, 0.1);
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+
+.product-form-page {
+  padding: 30px;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  min-height: 400px;
+
+  @media (max-width: 768px) {
+    padding: 20px 15px;
+  }
+}
+
+// ============================================
+// LOADING SKELETON
+// ============================================
+.loading-skeleton {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.skeleton-nav {
+  height: 44px;
+  width: 200px;
+  border-radius: $radius-md;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  margin-bottom: 25px;
+}
+
+.skeleton-header {
+  height: 80px;
+  border-radius: $radius-md;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  margin-bottom: 30px;
+}
+
+.skeleton-form-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.skeleton-section {
+  height: 500px;
+  border-radius: $radius-lg;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-section-right {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.skeleton-card {
+  height: 230px;
+  border-radius: $radius-lg;
+  background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+// ============================================
+// ACTION OVERLAY
+// ============================================
+.action-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.action-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid $border-color;
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  span {
+    font-size: 1rem;
+    color: $text-secondary;
+    font-weight: 500;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ============================================
+// PAGE CONTENT ANIMATION
+// ============================================
+.page-content {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// NAVIGATION
+// ============================================
+.page-navigation {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: $radius-md;
+    transition: all 0.2s;
+    text-decoration: none;
+    background: $white;
+    border: 1px solid $border-color;
+    color: $text-primary;
+
+    &:hover {
+      border-color: $primary;
+      color: $primary;
+      background: $primary-light;
+    }
+
+    &:nth-child(2) {
+      background: $info-light;
+      border: 1px solid $info;
+      color: $info;
+
+      &:hover {
+        background: $info;
+        color: $white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba($info, 0.3);
+      }
+    }
+  }
+}
+
+// ============================================
+// PAGE HEADER
+// ============================================
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+
+  .header-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    fa-icon {
+      font-size: 1.5rem;
+      color: $white;
+    }
+  }
+
+  .header-text {
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: $text-primary;
+      margin: 0 0 8px;
+
+      @media (max-width: 576px) {
+        font-size: 1.4rem;
+      }
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: $text-secondary;
+      margin: 0;
+    }
+  }
+}
+
+// ============================================
+// FORM LAYOUT
+// ============================================
+.form-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-bottom: 30px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.section-card {
+  background: $white;
+  border-radius: $radius-lg;
+  border: 1px solid $border-color;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 25px;
+  background: $background;
+  border-bottom: 1px solid $border-color;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0;
+
+    fa-icon {
+      color: $primary;
+    }
+  }
+
+  .image-count {
+    font-size: 0.85rem;
+    color: $text-secondary;
+    padding: 4px 10px;
+    background: $white;
+    border-radius: 12px;
+  }
+}
+
+.section-body {
+  padding: 25px;
+}
+
+// ============================================
+// FORM CONTROLS
+// ============================================
+.form-group {
+  margin-bottom: 20px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $text-secondary;
+    margin-bottom: 8px;
+
+    fa-icon {
+      font-size: 0.8rem;
+    }
+
+    .required {
+      color: $danger;
+    }
+
+    .text-danger {
+      color: $danger;
+    }
+
+    .text-success {
+      color: $success;
+    }
+
+    .text-warning {
+      color: $warning;
+    }
+
+    .text-info {
+      color: $info;
+    }
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: $white;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px $primary-light;
+    }
+
+    &.invalid {
+      border-color: $danger;
+      box-shadow: 0 0 0 3px $danger-light;
+    }
+
+    &::placeholder {
+      color: lighten($text-secondary, 15%);
+    }
+  }
+
+  ng-select {
+    width: 100%;
+
+    ::ng-deep {
+      .ng-select-container {
+        min-height: 46px;
+        border: 1px solid $border-color;
+        border-radius: $radius-sm;
+        background: $white;
+        transition: all 0.2s;
+
+        &:hover {
+          border-color: darken($border-color, 10%);
+        }
+
+        .ng-value-container {
+          padding: 0 16px;
+
+          .ng-placeholder {
+            color: lighten($text-secondary, 15%);
+            font-size: 0.95rem;
+          }
+
+          .ng-value {
+            font-size: 0.95rem;
+            color: $text-primary;
+          }
+
+          .ng-input {
+            padding: 0;
+
+            input {
+              padding: 0;
+              border: none;
+              box-shadow: none;
+
+              &:focus {
+                box-shadow: none;
+              }
+            }
+          }
+        }
+
+        .ng-arrow-wrapper {
+          padding-right: 12px;
+
+          .ng-arrow {
+            border-color: $text-secondary transparent transparent;
+          }
+        }
+
+        .ng-clear-wrapper {
+          color: $text-secondary;
+
+          &:hover {
+            color: $danger;
+          }
+        }
+      }
+
+      &.ng-select-focused {
+        .ng-select-container {
+          border-color: $primary;
+          box-shadow: 0 0 0 3px $primary-light;
+        }
+      }
+
+      &.ng-select-opened {
+        .ng-select-container {
+          border-color: $primary;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+        }
+      }
+
+      .ng-dropdown-panel {
+        border: 1px solid $primary;
+        border-top: none;
+        border-radius: 0 0 $radius-sm $radius-sm;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+        .ng-dropdown-panel-items {
+          .ng-option {
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            color: $text-primary;
+            transition: all 0.15s;
+
+            &.ng-option-marked {
+              background: $primary-light;
+              color: $primary;
+            }
+
+            &.ng-option-selected {
+              background: $primary;
+              color: $white;
+
+              &.ng-option-marked {
+                background: $primary-dark;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  textarea {
+    resize: none;
+    line-height: 1.6;
+  }
+
+  // Quill Editor Styling
+  quill-editor {
+    display: block;
+
+    ::ng-deep {
+      .ql-toolbar {
+        border: 1px solid $border-color;
+        border-bottom: none;
+        border-radius: $radius-sm $radius-sm 0 0;
+        background: $background;
+        padding: 10px;
+
+        .ql-formats {
+          margin-right: 12px;
+        }
+
+        button {
+          width: 32px;
+          height: 32px;
+          border-radius: 4px;
+          transition: all 0.2s;
+
+          &:hover {
+            background: $primary-light;
+            color: $primary;
+          }
+
+          &.ql-active {
+            background: $primary-light;
+            color: $primary;
+          }
+        }
+
+        .ql-picker {
+          color: $text-secondary;
+
+          .ql-picker-label {
+            border: 1px solid transparent;
+            border-radius: 4px;
+            padding: 4px 8px;
+            transition: all 0.2s;
+
+            &:hover {
+              background: $primary-light;
+              color: $primary;
+            }
+          }
+
+          &.ql-expanded .ql-picker-label {
+            background: $primary-light;
+            color: $primary;
+            border-color: $primary;
+          }
+
+          .ql-picker-options {
+            background: $white;
+            border: 1px solid $border-color;
+            border-radius: $radius-sm;
+            box-shadow: $shadow-md;
+            padding: 8px;
+          }
+        }
+      }
+
+      .ql-container {
+        border: 1px solid $border-color;
+        border-radius: 0 0 $radius-sm $radius-sm;
+        background: $white;
+        font-family: inherit;
+        font-size: 0.95rem;
+
+        &.ql-snow {
+          border-top: none;
+        }
+
+        .ql-editor {
+          min-height: 200px;
+          padding: 16px;
+          line-height: 1.7;
+          color: $text-primary;
+
+          &.ql-blank::before {
+            color: lighten($text-secondary, 15%);
+            font-style: normal;
+          }
+
+          p,
+          ul,
+          ol {
+            margin-bottom: 10px;
+          }
+
+          h1,
+          h2,
+          h3,
+          h4,
+          h5,
+          h6 {
+            margin-bottom: 12px;
+            color: $text-primary;
+          }
+        }
+      }
+
+      // Focus state
+      &:focus-within {
+        .ql-toolbar {
+          border-color: $primary;
+        }
+
+        .ql-container {
+          border-color: $primary;
+          box-shadow: 0 0 0 3px $primary-light;
+        }
+      }
+    }
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.input-with-suffix {
+  position: relative;
+
+  input {
+    padding-right: 50px;
+  }
+
+  .suffix {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9rem;
+    color: $text-secondary;
+    font-weight: 500;
+  }
+}
+
+.error-message {
+  display: block;
+  font-size: 0.8rem;
+  color: $danger;
+  margin-top: 6px;
+}
+
+.profit-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: $purple-light;
+  border-radius: $radius-sm;
+  margin-bottom: 20px;
+
+  fa-icon {
+    color: $purple;
+  }
+
+  span {
+    font-size: 0.9rem;
+    color: $text-primary;
+
+    strong {
+      color: $purple;
+    }
+  }
+}
+
+// ============================================
+// IMAGES
+// ============================================
+.images-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+
+  @media (max-width: 576px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.image-preview {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: $radius-sm;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .delete-image {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    background: $danger;
+    border: none;
+    border-radius: 50%;
+    color: $white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  &.pending {
+    border: 2px dashed $primary;
+  }
+
+  .pending-badge {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    padding: 4px 8px;
+    background: $primary;
+    color: $white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: 4px;
+  }
+}
+
+.upload-zone {
+  .upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: $background;
+    border: 2px dashed $border-color;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+
+    &:hover {
+      border-color: $primary;
+      background: $primary-light;
+    }
+
+    fa-icon {
+      font-size: 2.5rem;
+      color: $primary;
+      margin-bottom: 15px;
+    }
+
+    span {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: $text-primary;
+      margin-bottom: 5px;
+    }
+
+    small {
+      font-size: 0.8rem;
+      color: $text-secondary;
+    }
+  }
+}
+
+// ============================================
+// TOGGLE SETTINGS
+// ============================================
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.toggle-setting {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: $background;
+  border-radius: $radius-sm;
+  border: 1px solid $border-color;
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .toggle-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    @media (max-width: 576px) {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .setting-icon {
+      font-size: 1.3rem;
+      color: $primary;
+    }
+
+    .toggle-text {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+
+      .toggle-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: $text-primary;
+      }
+
+      .toggle-desc {
+        font-size: 0.85rem;
+        color: $text-secondary;
+      }
+    }
+  }
+}
+
+.toggle-switch {
+  position: relative;
+  width: 56px;
+  height: 30px;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+
+    &:checked+.toggle-slider {
+      background-color: $success;
+
+      &::before {
+        transform: translateX(26px);
+      }
+    }
+  }
+
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #ccc;
+    border-radius: 30px;
+    transition: 0.3s;
+
+    &::before {
+      content: '';
+      position: absolute;
+      height: 22px;
+      width: 22px;
+      left: 4px;
+      bottom: 4px;
+      background-color: $white;
+      border-radius: 50%;
+      transition: 0.3s;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+// ============================================
+// FORM ACTIONS
+// ============================================
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  padding-top: 20px;
+  border-top: 1px solid $border-color;
+
+  .btn-cancel {
+    padding: 14px 28px;
+    background: $white;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: $text-primary;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: $text-secondary;
+    }
+  }
+
+  .btn-submit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+    border: none;
+    border-radius: $radius-md;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: $white;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba($primary, 0.4);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+
+  @media (max-width: 576px) {
+    flex-direction: column-reverse;
+
+    .btn-cancel,
+    .btn-submit {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}

@@ -1,0 +1,110 @@
+<div class="operation-edit-page">
+
+    <!-- Loading Skeleton -->
+    <div class="loading-skeleton" *ngIf="isLoading">
+        <div class="skeleton-header"></div>
+        <div class="skeleton-form">
+            <div class="skeleton-product-header"></div>
+            <div class="skeleton-section"></div>
+            <div class="skeleton-section short"></div>
+            <div class="skeleton-actions"></div>
+        </div>
+    </div>
+
+    <!-- Submitting Overlay -->
+    <div class="action-overlay" *ngIf="isSubmitting">
+        <div class="action-spinner">
+            <div class="spinner"></div>
+            <span>Enregistrement en cours...</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="page-content" *ngIf="!isLoading">
+
+        <!-- Page Header -->
+        <header class="page-header">
+            <a class="back-link" (click)="navigateTo('/operations')">
+                <fa-icon [icon]="faArrowLeft"></fa-icon>
+                <span>Retour aux opérations</span>
+            </a>
+            <h1>Modifier une opération</h1>
+        </header>
+
+        <form [formGroup]="form" (ngSubmit)="edit()">
+            <div class="form-card">
+                <!-- Product Info (Read-only) -->
+                <div class="product-header">
+                    <div class="product-icon">
+                        <fa-icon [icon]="faBox"></fa-icon>
+                    </div>
+                    <div class="product-info">
+                        <span class="product-label">Produit</span>
+                        <span class="product-name">{{ form.get('productName').value || 'Chargement...' }}</span>
+                    </div>
+                    <div class="type-badge" [class.sold]="form.get('type').value === 'SOLD'"
+                        [class.loaded]="form.get('type').value === 'LOADED'"
+                        [class.returned]="form.get('type').value === 'RETURNED'">
+                        <fa-icon
+                            [icon]="form.get('type').value === 'SOLD' ? faShoppingCart : (form.get('type').value === 'LOADED' ? faTruck : faUndo)"></fa-icon>
+                        {{ form.get('type').value === 'SOLD' ? 'Vente' : (form.get('type').value === 'LOADED' ?
+                        'Chargement' : 'Retour') }}
+                    </div>
+                </div>
+
+                <!-- Form Fields -->
+                <div class="form-section">
+                    <h3 class="section-title"><fa-icon [icon]="faCoins"></fa-icon> Prix et quantité</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="price"><fa-icon [icon]="faTag"></fa-icon> Prix unitaire</label>
+                            <div class="input-with-suffix">
+                                <input type="number" id="price" formControlName="price" (change)="calculateTotal()"
+                                    placeholder="0.00">
+                                <span class="suffix">DT</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="amount"><fa-icon [icon]="faCubes"></fa-icon> Quantité</label>
+                            <input type="number" id="amount" formControlName="amount" (change)="calculateTotal()"
+                                placeholder="0">
+                        </div>
+                    </div>
+
+                    <!-- Total Display -->
+                    <div class="total-display">
+                        <div class="total-label">
+                            <fa-icon [icon]="faCalculator"></fa-icon>
+                            <span>Total calculé</span>
+                        </div>
+                        <div class="total-value">
+                            <span class="amount">{{ form.get('total').value | number:'1.2-2' }}</span>
+                            <span class="currency">DT</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date Section -->
+                <div class="form-section">
+                    <h3 class="section-title"><fa-icon [icon]="faCalendarAlt"></fa-icon> Date de l'opération</h3>
+
+                    <div class="form-group">
+                        <label for="date"><fa-icon [icon]="faClock"></fa-icon> Date et heure</label>
+                        <input type="datetime-local" id="date" formControlName="date">
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" (click)="navigateTo('/operations')">Annuler</button>
+                    <button type="submit" class="btn-submit" [disabled]="isSubmitting">
+                        <fa-icon [icon]="isSubmitting ? faSpinner : faSave" [class.fa-spin]="isSubmitting"></fa-icon>
+                        {{ isSubmitting ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,56 +1,97 @@
-<div class="">
-  <form [formGroup]="form" (ngSubmit)="login()">
-    <div class="row justify-content-center">
-      <div class="col-12 col-sm-12 col-md-12 col-lg-6 login-block">
-        <div class="mb-3 row">
-          <label for="email" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Email</label>
-          <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-            <input type="email" [ngClass]="{'invalid':submitted && !form.get('email').value || emailError}"
-              class="form-control" id="email" formControlName="email">
-            <div *ngIf="submitted && emailError" class="form-error">
-              Email non trouvé.
-            </div>
-          </div>
+<div class="login-page">
+  <div class="page-container">
+    <!-- Left Section - Hero/Branding -->
+    <div class="hero-section">
+      <div class="hero-content">
+        <div class="brand-badge">
+          <i class="fa fa-store"></i>
+          <span>Storiom</span>
+        </div>
+        <h1>Bon retour parmi nous</h1>
+        <p class="subtitle">Connectez-vous pour gérer votre boutique et vos ventes.</p>
 
-        </div>
-        <div class="mb-3 row">
-          <label for="inputPassword" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Mot de passe</label>
-          <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-            <input type="password" [ngClass]="{'invalid':submitted && !form.get('password').value || passwordError}"
-              class="form-control" id="inputPassword" formControlName="password">
-            <div *ngIf="submitted && passwordError" class="form-error">
-              Mot de passe incorrect.
-            </div>
+        <div class="hero-image">
+          <div class="floating-stat stat-1">
+            <i class="fa fa-tags"></i>
+            <span>Meilleurs Prix</span>
           </div>
-        </div>
-        <div class="mb-3 row justify-content-end">
-          <div class="col-auto">
-            <a [routerLink]="['/forgot-password']" class="text-decoration-none">Mot de passe oublié ?</a>
-          </div>
-        </div>
-        <div class="mb-3 row">
-          <div class="form-check mb-3">
-            <div class="col-12 col-sm-12 col-md-12 col-lg-12 p-2">
-              <input id="remember" class="form-check-input" type="checkbox" formControlName="remember">
-              <label for="remember" class="form-check-label">
-                Se souvenir de moi
-              </label>
-            </div>
-          </div>
-        </div>
-        <div class="mb-3 row justify-content-end">
-          <div class="col-12 col-sm-12 col-lg-auto">
-            <button type="submit" class="btn btn-primary full-width">Connexion</button>
-          </div>
-        </div>
-
-        <div class="mb-3 row">
-          <div class="col-auto col-sm-auto col-md-auto col-lg-auto p-2">
-            <span>Pas encore inscrit ? <a [routerLink]="['/register']"
-                routerLinkActive="router-link-active">S'inscrire</a> </span>
+          <div class="floating-stat stat-2">
+            <i class="fa fa-shopping-bag"></i>
+            <span>Shopping Facile</span>
           </div>
         </div>
       </div>
+
+      <div class="hero-footer">
+        <p>&copy; 2025 Storiom. Tous droits réservés.</p>
+      </div>
     </div>
-  </form>
+
+    <!-- Right Section - Login Form -->
+    <div class="form-section">
+      <div class="form-container">
+        <div class="form-header">
+          <h2>Connexion</h2>
+          <p>Entrez vos identifiants pour accéder à votre compte</p>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="login()">
+          <!-- Email Input -->
+          <div class="form-group" [class.has-error]="(submitted && form.get('email').invalid) || emailError">
+            <label for="email">Email</label>
+            <div class="input-wrapper">
+              <i class="fa fa-envelope input-icon"></i>
+              <input type="email" id="email" formControlName="email" placeholder="votre@email.com">
+            </div>
+            <div class="error-message" *ngIf="submitted && form.get('email').errors?.required">
+              <i class="fa fa-exclamation-circle"></i> L'email est requis
+            </div>
+            <div class="error-message" *ngIf="submitted && emailError">
+              <i class="fa fa-exclamation-circle"></i> Email non trouvé
+            </div>
+          </div>
+
+          <!-- Password Input -->
+          <div class="form-group" [class.has-error]="(submitted && form.get('password').invalid) || passwordError">
+            <div class="label-row">
+              <label for="password">Mot de passe</label>
+              <a [routerLink]="['/forgot-password']" class="forgot-link">Mot de passe oublié ?</a>
+            </div>
+            <div class="input-wrapper">
+              <i class="fa fa-lock input-icon"></i>
+              <input type="password" id="password" formControlName="password" placeholder="••••••••">
+            </div>
+            <div class="error-message" *ngIf="submitted && form.get('password').errors?.required">
+              <i class="fa fa-exclamation-circle"></i> Le mot de passe est requis
+            </div>
+            <div class="error-message" *ngIf="submitted && passwordError">
+              <i class="fa fa-exclamation-circle"></i> Mot de passe incorrect
+            </div>
+          </div>
+
+          <!-- Remember Me -->
+          <div class="form-group checkbox-group">
+            <label class="custom-checkbox">
+              <input type="checkbox" formControlName="remember">
+              <span class="checkmark"></span>
+              <span class="checkbox-text">Se souvenir de moi</span>
+            </label>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="submit-btn">
+            <span>Se Connecter</span>
+            <i class="fa fa-arrow-right"></i>
+          </button>
+
+          <!-- Register Link -->
+          <div class="register-prompt">
+            <p>Pas encore de compte ? <a [routerLink]="['/register']">Créer un compte</a></p>
+            <!--<p class="seller-prompt">Vous êtes vendeur ? <a routerLink="/seller-onboarding">Lancez votre boutique</a>
+            </p>-->
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>

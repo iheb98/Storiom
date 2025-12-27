@@ -1,0 +1,269 @@
+// Receipt Body Styles - Transfer from receipt-view.scss
+
+.receipt-body {
+    padding: 40px;
+    background-color: white; // Ensure white background
+
+    @media print {
+        padding: 0;
+    }
+
+    @media (max-width: 576px) {
+        padding: 20px;
+    }
+}
+
+// Header
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    border-bottom: 2px solid #f1f1f1;
+    padding-bottom: 2rem;
+
+    @media (max-width: 576px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+    }
+
+    .store-info {
+        .store-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .store-logo {
+            max-height: 60px;
+            margin-bottom: 10px;
+        }
+    }
+
+    .invoice-details {
+        text-align: right;
+
+        @media (max-width: 576px) {
+            text-align: left;
+            width: 100%;
+        }
+
+        .invoice-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #e2e8f0; // Subtle text color for visual hierarchy
+            text-transform: uppercase;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .invoice-number-block {
+            margin-top: 1rem;
+
+            .label {
+                font-size: 0.75rem;
+                color: #64748b;
+                text-transform: uppercase;
+                font-weight: 600;
+                display: block;
+            }
+
+            .value {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #1e293b;
+            }
+        }
+    }
+}
+
+// Info Grid (From / To)
+.info-section {
+    display: flex;
+    gap: 4rem;
+    margin-bottom: 3rem;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-block {
+        flex: 1;
+
+        h5 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #94a3b8;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .info-content {
+            font-size: 0.95rem;
+            color: #334155;
+            line-height: 1.6;
+
+            strong {
+                display: block;
+                font-size: 1.1rem;
+                color: #0f172a;
+                margin-bottom: 0.5rem;
+            }
+
+            .contact-line {
+                margin-bottom: 0.25rem; // Add slight spacing between lines
+
+                .contact-label {
+                    margin-right: 0.5rem;
+                    font-weight: 500; // Match previous look if needed
+                }
+
+                .contact-value {
+                    color: #334155;
+                    word-wrap: break-word;
+                    word-break: break-word;
+                    letter-spacing: normal;
+                }
+            }
+        }
+    }
+}
+
+// Table
+.items-table-container {
+    margin-bottom: 2rem;
+    overflow-x: auto; // Allow horizontal scroll on mobile
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 600px; // Force table to keep structure, scroll if needed
+
+        thead {
+            th {
+                text-align: left;
+                padding: 1rem;
+                background-color: #f8fafc;
+                color: #475569;
+                font-weight: 600;
+                font-size: 0.85rem;
+                text-transform: uppercase;
+                border-bottom: 1px solid #e2e8f0;
+
+                &:last-child {
+                    text-align: right;
+                }
+            }
+        }
+
+        tbody {
+            tr {
+                border-bottom: 1px solid #f1f5f9;
+
+                td {
+                    padding: 1rem;
+                    color: #334155;
+                    vertical-align: top;
+
+                    &:last-child {
+                        text-align: right;
+                        font-weight: 600;
+                    }
+
+                    .item-desc {
+                        font-weight: 500;
+                        color: #1e293b;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Totals
+.totals-section {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    page-break-inside: avoid;
+
+    @media (max-width: 576px) {
+        justify-content: flex-start; // Align left on small screens
+        margin-top: 1.5rem;
+    }
+
+    .totals-box {
+        width: 300px;
+
+        @media (max-width: 576px) {
+            width: 100%; // Full width on mobile
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            color: #64748b;
+            font-size: 0.95rem;
+            white-space: nowrap; // Prevent wrapping for "TVA (19%)" etc.
+
+            &.final {
+                border-top: 2px solid #cbd5e1;
+                margin-top: 0.5rem;
+                padding-top: 1rem;
+                color: #0f172a;
+                font-weight: 700;
+                font-size: 1.25rem;
+
+                .currency {
+                    color: #0d6efd; // Brand color accent
+                }
+            }
+        }
+    }
+}
+
+// Footer
+.footer-section {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid #f1f5f9;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.85rem;
+
+    .thank-you {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        color: #475569;
+    }
+}
+
+// Print Specific Overrides
+@media print {
+    @page {
+        margin: 0;
+        size: auto;
+    }
+
+    body {
+        margin: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .header-section,
+    .info-section,
+    .items-table-container,
+    .totals-section,
+    .footer-section {
+        page-break-inside: avoid;
+    }
+}

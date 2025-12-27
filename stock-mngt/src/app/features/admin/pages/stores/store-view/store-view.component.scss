@@ -1,0 +1,647 @@
+// Variables
+$primary: #3f51b5;
+$primary-dark: #303f9f;
+$primary-light: rgba(63, 81, 181, 0.1);
+$success: #2e7d32;
+$warning: #f57c00;
+$danger: #c62828;
+$info: #0288d1;
+$text-primary: #2c3e50;
+$text-secondary: #7f8c8d;
+$border-color: #e8ecef;
+$background: #f5f7fa;
+$white: #ffffff;
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 20px rgba(0, 0, 0, 0.1);
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+
+.store-view-page {
+    padding: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    position: relative;
+    min-height: 400px;
+
+    @media (max-width: 768px) {
+        padding: 20px 15px;
+    }
+}
+
+// ============================================
+// LOADING SKELETON
+// ============================================
+.loading-skeleton {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.skeleton-header {
+    height: 200px;
+    border-radius: $radius-lg;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin-bottom: 30px;
+}
+
+.skeleton-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 576px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.skeleton-stat {
+    height: 110px;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeleton-content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.skeleton-card {
+    height: 280px;
+    border-radius: $radius-md;
+    background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+// ============================================
+// PAGE CONTENT ANIMATION
+// ============================================
+.page-content {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// ============================================
+// STORE HEADER
+// ============================================
+.store-header {
+    background: linear-gradient(135deg, $white 0%, $background 100%);
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    padding: 30px;
+    margin-bottom: 30px;
+    color: $text-primary;
+    box-shadow: $shadow-sm;
+
+    .header-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 25px;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+    }
+
+    .store-logo {
+        width: 120px;
+        height: 120px;
+        border-radius: $radius-md;
+        overflow: hidden;
+        background: $white;
+        flex-shrink: 0;
+        cursor: pointer;
+        transition: transform 0.3s;
+        border: 1px solid $border-color;
+        box-shadow: $shadow-sm;
+
+        &:hover {
+            transform: scale(1.05);
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        @media (max-width: 768px) {
+            width: 100px;
+            height: 100px;
+        }
+    }
+
+    .store-info {
+        flex: 1;
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 0 12px;
+
+            @media (max-width: 768px) {
+                font-size: 1.5rem;
+            }
+        }
+
+        .store-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+
+            @media (max-width: 768px) {
+                justify-content: center;
+            }
+
+            .badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 6px 14px;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: 600;
+
+                &.active {
+                    background: rgba($success, 0.15);
+                    color: darken($success, 10%);
+                }
+
+                &.inactive {
+                    background: rgba($danger, 0.15);
+                    color: darken($danger, 5%);
+                }
+
+                &.delivery {
+                    background: rgba($success, 0.15);
+                    color: darken($success, 10%);
+                }
+
+                &.no-delivery {
+                    background: rgba($warning, 0.15);
+                    color: darken($warning, 10%);
+                }
+
+                &.visibility {
+                    background: rgba($info, 0.15);
+                    color: darken($info, 10%);
+                }
+
+                &.not-visible {
+                    background: rgba($warning, 0.15);
+                    color: darken($warning, 10%);
+                }
+            }
+        }
+
+        .store-description {
+            font-size: 0.95rem;
+            color: $text-primary;
+            margin: 15px 0 0;
+            line-height: 1.7;
+            max-width: 700px;
+            max-height: 80px;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+
+            // Rich text content styling
+            p {
+                margin: 0 0 12px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                margin: 0 0 12px;
+                color: $text-primary;
+                font-weight: 600;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+
+            h3 {
+                font-size: 1.15rem;
+            }
+
+            h4 {
+                font-size: 1rem;
+            }
+
+            strong,
+            b {
+                font-weight: 600;
+            }
+
+            em,
+            i {
+                font-style: italic;
+            }
+
+            u {
+                text-decoration: underline;
+            }
+
+            s {
+                text-decoration: line-through;
+            }
+
+            ul,
+            ol {
+                margin: 0 0 12px;
+                padding-left: 25px;
+
+                li {
+                    margin-bottom: 6px;
+                }
+            }
+
+            a {
+                color: $primary;
+                text-decoration: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+
+            [style*="background"] {
+                padding: 2px 4px;
+                border-radius: 3px;
+            }
+        }
+    }
+
+    // Expanded state
+    &.expanded .store-info .store-description {
+        max-height: 500px;
+    }
+
+    .header-actions {
+        .btn-edit {
+            background: $primary;
+            color: $white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: $radius-sm;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba($primary, 0.4);
+            }
+        }
+    }
+
+    .header-toggle-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        margin: 15px auto 0;
+        background: $primary-light;
+        border: 2px solid rgba($primary, 0.3);
+        border-radius: 50%;
+        color: $primary;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            background: rgba($primary, 0.2);
+            transform: scale(1.1);
+        }
+
+        fa-icon {
+            font-size: 1rem;
+        }
+    }
+}
+
+// ============================================
+// STATS GRID
+// ============================================
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 576px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.stat-card {
+    background: $white;
+    border-radius: $radius-md;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border: 1px solid $border-color;
+    transition: all 0.3s;
+    box-shadow: $shadow-sm;
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: $shadow-md;
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: $radius-sm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+
+        &.products {
+            background: rgba($primary, 0.1);
+            color: $primary;
+        }
+
+        &.orders {
+            background: rgba($success, 0.1);
+            color: $success;
+        }
+
+        &.categories {
+            background: rgba($info, 0.1);
+            color: $info;
+        }
+
+        &.suppliers {
+            background: rgba($warning, 0.1);
+            color: $warning;
+        }
+    }
+
+    .stat-content {
+        display: flex;
+        flex-direction: column;
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: $text-primary;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: $text-secondary;
+            margin-top: 5px;
+        }
+    }
+}
+
+// ============================================
+// CONTENT GRID
+// ============================================
+.content-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.info-card {
+    background: $white;
+    border-radius: $radius-md;
+    border: 1px solid $border-color;
+    overflow: hidden;
+    box-shadow: $shadow-sm;
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 20px;
+        background: $background;
+        border-bottom: 1px solid $border-color;
+
+        fa-icon {
+            font-size: 1.2rem;
+            color: $primary;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            color: $text-primary;
+        }
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 12px 0;
+        border-bottom: 1px solid $border-color;
+
+        &:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        &:first-child {
+            padding-top: 0;
+        }
+
+        .info-icon {
+            width: 36px;
+            height: 36px;
+            background: $primary-light;
+            color: $primary;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .info-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            .info-label {
+                font-size: 0.8rem;
+                color: $text-secondary;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .info-value {
+                font-size: 1rem;
+                color: $text-primary;
+                font-weight: 500;
+            }
+
+            .info-link {
+                font-size: 1rem;
+                color: $primary;
+                text-decoration: none;
+                font-weight: 500;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+}
+
+// ============================================
+// QUICK ACTIONS
+// ============================================
+.actions-card {
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+
+        @media (max-width: 576px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .action-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 20px 15px;
+        background: $background;
+        border-radius: $radius-sm;
+        text-decoration: none;
+        color: $text-primary;
+        transition: all 0.3s;
+        text-align: center;
+
+        &:hover {
+            background: $primary;
+            color: $white;
+            transform: translateY(-2px);
+        }
+
+        fa-icon {
+            font-size: 1.5rem;
+        }
+
+        span {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+    }
+}
+
+// ============================================
+// IMAGE POPUP
+// ============================================
+.image-popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: zoom-out;
+
+    img {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: $radius-md;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    }
+}

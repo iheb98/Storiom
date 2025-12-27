@@ -1,0 +1,35 @@
+<div class="category-dialog">
+  <!-- Dialog Header -->
+  <div class="dialog-header">
+    <div class="header-icon">
+      <i class="fa fa-folder"></i>
+    </div>
+    <div class="header-text">
+      <h2>{{ data ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}</h2>
+      <p>{{ data ? 'Modifiez le nom de cette catégorie' : 'Ajoutez une nouvelle catégorie à votre arborescence' }}</p>
+    </div>
+    <button class="close-btn" (click)="onNoClick()">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Dialog Content -->
+  <div class="dialog-content">
+    <div class="form-group">
+      <label for="categoryName">
+        <i class="fa fa-folder-open"></i> Nom de la catégorie
+      </label>
+      <input type="text" id="categoryName" [(ngModel)]="categoryName"
+        placeholder="Ex: Électronique, Vêtements, Alimentation..." autofocus>
+    </div>
+  </div>
+
+  <!-- Dialog Actions -->
+  <div class="dialog-actions">
+    <button class="btn-cancel" (click)="onNoClick()">Annuler</button>
+    <button class="btn-submit" [mat-dialog-close]="categoryName" [disabled]="!categoryName">
+      <i class="fa" [class.fa-plus]="!data" [class.fa-save]="data"></i>
+      {{ data ? 'Enregistrer' : 'Ajouter' }}
+    </button>
+  </div>
+</div>

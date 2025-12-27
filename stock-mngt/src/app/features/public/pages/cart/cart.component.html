@@ -1,0 +1,136 @@
+<div class="cart-page">
+
+  <!-- Page Header -->
+  <header class="page-header">
+    <h1><fa-icon [icon]="faShoppingCart"></fa-icon> Mon Panier</h1>
+    <span class="item-count" *ngIf="!isLoading && cart.length > 0">{{ totalItems }} article(s)</span>
+  </header>
+
+  <!-- Loading Skeleton -->
+  <div class="cart-loading" *ngIf="isLoading">
+    <div class="cart-items-skeleton">
+      <div class="skeleton-item" *ngFor="let i of [1,2,3]"></div>
+    </div>
+    <div class="summary-skeleton"></div>
+  </div>
+
+  <!-- Cart Content -->
+  <div class="cart-content" *ngIf="!isLoading && cart.length > 0">
+
+    <!-- Cart Items -->
+    <div class="cart-items-section">
+      <div class="cart-item" *ngFor="let item of cart">
+
+        <!-- Product Image -->
+        <div class="item-image" [routerLink]="['/publicProduct', item.product?.id]">
+          <img [src]="getProductImage(item.product)" [alt]="item.product?.name">
+        </div>
+
+        <!-- Product Details -->
+        <div class="item-details">
+          <h3 class="item-name" [routerLink]="['/publicProduct', item.product?.id]">
+            {{ item.product?.name }}
+          </h3>
+          <p class="item-store" *ngIf="item.product?.store">
+            <fa-icon [icon]="faStore"></fa-icon>
+            {{ item.product?.store?.name }}
+          </p>
+          <span class="stock-status in-stock" *ngIf="item.product?.quantity > 0">
+            <fa-icon [icon]="faCheck"></fa-icon> En stock
+          </span>
+          <span class="stock-status out-of-stock" *ngIf="item.product?.quantity <= 0">
+            <fa-icon [icon]="faTimes"></fa-icon> Rupture de stock
+          </span>
+        </div>
+
+        <!-- Quantity Controls -->
+        <div class="item-quantity">
+          <button class="qty-btn" (click)="decreaseQty(item)" [disabled]="item.quantity <= 1">
+            <fa-icon [icon]="faMinus"></fa-icon>
+          </button>
+          <span class="qty-value">{{ item.quantity }}</span>
+          <button class="qty-btn" (click)="increaseQty(item)">
+            <fa-icon [icon]="faPlus"></fa-icon>
+          </button>
+        </div>
+
+        <!-- Item Price -->
+        <div class="item-price">
+          <span class="price-value">{{ (item.product?.sellingPrice * item.quantity) | number:'1.2-2' }}</span>
+          <span class="currency">TND</span>
+          <span class="unit-price" *ngIf="item.quantity > 1">
+            {{ item.product?.sellingPrice | number:'1.2-2' }} TND × {{ item.quantity }}
+          </span>
+        </div>
+
+        <!-- Remove Button -->
+        <button class="remove-btn" (click)="removeItem(item)">
+          <fa-icon [icon]="faTrash"></fa-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-summary-section">
+      <div class="summary-card">
+        <h3>Récapitulatif</h3>
+
+        <div class="summary-row">
+          <span>Sous-total ({{ totalItems }} articles)</span>
+          <span>{{ totalPrice | number:'1.2-2' }} TND</span>
+        </div>
+
+        <div class="summary-row">
+          <span>Livraison</span>
+          <span class="free">Calculée à la commande</span>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>{{ totalPrice | number:'1.2-2' }} TND</span>
+        </div>
+
+        <button class="checkout-btn" (click)="checkout()" [disabled]="cart.length === 0">
+          <fa-icon [icon]="faLock"></fa-icon>
+          Passer la commande
+        </button>
+
+        <!--<div class="secure-notice">
+          <fa-icon [icon]="faShieldAlt"></fa-icon>
+          Paiement 100% sécurisé
+        </div>-->
+
+        <button class="continue-shopping-btn" (click)="goToMarketplace()">
+          <fa-icon [icon]="faArrowLeft"></fa-icon>
+          Continuer mes achats
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty Cart State -->
+  <div class="empty-cart" *ngIf="!isLoading && cart.length === 0">
+    <div class="empty-icon">
+      <fa-icon [icon]="faShoppingCart"></fa-icon>
+    </div>
+    <h2>Votre panier est vide</h2>
+    <p>Découvrez nos produits et ajoutez-les à votre panier !</p>
+    <button class="browse-btn" (click)="goToMarketplace()">
+      <fa-icon [icon]="faShoppingBag"></fa-icon>
+      Parcourir le marketplace
+    </button>
+  </div>
+</div>
+
+<!-- Mobile Sticky Bar -->
+<div class="mobile-sticky-bar" *ngIf="!isLoading && cart.length > 0">
+  <div class="sticky-total">
+    <span class="label">Total</span>
+    <span class="amount">{{ totalPrice | number:'1.2-2' }} TND</span>
+  </div>
+  <button class="sticky-checkout-btn" (click)="checkout()">
+    Commander
+  </button>
+</div>

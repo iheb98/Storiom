@@ -1,0 +1,93 @@
+<div class="onboarding-container">
+    <div class="onboarding-card">
+        <div class="header">
+            <h1>Bienvenue sur Storiom Vendeur</h1>
+            <p>Créez votre boutique et commencez à vendre vos produits dès aujourd'hui.</p>
+        </div>
+
+        <div class="features-section">
+            <h2>Ce que vous obtenez :</h2>
+            <ul class="features-list">
+                <li><i class="fa fa-store"></i> Votre propre boutique en ligne personnalisée</li>
+                <li><i class="fa fa-box"></i> Gestion complète de vos produits et stocks</li>
+                <li><i class="fa fa-shopping-cart"></i> Traitement des commandes simplifié</li>
+                <li><i class="fa fa-chart-line"></i> Tableaux de bord et analyses détaillées</li>
+                <li><i class="fa fa-users"></i> Accès à notre base de clients</li>
+            </ul>
+        </div>
+
+        <div class="terms-section">
+            <h2>Conditions Générales d'Utilisation</h2>
+            <div class="terms-box">
+                <div class="terms-content">
+                    <h3>1. Acceptation des Conditions</h3>
+                    <p>En créant une boutique sur Storiom, vous acceptez d'être lié par les présentes conditions
+                        générales d'utilisation. Si vous n'acceptez pas ces conditions, vous ne devez pas utiliser nos
+                        services.</p>
+
+                    <h3>2. Inscription et Compte Vendeur</h3>
+                    <p>Vous devez fournir des informations exactes, complètes et à jour lors de votre inscription. Vous
+                        êtes responsable de la confidentialité de votre compte et de toutes les activités qui s'y
+                        déroulent.</p>
+
+                    <h3>3. Responsabilité des Produits</h3>
+                    <p>En tant que vendeur, vous êtes entièrement responsable des produits que vous proposez à la vente,
+                        y compris leur qualité, leur conformité aux réglementations applicables, leur description et
+                        leur prix. Storiom n'assume aucune responsabilité quant aux produits vendus par les vendeurs.
+                    </p>
+
+                    <h3>4. Limitation de Responsabilité</h3>
+                    <p>Storiom agit uniquement en tant qu'intermédiaire entre les vendeurs et les acheteurs. En aucun
+                        cas Storiom ne pourra être tenu responsable des dommages directs, indirects, accessoires,
+                        spéciaux ou consécutifs résultant de l'utilisation de la plateforme ou de l'impossibilité de
+                        l'utiliser.</p>
+
+                    <h3>5. Propriété Intellectuelle</h3>
+                    <p>Vous conservez tous les droits de propriété intellectuelle sur vos contenus. En publiant sur
+                        Storiom, vous nous accordez une licence non exclusive pour afficher et promouvoir vos produits
+                        sur notre plateforme.</p>
+
+                    <h3>6. Conformité Légale</h3>
+                    <p>Vous vous engagez à respecter toutes les lois et réglementations applicables, notamment en
+                        matière de protection des consommateurs, de fiscalité et de protection des données personnelles.
+                    </p>
+
+                    <h3>7. Paiements et Commissions</h3>
+                    <p>Les modalités de paiement et les commissions applicables seront communiquées séparément. Storiom
+                        se réserve le droit de modifier ces conditions avec un préavis raisonnable.</p>
+
+                    <h3>8. Résiliation</h3>
+                    <p>Storiom se réserve le droit de suspendre ou de résilier votre compte vendeur à tout moment,
+                        notamment en cas de violation des présentes conditions ou de comportement frauduleux.</p>
+
+                    <h3>9. Indemnisation</h3>
+                    <p>Vous acceptez d'indemniser et de dégager Storiom de toute responsabilité en cas de réclamations,
+                        pertes, dommages ou dépenses résultant de votre utilisation de la plateforme ou de la violation
+                        des présentes conditions.</p>
+
+                    <h3>10. Modification des Conditions</h3>
+                    <p>Storiom se réserve le droit de modifier les présentes conditions à tout moment. Les modifications
+                        entreront en vigueur dès leur publication sur la plateforme.</p>
+
+                    <h3>11. Droit Applicable</h3>
+                    <p>Les présentes conditions sont régies par le droit tunisien. Tout litige sera soumis à la
+                        compétence exclusive des tribunaux tunisiens.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="accept-section">
+            <label class="checkbox-container">
+                <input type="checkbox" [(ngModel)]="termsAccepted">
+                <span class="checkmark"></span>
+                J'ai lu et j'accepte les conditions générales d'utilisation
+            </label>
+        </div>
+
+        <div class="actions">
+            <button class="create-btn" [disabled]="!termsAccepted" (click)="createStore()">
+                <i class="fa fa-plus-circle"></i> Créer Ma Boutique
+            </button>
+        </div>
+    </div>
+</div>

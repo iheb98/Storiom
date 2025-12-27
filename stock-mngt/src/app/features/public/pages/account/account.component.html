@@ -1,0 +1,136 @@
+<!-- Loading Skeleton -->
+<div class="account-skeleton" *ngIf="isLoading">
+    <div class="skeleton-header">
+        <div class="skeleton-title"></div>
+        <div class="skeleton-subtitle"></div>
+    </div>
+    <div class="skeleton-layout">
+        <div class="skeleton-sidebar">
+            <div class="skeleton-avatar"></div>
+            <div class="skeleton-name"></div>
+            <div class="skeleton-email"></div>
+            <div class="skeleton-nav">
+                <div class="skeleton-nav-item"></div>
+                <div class="skeleton-nav-item"></div>
+                <div class="skeleton-separator"></div>
+                <div class="skeleton-nav-item"></div>
+            </div>
+        </div>
+        <div class="skeleton-content">
+            <div class="skeleton-section-title"></div>
+            <div class="skeleton-form-row">
+                <div class="skeleton-input"></div>
+                <div class="skeleton-input"></div>
+            </div>
+            <div class="skeleton-input full"></div>
+            <div class="skeleton-input full"></div>
+            <div class="skeleton-section-title short"></div>
+            <div class="skeleton-form-row">
+                <div class="skeleton-input"></div>
+                <div class="skeleton-input"></div>
+            </div>
+            <div class="skeleton-input full"></div>
+            <div class="skeleton-button"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Account Content -->
+<div class="account-container" *ngIf="!isLoading && user">
+    <!-- Page Header -->
+    <div class="account-header">
+        <div class="header-content">
+            <h1>Mon Compte</h1>
+            <p>Gérez votre profil et consultez vos commandes</p>
+        </div>
+    </div>
+
+    <div class="account-layout">
+        <!-- SIDEBAR -->
+        <aside class="account-sidebar">
+            <!-- User Card -->
+            <div class="user-card">
+                <div class="avatar-wrapper">
+                    <div class="avatar-circle">
+                        {{ getInitials() }}
+                    </div>
+                    <div class="status-dot"></div>
+                </div>
+                <div class="user-details">
+                    <h3>{{ user.firstName }} {{ user.lastName }}</h3>
+                    <span class="email">{{ user.email }}</span>
+                    <span class="member-since" *ngIf="getJoinDate()">
+                        <fa-icon [icon]="faCalendarAlt"></fa-icon>
+                        Membre depuis {{ getJoinDate() }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Quick Info -->
+            <div class="quick-info">
+                <div class="info-item" *ngIf="user.phone">
+                    <fa-icon [icon]="faPhone"></fa-icon>
+                    <span>{{ user.phone }}</span>
+                </div>
+                <div class="info-item" *ngIf="user.address?.city">
+                    <fa-icon [icon]="faMapMarkerAlt"></fa-icon>
+                    <span>{{ user.address.city }}, {{ user.address.state || user.address.country }}</span>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="nav-links">
+                <button [class.active]="activeTab === 'profile'" (click)="switchTab('profile')">
+                    <fa-icon [icon]="faUser"></fa-icon>
+                    <span>Détails du profil</span>
+                    <fa-icon [icon]="faChevronRight" class="arrow"></fa-icon>
+                </button>
+                <button [class.active]="activeTab === 'orders'" (click)="switchTab('orders')">
+                    <fa-icon [icon]="faShoppingBag"></fa-icon>
+                    <span>Mes Commandes</span>
+                    <fa-icon [icon]="faChevronRight" class="arrow"></fa-icon>
+                </button>
+                <div class="nav-separator"></div>
+                <button class="logout-btn" (click)="logout()">
+                    <fa-icon [icon]="faSignOutAlt"></fa-icon>
+                    <span>Déconnexion</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- CONTENT AREA -->
+        <main class="account-content">
+            <!-- PROFILE TAB -->
+            <div class="tab-content" *ngIf="activeTab === 'profile'">
+                <app-profile-details [user]="user"></app-profile-details>
+            </div>
+
+            <!-- ORDERS TAB -->
+            <div class="tab-content" *ngIf="activeTab === 'orders'">
+                <div class="orders-placeholder">
+                    <div class="placeholder-icon">
+                        <fa-icon [icon]="faShoppingBag"></fa-icon>
+                    </div>
+                    <h3>Historique des commandes</h3>
+                    <p>Cette fonctionnalité sera bientôt disponible.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Mobile Bottom Navigation -->
+<div class="mobile-tabs" *ngIf="!isLoading && user">
+    <button [class.active]="activeTab === 'profile'" (click)="switchTab('profile')">
+        <fa-icon [icon]="faUser"></fa-icon>
+        <span>Profil</span>
+    </button>
+    <button [class.active]="activeTab === 'orders'" (click)="switchTab('orders')">
+        <fa-icon [icon]="faShoppingBag"></fa-icon>
+        <span>Commandes</span>
+    </button>
+    <button class="logout" (click)="logout()">
+        <fa-icon [icon]="faSignOutAlt"></fa-icon>
+        <span>Quitter</span>
+    </button>
+</div>

@@ -1,0 +1,142 @@
+<div class="suppliers-page">
+
+    <!-- Action Loading Overlay -->
+    <div class="action-overlay" *ngIf="isActionLoading">
+        <div class="action-spinner">
+            <div class="spinner"></div>
+            <span>Traitement en cours...</span>
+        </div>
+    </div>
+
+    <!-- Main Content - Always visible -->
+    <div class="page-content">
+
+        <!-- Page Header -->
+        <header class="page-header">
+            <div class="header-left">
+                <div class="header-icon">
+                    <fa-icon [icon]="faTruckLoading"></fa-icon>
+                </div>
+                <div class="header-content">
+                    <h1>Gestion des Fournisseurs</h1>
+                    <p>{{ count || 0 }} fournisseurs au total</p>
+                </div>
+            </div>
+            <button class="btn-add" (click)="create()">
+                <fa-icon [icon]="faPlus"></fa-icon>
+                <span>Nouveau Fournisseur</span>
+            </button>
+        </header>
+
+        <!-- Actions Bar -->
+        <div class="actions-bar">
+            <button class="btn-filter" [class.active]="!filtersCollapsed" (click)="toggleFilters()">
+                <fa-icon [icon]="faFilter"></fa-icon>
+                <span>Filtres</span>
+            </button>
+            <button class="btn-reset" (click)="reset()" title="Réinitialiser les filtres">
+                <fa-icon [icon]="faUndo"></fa-icon>
+            </button>
+        </div>
+
+        <!-- Filters Panel -->
+        <div class="filters-panel" [class.collapsed]="filtersCollapsed">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label><fa-icon [icon]="faUser"></fa-icon> Prénom</label>
+                    <input type="text" [(ngModel)]="firstNameFilter" placeholder="Rechercher...">
+                </div>
+
+                <div class="filter-group">
+                    <label><fa-icon [icon]="faUser"></fa-icon> Nom</label>
+                    <input type="text" [(ngModel)]="lastNameFilter" placeholder="Rechercher...">
+                </div>
+
+                <div class="filter-group">
+                    <label><fa-icon [icon]="faPhone"></fa-icon> Téléphone</label>
+                    <input type="text" [(ngModel)]="phoneFilter" placeholder="Rechercher...">
+                </div>
+
+                <div class="filter-group">
+                    <label><fa-icon [icon]="faEnvelope"></fa-icon> Email</label>
+                    <input type="text" [(ngModel)]="emailFilter" placeholder="Rechercher...">
+                </div>
+
+                <div class="filter-group range-group">
+                    <label><fa-icon [icon]="faCoins"></fa-icon> Crédit</label>
+                    <div class="range-inputs">
+                        <input type="number" [(ngModel)]="minCreditFilter" placeholder="Min">
+                        <span class="range-separator">—</span>
+                        <input type="number" [(ngModel)]="maxCreditFilter" placeholder="Max">
+                    </div>
+                </div>
+            </div>
+
+            <div class="filters-actions">
+                <button class="btn-apply" (click)="filter()">
+                    <fa-icon [icon]="faSearch"></fa-icon> Appliquer les filtres
+                </button>
+            </div>
+        </div>
+
+        <!-- List Loading Skeleton -->
+        <div class="suppliers-list-skeleton" *ngIf="isLoading">
+            <div class="skeleton-item" *ngFor="let i of [1,2,3,4,5]"></div>
+        </div>
+
+        <!-- Suppliers List -->
+        <div class="suppliers-list" *ngIf="!isLoading && suppliers?.length > 0">
+            <div class="supplier-item" *ngFor="let supplier of suppliers">
+                <div class="supplier-avatar">
+                    <span>{{ (supplier?.firstName?.charAt(0) || '') + (supplier?.lastName?.charAt(0) || '') }}</span>
+                </div>
+
+                <div class="supplier-info">
+                    <div class="supplier-header">
+                        <span class="supplier-name">{{ supplier?.firstName }} {{ supplier?.lastName }}</span>
+                    </div>
+                    <div class="supplier-details">
+                        <span class="detail-item" *ngIf="supplier?.phone">
+                            <fa-icon [icon]="faPhone"></fa-icon>
+                            {{ supplier?.phone }}
+                        </span>
+                        <span class="detail-item" *ngIf="supplier?.email">
+                            <fa-icon [icon]="faEnvelope"></fa-icon>
+                            {{ supplier?.email }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="supplier-credit" *ngIf="supplier?.credit" [class.positive]="supplier?.credit > 0">
+                    <span class="credit-label">Crédit</span>
+                    <span class="credit-value">{{ supplier?.credit | number:'1.2-2' }} DT</span>
+                </div>
+
+                <div class="supplier-actions">
+                    <button class="btn-action edit" (click)="editSupplier(supplier)" title="Modifier">
+                        <fa-icon [icon]="faEdit"></fa-icon>
+                    </button>
+                    <button class="btn-action delete" (click)="deleteSupplier(supplier)" title="Supprimer">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="!isLoading && count === 0">
+            <div class="empty-icon">
+                <fa-icon [icon]="faTruck"></fa-icon>
+            </div>
+            <h3>Aucun fournisseur trouvé</h3>
+            <p>Essayez de modifier vos critères de recherche ou ajoutez un nouveau fournisseur</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-wrapper" *ngIf="!isLoading && suppliers?.length > 0">
+            <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
+                [showFirstLastButtons]="true" [pageSizeOptions]="[5, 10, 20]" [pageIndex]="0">
+            </mat-paginator>
+        </div>
+    </div>
+</div>

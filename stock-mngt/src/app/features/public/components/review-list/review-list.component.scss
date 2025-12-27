@@ -1,0 +1,85 @@
+.reviews-container {
+    padding: 24px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+
+    .reviews-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 24px;
+        color: #2c3e50;
+    }
+
+    .review-item {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+
+        &:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .review-header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+                background: #f1f2f6;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 12px;
+                color: #a4b0be;
+            }
+
+            .review-meta {
+                display: flex;
+                flex-direction: column;
+
+                .user-name {
+                    font-weight: 600;
+                    color: #2f3542;
+                    font-size: 0.95rem;
+                }
+
+                .review-date {
+                    font-size: 0.8rem;
+                    color: #747d8c;
+                    margin-bottom: 4px;
+                }
+
+                .stars {
+                    color: #f1c40f;
+                    font-size: 0.85rem;
+
+                    i {
+                        margin-right: 2px;
+                    }
+                }
+            }
+        }
+
+        .review-content {
+            color: #57606f;
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+    }
+
+    .no-reviews,
+    .no-comments {
+        text-align: center;
+        padding: 40px 0;
+        color: #777;
+        font-style: italic;
+        background: #f9f9f9;
+        border-radius: 8px;
+    }
+}

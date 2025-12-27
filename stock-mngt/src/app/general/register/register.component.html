@@ -1,100 +1,323 @@
-<div class="">
-    <form [formGroup]="form" (ngSubmit)="register()">
-        <div class="row justify-content-center">
-            <div class="col-12 col-sm-12 col-md-12 col-lg-6 login-block">
-                <div class="mb-3 row">
-                    <label for="lastName" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Nom</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="text" [ngClass]="{'invalid':submitted && !form.get('lastName').value}"
-                            class="form-control" id="lastName" formControlName="lastName">
-                        <div *ngIf="submitted && !form.get('lastName').value" class="form-error">
-                            Le nom est obligatoire.
-                        </div>
-                    </div>
+<div class="login-page">
+    <div class="page-container">
+        <!-- Left Section - Hero/Branding -->
+        <div class="hero-section">
+            <div class="hero-content">
+                <div class="brand-badge">
+                    <fa-icon [icon]="faStore"></fa-icon>
+                    <span>Storiom</span>
                 </div>
-                <div class="mb-3 row">
-                    <label for="firstName" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Prénom</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="firstName" [ngClass]="{'invalid':submitted && !form.get('firstName').value}"
-                            class="form-control" id="firstName" formControlName="firstName">
-                        <div *ngIf="submitted && !form.get('firstName').value" class="form-error">
-                            Le prénom est obligatoire.
-                        </div>
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="email" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Email</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="email" [ngClass]="{'invalid':submitted && !form.get('email').value || emailError}"
-                            class="form-control" id="email" formControlName="email" email="true">
-                        <div *ngIf="submitted && !form.get('email').value" class="form-error">
-                            L'email est obligatoire.
-                        </div>
-                        <div *ngIf="submitted && form.get('email').errors?.pattern" class="form-error">
-                            Mauvaise format d'email
-                        </div>
-                        <div *ngIf="submitted && emailFound" class="form-error">
-                            L'email entré est déja utilisé.
-                        </div>
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="phone" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Téléphone</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="phone" class="form-control" id="phone" formControlName="phone">
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="inputPassword" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Mot de
-                        passe</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="password"
-                            [ngClass]="{'invalid':submitted && !form.get('password').value || passwordError}"
-                            class="form-control" id="inputPassword" formControlName="password">
-                        <div *ngIf="submitted && passwordError" class="form-error">
-                            Mot de passe trop faible.
-                        </div>
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <label for="confirmPassword" class="col-12 col-sm-12 col-md-3 col-lg-3 col-form-label">Confirmer le
-                        mot de
-                        passe</label>
-                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
-                        <input type="password"
-                            [ngClass]="{'invalid':submitted && !form.get('confirmPassword').value || confirmPasswordError}"
-                            class="form-control" id="confirmPassword" formControlName="confirmPassword">
-                        <div *ngIf="form.get('confirmPassword').value && (form.get('confirmPassword').value != form.get('password').value)"
-                            class="form-error">
-                            Les deux mots de passe ne sont pas identiques.
-                        </div>
-                    </div>
-                </div>
-                <div class="mb-3 row">
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="termsCheck" formControlName="termsAccepted">
-                        <label class="form-check-label">
-                            J'accepte les <a href="#" (click)="openTermsDialog($event)">Conditions Générales
-                                d'Utilisation</a>
-                        </label>
-                    </div>
-                    <div *ngIf="submitted && !form.get('termsAccepted').value" class="form-error">
-                        Vous devez accepter les conditions.
-                    </div>
-                </div>
-                <div class="mb-3 row justify-content-end">
-                    <div class="col-12 col-sm-12 col-lg-auto">
-                        <button type="submit" class="btn btn-primary full-width">S'inscrire</button>
-                    </div>
-                </div>
+                <h1>Rejoignez Storiom</h1>
+                <p class="subtitle">Créez votre compte et découvrez des milliers de produits uniques.</p>
 
-                <div class="mb-3 row">
-                    <div class="col-auto col-sm-auto col-md-auto col-lg-auto p-2">
-                        <span>Déja inscrit ? <a [routerLink]="['/login']" routerLinkActive="router-link-active">Se
-                                connecter</a> </span>
+                <div class="hero-image">
+                    <div class="floating-stat stat-1">
+                        <fa-icon [icon]="faRocket"></fa-icon>
+                        <span>Démarrage Rapide</span>
+                    </div>
+                    <div class="floating-stat stat-2">
+                        <fa-icon [icon]="faShieldAlt"></fa-icon>
+                        <span>Compte Sécurisé</span>
                     </div>
                 </div>
             </div>
+
+            <div class="hero-footer">
+                <p>&copy; 2025 Storiom. Tous droits réservés.</p>
+            </div>
         </div>
-    </form>
+
+        <!-- Right Section - Register Form -->
+        <div class="form-section">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>Inscription</h2>
+                    <p>Remplissez le formulaire pour créer un nouveau compte</p>
+                </div>
+
+                <form [formGroup]="form" (ngSubmit)="register()">
+
+                    <!-- Names Row -->
+                    <div class="form-row">
+                        <div class="form-group" [class.has-error]="submitted && form.get('lastName').invalid">
+                            <label for="lastName">Nom</label>
+                            <div class="input-wrapper">
+                                <fa-icon [icon]="faUser" class="input-icon"></fa-icon>
+                                <input type="text" id="lastName" formControlName="lastName" placeholder="Votre nom">
+                            </div>
+                            <div *ngIf="submitted && form.get('lastName').errors?.required" class="error-message">
+                                Le nom est obligatoire
+                            </div>
+                        </div>
+
+                        <div class="form-group" [class.has-error]="submitted && form.get('firstName').invalid">
+                            <label for="firstName">Prénom</label>
+                            <div class="input-wrapper">
+                                <fa-icon [icon]="faUser" class="input-icon"></fa-icon>
+                                <input type="text" id="firstName" formControlName="firstName"
+                                    placeholder="Votre prénom">
+                            </div>
+                            <div *ngIf="submitted && form.get('firstName').errors?.required" class="error-message">
+                                Le prénom est obligatoire
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email Input -->
+                    <div class="form-group" [class.has-error]="(submitted && form.get('email').invalid) || emailFound">
+                        <label for="email">Email</label>
+                        <div class="input-wrapper">
+                            <fa-icon [icon]="faEnvelope" class="input-icon"></fa-icon>
+                            <input type="email" id="email" formControlName="email" placeholder="votre@email.com">
+                        </div>
+                        <div *ngIf="submitted && form.get('email').errors?.required" class="error-message">
+                            L'email est requis
+                        </div>
+                        <div *ngIf="submitted && form.get('email').errors?.pattern" class="error-message">
+                            Format d'email invalide
+                        </div>
+                        <div *ngIf="submitted && emailFound" class="error-message">
+                            Cet email est déjà utilisé
+                        </div>
+                    </div>
+
+                    <!-- Phone Input -->
+                    <div class="form-group">
+                        <label for="phone">Téléphone</label>
+                        <div class="input-wrapper">
+                            <fa-icon [icon]="faPhone" class="input-icon"></fa-icon>
+                            <input type="tel" id="phone" formControlName="phone" placeholder="+216 ...">
+                        </div>
+                    </div>
+
+                    <!-- Address Section (Collapsible) -->
+                    <div class="address-toggle" (click)="showAddressSection = !showAddressSection">
+                        <span class="toggle-label">
+                            <fa-icon [icon]="faMapMarkerAlt" class="toggle-icon"></fa-icon>
+                            Ajouter une adresse (Optionnel)
+                        </span>
+                        <fa-icon [icon]="showAddressSection ? faChevronUp : faChevronDown"
+                            class="toggle-arrow"></fa-icon>
+                    </div>
+                    <div class="address-fields" [class.expanded]="showAddressSection">
+                        <div class="form-row">
+                            <!-- Governorate Autocomplete -->
+                            <div class="form-group">
+                                <div class="autocomplete-wrapper">
+                                    <input type="text" class="simple-input" [(ngModel)]="governorateSearchText"
+                                        [ngModelOptions]="{standalone: true}" (input)="onGovernorateSearch()"
+                                        (focus)="showGovernorateSuggestions = true"
+                                        (blur)="hideGovernorateSuggestionsDelayed()" placeholder="Gouvernorat"
+                                        autocomplete="off">
+                                    <fa-icon [icon]="faChevronDown" class="dropdown-icon"
+                                        (click)="toggleGovernorateSuggestions()"></fa-icon>
+                                    <div class="suggestions-dropdown"
+                                        *ngIf="showGovernorateSuggestions && filteredGovernorates.length > 0">
+                                        <div class="suggestion-item" *ngFor="let gov of filteredGovernorates"
+                                            (mousedown)="selectGovernorate(gov)">
+                                            {{ gov }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- City Autocomplete -->
+                            <div class="form-group">
+                                <div class="autocomplete-wrapper">
+                                    <input type="text" class="simple-input" [(ngModel)]="citySearchText"
+                                        [ngModelOptions]="{standalone: true}" (input)="onCitySearch()"
+                                        (focus)="showCitySuggestions = true" (blur)="hideCitySuggestionsDelayed()"
+                                        placeholder="Ville / Délégation" autocomplete="off">
+                                    <fa-icon [icon]="faChevronDown" class="dropdown-icon"
+                                        (click)="toggleCitySuggestions()"></fa-icon>
+                                    <div class="suggestions-dropdown"
+                                        *ngIf="showCitySuggestions && filteredCities.length > 0">
+                                        <div class="suggestion-item" *ngFor="let city of filteredCities"
+                                            (mousedown)="selectCity(city)">
+                                            {{ city }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="simple-input" placeholder="Rue / Adresse"
+                                formControlName="street">
+                        </div>
+                    </div>
+
+                    <!-- Password Row -->
+                    <div class="form-row">
+                        <div class="form-group"
+                            [class.has-error]="(submitted && form.get('password').invalid) || passwordError">
+                            <label for="password">Mot de passe</label>
+                            <div class="input-wrapper">
+                                <fa-icon [icon]="faLock" class="input-icon"></fa-icon>
+                                <input type="password" id="password" formControlName="password" placeholder="••••••••">
+                            </div>
+                            <div *ngIf="submitted && form.get('password').errors?.required" class="error-message">
+                                Requis
+                            </div>
+                        </div>
+
+                        <div class="form-group"
+                            [class.has-error]="(submitted && form.get('confirmPassword').invalid) || confirmPasswordError">
+                            <label for="confirmPassword">Confirmer</label>
+                            <div class="input-wrapper">
+                                <fa-icon [icon]="faLock" class="input-icon"></fa-icon>
+                                <input type="password" id="confirmPassword" formControlName="confirmPassword"
+                                    placeholder="••••••••">
+                            </div>
+                            <div *ngIf="form.get('confirmPassword').value && (form.get('confirmPassword').value != form.get('password').value)"
+                                class="error-message">
+                                Ne correspond pas
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Terms Checkbox -->
+                    <div class="form-group checkbox-group"
+                        [class.has-error]="submitted && form.get('termsAccepted').invalid">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" formControlName="termsAccepted">
+                            <span class="checkmark"></span>
+                            <span class="checkbox-text">
+                                J'accepte les <a href="#"
+                                    (click)="$event.stopPropagation(); openTermsDialog($event)">Conditions Générales</a>
+                            </span>
+                        </label>
+                        <div *ngIf="submitted && !form.get('termsAccepted').value" class="error-message">
+                            Vous devez accepter les conditions
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="submit-btn" [disabled]="form.invalid && submitted">
+                        <span>Créer mon compte</span>
+                        <fa-icon [icon]="faArrowRight"></fa-icon>
+                    </button>
+
+                    <!-- Login Link -->
+                    <div class="register-prompt">
+                        <p>Déjà inscrit ? <a [routerLink]="['/login']">Se connecter</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Terms Modal -->
+    <div class="terms-modal-overlay" *ngIf="showTermsModal" (click)="showTermsModal = false">
+        <div class="terms-modal" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2><fa-icon [icon]="faFileContract"></fa-icon> Conditions Générales d'Utilisation</h2>
+                <button class="close-btn" (click)="showTermsModal = false">
+                    <fa-icon [icon]="faTimes"></fa-icon>
+                </button>
+            </div>
+            <div class="modal-content">
+                <p class="update-date"><strong>Dernière mise à jour :</strong> 14 décembre 2025</p>
+
+                <h3>1. Objet</h3>
+                <p>Storiom est une plateforme communautaire et une marketplace permettant aux utilisateurs de :</p>
+                <ul>
+                    <li>Découvrir et acheter des produits auprès de vendeurs indépendants.</li>
+                    <li>Créer un compte personnel pour suivre leurs commandes et favoris.</li>
+                    <li>Accéder, s'ils le souhaitent, à la fonctionnalité de création de boutique (sous réserve de
+                        conditions spécifiques).</li>
+                </ul>
+
+                <h3>2. Acceptation des Conditions</h3>
+                <p>En créant un compte sur Storiom, vous acceptez les présentes Conditions Générales d'Utilisation
+                    (CGU).
+                    Ces conditions régissent votre utilisation de la plateforme en tant qu'utilisateur (acheteur ou
+                    visiteur).</p>
+
+                <h3>3. Compte Utilisateur</h3>
+                <ul>
+                    <li><strong>Inscription :</strong> Vous vous engagez à fournir des informations exactes lors de
+                        votre inscription.</li>
+                    <li><strong>Sécurité :</strong> Vous êtes responsable de la confidentialité de votre mot de passe et
+                        de l'accès à votre compte.</li>
+                    <li><strong>Usage personnel :</strong> Le compte est destiné à un usage personnel. Si vous souhaitez
+                        vendre, vous pourrez activer l'option "Vendeur" ultérieurement.</li>
+                </ul>
+
+                <h3>4. Rôle de Storiom (Marketplace)</h3>
+                <p>Storiom agit en tant qu'intermédiaire technique (hébergeur) mettant en relation des acheteurs et des
+                    vendeurs indépendants.</p>
+                <ul>
+                    <li>Storiom n'est pas le vendeur des produits (sauf mention contraire explicite).</li>
+                    <li>Les vendeurs sont seuls responsables de leurs produits, de leurs prix, et de la conformité de
+                        leurs offres.</li>
+                    <li>En cas de litige sur une commande, Storiom pourra intervenir comme médiateur, mais la
+                        responsabilité finale incombe au vendeur.</li>
+                </ul>
+
+                <h3>5. Devenir Vendeur</h3>
+                <p>Tout utilisateur inscrit peut choisir de créer sa propre boutique sur Storiom.</p>
+                <ul>
+                    <li>Cette fonctionnalité change votre statut en "Vendeur".</li>
+                    <li>L'activation d'une boutique est soumise à des <strong>Conditions Générales de Vente (CGV)
+                            spécifiques</strong> et à une tarification dédiée (abonnements ou commissions) qui vous
+                        seront présentées lors de la création de la boutique.</li>
+                </ul>
+
+                <h3>6. Protection des Données</h3>
+                <p>Nous respectons votre vie privée. Vos données personnelles (nom, adresse, historique) sont utilisées
+                    uniquement pour :</p>
+                <ul>
+                    <li>Gérer votre compte et vos accès.</li>
+                    <li>Traiter vos commandes et permettre la livraison par les vendeurs.</li>
+                    <li>Améliorer votre expérience sur la plateforme.</li>
+                </ul>
+                <p>Vos données ne sont jamais vendues à des tiers publicitaires sans votre consentement.</p>
+
+                <h3>7. Code de Conduite</h3>
+                <p>L'utilisateur s'engage à utiliser la plateforme de manière respectueuse et légale :</p>
+                <ul>
+                    <li>Pas de propos haineux, racistes ou diffamatoires dans les avis ou messages.</li>
+                    <li>Pas d'usurpation d'identité ou de fraude.</li>
+                    <li>Respect des droits de propriété intellectuelle des vendeurs et de Storiom.</li>
+                </ul>
+
+                <h3>8. Commandes et Paiements</h3>
+                <ul>
+                    <li><strong>Paiement :</strong> Storiom ne prend pas en charge les paiements en ligne pour le
+                        moment.</li>
+                    <li><strong>Modalités :</strong> Le règlement s'effectue directement auprès du vendeur, ou par
+                        paiement à la livraison (Cash on Delivery) si la boutique propose ce service.</li>
+                    <li>Les prix sont affichés en Dinars Tunisiens (TND) et incluent les taxes applicables selon le
+                        vendeur.</li>
+                </ul>
+
+                <h3>9. Limitation de Responsabilité</h3>
+                <p>Bien que nous nous efforcions de maintenir un service fiable, Storiom ne peut garantir :</p>
+                <ul>
+                    <li>Une disponibilité permanente du site (maintenance, pannes).</li>
+                    <li>L'exactitude absolue des descriptions fournies par les vendeurs tiers.</li>
+                </ul>
+
+                <h3>10. Modification et Résiliation</h3>
+                <ul>
+                    <li>Vous pouvez supprimer votre compte à tout moment depuis vos paramètres.</li>
+                    <li>Storiom se réserve le droit de suspendre un compte en cas de violation grave des présentes
+                        conditions.</li>
+                    <li>Nous pouvons modifier ces conditions à tout moment ; les utilisateurs seront notifiés des
+                        changements majeurs.</li>
+                </ul>
+
+                <h3>11. Contact</h3>
+                <p>Pour toute question concernant votre compte ou une commande, contactez notre support :
+                    <a href="mailto:support@storiom.com">support@storiom.com</a>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="accept-btn" type="button"
+                    (click)="form.get('termsAccepted').setValue(true); showTermsModal = false">
+                    <fa-icon [icon]="faCheck"></fa-icon> J'accepte les conditions
+                </button>
+            </div>
+        </div>
+    </div>
 </div>

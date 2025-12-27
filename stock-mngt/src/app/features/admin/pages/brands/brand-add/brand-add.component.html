@@ -1,0 +1,34 @@
+<div class="brand-dialog">
+  <!-- Dialog Header -->
+  <div class="dialog-header">
+    <div class="header-icon">
+      <i class="fa fa-tag"></i>
+    </div>
+    <div class="header-text">
+      <h2>{{ data ? 'Modifier la marque' : 'Nouvelle marque' }}</h2>
+      <p>{{ data ? 'Modifiez le nom de cette marque' : 'Ajoutez une nouvelle marque à votre catalogue' }}</p>
+    </div>
+    <button class="close-btn" (click)="onNoClick()">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Dialog Content -->
+  <div class="dialog-content">
+    <div class="form-group">
+      <label for="brandName">
+        <i class="fa fa-bookmark"></i> Nom de la marque
+      </label>
+      <input type="text" id="brandName" [(ngModel)]="brandName" placeholder="Ex: Nike, Adidas, Samsung..." autofocus>
+    </div>
+  </div>
+
+  <!-- Dialog Actions -->
+  <div class="dialog-actions">
+    <button class="btn-cancel" (click)="onNoClick()">Annuler</button>
+    <button class="btn-submit" [mat-dialog-close]="brandName" [disabled]="!brandName">
+      <i class="fa" [class.fa-plus]="!data" [class.fa-save]="data"></i>
+      {{ data ? 'Enregistrer' : 'Ajouter' }}
+    </button>
+  </div>
+</div>

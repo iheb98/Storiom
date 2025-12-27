@@ -1,0 +1,164 @@
+import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import {
+  faEdit, faInfo, faBox, faShoppingCart, faFolder, faTruck,
+  faCheckCircle, faTimesCircle, faEye, faEyeSlash, faPhoneAlt, faPhone,
+  faEnvelope, faGlobe, faMapMarkerAlt, faRoad, faCity, faMap,
+  faBolt, faPlus, faExternalLinkAlt, faStore, faChevronDown, faChevronUp
+} from '@fortawesome/free-solid-svg-icons';
+import { AuthService } from 'src/app/core/services/auth.service';
+
+import { StoreService } from 'src/app/core/services/store.service';
+import { ProductService } from 'src/app/core/services/product.service';
+import { CategoryService } from 'src/app/core/services/category.service';
+import { SupplierService } from 'src/app/core/services/supplier.service';
+import { environment } from 'src/environments/environment';
+import Swal from 'sweetalert2';
+
+import { OrderService } from 'src/app/core/services/order.service';
+
+@Component({
+  selector: 'app-store-view',
+  templateUrl: './store-view.component.html',
+  styleUrls: ['./store-view.component.scss']
+})
+export class StoreViewComponent implements OnInit, AfterViewChecked {
+  @ViewChild('descriptionEl') descriptionEl: ElementRef;
+  store: any;
+  storeWebsite: string;
+  backend_URL = environment.backend;
+
+  // Icons
+  editIcon = faEdit;
+  infoIcon = faInfo;
+  boxIcon = faBox;
+  cartIcon = faShoppingCart;
+  folderIcon = faFolder;
+  truckIcon = faTruck;
+  checkIcon = faCheckCircle;
+  timesIcon = faTimesCircle;
+  eyeIcon = faEye;
+  eyeSlashIcon = faEyeSlash;
+  phoneHeaderIcon = faPhoneAlt;
+  phoneIcon = faPhone;
+  envelopeIcon = faEnvelope;
+  globeIcon = faGlobe;
+  mapMarkerIcon = faMapMarkerAlt;
+  roadIcon = faRoad;
+  cityIcon = faCity;
+  mapIcon = faMap;
+  boltIcon = faBolt;
+  plusIcon = faPlus;
+  externalLinkIcon = faExternalLinkAlt;
+  storeIcon = faStore;
+  chevronDownIcon = faChevronDown;
+  chevronUpIcon = faChevronUp;
+
+  selectedImage: string | null = null;
+
+  // Stats
+  productsCount = 0;
+  ordersCount = 0;
+  categoriesCount = 0;
+  suppliersCount = 0;
+
+  // Loading States
+  isLoading = true;
+  isDescriptionExpanded = false;
+  isDescriptionOverflowing = false;
+
+  constructor(
+    private authService: AuthService,
+    private storeService: StoreService,
+    private productService: ProductService,
+    private orderService: OrderService,
+    private categoryService: CategoryService,
+    private supplierService: SupplierService,
+
+  ) { }
+
+  ngOnInit(): void {
+    this.loadData();
+  }
+
+  ngAfterViewChecked(): void {
+    this.checkDescriptionOverflow();
+  }
+
+  checkDescriptionOverflow() {
+    if (this.descriptionEl?.nativeElement) {
+      const el = this.descriptionEl.nativeElement;
+      this.isDescriptionOverflowing = el.scrollHeight > el.clientHeight;
+    }
+  }
+
+  loadData() {
+    this.isLoading = true;
+    const storeId = this.authService.getConnectedUser()?.store;
+
+    this.storeService.getStore(storeId).subscribe(
+      store => {
+        this.store = store;
+        this.storeWebsite = this.fillLink(this.store?.site);
+        this.loadStats(storeId);
+        this.isLoading = false;
+      },
+      error => {
+        this.isLoading = false;
+        Swal.fire({
+          icon: 'error',
+          title: error?.error?.message || 'Erreur lors du chargement du magasin',
+          showConfirmButton: false,
+          timer: 2000
+        });
+      }
+    );
+  }
+
+  loadStats(storeId: number) {
+    // Load products count (Backend returns a raw number)
+    this.productService.countProductsByStoreId(storeId, {}).subscribe(
+      res => {
+        this.productsCount = typeof res === 'object' ? (res?.count || 0) : (res || 0);
+      }
+    );
+
+    // Load orders count
+    this.orderService.getStoreOrders(storeId).subscribe(
+      res => {
+        this.ordersCount = res?.length || 0;
+      }
+    );
+
+    // Load categories count
+    this.categoryService.getCategoriesByStoreId(storeId).subscribe(
+      res => {
+        this.categoriesCount = res?.length || 0;
+      }
+    );
+
+    // Load suppliers count
+    this.supplierService.getAllSuppliersByStoreId(storeId).subscribe(
+      res => {
+        this.suppliersCount = res?.length || 0;
+      }
+    );
+  }
+
+  fillLink(link: string): string {
+    if (link != null) {
+      if (link.indexOf('http://') === -1 && link.indexOf('https://') === -1) {
+        return 'http://' + link;
+      }
+      return link;
+    }
+    return null;
+  }
+
+  openImage(image: string) {
+    this.selectedImage = image;
+  }
+
+  closeImage() {
+    this.selectedImage = null;
+  }
+}

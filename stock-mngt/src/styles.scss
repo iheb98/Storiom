@@ -1,16 +1,117 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~bootstrap/dist/css/bootstrap.css";
 @import "~@ng-select/ng-select/themes/default.theme.css";
+
 html,
 body {
     height: 100%;
-}
-body {
     margin: 0;
-    //font-family: Roboto, "Helvetica Neue", sans-serif;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-
 }
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+// ============================================
+// THEME SYSTEM - Light & Dark Mode
+// ============================================
+
+// Light Mode (Default)
+body,
+body.light-mode {
+    // Backgrounds
+    --bg-page: #f5f7fa;
+    --bg-card: #ffffff;
+    --bg-sidebar: #ffffff;
+    --bg-header: #ffffff;
+    --bg-input: #ffffff;
+    --bg-hover: #f0f2f5;
+    --bg-active: rgba(63, 81, 181, 0.1);
+
+    // Text Colors
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --text-muted: #999999;
+    --text-inverse: #ffffff;
+
+    // Border Colors
+    --border-color: #e0e0e0;
+    --border-light: #f0f0f0;
+
+    // Shadows
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+    // Component-specific
+    --table-stripe: #fafafa;
+    --table-hover: #f5f5f5;
+    --skeleton-bg: #e0e0e0;
+    --skeleton-shine: #f5f5f5;
+    --overlay-bg: rgba(0, 0, 0, 0.5);
+
+    // Status colors (same for both themes)
+    --success: #4caf50;
+    --success-light: rgba(76, 175, 80, 0.1);
+    --warning: #ff9800;
+    --warning-light: rgba(255, 152, 0, 0.1);
+    --danger: #f44336;
+    --danger-light: rgba(244, 67, 54, 0.1);
+    --info: #2196f3;
+    --info-light: rgba(33, 150, 243, 0.1);
+}
+
+// Dark Mode
+body.dark-mode {
+    // Backgrounds
+    --bg-page: #0f0f1a;
+    --bg-card: #1a1a2e;
+    --bg-sidebar: #16213e;
+    --bg-header: #1a1a2e;
+    --bg-input: #252540;
+    --bg-hover: #252540;
+    --bg-active: rgba(99, 102, 241, 0.2);
+
+    // Text Colors
+    --text-primary: #e4e4e7;
+    --text-secondary: #a1a1aa;
+    --text-muted: #71717a;
+    --text-inverse: #0f0f1a;
+
+    // Border Colors
+    --border-color: #2a2a4a;
+    --border-light: #1f1f35;
+
+    // Shadows
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+    // Component-specific
+    --table-stripe: #1f1f35;
+    --table-hover: #252540;
+    --skeleton-bg: #2a2a4a;
+    --skeleton-shine: #353560;
+    --overlay-bg: rgba(0, 0, 0, 0.7);
+
+    // Status colors adjusted for dark mode
+    --success: #22c55e;
+    --success-light: rgba(34, 197, 94, 0.15);
+    --warning: #f59e0b;
+    --warning-light: rgba(245, 158, 11, 0.15);
+    --danger: #ef4444;
+    --danger-light: rgba(239, 68, 68, 0.15);
+    --info: #3b82f6;
+    --info-light: rgba(59, 130, 246, 0.15);
+}
+
+// Smooth transition for theme changes
+body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 
 .title {
     width: 100%;
@@ -33,20 +134,13 @@ body {
     height: 100%;
 }
 
-.page-title {
-}
+.page-title {}
 
 .page-content {
     position: relative;
     height: 100%;
 }
 
-button {
-    background-color: transparent;
-    border: 0;
-    border-radius: 3px;
-    margin: auto;
-}
 
 button:active {
     background-color: rgba(0, 0, 0, 0.27) !important;
@@ -84,56 +178,62 @@ input.ng-touched.ng-invalid {
 .align-right {
     text-align: right;
 }
+
 .align-center {
     text-align: center;
 }
+
 .align-left {
     text-align: left;
 }
 
 
-.pdf-btn{
+.pdf-btn {
     border: 1px solid red;
     border-radius: 10px;
     font-weight: bold;
     font-size: 20px;
 }
-.pdf-btn:hover{
+
+.pdf-btn:hover {
     box-shadow: 0 0 10px red;
     transform: translateY(-5px);
     transition-duration: 0.3s;
 }
 
-.print-btn{
+.print-btn {
     border: 1px solid rgb(41, 131, 233);
     border-radius: 10px;
     font-weight: bold;
     font-size: 20px;
 }
-.print-btn:hover{
+
+.print-btn:hover {
     box-shadow: 0 0 10px rgb(41, 131, 233);
     transform: translateY(-5px);
     transition-duration: 0.3s;
 }
 
-.back-btn{
+.back-btn {
     border: 1px solid rgb(115, 5, 189);
     border-radius: 10px;
     font-weight: bold;
     font-size: 20px;
 }
-.back-btn:hover{
+
+.back-btn:hover {
     box-shadow: 0 0 10px rgb(120, 3, 210);
     transform: translateY(-5px);
     transition-duration: 0.3s;
 }
+
 // ---------------------------
 
-.align-center{
+.align-center {
     text-align: center;
 }
 
-table{
+table {
     background-color: white;
     border: 1px solid lightgray;
 }
@@ -153,6 +253,7 @@ table{
 }
 
 @media screen and (max-width: 600px) {
+
     // .full-page {
     //     padding: 20px 20px 0 20px;
     //     position: relative;
@@ -170,40 +271,39 @@ table{
 // .container {
 //     display: flex;
 //   }
-  
-  .sidenav {
+
+.sidenav {
     width: 250px;
-  }
-  
-  .main-content {
+}
+
+.main-content {
     flex: 1;
-    padding: 20px;
-  }
-  
-  .search-bar {
+    //padding: 20px;
+}
+
+.search-bar {
     display: flex;
     justify-content: center;
     margin: 20px 0;
-  }
-  
-  .product-card {
+}
+
+.product-card {
     border: 1px solid #ddd;
     padding: 15px;
     margin: 10px;
     text-align: center;
-  }
-  
-  .product-card img {
+}
+
+.product-card img {
     width: 100%;
     height: auto;
-  }
-  
-  .product-card .price {
+}
+
+.product-card .price {
     color: #e91e63;
     font-weight: bold;
-  }
-  
-  .product-card .reviews {
+}
+
+.product-card .reviews {
     color: #fbc02d;
-  }
-  
+}

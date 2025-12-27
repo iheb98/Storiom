@@ -9,12 +9,14 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ Address, Subscription, Store, PaymentOrder }) {
+    static associate({ Address, Subscription, Store, PaymentOrder, Order, Review }) {
       // define association here
       this.hasOne(Address, { foreignKey: 'user_id', as: 'address' })
       this.hasOne(Subscription, { foreignKey: 'user_id', as: 'subscription' })
       this.hasOne(Store, { foreignKey: 'user_id', as: 'store' })
       this.hasMany(PaymentOrder, { foreignKey: 'user_id' })
+      this.hasMany(Order, { foreignKey: 'user_id', as: 'orders' })
+      this.hasMany(Review, { foreignKey: 'user_id', as: 'reviews' })
     }
     toJSON() {
       return { ...this.get(), creatorUserId: undefined, password: undefined }
@@ -96,6 +98,22 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: true,
       field: 'terms_accepted_at'
+    },
+    settings: {
+      type: DataTypes.JSONB,
+      allowNull: true,
+      defaultValue: {
+        theme: {
+          primaryColor: '#3f51b5',
+          mode: 'light'
+        },
+        defaults: {
+          productVisibleToPublic: true,
+        },
+        navigation: {
+          defaultScreen: 'none'
+        }
+      }
     }
 
   }, {

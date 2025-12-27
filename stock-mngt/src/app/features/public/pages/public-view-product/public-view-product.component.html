@@ -1,0 +1,246 @@
+<div class="product-page" *ngIf="product">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav">
+        <a routerLink="/" class="back-link">Accueil</a>
+        <span class="separator"><fa-icon [icon]="faChevronRight"></fa-icon></span>
+        <a (click)="goBack()" class="back-link">
+            Produits
+        </a>
+        <span class="separator"><fa-icon [icon]="faChevronRight"></fa-icon></span>
+        <span class="current">{{ product?.name }}</span>
+    </nav>
+
+    <!-- Main Product Section -->
+    <div class="product-main">
+
+        <!-- Image Gallery -->
+        <div class="gallery-section">
+            <div class="main-image-container" (click)="openImage(selectedImage)">
+                <img [src]="selectedImage" [alt]="product?.name" class="main-image">
+                <div class="zoom-hint">
+                    <fa-icon [icon]="faSearchPlus"></fa-icon>
+                </div>
+                <span class="discount-badge" *ngIf="product?.discount > 0">
+                    -{{ product?.discount }}%
+                </span>
+            </div>
+            <div class="thumbnails" *ngIf="product?.images?.length > 1">
+                <button class="thumb" *ngFor="let img of product.images; let i = index"
+                    [class.active]="selectedImageIndex === i" (click)="selectImage(i)">
+                    <img [src]="environment.backend + '/' + img" [alt]="'Image ' + (i + 1)">
+                </button>
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="info-section">
+            <!-- Title & Brand -->
+            <div class="product-header">
+                <span class="brand-name" *ngIf="product?.brand">{{ product?.brand?.name }}</span>
+                <h1 class="product-title">{{ product?.name }}</h1>
+            </div>
+
+            <!-- Rating -->
+            <div class="rating-row">
+                <div class="stars">
+                    <fa-icon *ngFor="let star of [1,2,3,4,5]"
+                        [icon]="star <= product.averageRating ? faStar : (star - 0.5 <= product.averageRating ? faStarHalfAlt : faStarEmpty)"
+                        [class.filled]="star <= product.averageRating"
+                        [class.half]="star - 0.5 <= product.averageRating && star > product.averageRating">
+                    </fa-icon>
+                </div>
+                <span class="rating-text">{{ product.averageRating | number:'1.1-1' }}</span>
+                <span class="reviews-count">({{ product.reviews?.length || 0 }} avis)</span>
+            </div>
+
+            <!-- Price -->
+            <div class="price-section">
+                <div class="price-main">
+                    <span class="current-price">{{ product?.sellingPrice | number:'1.2-2' }}</span>
+                    <span class="currency">TND</span>
+                </div>
+                <span class="original-price" *ngIf="product?.discount > 0">
+                    {{ getOriginalPrice() | number:'1.2-2' }} TND
+                </span>
+            </div>
+
+            <!-- Stock Status -->
+            <div class="stock-row">
+                <span class="stock-badge" [class.in-stock]="product?.quantity > 0"
+                    [class.out-of-stock]="product?.quantity <= 0">
+                    <fa-icon [icon]="product?.quantity > 0 ? faCheck : faTimes"></fa-icon>
+                    {{ product?.quantity > 0 ? 'En Stock' : 'Rupture de Stock' }}
+                </span>
+                <!--<span class="quantity-left" *ngIf="product?.quantity > 0 && product?.quantity <= 10">
+                    Plus que {{ product?.quantity }} en stock !
+                </span>-->
+            </div>
+
+            <!-- Quantity & Add to Cart -->
+            <div class="purchase-section">
+                <div class="quantity-selector">
+                    <button class="qty-btn minus" (click)="decreaseQuantity()" [disabled]="quantity <= 1">
+                        <fa-icon [icon]="faMinus"></fa-icon>
+                    </button>
+                    <span class="qty-value">{{ quantity }}</span>
+                    <button class="qty-btn plus" (click)="increaseQuantity()">
+                        <fa-icon [icon]="faPlus"></fa-icon>
+                    </button>
+                </div>
+                <button class="add-to-cart-btn" (click)="addToCart(product)" [disabled]="product?.quantity <= 0">
+                    <fa-icon [icon]="faShoppingCart"></fa-icon>
+                    <span>Ajouter au Panier</span>
+                </button>
+            </div>
+
+            <!-- Delivery Info -->
+            <div class="delivery-info" *ngIf="product?.store?.isSupportingDeliveries">
+                <div class="info-item">
+                    <fa-icon [icon]="faTruck"></fa-icon>
+                    <span>Livraison disponible</span>
+                </div>
+                <!--<div class="info-item">
+                    <fa-icon [icon]="faShieldAlt"></fa-icon>
+                    <span>Transaction sécurisée</span>
+                </div>-->
+            </div>
+
+            <!-- Seller Card -->
+            <div class="seller-card">
+                <div class="seller-header">
+                    <fa-icon [icon]="faStore"></fa-icon>
+                    <span>Vendu par</span>
+                </div>
+                <div class="seller-info">
+                    <span class="seller-name">{{ product?.store?.name }}</span>
+                    <span class="seller-location"
+                        *ngIf="product?.store?.address?.state || product?.store?.address?.city">
+                        <fa-icon [icon]="faMapMarker"></fa-icon>
+                        {{ product?.store?.address?.city }}<span
+                            *ngIf="product?.store?.address?.city && product?.store?.address?.state">, </span>{{
+                        product?.store?.address?.state }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description Section -->
+    <div class="description-section">
+        <div class="section-header">
+            <h2><fa-icon [icon]="faInfoCircle"></fa-icon> Description du produit</h2>
+        </div>
+        <div class="description-content" *ngIf="product?.description" [innerHTML]="product?.description | safeHtml">
+        </div>
+        <p class="no-description" *ngIf="!product?.description">Aucune description disponible pour ce produit.</p>
+
+        <!-- Product Details -->
+        <div class="details-grid">
+            <div class="detail-card" *ngIf="product?.category">
+                <span class="detail-label">Catégorie</span>
+                <span class="detail-value">{{ product?.category?.name }}</span>
+            </div>
+            <div class="detail-card" *ngIf="product?.brand">
+                <span class="detail-label">Marque</span>
+                <span class="detail-value">{{ product?.brand?.name }}</span>
+            </div>
+            <div class="detail-card" *ngIf="product?.color">
+                <span class="detail-label">Couleur</span>
+                <span class="detail-value">{{ product?.color }}</span>
+            </div>
+            <div class="detail-card" *ngIf="product?.size">
+                <span class="detail-label">Taille</span>
+                <span class="detail-value">{{ product?.size }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="reviews-section">
+        <div class="section-header">
+            <h2><fa-icon [icon]="faComments"></fa-icon> Avis et Commentaires</h2>
+            <span class="reviews-summary">{{ product.reviews?.length || 0 }} avis • Note moyenne : {{
+                product.averageRating | number:'1.1-1' }}/5</span>
+        </div>
+
+        <div class="reviews-container">
+            <div class="review-form-wrapper">
+                <app-review-form [productId]="product.id" [initialReview]="userReview"
+                    (reviewSubmitted)="onReviewSubmitted($event)"></app-review-form>
+            </div>
+            <div class="reviews-list-wrapper">
+                <app-review-list [reviews]="product.reviews"></app-review-list>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Skeleton -->
+<div class="loading-skeleton" *ngIf="!product">
+    <!-- Breadcrumb Skeleton -->
+    <div class="skeleton-breadcrumb">
+        <div class="skeleton-text short"></div>
+        <div class="skeleton-text short"></div>
+        <div class="skeleton-text medium"></div>
+    </div>
+
+    <!-- Main Product Skeleton -->
+    <div class="skeleton-product-main">
+        <!-- Image Gallery Skeleton -->
+        <div class="skeleton-gallery">
+            <div class="skeleton-main-image"></div>
+            <div class="skeleton-thumbnails">
+                <div class="skeleton-thumb" *ngFor="let i of [1,2,3,4]"></div>
+            </div>
+        </div>
+
+        <!-- Info Section Skeleton -->
+        <div class="skeleton-info">
+            <div class="skeleton-text short"></div>
+            <div class="skeleton-text long"></div>
+            <div class="skeleton-stars"></div>
+            <div class="skeleton-price"></div>
+            <div class="skeleton-text medium"></div>
+            <div class="skeleton-purchase">
+                <div class="skeleton-qty"></div>
+                <div class="skeleton-btn"></div>
+            </div>
+            <div class="skeleton-delivery"></div>
+            <div class="skeleton-seller"></div>
+        </div>
+    </div>
+
+    <!-- Description Skeleton -->
+    <div class="skeleton-section">
+        <div class="skeleton-text medium"></div>
+        <div class="skeleton-text long"></div>
+        <div class="skeleton-text long"></div>
+    </div>
+</div>
+
+<!-- Image Lightbox -->
+<div class="lightbox" *ngIf="lightboxOpen" (click)="closeLightbox()">
+    <button class="lightbox-close">
+        <fa-icon [icon]="faTimes"></fa-icon>
+    </button>
+    <button class="lightbox-nav prev" (click)="prevImage($event)" *ngIf="product?.images?.length > 1">
+        <fa-icon [icon]="faChevronLeft"></fa-icon>
+    </button>
+    <img [src]="selectedImage" [alt]="product?.name">
+    <button class="lightbox-nav next" (click)="nextImage($event)" *ngIf="product?.images?.length > 1">
+        <fa-icon [icon]="faChevronRight"></fa-icon>
+    </button>
+    <div class="lightbox-counter" *ngIf="product?.images?.length > 1">
+        {{ selectedImageIndex + 1 }} / {{ product?.images?.length }}
+    </div>
+</div>
+
+<!-- Mobile Sticky Bar -->
+<div class="mobile-sticky-bar" *ngIf="product">
+    <div class="sticky-price">{{ product?.sellingPrice | number:'1.2-2' }} TND</div>
+    <button class="sticky-cart-btn" (click)="addToCart(product)" [disabled]="product?.quantity <= 0">
+        <fa-icon [icon]="faShoppingCart"></fa-icon>
+        Ajouter
+    </button>
+</div>

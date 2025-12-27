@@ -1,0 +1,68 @@
+<div class="parent-categories-container">
+
+    <!-- Loading Skeleton -->
+    <div class="loading-skeleton" *ngIf="isLoading">
+        <div class="skeleton-grid">
+            <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5]"></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="page-content" *ngIf="!isLoading">
+
+        <!-- Category Cards Grid -->
+        <div class="categories-grid" *ngIf="stats?.length > 0">
+            <div class="category-card" *ngFor="let stat of stats; let i = index">
+                <div class="card-header">
+                    <div class="category-rank">{{ i + 1 }}</div>
+                    <h3 class="category-name">{{ stat?.categoryName }}</h3>
+                </div>
+
+                <div class="card-body">
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Valeur de fond</span>
+                            <span class="stat-value stock">{{ stat?.stockValue ? (stat?.stockValue | number:'1.2-2') + '
+                                DT'
+                                : '--' }}</span>
+                        </div>
+
+                        <div class="stat-item">
+                            <span class="stat-label">Valeur de vente</span>
+                            <span class="stat-value selling">{{ stat?.stockSellingValue ? (stat?.stockSellingValue |
+                                number:'1.2-2') + ' DT' : '--' }}</span>
+                        </div>
+
+                        <div class="stat-item">
+                            <span class="stat-label">Valeur nette</span>
+                            <span class="stat-value net">{{ stat?.stockNetValue ? (stat?.stockNetValue | number:'1.2-2')
+                                + '
+                                DT' : '--' }}</span>
+                        </div>
+
+                        <div class="stat-item highlight">
+                            <span class="stat-label">Total des ventes</span>
+                            <span class="stat-value total">{{ stat?.totalSold ? (stat?.totalSold | number:'1.2-2') + '
+                                DT' :
+                                '--' }}</span>
+                        </div>
+
+                        <div class="stat-item highlight">
+                            <span class="stat-label">Net des ventes</span>
+                            <span class="stat-value profit">{{ stat?.totalSoldNet ? (stat?.totalSoldNet |
+                                number:'1.2-2') +
+                                ' DT' : '--' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="stats?.length === 0">
+            <fa-icon [icon]="faFolderOpen"></fa-icon>
+            <h4>Aucune catégorie trouvée</h4>
+            <p>Les statistiques de vos catégories apparaîtront ici</p>
+        </div>
+    </div>
+</div>

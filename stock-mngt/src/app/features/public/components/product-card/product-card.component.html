@@ -1,0 +1,62 @@
+<div class="product-card" (click)="viewDetails()">
+  <div class="product-image-container">
+    <!-- New Badge (conditional) -->
+    <!-- <span class="badge new" *ngIf="isNew(product)">New</span> -->
+
+    <img [src]="product?.images?.length ? environment.backend + '/' + product?.images[0] : 'assets/default_product.png'"
+      [alt]="product.name">
+
+    <!-- Overlay Utils -->
+    <div class="overlay-utils">
+      <button class="util-btn" title="Aperçu Rapide" (click)="$event.stopPropagation(); viewDetails()">
+        <i class="fa fa-eye"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="product-details">
+    <div class="category-name" *ngIf="product.category">{{ product.category.name }}</div>
+
+    <h3>{{ product.name }}</h3>
+
+    <div class="rating">
+      <ng-container *ngFor="let star of [1,2,3,4,5]">
+        <i class="fa" [ngClass]="{
+             'fa-star checked': averageRating >= star,
+             'fa-star-half-o checked': averageRating > (star - 1) && averageRating < star,
+             'fa-star-o': averageRating < (star - 0.5)
+           }">
+        </i>
+      </ng-container>
+      <span>({{ averageRating | number:'1.1-1' }})</span>
+    </div>
+
+    <div class="price-row">
+      <span class="price">{{ product.sellingPrice }} TND</span>
+    </div>
+
+    <div class="store-name" *ngIf="product.store">
+      Vendu par <a class="store-link" (click)="goToStore($event)">{{ product.store.name }}</a>
+      <span class="location" *ngIf="product.store.address?.state || product.store.address?.city">
+        <i class="fa fa-map-marker-alt"></i>
+        {{ product.store.address?.city }}<span *ngIf="product.store.address?.city && product.store.address?.state">,
+        </span>{{ product.store.address?.state }}
+      </span>
+      <span class="delivery-badge success" *ngIf="product.store.isSupportingDeliveries">
+        <i class="fa fa-truck"></i> Livraison disponible
+      </span>
+      <span class="delivery-badge error" *ngIf="!product.store.isSupportingDeliveries">
+        <i class="fa fa-times-circle"></i> Pas de livraison
+      </span>
+    </div>
+
+    <div class="card-footer">
+      <button class="action-btn details-btn" (click)="$event.stopPropagation(); viewDetails()">
+        Détails
+      </button>
+      <button class="action-btn cart-btn" (click)="addToCart($event)">
+        <i class="fa fa-shopping-cart"></i> Ajouter
+      </button>
+    </div>
+  </div>
+</div>

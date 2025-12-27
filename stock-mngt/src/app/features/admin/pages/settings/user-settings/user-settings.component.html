@@ -1,0 +1,112 @@
+<div class="settings-container">
+    <div class="settings-header">
+        <h1><fa-icon [icon]="faCog"></fa-icon> Paramètres</h1>
+        <p class="subtitle">Personnalisez votre expérience utilisateur</p>
+    </div>
+
+    <div class="settings-content" *ngIf="!isLoading">
+        <form [formGroup]="settingsForm">
+            <!-- Theme Section -->
+            <!--<div class="settings-section">
+                <div class="section-header">
+                    <fa-icon [icon]="faPalette"></fa-icon>
+                    <h2>Apparence</h2>
+                </div>
+                <div class="section-body">
+                    <div class="setting-item">
+                        <label>Couleur principale</label>
+                        <div class="color-options">
+                            <button *ngFor="let color of colorOptions" class="color-btn"
+                                [style.backgroundColor]="color.value"
+                                [class.selected]="settingsForm.get('primaryColor').value === color.value"
+                                (click)="selectColor(color.value)" [title]="color.name">
+                            </button>
+                            <input type="color" class="color-input" formControlName="primaryColor"
+                                title="Couleur personnalisée">
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <label>Mode d'affichage</label>
+                        <div class="mode-toggle">
+                            <button class="mode-btn" [class.active]="settingsForm.get('mode').value === 'light'"
+                                (click)="settingsForm.patchValue({mode: 'light'})">
+                                <fa-icon [icon]="faSun"></fa-icon>
+                                Clair
+                            </button>
+                            <button class="mode-btn" [class.active]="settingsForm.get('mode').value === 'dark'"
+                                (click)="settingsForm.patchValue({mode: 'dark'})">
+                                <fa-icon [icon]="faMoon"></fa-icon>
+                                Sombre
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+
+            <!-- Defaults Section -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <fa-icon [icon]="faBox"></fa-icon>
+                    <h2>Valeurs par défaut</h2>
+                </div>
+                <div class="section-body">
+                    <div class="setting-item toggle-item">
+                        <div class="toggle-info">
+                            <fa-icon
+                                [icon]="settingsForm.get('productVisibleToPublic').value ? faEye : faEyeSlash"></fa-icon>
+                            <div>
+                                <label>Produits visibles au public</label>
+                                <p>Les nouveaux produits seront visibles sur le marketplace par défaut</p>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" formControlName="productVisibleToPublic">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Navigation Section -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <fa-icon [icon]="faHome"></fa-icon>
+                    <h2>Navigation</h2>
+                </div>
+                <div class="section-body">
+                    <div class="setting-item">
+                        <label>Écran par défaut après connexion</label>
+                        <div class="screen-options">
+                            <button *ngFor="let screen of screenOptions" class="screen-btn"
+                                [class.selected]="settingsForm.get('defaultScreen').value === screen.value"
+                                (click)="selectScreen(screen.value)">
+                                <fa-icon [icon]="screen.icon"></fa-icon>
+                                <span>{{ screen.name }}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="settings-actions">
+                <button class="btn-reset" (click)="resetSettings()" [disabled]="isSaving">
+                    <fa-icon [icon]="faUndo"></fa-icon>
+                    Réinitialiser
+                </button>
+                <button class="btn-save" (click)="saveSettings()" [disabled]="isSaving">
+                    <fa-icon [icon]="faSave"></fa-icon>
+                    {{ isSaving ? 'Enregistrement...' : 'Enregistrer' }}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>Chargement des paramètres...</p>
+    </div>
+</div>

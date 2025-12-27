@@ -3,9 +3,26 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { TermsComponent } from 'src/app/pages/terms/terms.component';
-import { AuthService } from 'src/app/services/auth.service';
-import { LoadingService } from 'src/app/services/loading.service';
+import { AuthService } from 'src/app/core/services/auth.service';
+import { getAllGovernorates, getCitiesForGovernorate, getAllCities } from 'src/app/shared/data/tunisia-locations';
+
 import Swal from 'sweetalert2';
+import {
+  faStore,
+  faRocket,
+  faShieldAlt,
+  faUser,
+  faEnvelope,
+  faPhone,
+  faLock,
+  faArrowRight,
+  faFileContract,
+  faTimes,
+  faCheck,
+  faMapMarkerAlt,
+  faChevronDown,
+  faChevronUp
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-register',
@@ -14,21 +31,50 @@ import Swal from 'sweetalert2';
 })
 export class RegisterComponent implements OnInit {
 
+  // Icons
+  faStore = faStore;
+  faRocket = faRocket;
+  faShieldAlt = faShieldAlt;
+  faUser = faUser;
+  faEnvelope = faEnvelope;
+  faPhone = faPhone;
+  faLock = faLock;
+  faArrowRight = faArrowRight;
+  faFileContract = faFileContract;
+  faTimes = faTimes;
+  faCheck = faCheck;
+  faMapMarkerAlt = faMapMarkerAlt;
+  faChevronDown = faChevronDown;
+  faChevronUp = faChevronUp;
+
   form: FormGroup;
   submitted: boolean;
   emailError: boolean;
   emailFound: boolean;
   passwordError: boolean;
   confirmPasswordError: boolean;
+  showAddressSection = false;
+
+  // Autocomplete for address
+  governorateSearchText = '';
+  citySearchText = '';
+  availableGovernorates: string[] = [];
+  availableCities: string[] = [];
+  filteredGovernorates: string[] = [];
+  filteredCities: string[] = [];
+  showGovernorateSuggestions = false;
+  showCitySuggestions = false;
+
   constructor(
     private router: Router,
     private formBuilder: FormBuilder,
     private authService: AuthService,
-    private loadingService: LoadingService,
-    private dialog: MatDialog) { }
+    private dialog: MatDialog
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
+    this.initLocationData();
   }
 
   initForm() {
@@ -39,8 +85,102 @@ export class RegisterComponent implements OnInit {
       phone: [''],
       password: ['', Validators.required],
       confirmPassword: ['', Validators.required],
-      termsAccepted: [false, Validators.required]
-    });
+      termsAccepted: [false, Validators.required],
+      country: ['Tunisie'],
+      state: [''],
+      city: [''],
+      street: [''],
+      postalCode: ['']
+    })
+  }
+
+  initLocationData() {
+    this.availableGovernorates = getAllGovernorates();
+    this.filteredGovernorates = [...this.availableGovernorates];
+    this.availableCities = getAllCities();
+    this.filteredCities = [...this.availableCities];
+  }
+
+  // ========================================
+  // Governorate Autocomplete
+  // ========================================
+  normalizeText(text: string): string {
+    return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  onGovernorateSearch() {
+    const searchTerm = this.normalizeText(this.governorateSearchText.trim());
+    if (!searchTerm) {
+      this.filteredGovernorates = [...this.availableGovernorates];
+      this.form.patchValue({ state: '' });
+      this.availableCities = getAllCities();
+      this.filteredCities = [...this.availableCities];
+    } else {
+      this.filteredGovernorates = this.availableGovernorates.filter(gov =>
+        this.normalizeText(gov).includes(searchTerm)
+      );
+    }
+    this.showGovernorateSuggestions = true;
+  }
+
+  selectGovernorate(governorate: string) {
+    this.governorateSearchText = governorate;
+    this.form.patchValue({ state: governorate });
+    this.showGovernorateSuggestions = false;
+
+    // Update cities based on selected governorate
+    this.availableCities = getCitiesForGovernorate(governorate);
+    this.filteredCities = [...this.availableCities];
+    this.citySearchText = '';
+    this.form.patchValue({ city: '' });
+  }
+
+  toggleGovernorateSuggestions() {
+    this.showGovernorateSuggestions = !this.showGovernorateSuggestions;
+    if (this.showGovernorateSuggestions) {
+      this.filteredGovernorates = [...this.availableGovernorates];
+    }
+  }
+
+  hideGovernorateSuggestionsDelayed() {
+    setTimeout(() => {
+      this.showGovernorateSuggestions = false;
+    }, 200);
+  }
+
+  // ========================================
+  // City Autocomplete
+  // ========================================
+  onCitySearch() {
+    const searchTerm = this.normalizeText(this.citySearchText.trim());
+    if (!searchTerm) {
+      this.filteredCities = [...this.availableCities];
+      this.form.patchValue({ city: '' });
+    } else {
+      this.filteredCities = this.availableCities.filter(city =>
+        this.normalizeText(city).includes(searchTerm)
+      );
+    }
+    this.showCitySuggestions = true;
+  }
+
+  selectCity(city: string) {
+    this.citySearchText = city;
+    this.form.patchValue({ city: city });
+    this.showCitySuggestions = false;
+  }
+
+  toggleCitySuggestions() {
+    this.showCitySuggestions = !this.showCitySuggestions;
+    if (this.showCitySuggestions) {
+      this.filteredCities = [...this.availableCities];
+    }
+  }
+
+  hideCitySuggestionsDelayed() {
+    setTimeout(() => {
+      this.showCitySuggestions = false;
+    }, 200);
   }
 
   register() {
@@ -48,10 +188,10 @@ export class RegisterComponent implements OnInit {
     this.emailError = false;
     this.passwordError = false;
     if (this.form.valid && this.form.get('termsAccepted').value) {
-      this.loadingService.screenLoading()
+
       this.authService.registerUser({ ...this.form.getRawValue(), confirmPassword: undefined })
         .subscribe(response => {
-          this.loadingService.screenLoaded()
+
           if (response.errorType == "EMAIL_FOUND") {
             this.emailFound = true;
             Swal.fire({
@@ -70,10 +210,10 @@ export class RegisterComponent implements OnInit {
               showConfirmButton: false,
               timer: 6000
             })
-            this.router.navigate(['stores/view'])
+            this.router.navigate([''])
           }
         }, error => {
-          this.loadingService.screenLoaded()
+
           Swal.fire({
             icon: 'error',
             title: 'Une erreur est survenue ! Merci de réessayer plus tard',
@@ -83,14 +223,11 @@ export class RegisterComponent implements OnInit {
         })
     }
   }
-  openModal(event: Event) {
-    event.preventDefault(); // This stops the navigation to root
-  }
+  showTermsModal = false;
 
   openTermsDialog(event: Event): void {
     event.preventDefault();
-    this.dialog.open(TermsComponent, {
-      width: '600px'
-    });
+    this.showTermsModal = true;
   }
 }
+

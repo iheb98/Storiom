@@ -1,0 +1,138 @@
+<div class="receipt-page-wrapper">
+
+    <!-- Loading Skeleton -->
+    <div class="loading-skeleton" *ngIf="isLoading">
+        <div class="skeleton-actions"></div>
+        <div class="skeleton-header"></div>
+        <div class="skeleton-info"></div>
+        <div class="skeleton-table"></div>
+        <div class="skeleton-totals"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div #receiptSection class="receipt-container" *ngIf="!isLoading">
+        <!-- Action Bar (Hidden in Print) -->
+        <div class="action-bar" data-html2canvas-ignore="true">
+            <button class="btn-action btn-back" (click)="back()">
+                <fa-icon [icon]="backIcon"></fa-icon> Retour
+            </button>
+            <button class="btn-action btn-print" (click)="print()">
+                <fa-icon [icon]="printIcon"></fa-icon> Imprimer
+            </button>
+            <button class="btn-action btn-download" (click)="downloadAsPDF()">
+                <fa-icon [icon]="pdfIcon"></fa-icon> Télécharger PDF
+            </button>
+        </div>
+
+        <div class="receipt-body">
+            <!-- Header -->
+            <div class="header-section">
+                <div class="store-info">
+                    <h2 class="store-name">{{store?.name}}</h2>
+                </div>
+                <div class="invoice-details">
+                    <h1 class="invoice-title">FACTURE</h1>
+                    <div class="invoice-number-block">
+                        <span class="label">N° Facture</span>
+                        <span class="value">#{{receipt?.code}}</span>
+                    </div>
+                    <div class="invoice-number-block">
+                        <span class="label">Date</span>
+                        <span class="value">{{receipt?.date | date:'dd/MM/yyyy'}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="info-section">
+                <div class="info-block from">
+                    <h5>De :</h5>
+                    <div class="info-content">
+                        <strong>{{store?.name}}</strong>
+                        <div *ngIf="store?.address" class="contact-line">
+                            {{store?.address?.street}}, {{store?.address?.city}}
+                        </div>
+                        <div *ngIf="store?.address" class="contact-line">
+                            {{store?.address?.state}} {{store?.address?.postalCode}}
+                        </div>
+                        <div *ngIf="store?.address?.country" class="contact-line">
+                            {{store?.address?.country}}
+                        </div>
+                        <br *ngIf="store?.address">
+                        <div *ngIf="store?.phone" class="contact-line">
+                            <span class="contact-label">Tél :</span> <span class="contact-value">{{store?.phone}}</span>
+                        </div>
+                        <div *ngIf="store?.email" class="contact-line">
+                            <span class="contact-label">Email :</span> <span
+                                class="contact-value">{{store?.email}}</span>
+                        </div>
+                        <div *ngIf="store?.site" class="contact-line">
+                            <span class="contact-label">Web :</span> <span class="contact-value">{{store?.site}}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-block to">
+                    <h5>Facturé à :</h5>
+                    <div class="info-content">
+                        <strong>
+                            {{ receipt?.name ||
+                            ((receipt?.supplier?.firstName || '') + ' ' + (receipt?.supplier?.lastName || ''))
+                            }}
+                        </strong>
+                        <div *ngIf="receipt?.store?.address" class="contact-line">
+                            {{receipt?.store?.address?.state}} {{receipt?.store?.address?.city}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items Table -->
+            <div class="items-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Quantité</th>
+                            <th>Prix Unitaire</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let operation of receipt?.operations">
+                            <td>
+                                <div class="item-desc">{{operation?.product?.name}}</div>
+                            </td>
+                            <td>{{operation?.amount}}</td>
+                            <td>{{operation?.price | number:'1.2-2'}} DT</td>
+                            <td>{{(operation?.price * operation?.amount) | number:'1.2-2'}} DT</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Totals -->
+            <div class="totals-section">
+                <div class="totals-box">
+                    <div class="total-row">
+                        <span>Sous-total</span>
+                        <span>{{(receipt?.total - (receipt?.tva * receipt?.total / 100)) | number:'1.2-2'}} DT</span>
+                    </div>
+                    <div class="total-row">
+                        <span>TVA ({{receipt?.tva}}%)</span>
+                        <span>{{(receipt?.tva * receipt?.total / 100) | number:'1.2-2'}} DT</span>
+                    </div>
+                    <div class="total-row final">
+                        <span>Total à payer</span>
+                        <span class="currency">{{receipt?.total | number:'1.2-2'}} DT</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer-section">
+                <div class="thank-you">Merci de votre confiance !</div>
+                <div>Contactez-nous à {{store?.email}} pour toute question.</div>
+            </div>
+        </div>
+    </div>
+</div>

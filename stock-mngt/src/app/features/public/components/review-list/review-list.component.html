@@ -1,0 +1,31 @@
+<div class="reviews-container">
+    <h3 class="reviews-title">Avis clients ({{ reviews?.length || 0 }})</h3>
+
+    <div class="review-item" *ngFor="let review of visibleReviews">
+        <div class="review-header">
+            <div class="user-avatar">
+                <i class="fa fa-user"></i>
+            </div>
+            <div class="review-meta">
+                <span class="user-name">{{ review.user ? (review.user.firstName + ' ' + review.user.lastName) :
+                    'Utilisateur' }}</span>
+                <span class="review-date">{{ review.createdAt | date:'mediumDate' }}</span>
+                <div class="stars">
+                    <i *ngFor="let star of getStars(review.rating)" class="fa"
+                        [ngClass]="star ? 'fa-star' : 'fa-star-o'"></i>
+                </div>
+            </div>
+        </div>
+        <div class="review-content">
+            <p>{{ review.comment }}</p>
+        </div>
+    </div>
+
+    <div class="no-reviews" *ngIf="(!reviews || reviews.length === 0)">
+        <p>Aucun avis pour le moment. Soyez le premier à donner votre avis !</p>
+    </div>
+
+    <div class="no-comments" *ngIf="reviews && reviews.length > 0 && visibleReviews.length === 0">
+        <p>Ce produit a été noté, mais il n'y a pas encore de commentaires écrits.</p>
+    </div>
+</div>

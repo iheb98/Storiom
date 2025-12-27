@@ -73,6 +73,9 @@ module.exports = {
       creatorUserId: {
         type: DataTypes.INTEGER
       },
+      discount: {
+        type: DataTypes.FLOAT,
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

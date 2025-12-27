@@ -1,0 +1,119 @@
+<div class="search-dialog">
+    <!-- Dialog Header -->
+    <div class="dialog-header">
+        <div class="header-content">
+            <i class="fa fa-search"></i>
+            <div>
+                <h2>Sélectionner des produits</h2>
+                <p>{{ count || 0 }} produits disponibles</p>
+            </div>
+        </div>
+        <button class="close-btn" mat-dialog-close>
+            <i class="fa fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-section">
+        <div class="search-input-wrapper">
+            <i class="fa fa-search"></i>
+            <input type="text" placeholder="Rechercher un produit..." [(ngModel)]="nameFilter" (keyup.enter)="filter()">
+        </div>
+        <button class="btn-filter" [class.active]="!filtersCollapsed" (click)="toggleFilters()">
+            <i class="fa fa-filter"></i>
+        </button>
+    </div>
+
+    <!-- Filters Panel -->
+    <div class="filters-panel" [class.collapsed]="filtersCollapsed">
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label>Description</label>
+                <input type="text" [(ngModel)]="descriptionFilter" placeholder="Contient...">
+            </div>
+            <div class="filter-group">
+                <label>Fournisseur</label>
+                <ng-select [(ngModel)]="supplierFilter" placeholder="Tous">
+                    <ng-option *ngFor="let element of suppliers" [value]="element?.id">
+                        {{ element.firstName + ' ' + element.lastName }}
+                    </ng-option>
+                </ng-select>
+            </div>
+            <div class="filter-group range">
+                <label>Quantité</label>
+                <div class="range-inputs">
+                    <input type="number" [(ngModel)]="minQuantityFilter" placeholder="Min">
+                    <input type="number" [(ngModel)]="maxQuantityFilter" placeholder="Max">
+                </div>
+            </div>
+            <div class="filter-group range">
+                <label>Prix</label>
+                <div class="range-inputs">
+                    <input type="number" [(ngModel)]="minSellingPriceFilter" placeholder="Min">
+                    <input type="number" [(ngModel)]="maxSellingPriceFilter" placeholder="Max">
+                </div>
+            </div>
+        </div>
+        <div class="filter-actions">
+            <button class="btn-reset" (click)="reset()">Réinitialiser</button>
+            <button class="btn-apply" (click)="filter()">Appliquer</button>
+        </div>
+    </div>
+
+    <!-- Selected Products Badge -->
+    <div class="selected-badge" *ngIf="data.selectedProducts?.length > 0">
+        <span class="badge-count">{{ data.selectedProducts.length }}</span>
+        <span>produit(s) sélectionné(s)</span>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-grid" mat-dialog-content>
+        <div class="product-card" *ngFor="let item of products" [class.selected]="isSelected(item?.id)"
+            (click)="isSelected(item?.id) ? removeFromSelectedList(item?.id) : addToSelectedList(item)">
+
+            <div class="selection-indicator">
+                <i class="fa" [class.fa-check]="isSelected(item?.id)" [class.fa-plus]="!isSelected(item?.id)"></i>
+            </div>
+
+            <div class="product-image">
+                <img [src]="item?.images[0] ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png'"
+                    [alt]="item?.name">
+            </div>
+
+            <div class="product-info">
+                <h3 class="product-name">{{ item?.name }}</h3>
+                <span class="product-category">{{ item?.category?.name || 'Sans catégorie' }}</span>
+                <div class="product-details">
+                    <span class="product-price">{{ item?.sellingPrice | number:'1.2-2' }} {{ item?.currency || 'DT'
+                        }}</span>
+                    <span class="product-stock" [class.low]="item?.quantity <= 10"
+                        [class.critical]="item?.quantity <= 5">
+                        {{ item?.quantity }} dispo
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="products?.length === 0">
+            <i class="fa fa-box-open"></i>
+            <p>Aucun produit trouvé</p>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-section">
+        <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="6"
+            [showFirstLastButtons]="true" [pageSizeOptions]="[6, 12, 24]" [pageIndex]="0">
+        </mat-paginator>
+    </div>
+
+    <!-- Dialog Actions -->
+    <div class="dialog-actions" mat-dialog-actions>
+        <button class="btn-cancel" mat-dialog-close>Annuler</button>
+        <button class="btn-confirm" [mat-dialog-close]="{selectedProducts: data.selectedProducts}">
+            <i class="fa fa-check"></i>
+            Confirmer ({{ data.selectedProducts?.length || 0 }})
+        </button>
+    </div>
+</div>

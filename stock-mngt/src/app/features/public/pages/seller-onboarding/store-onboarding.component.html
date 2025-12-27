@@ -1,0 +1,131 @@
+<div class="onboarding-page">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="brand-logo">
+                <fa-icon [icon]="faStore"></fa-icon>
+                <span>Storiom</span>
+            </div>
+            <h1>Devenez Vendeur sur Storiom</h1>
+            <p class="hero-subtitle">Créez votre boutique en ligne et atteignez des milliers de clients potentiels.
+                Gérez vos produits, vos stocks et vos commandes depuis une seule plateforme.</p>
+            <button class="cta-button" (click)="createStore()">
+                <span>Commencer Maintenant</span>
+                <fa-icon [icon]="faArrowRight"></fa-icon>
+            </button>
+        </div>
+        <div class="hero-decoration">
+            <div class="floating-card card-1">
+                <fa-icon [icon]="faBoxOpen"></fa-icon>
+                <span>Gestion Facile</span>
+            </div>
+            <div class="floating-card card-2">
+                <fa-icon [icon]="faBolt"></fa-icon>
+                <span>Ventes Rapides</span>
+            </div>
+            <div class="floating-card card-3">
+                <fa-icon [icon]="faChartLine"></fa-icon>
+                <span>Croissance</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="section-header">
+            <h2>Pourquoi Vendre sur Storiom ?</h2>
+            <p>Tout ce dont vous avez besoin pour réussir votre commerce en ligne</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <fa-icon [icon]="faStore"></fa-icon>
+                </div>
+                <h3>Votre Boutique Personnalisée</h3>
+                <p>Créez une vitrine unique pour vos produits avec votre logo et vos informations de contact.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <fa-icon [icon]="faBoxes"></fa-icon>
+                </div>
+                <h3>Gestion des Stocks</h3>
+                <p>Suivez facilement vos niveaux de stock et recevez des alertes quand il est temps de réapprovisionner.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <fa-icon [icon]="faShoppingCart"></fa-icon>
+                </div>
+                <h3>Commandes Simplifiées</h3>
+                <p>Recevez et gérez les commandes de vos clients depuis un tableau de bord intuitif.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <fa-icon [icon]="faChartBar"></fa-icon>
+                </div>
+                <h3>Tableau de Bord Complet</h3>
+                <p>Analysez vos ventes, vos produits les plus populaires et suivez vos performances.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <fa-icon [icon]="faTags"></fa-icon>
+                </div>
+                <h3>Catégories & Marques</h3>
+                <p>Organisez vos produits par catégories et marques pour une navigation optimale.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <fa-icon [icon]="faFileInvoice"></fa-icon>
+                </div>
+                <h3>Factures & Rapports</h3>
+                <p>Générez des factures professionnelles et des rapports détaillés de vos activités.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works-section">
+        <div class="section-header">
+            <h2>Comment Ça Marche ?</h2>
+            <p>3 étapes simples pour commencer à vendre</p>
+        </div>
+
+        <div class="steps-container">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Créez Votre Boutique</h3>
+                <p>Remplissez quelques informations de base sur votre activité</p>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Ajoutez Vos Produits</h3>
+                <p>Importez votre catalogue avec photos, descriptions et prix</p>
+            </div>
+            <div class="step-connector"></div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Commencez à Vendre</h3>
+                <p>Votre boutique est en ligne, recevez vos premières commandes</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Prêt à Lancer Votre Boutique ?</h2>
+            <p>Rejoignez notre communauté de vendeurs et développez votre activité</p>
+            <button class="cta-button large" (click)="createStore()">
+                <fa-icon [icon]="faRocket"></fa-icon>
+                <span>Créer Ma Boutique Gratuitement</span>
+            </button>
+        </div>
+    </section>
+</div>

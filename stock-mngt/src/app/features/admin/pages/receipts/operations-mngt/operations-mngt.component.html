@@ -1,0 +1,161 @@
+<div class="operations-page">
+
+    <!-- Action Overlay -->
+    <div class="action-overlay" *ngIf="isActionLoading">
+        <div class="action-spinner">
+            <div class="spinner"></div>
+            <span>Suppression en cours...</span>
+        </div>
+    </div>
+
+    <!-- Main Content - Always visible -->
+    <div class="page-content">
+
+        <!-- Page Header -->
+        <header class="page-header">
+            <div class="header-content">
+                <div class="header-icon">
+                    <fa-icon [icon]="faExchangeAlt"></fa-icon>
+                </div>
+                <div class="header-text">
+                    <h1>Gestion des Opérations</h1>
+                    <p>{{ count || 0 }} opérations au total</p>
+                </div>
+            </div>
+            <button class="btn-add" (click)="create()">
+                <fa-icon [icon]="faPlus"></fa-icon>
+                <span>Nouvelle Opération</span>
+            </button>
+        </header>
+
+        <!-- Actions Bar -->
+        <div class="actions-bar">
+            <button class="btn-filter" [class.active]="!filtersCollapsed" (click)="toggleFilters()">
+                <fa-icon [icon]="faFilter"></fa-icon>
+                <span>Filtres</span>
+            </button>
+            <button class="btn-reset" (click)="reset()">
+                <fa-icon [icon]="faUndo"></fa-icon>
+            </button>
+        </div>
+
+        <!-- Filters Panel -->
+        <div class="filters-panel" [class.collapsed]="filtersCollapsed">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label><fa-icon [icon]="faBox"></fa-icon> Produit</label>
+                    <input type="text" [(ngModel)]="productName" placeholder="Nom du produit...">
+                </div>
+
+                <div class="filter-group">
+                    <label><fa-icon [icon]="faTag"></fa-icon> Type</label>
+                    <ng-select [(ngModel)]="typeFilter" placeholder="Tous les types">
+                        <ng-option *ngFor="let element of types" [value]="element?.value">
+                            {{ element?.label }}
+                        </ng-option>
+                    </ng-select>
+                </div>
+
+                <div class="filter-group range-group">
+                    <label><fa-icon [icon]="faCoins"></fa-icon> Prix</label>
+                    <div class="range-inputs">
+                        <input type="number" [(ngModel)]="minPriceFilter" placeholder="Min">
+                        <span class="range-separator">—</span>
+                        <input type="number" [(ngModel)]="maxPriceFilter" placeholder="Max">
+                    </div>
+                </div>
+
+                <div class="filter-group range-group">
+                    <label><fa-icon [icon]="faCubes"></fa-icon> Quantité</label>
+                    <div class="range-inputs">
+                        <input type="number" [(ngModel)]="minAmountFilter" placeholder="Min">
+                        <span class="range-separator">—</span>
+                        <input type="number" [(ngModel)]="maxAmountFilter" placeholder="Max">
+                    </div>
+                </div>
+
+                <div class="filter-group range-group">
+                    <label><fa-icon [icon]="faCalendar"></fa-icon> Date</label>
+                    <div class="range-inputs">
+                        <input type="date" [(ngModel)]="fromDateFilter">
+                        <span class="range-separator">—</span>
+                        <input type="date" [(ngModel)]="toDateFilter">
+                    </div>
+                </div>
+            </div>
+
+            <div class="filters-actions">
+                <button class="btn-apply" (click)="filter()">
+                    <fa-icon [icon]="faSearch"></fa-icon> Appliquer les filtres
+                </button>
+            </div>
+        </div>
+
+        <!-- List Loading Skeleton -->
+        <div class="operations-list-skeleton" *ngIf="isLoading">
+            <div class="skeleton-item" *ngFor="let i of [1,2,3,4,5]"></div>
+        </div>
+
+        <!-- Operations List -->
+        <div class="operations-list" *ngIf="!isLoading && operations?.length > 0">
+            <div class="operation-item" *ngFor="let operation of operations">
+                <div class="operation-type" [class.sold]="operation?.type === 'SOLD'"
+                    [class.loaded]="operation?.type === 'LOADED'" [class.returned]="operation?.type === 'RETURNED'">
+                    <fa-icon
+                        [icon]="operation?.type === 'SOLD' ? faShoppingCart : (operation?.type === 'LOADED' ? faTruck : faUndoAlt)"></fa-icon>
+                </div>
+
+                <div class="operation-info">
+                    <div class="operation-header">
+                        <span class="operation-product">{{ operation?.product?.name || 'Produit inconnu' }}</span>
+                        <span class="operation-badge" [class.sold]="operation?.type === 'SOLD'"
+                            [class.loaded]="operation?.type === 'LOADED'"
+                            [class.returned]="operation?.type === 'RETURNED'">
+                            {{ operation?.type === 'SOLD' ? 'Vente' : (operation?.type === 'LOADED' ? 'Chargement' :
+                            'Retour') }}
+                        </span>
+                    </div>
+                    <div class="operation-details">
+                        <span class="detail-item">
+                            <fa-icon [icon]="faCoins"></fa-icon>
+                            {{ operation?.price | number:'1.2-2' }} DT × {{ operation?.amount }}
+                        </span>
+                        <span class="detail-item">
+                            <fa-icon [icon]="faCalendar"></fa-icon>
+                            {{ operation?.date | date:'dd/MM/yyyy HH:mm' }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="operation-total" [class.sold]="operation?.type === 'SOLD'"
+                    [class.loaded]="operation?.type === 'LOADED'">
+                    <span class="total-value">{{ (operation?.price * operation?.amount) | number:'1.2-2' }}</span>
+                    <span class="total-currency">DT</span>
+                </div>
+
+                <div class="operation-actions">
+                    <button class="btn-action edit" (click)="editOperation(operation)" title="Modifier">
+                        <fa-icon [icon]="faEdit"></fa-icon>
+                    </button>
+                    <button class="btn-action delete" (click)="deleteOperation(operation)" title="Supprimer">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="!isLoading && count === 0">
+            <fa-icon [icon]="faExchangeAlt"></fa-icon>
+            <h3>Aucune opération trouvée</h3>
+            <p>Essayez de modifier vos critères de recherche ou créez une nouvelle opération</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-wrapper" *ngIf="!isLoading && operations?.length > 0">
+            <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="5"
+                [showFirstLastButtons]="true" [pageSizeOptions]="[5, 10, 20, 50, 100]" [pageIndex]="0">
+            </mat-paginator>
+        </div>
+    </div>
+</div>

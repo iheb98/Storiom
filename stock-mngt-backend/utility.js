@@ -31,6 +31,7 @@ const paginate = (query, { page, pageSize }) => {
     };
 };
 const buildQuery = (sentQuery) => {
+    if (!sentQuery) return {};
     let query = sentQuery.split(',')
     let finalQuery = {}
     for (let item of query) {

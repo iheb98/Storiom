@@ -1,0 +1,182 @@
+<div class="receipt-form-page">
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="header-content">
+            <a class="back-link" (click)="navigateTo('/receipts')">
+                <i class="fa fa-arrow-left"></i>
+                <span>Retour aux factures</span>
+            </a>
+            <h1>Créer une facture</h1>
+        </div>
+    </header>
+
+    <form [formGroup]="form">
+        <div class="form-layout">
+            <!-- Left Column: Receipt Info -->
+            <div class="form-section">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2><i class="fa fa-file-invoice"></i> Informations de la facture</h2>
+                    </div>
+                    <div class="section-body">
+                        <!-- Receipt Type -->
+                        <div class="form-group">
+                            <label for="type">
+                                <i class="fa fa-tag"></i> Type de facture <span class="required">*</span>
+                            </label>
+                            <div class="type-selector">
+                                <button type="button" class="type-btn sold"
+                                    [class.active]="form.get('type').value === 'SOLD'"
+                                    (click)="form.get('type').setValue('SOLD')">
+                                    <i class="fa fa-shopping-cart"></i>
+                                    <span>Vente</span>
+                                </button>
+                                <button type="button" class="type-btn loaded"
+                                    [class.active]="form.get('type').value === 'LOADED'"
+                                    (click)="form.get('type').setValue('LOADED')">
+                                    <i class="fa fa-truck"></i>
+                                    <span>Chargement</span>
+                                </button>
+                                <button type="button" class="type-btn returned"
+                                    [class.active]="form.get('type').value === 'RETURNED'"
+                                    (click)="form.get('type').setValue('RETURNED')">
+                                    <i class="fa fa-undo"></i>
+                                    <span>Retour</span>
+                                </button>
+                            </div>
+                            <span class="error-message" *ngIf="form.get('type').value == null && validated">
+                                Veuillez sélectionner un type
+                            </span>
+                        </div>
+
+                        <!-- Date & TVA -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="date"><i class="fa fa-calendar"></i> Date</label>
+                                <input type="datetime-local" id="date" formControlName="date">
+                            </div>
+                            <div class="form-group">
+                                <label for="tva"><i class="fa fa-percent"></i> TVA</label>
+                                <div class="input-with-suffix">
+                                    <input type="number" id="tva" formControlName="tva">
+                                    <span class="suffix">%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Client Name (for SOLD/RETURNED) -->
+                        <div class="form-group"
+                            *ngIf="form.get('type').value === 'SOLD' || form.get('type').value === 'RETURNED'">
+                            <label for="name"><i class="fa fa-user"></i> Nom du client</label>
+                            <input type="text" id="name" formControlName="name"
+                                placeholder="Entrez le nom du client...">
+                        </div>
+
+                        <!-- Supplier (for LOADED) -->
+                        <div class="form-group" *ngIf="form.get('type').value === 'LOADED'">
+                            <label for="supplier"><i class="fa fa-truck"></i> Fournisseur</label>
+                            <ng-select formControlName="supplierId" id="supplier"
+                                placeholder="Sélectionner un fournisseur...">
+                                <ng-option *ngFor="let element of suppliers" [value]="element?.id">
+                                    {{ element.firstName + ' ' + element.lastName }}
+                                </ng-option>
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Products Buttons -->
+                <div class="section-card">
+                    <div class="section-header">
+                        <h2><i class="fa fa-boxes"></i> Produits</h2>
+                    </div>
+                    <div class="section-body">
+                        <div class="product-actions">
+                            <button type="button" class="btn-select-products" (click)="addProducts()">
+                                <i class="fa fa-search"></i>
+                                <span>Sélectionner des produits</span>
+                            </button>
+                            <button type="button" class="btn-new-product" (click)="addNewProduct()">
+                                <i class="fa fa-plus"></i>
+                                <span>Nouveau produit</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Products List & Total -->
+            <div class="form-section">
+                <div class="section-card products-card">
+                    <div class="section-header">
+                        <h2><i class="fa fa-list"></i> Produits sélectionnés</h2>
+                        <span class="product-count">{{ selectedProducts?.length || 0 }}</span>
+                    </div>
+                    <div class="section-body">
+                        <!-- Products List -->
+                        <div class="products-list" *ngIf="selectedProducts?.length > 0">
+                            <div class="product-item" *ngFor="let product of selectedProducts">
+                                <div class="product-info">
+                                    <span class="product-name">{{ product?.name }}</span>
+                                    <span class="product-stock">{{ product?.quantity }} disponibles</span>
+                                </div>
+                                <div class="product-inputs">
+                                    <div class="input-group">
+                                        <label>Prix</label>
+                                        <div class="input-with-suffix small">
+                                            <input type="number" [(ngModel)]="product.price"
+                                                [ngModelOptions]="{standalone: true}" (change)="calculateTotal()">
+                                            <span class="suffix">DT</span>
+                                        </div>
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Qté</label>
+                                        <input type="number" class="qty-input" [(ngModel)]="product.amount"
+                                            [ngModelOptions]="{standalone: true}" (change)="calculateTotal()"
+                                            [class.warning]="product.amount > product.quantity && form.get('type').value === 'SOLD'">
+                                    </div>
+                                </div>
+                                <div class="product-subtotal">
+                                    {{ (product.price * product.amount) | number:'1.2-2' }} DT
+                                </div>
+                                <button type="button" class="btn-remove" (click)="deleteProduct(product)">
+                                    <fa-icon [icon]="faTrash"></fa-icon>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div class="empty-products" *ngIf="selectedProducts?.length === 0">
+                            <i class="fa fa-box-open"></i>
+                            <p>Aucun produit sélectionné</p>
+                        </div>
+                    </div>
+
+                    <!-- Total Section -->
+                    <div class="total-section" *ngIf="selectedProducts?.length > 0">
+                        <div class="total-row">
+                            <span class="total-label">Total HT</span>
+                            <span class="total-value">{{ total | number:'1.2-2' }} DT</span>
+                        </div>
+                        <div class="total-row tva">
+                            <span class="total-label">TVA ({{ form.get('tva').value || 0 }}%)</span>
+                            <span class="total-value">{{ (total * (form.get('tva').value || 0) / 100) | number:'1.2-2'
+                                }} DT</span>
+                        </div>
+                        <div class="total-row grand">
+                            <span class="total-label">Total TTC</span>
+                            <span class="total-value">{{ (total * (1 + (form.get('tva').value || 0) / 100)) |
+                                number:'1.2-2' }} DT</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="button" class="btn-submit" (click)="create()" *ngIf="selectedProducts?.length > 0">
+                    <i class="fa fa-check"></i>
+                    Créer la facture
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,80 @@
+<div class="sell-dialog">
+  <!-- Dialog Header -->
+  <div class="dialog-header" [class.sell]="data.operationType === 'SOLD'"
+    [class.load]="data.operationType === 'LOADED'">
+    <div class="header-icon">
+      <i class="fa" [class.fa-shopping-cart]="data.operationType === 'SOLD'"
+        [class.fa-truck]="data.operationType === 'LOADED'"></i>
+    </div>
+    <div class="header-content">
+      <h2>{{ data.operationType === 'SOLD' ? 'Vendre' : 'Charger' }} un produit</h2>
+      <p>{{ product?.name }}</p>
+    </div>
+    <button class="close-btn" (click)="onNoClick()">
+      <i class="fa fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Dialog Body -->
+  <div class="dialog-body">
+    <!-- Product Summary -->
+    <div class="product-summary">
+      <div class="summary-item">
+        <span class="label">Stock actuel</span>
+        <span class="value" [class.critical]="product?.quantity <= 5"
+          [class.warning]="product?.quantity > 5 && product?.quantity <= 10">
+          {{ product?.quantity }} unités
+        </span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Prix {{ data.operationType === 'SOLD' ? 'de vente' : "d'achat" }}</span>
+        <span class="value price">{{ price | number:'1.2-2' }} DT</span>
+      </div>
+    </div>
+
+    <!-- Form Fields -->
+    <div class="form-fields">
+      <div class="form-group">
+        <label for="amount">
+          <i class="fa fa-cubes"></i> Quantité à {{ data.operationType === 'SOLD' ? 'vendre' : 'charger' }}
+        </label>
+        <input type="number" id="amount" [(ngModel)]="amount" placeholder="Ex: 10" [class.invalid]="amountError"
+          min="1">
+        <span class="error-message" *ngIf="amountError">{{ amountError }}</span>
+
+        <!-- Stock Warning for Sell -->
+        <div class="stock-warning" *ngIf="data.operationType === 'SOLD' && amount > product?.quantity">
+          <i class="fa fa-exclamation-triangle"></i>
+          Quantité supérieure au stock disponible
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="price">
+          <i class="fa fa-coins"></i> Prix unitaire
+        </label>
+        <div class="input-with-suffix">
+          <input type="number" id="price" [(ngModel)]="price" placeholder="0.00">
+          <span class="suffix">DT</span>
+        </div>
+      </div>
+
+      <!-- Total Preview -->
+      <div class="total-preview" *ngIf="amount && price">
+        <span class="total-label">Total</span>
+        <span class="total-value">{{ (amount * price) | number:'1.2-2' }} DT</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dialog Actions -->
+  <div class="dialog-actions">
+    <button class="btn-cancel" (click)="onNoClick()">Annuler</button>
+    <button class="btn-confirm" [class.sell]="data.operationType === 'SOLD'"
+      [class.load]="data.operationType === 'LOADED'" (click)="confirm()">
+      <i class="fa" [class.fa-shopping-cart]="data.operationType === 'SOLD'"
+        [class.fa-truck]="data.operationType === 'LOADED'"></i>
+      {{ data.operationType === 'SOLD' ? 'Confirmer la vente' : 'Confirmer le chargement' }}
+    </button>
+  </div>
+</div>

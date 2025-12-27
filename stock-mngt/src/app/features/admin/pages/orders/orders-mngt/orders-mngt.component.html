@@ -1,0 +1,215 @@
+<div class="orders-page">
+
+    <!-- Action Loading Overlay -->
+    <div class="action-overlay" *ngIf="isActionLoading">
+        <div class="action-spinner">
+            <div class="spinner"></div>
+            <span>Mise à jour en cours...</span>
+        </div>
+    </div>
+
+    <!-- Main Content - Always visible -->
+    <div class="page-content">
+
+        <!-- Page Header -->
+        <header class="page-header">
+            <div class="header-icon">
+                <fa-icon [icon]="faShoppingCart"></fa-icon>
+            </div>
+            <div class="header-content">
+                <h1>Gestion des Commandes</h1>
+                <p>{{ orders?.length || 0 }} commande(s) au total</p>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid" *ngIf="orders?.length > 0">
+            <div class="stat-card pending" (click)="filterByStatus('PENDING')"
+                [class.active]="activeFilter === 'PENDING'">
+                <div class="stat-icon">
+                    <fa-icon [icon]="faClock"></fa-icon>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-number">{{ getStatusCount('PENDING') }}</span>
+                    <span class="stat-label">En attente</span>
+                </div>
+            </div>
+            <div class="stat-card confirmed" (click)="filterByStatus('CONFIRMED')"
+                [class.active]="activeFilter === 'CONFIRMED'">
+                <div class="stat-icon">
+                    <fa-icon [icon]="faCheckCircle"></fa-icon>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-number">{{ getStatusCount('CONFIRMED') }}</span>
+                    <span class="stat-label">Confirmées</span>
+                </div>
+            </div>
+            <div class="stat-card shipped" (click)="filterByStatus('SHIPPED')"
+                [class.active]="activeFilter === 'SHIPPED'">
+                <div class="stat-icon">
+                    <fa-icon [icon]="faTruck"></fa-icon>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-number">{{ getStatusCount('SHIPPED') }}</span>
+                    <span class="stat-label">Expédiées</span>
+                </div>
+            </div>
+            <div class="stat-card delivered" (click)="filterByStatus('DELIVERED')"
+                [class.active]="activeFilter === 'DELIVERED'">
+                <div class="stat-icon">
+                    <fa-icon [icon]="faBox"></fa-icon>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-number">{{ getStatusCount('DELIVERED') }}</span>
+                    <span class="stat-label">Livrées</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar" *ngIf="orders?.length > 0">
+            <button class="filter-btn" [class.active]="activeFilter === ''" (click)="filterByStatus('')">
+                <fa-icon [icon]="faList"></fa-icon>
+                Toutes
+            </button>
+            <button class="filter-btn cancelled" [class.active]="activeFilter === 'CANCELLED'"
+                (click)="filterByStatus('CANCELLED')">
+                <fa-icon [icon]="faTimesCircle"></fa-icon>
+                Annulées ({{ getStatusCount('CANCELLED') }})
+            </button>
+        </div>
+
+        <!-- List Loading Skeleton -->
+        <div class="orders-list-skeleton" *ngIf="isLoading">
+            <div class="skeleton-order-card" *ngFor="let i of [1,2,3,4,5]"></div>
+        </div>
+
+        <!-- Orders List -->
+        <div class="orders-list" *ngIf="!isLoading && filteredOrders?.length > 0">
+            <div class="order-card" *ngFor="let order of filteredOrders"
+                [class.expanded]="expandedOrderId === order.id">
+
+                <!-- Order Header -->
+                <div class="order-header" (click)="toggleExpand(order.id)">
+                    <div class="order-info">
+                        <span class="order-number">#{{ order.id }}</span>
+                        <span class="order-client" *ngIf="order.user">
+                            <fa-icon [icon]="faUser"></fa-icon>
+                            {{ order.user.firstName }} {{ order.user.lastName }}
+                        </span>
+                        <span class="order-date">
+                            <fa-icon [icon]="faCalendar"></fa-icon>
+                            {{ order.createdAt | date:'dd MMM yyyy, HH:mm' }}
+                        </span>
+                    </div>
+                    <div class="order-meta">
+                        <span class="order-total">{{ order.totalAmount | number:'1.2-2' }} {{ store?.currency || 'DT'
+                            }}</span>
+                        <span class="status-badge" [ngClass]="order.status.toLowerCase()">
+                            <fa-icon [icon]="getStatusIcon(order.status)"></fa-icon>
+                            {{ getStatusLabel(order.status) }}
+                        </span>
+                        <span class="expand-icon">
+                            <fa-icon [icon]="expandedOrderId === order.id ? faChevronUp : faChevronDown"></fa-icon>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Order Details (Expandable) -->
+                <div class="order-details" *ngIf="expandedOrderId === order.id">
+
+                    <!-- Customer Section -->
+                    <div class="details-section customer-section">
+                        <h4><fa-icon [icon]="faUser"></fa-icon> Client</h4>
+                        <div class="customer-card" *ngIf="order.user">
+                            <div class="customer-avatar">
+                                {{ order.user.firstName?.charAt(0) }}{{ order.user.lastName?.charAt(0) }}
+                            </div>
+                            <div class="customer-info">
+                                <span class="customer-name">{{ order.user.firstName }} {{ order.user.lastName }}</span>
+                                <span class="customer-contact">
+                                    <fa-icon [icon]="faEnvelope"></fa-icon> {{ order.user.email }}
+                                </span>
+                                <span class="customer-contact" *ngIf="order.user.phone">
+                                    <fa-icon [icon]="faPhone"></fa-icon> {{ order.user.phone }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Items Section -->
+                    <div class="details-section items-section">
+                        <h4><fa-icon [icon]="faShoppingBag"></fa-icon> Articles ({{ order.items?.length }})</h4>
+                        <div class="items-list">
+                            <div class="item-row" *ngFor="let item of order.items">
+                                <div class="item-image">
+                                    <img [src]="getProductImage(item.product)" [alt]="item.product?.name">
+                                </div>
+                                <div class="item-info">
+                                    <span class="item-name">{{ item.product?.name }}</span>
+                                    <span class="item-qty">Qté: {{ item.quantity }}</span>
+                                </div>
+                                <div class="item-price">
+                                    {{ item.price * item.quantity | number:'1.2-2' }} {{ store?.currency || 'DT' }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-summary">
+                            <div class="summary-row total">
+                                <span>Total</span>
+                                <span>{{ order.totalAmount | number:'1.2-2' }} {{ store?.currency || 'DT' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions Section -->
+                    <div class="details-section actions-section">
+                        <h4><fa-icon [icon]="faCog"></fa-icon> Actions</h4>
+                        <div class="status-actions">
+                            <button class="action-btn pending" [class.current]="order.status === 'PENDING'"
+                                [disabled]="order.status === 'PENDING'" (click)="updateStatus(order, 'PENDING')">
+                                <fa-icon [icon]="faClock"></fa-icon> En attente
+                            </button>
+                            <button class="action-btn confirmed" [class.current]="order.status === 'CONFIRMED'"
+                                [disabled]="order.status === 'CONFIRMED'" (click)="updateStatus(order, 'CONFIRMED')">
+                                <fa-icon [icon]="faCheckCircle"></fa-icon> Confirmer
+                            </button>
+                            <button class="action-btn shipped" [class.current]="order.status === 'SHIPPED'"
+                                [disabled]="order.status === 'SHIPPED'" (click)="updateStatus(order, 'SHIPPED')">
+                                <fa-icon [icon]="faTruck"></fa-icon> Expédier
+                            </button>
+                            <button class="action-btn delivered" [class.current]="order.status === 'DELIVERED'"
+                                [disabled]="order.status === 'DELIVERED'" (click)="updateStatus(order, 'DELIVERED')">
+                                <fa-icon [icon]="faBox"></fa-icon> Livrer
+                            </button>
+                            <button class="action-btn cancelled" [class.current]="order.status === 'CANCELLED'"
+                                [disabled]="order.status === 'CANCELLED'" (click)="updateStatus(order, 'CANCELLED')">
+                                <fa-icon [icon]="faTimesCircle"></fa-icon> Annuler
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="!isLoading && orders?.length === 0">
+            <div class="empty-icon">
+                <fa-icon [icon]="faBoxOpen"></fa-icon>
+            </div>
+            <h3>Aucune commande</h3>
+            <p>Vous n'avez pas encore reçu de commandes. Partagez votre boutique pour commencer à vendre !</p>
+        </div>
+
+        <!-- Filtered Empty State -->
+        <div class="empty-state filtered" *ngIf="!isLoading && orders?.length > 0 && filteredOrders?.length === 0">
+            <div class="empty-icon">
+                <fa-icon [icon]="faFilter"></fa-icon>
+            </div>
+            <h3>Aucune commande {{ getStatusLabel(activeFilter).toLowerCase() }}</h3>
+            <button class="btn-clear-filter" (click)="filterByStatus('')">
+                <fa-icon [icon]="faTimes"></fa-icon> Effacer le filtre
+            </button>
+        </div>
+    </div>
+</div>

@@ -9,12 +9,13 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ Category, Brand, Supplier, Address }) {
+    static associate({ Category, Brand, Supplier, Address, Order }) {
       // define association here
       this.hasMany(Category, { foreignKey: 'store_id', as: 'categories' })
       this.hasOne(Address, { foreignKey: 'store_id', as: 'address' })
       this.hasMany(Brand, { foreignKey: 'store_id', as: 'brands' })
       this.hasMany(Supplier, { foreignKey: 'store_id', as: 'suppliers' })
+      this.hasMany(Order, { foreignKey: 'store_id', as: 'orders' })
     }
     toJSON() {
       return { ...this.get(), images: this.images ? JSON.parse(this.images) : [], userId: undefined, user_id: undefined, creatorUserId: undefined, createdAt: undefined, updatedAt: undefined }
@@ -27,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     images: DataTypes.STRING,
     phone: DataTypes.STRING,
     email: DataTypes.STRING,
+
     site: DataTypes.STRING,
     active: {
       type: DataTypes.BOOLEAN,
@@ -37,6 +39,16 @@ module.exports = (sequelize, DataTypes) => {
       field: 'user_id'
     },
     type: DataTypes.STRING,
+    isVisibleToPublic: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+      field: 'is_visible_to_public'
+    },
+    isSupportingDeliveries: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      field: 'is_supporting_deliveries'
+    },
     selectedCategories: DataTypes.STRING,
     creatorUserId: {
       type: DataTypes.INTEGER

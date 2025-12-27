@@ -1,0 +1,521 @@
+// Variables
+$primary: #3f51b5;
+$primary-dark: #303f9f;
+$primary-light: rgba(63, 81, 181, 0.1);
+$success: #2e7d32;
+$success-light: rgba(46, 125, 50, 0.1);
+$warning: #f57c00;
+$warning-light: rgba(245, 124, 0, 0.1);
+$danger: #c62828;
+$danger-light: rgba(198, 40, 40, 0.1);
+$purple: #7c3aed;
+$purple-light: rgba(124, 58, 237, 0.1);
+$text-primary: #2c3e50;
+$text-secondary: #7f8c8d;
+$border-color: #e8ecef;
+$background: #f5f7fa;
+$white: #ffffff;
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+
+.add-product-dialog {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+// ============================================
+// DIALOG HEADER
+// ============================================
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+  color: $white;
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    >i {
+      font-size: 1.5rem;
+      opacity: 0.8;
+    }
+
+    h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 0 0 4px;
+    }
+
+    p {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin: 0;
+    }
+  }
+
+  .close-btn {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 50%;
+    color: $white;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+}
+
+// ============================================
+// DIALOG CONTENT
+// ============================================
+.dialog-content {
+  padding: 25px;
+  overflow-y: auto;
+  flex: 1;
+  background: $white;
+}
+
+.form-section {
+  margin-bottom: 25px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid $border-color;
+
+  &:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: $text-primary;
+  margin: 0 0 15px;
+
+  i {
+    color: $primary;
+  }
+
+  .image-count {
+    margin-left: auto;
+    font-size: 0.8rem;
+    color: $text-secondary;
+    font-weight: 400;
+  }
+}
+
+// ============================================
+// FORM CONTROLS
+// ============================================
+.form-group {
+  margin-bottom: 15px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $text-secondary;
+    margin-bottom: 8px;
+
+    i {
+      margin-right: 6px;
+      color: $primary;
+    }
+
+    .required {
+      color: $danger;
+    }
+
+    .text-danger {
+      color: $danger;
+    }
+
+    .text-success {
+      color: $success;
+    }
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: $white;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      box-shadow: 0 0 0 3px $primary-light;
+    }
+
+    &.invalid {
+      border-color: $danger;
+      box-shadow: 0 0 0 3px $danger-light;
+    }
+  }
+
+  // ng-select custom styling
+  ng-select {
+    width: 100%;
+
+    ::ng-deep {
+      .ng-select-container {
+        min-height: 46px;
+        border: 1px solid $border-color;
+        border-radius: $radius-sm;
+        background: $white;
+        transition: all 0.2s;
+
+        &:hover {
+          border-color: darken($border-color, 10%);
+        }
+
+        .ng-value-container {
+          padding: 0 14px;
+
+          .ng-placeholder {
+            color: $text-secondary;
+            font-size: 0.95rem;
+          }
+
+          .ng-value {
+            font-size: 0.95rem;
+            color: $text-primary;
+          }
+
+          .ng-input {
+            padding: 0;
+
+            input {
+              padding: 0;
+              border: none;
+              box-shadow: none;
+
+              &:focus {
+                box-shadow: none;
+              }
+            }
+          }
+        }
+
+        .ng-arrow-wrapper {
+          padding-right: 10px;
+
+          .ng-arrow {
+            border-color: $text-secondary transparent transparent;
+          }
+        }
+
+        .ng-clear-wrapper {
+          color: $text-secondary;
+
+          &:hover {
+            color: $danger;
+          }
+        }
+      }
+
+      &.ng-select-focused {
+        .ng-select-container {
+          border-color: $primary;
+          box-shadow: 0 0 0 3px $primary-light;
+        }
+      }
+
+      &.ng-select-opened {
+        .ng-select-container {
+          border-color: $primary;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+        }
+      }
+
+      .ng-dropdown-panel {
+        border: 1px solid $primary;
+        border-top: none;
+        border-radius: 0 0 $radius-sm $radius-sm;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+        .ng-dropdown-panel-items {
+          .ng-option {
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            color: $text-primary;
+            transition: all 0.15s;
+
+            &.ng-option-marked {
+              background: $primary-light;
+              color: $primary;
+            }
+
+            &.ng-option-selected {
+              background: $primary;
+              color: $white;
+
+              &.ng-option-marked {
+                background: $primary-dark;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  textarea {
+    resize: none;
+    line-height: 1.6;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.input-with-suffix {
+  position: relative;
+
+  input {
+    padding-right: 50px;
+  }
+
+  .suffix {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9rem;
+    color: $text-secondary;
+    font-weight: 500;
+  }
+}
+
+.error-message {
+  display: block;
+  font-size: 0.8rem;
+  color: $danger;
+  margin-top: 6px;
+}
+
+.profit-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: $purple-light;
+  border-radius: $radius-sm;
+
+  i {
+    color: $purple;
+  }
+
+  span {
+    font-size: 0.9rem;
+    color: $text-primary;
+
+    strong {
+      color: $purple;
+    }
+  }
+}
+
+// ============================================
+// CATEGORY
+// ============================================
+.category-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: $background;
+  border-radius: $radius-sm;
+
+  .category-path {
+    flex: 1;
+    font-size: 0.9rem;
+    color: $text-primary;
+  }
+
+  .btn-edit-category {
+    width: 32px;
+    height: 32px;
+    background: $white;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
+    color: $primary;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: $primary-light;
+    }
+  }
+}
+
+.category-selectors {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+// ============================================
+// IMAGES
+// ============================================
+.images-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.image-preview {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  border: 1px solid $border-color;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .delete-image {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+    background: $danger;
+    border: none;
+    border-radius: 50%;
+    color: $white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    font-size: 0.7rem;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+}
+
+.upload-zone {
+  .upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background: $background;
+    border: 2px dashed $border-color;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: $primary;
+      background: $primary-light;
+    }
+
+    i {
+      font-size: 1.3rem;
+      color: $primary;
+    }
+
+    span {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: $text-primary;
+    }
+  }
+}
+
+// ============================================
+// DIALOG ACTIONS
+// ============================================
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 25px;
+  background: $background;
+  border-top: 1px solid $border-color;
+
+  .btn-cancel {
+    padding: 12px 24px;
+    background: $white;
+    border: 1px solid $border-color;
+    border-radius: $radius-sm;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: $text-primary;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: $text-secondary;
+    }
+  }
+
+  .btn-submit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, $success 0%, darken($success, 10%) 100%);
+    border: none;
+    border-radius: $radius-sm;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: $white;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba($success, 0.4);
+    }
+  }
+}
+
+// ============================================
+// MAT DIALOG OVERRIDES
+// ============================================
+::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface {
+  padding: 0 !important;
+  border-radius: $radius-lg !important;
+  overflow: hidden;
+}

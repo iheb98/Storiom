@@ -1,0 +1,106 @@
+<div class="admin-layout" [class.sidebar-collapsed]="sidebarCollapsed" [class.mobile-open]="mobileMenuOpen">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-section">
+        <div class="store-logo-wrapper">
+          <div class="skeleton-logo" *ngIf="!store"></div>
+          <img *ngIf="store" [src]="store?.logo ? backend_URL + '/' + store?.logo : 'assets/default_store.png'"
+            alt="Logo" class="store-logo loaded">
+        </div>
+        <span class="store-name">{{ store?.name || 'Storiom' }}</span>
+      </div>
+      <button class="collapse-btn desktop-only" (click)="toggleSidebar()">
+        <i class="fa" [class.fa-chevron-left]="!sidebarCollapsed" [class.fa-chevron-right]="sidebarCollapsed"></i>
+      </button>
+    </div>
+
+    <!-- Subscription Badge -->
+    <div class="subscription-badge" *ngIf="subscriptionStatus" [class.active]="subscriptionStatus === 'Active'"
+      [class.expired]="subscriptionStatus === 'Expired'" [matTooltip]="getSubscriptionTooltip()">
+      <i class="fa" [class.fa-check-circle]="subscriptionStatus === 'Active'"
+        [class.fa-exclamation-circle]="subscriptionStatus === 'Expired'"></i>
+      <span>{{ subscriptionDetails?.duration === 'TRIAL' ? 'Demo' : subscriptionDetails?.duration }}</span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <span class="nav-section-title">Menu Principal</span>
+        <ul class="nav-list">
+          <li *ngFor="let item of menu" class="nav-item">
+            <a [routerLink]="['/' + item.link]" routerLinkActive="active" class="nav-link"
+              [matTooltip]="sidebarCollapsed ? item.label : ''">
+              <fa-icon [icon]="item.icon" class="nav-icon"></fa-icon>
+              <span class="nav-label">{{ item.label }}</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+      <a class="nav-link logout-link" (click)="logout()" [matTooltip]="sidebarCollapsed ? 'Déconnexion' : ''">
+        <fa-icon [icon]="powerIcon" class="nav-icon"></fa-icon>
+        <span class="nav-label">Déconnexion</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Mobile Overlay -->
+  <div class="mobile-overlay" (click)="closeMobileMenu()"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Header -->
+    <header class="top-header">
+      <button class="mobile-menu-btn" (click)="toggleMobileMenu()">
+        <i class="fa fa-bars"></i>
+      </button>
+
+      <div class="header-left">
+        <h1 class="page-title">{{ currentPageTitle }}</h1>
+      </div>
+
+      <div class="header-right">
+        <!-- Subscription Status (Mobile) -->
+        <div class="subscription-status-mobile" *ngIf="subscriptionStatus"
+          [class.active]="subscriptionStatus === 'Active'" [class.expired]="subscriptionStatus === 'Expired'">
+          <i class="fa" [class.fa-check-circle]="subscriptionStatus === 'Active'"
+            [class.fa-exclamation-circle]="subscriptionStatus === 'Expired'"></i>
+        </div>
+
+        <!-- User Profile -->
+        <div class="user-profile" (click)="toggleUserMenu()">
+          <div class="avatar-wrapper">
+            <div class="skeleton-avatar" *ngIf="!store"></div>
+            <img *ngIf="store" [src]="store?.logo ? backend_URL + '/' + store?.logo : 'assets/default_store.png'"
+              alt="Profile" class="user-avatar loaded">
+          </div>
+          <span class="user-name">{{ connectedUser?.name || 'Admin' }}</span>
+          <i class="fa fa-chevron-down"></i>
+        </div>
+
+        <!-- User Dropdown -->
+        <div class="user-dropdown" *ngIf="userMenuOpen">
+          <a routerLink="/" class="dropdown-item">
+            <i class="fa fa-store"></i> Marketplace
+          </a>
+          <a routerLink="/admin/settings" class="dropdown-item">
+            <i class="fa fa-cog"></i> Paramètres
+          </a>
+          <div class="dropdown-divider"></div>
+          <a (click)="logout()" class="dropdown-item logout">
+            <i class="fa fa-sign-out-alt"></i> Déconnexion
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,645 @@
+// Variables - Using CSS Custom Properties for theme support
+$primary: #3f51b5;
+$primary-dark: #303f9f;
+$primary-light: rgba(63, 81, 181, 0.1);
+
+// Sidebar colors - fixed for both themes (dark sidebar looks good in both)
+$sidebar-bg: #1a1a2e;
+$sidebar-hover: #16213e;
+$sidebar-active: #0f3460;
+$text-light: #ffffff;
+
+// These use CSS custom properties for theme support
+$text-primary: var(--text-primary, #2c3e50);
+$text-secondary: var(--text-secondary, #7f8c8d);
+$text-muted: var(--text-muted, #999999);
+$border-color: var(--border-color, #e8ecef);
+$background: var(--bg-page, #f5f7fa);
+$white: var(--bg-card, #ffffff);
+$header-bg: var(--bg-header, #ffffff);
+
+// Status colors
+$success: var(--success, #2e7d32);
+$warning: var(--warning, #f57c00);
+$danger: var(--danger, #c62828);
+
+// Shadows using CSS variables
+$shadow-sm: var(--shadow-sm, 0 2px 8px rgba(0, 0, 0, 0.06));
+$shadow-md: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.1));
+
+$radius-sm: 8px;
+$radius-md: 12px;
+
+$sidebar-width: 260px;
+$sidebar-collapsed-width: 70px;
+$header-height: 70px;
+$transition-speed: 0.3s;
+
+// ============================================
+// LAYOUT CONTAINER
+// ============================================
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+// ============================================
+// SIDEBAR
+// ============================================
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: $sidebar-width;
+    background: $sidebar-bg;
+    color: $text-light;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    transition: width $transition-speed ease;
+    overflow: hidden;
+
+    .sidebar-collapsed & {
+        width: $sidebar-collapsed-width;
+
+        // Expand on hover
+        &:hover {
+            width: $sidebar-width;
+            box-shadow: 5px 0 25px rgba(0, 0, 0, 0.3);
+
+            // Show all hidden elements on hover
+            .logo-section {
+                display: flex !important;
+            }
+
+            .store-name,
+            .nav-label {
+                display: inline !important;
+            }
+
+            .subscription-badge {
+                display: flex !important;
+            }
+
+            .nav-section-title {
+                display: block !important;
+            }
+
+            .nav-link {
+                justify-content: flex-start;
+                padding: 12px 15px;
+            }
+
+            .sidebar-header {
+                justify-content: space-between;
+                padding: 20px 15px;
+            }
+        }
+    }
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    .sidebar-collapsed & {
+        justify-content: center;
+        padding: 15px;
+    }
+
+    .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        overflow: hidden;
+
+        .sidebar-collapsed & {
+            display: none;
+        }
+
+        .store-logo-wrapper {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+
+        .skeleton-logo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: $radius-sm;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.1) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .store-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: $radius-sm;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: $white;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+
+            &.loaded {
+                opacity: 1;
+            }
+        }
+
+        .store-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            .sidebar-collapsed & {
+                display: none;
+            }
+        }
+    }
+
+    .collapse-btn {
+        width: 30px;
+        height: 30px;
+        border: none;
+        background: rgba(255, 255, 255, 0.1);
+        color: $text-light;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background $transition-speed;
+        flex-shrink: 0;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    }
+}
+
+.subscription-badge {
+    margin: 15px;
+    padding: 10px 15px;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+
+    &.active {
+        background: rgba(46, 125, 50, 0.2);
+        color: #81c784;
+    }
+
+    &.expired {
+        background: rgba(198, 40, 40, 0.2);
+        color: #ef9a9a;
+    }
+
+    .sidebar-collapsed & {
+        display: none;
+    }
+}
+
+// ============================================
+// NAVIGATION
+// ============================================
+.sidebar-nav {
+    flex: 1;
+    padding: 15px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+    }
+}
+
+.nav-section {
+    margin-bottom: 20px;
+}
+
+.nav-section-title {
+    display: block;
+    padding: 10px 20px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: $text-muted;
+
+    .sidebar-collapsed & {
+        display: none;
+    }
+}
+
+.nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    margin: 2px 10px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    color: $text-muted;
+    text-decoration: none;
+    border-radius: $radius-sm;
+    transition: all $transition-speed;
+    cursor: pointer;
+
+    &:hover {
+        background: $sidebar-hover;
+        color: $text-light;
+    }
+
+    &.active {
+        background: $sidebar-active;
+        color: $text-light;
+
+        .nav-icon {
+            color: $primary;
+        }
+    }
+
+    .nav-icon {
+        width: 20px;
+        font-size: 1rem;
+        flex-shrink: 0;
+        text-align: center;
+    }
+
+    .nav-label {
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+    .sidebar-collapsed & {
+        justify-content: center;
+        padding: 14px;
+
+        .nav-label {
+            display: none;
+        }
+    }
+}
+
+// ============================================
+// SIDEBAR FOOTER
+// ============================================
+.sidebar-footer {
+    padding: 15px 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+    .logout-link {
+        color: $danger !important;
+
+        &:hover {
+            background: rgba(198, 40, 40, 0.2);
+        }
+    }
+}
+
+// ============================================
+// MOBILE OVERLAY
+// ============================================
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+// ============================================
+// MAIN CONTENT
+// ============================================
+.main-content {
+    flex: 1;
+    margin-left: $sidebar-width;
+    min-height: 100vh;
+    background: $background;
+    display: flex;
+    flex-direction: column;
+    transition: margin-left $transition-speed ease;
+
+    .sidebar-collapsed & {
+        margin-left: $sidebar-collapsed-width;
+    }
+}
+
+// ============================================
+// TOP HEADER
+// ============================================
+.top-header {
+    height: $header-height;
+    background: $white;
+    border-bottom: 1px solid $border-color;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    .mobile-menu-btn {
+        display: none;
+        width: 40px;
+        height: 40px;
+        border: none;
+        background: $background;
+        border-radius: $radius-sm;
+        font-size: 1.2rem;
+        color: $text-primary;
+        cursor: pointer;
+        margin-right: 15px;
+
+        &:hover {
+            background: var(--bg-hover, #e8ecef);
+        }
+    }
+
+    .header-left {
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: $text-primary;
+            margin: 0;
+        }
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        position: relative;
+    }
+}
+
+.subscription-status-mobile {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+
+    &.active {
+        background: rgba($success, 0.1);
+        color: $success;
+    }
+
+    &.expired {
+        background: rgba($danger, 0.1);
+        color: $danger;
+    }
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: $background;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: background $transition-speed;
+
+    &:hover {
+        background: var(--bg-hover, #e8ecef);
+    }
+
+    .avatar-wrapper {
+        position: relative;
+        width: 36px;
+        height: 36px;
+        flex-shrink: 0;
+    }
+
+    .skeleton-avatar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: linear-gradient(90deg, var(--skeleton-bg, #e0e0e0) 25%, var(--skeleton-shine, #f5f5f5) 50%, var(--skeleton-bg, #e0e0e0) 75%);
+        background-size: 200% 100%;
+        animation: avatar-shimmer 1.5s infinite;
+    }
+
+    @keyframes avatar-shimmer {
+        0% {
+            background-position: 200% 0;
+        }
+
+        100% {
+            background-position: -200% 0;
+        }
+    }
+
+    .user-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+
+        &.loaded {
+            opacity: 1;
+        }
+    }
+
+    .user-name {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: $text-primary;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    i {
+        font-size: 0.7rem;
+        color: $text-secondary;
+    }
+}
+
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 10px;
+    background: $white;
+    border-radius: $radius-md;
+    box-shadow: $shadow-md;
+    min-width: 200px;
+    overflow: hidden;
+    z-index: 200;
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        color: $text-primary;
+        text-decoration: none;
+        transition: background $transition-speed;
+        cursor: pointer;
+
+        &:hover {
+            background: $background;
+        }
+
+        &.logout {
+            color: $danger;
+        }
+
+        i {
+            width: 18px;
+            font-size: 0.9rem;
+        }
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background: $border-color;
+        margin: 5px 0;
+    }
+}
+
+// ============================================
+// PAGE CONTENT
+// ============================================
+.page-content {
+    flex: 1;
+    padding: 0;
+    overflow-y: auto;
+}
+
+// ============================================
+// RESPONSIVE
+// ============================================
+@media (max-width: 992px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    // When mobile menu is open, show sidebar regardless of collapsed state
+    .mobile-open .sidebar,
+    .mobile-open.sidebar-collapsed .sidebar {
+        transform: translateX(0);
+        width: $sidebar-width;
+    }
+
+    // Show all hidden elements when mobile menu is open
+    .mobile-open.sidebar-collapsed {
+        .logo-section {
+            display: flex !important;
+        }
+
+        .store-name,
+        .nav-label {
+            display: inline !important;
+        }
+
+        .subscription-badge {
+            display: flex !important;
+        }
+
+        .nav-section-title {
+            display: block !important;
+        }
+
+        .nav-link {
+            justify-content: flex-start !important;
+            padding: 12px 15px !important;
+        }
+
+        .sidebar-header {
+            justify-content: space-between !important;
+            padding: 20px 15px !important;
+        }
+    }
+
+    .mobile-overlay {
+        .mobile-open & {
+            display: block;
+        }
+    }
+
+    .main-content {
+        margin-left: 0;
+
+        .sidebar-collapsed & {
+            margin-left: 0;
+        }
+    }
+
+    .top-header {
+        padding: 0 15px;
+
+        .mobile-menu-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    }
+
+    .user-profile {
+        .user-name {
+            display: none;
+        }
+    }
+
+    .desktop-only {
+        display: none !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .top-header {
+        .header-left {
+            .page-title {
+                font-size: 1.1rem;
+            }
+        }
+    }
+}

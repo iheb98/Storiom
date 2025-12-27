@@ -1,0 +1,188 @@
+<!-- Loading Skeleton -->
+<div class="profile-skeleton" *ngIf="isLoading">
+    <div class="skeleton-header">
+        <div class="skeleton-title"></div>
+        <div class="skeleton-subtitle"></div>
+    </div>
+    <div class="skeleton-section">
+        <div class="skeleton-section-label"></div>
+        <div class="skeleton-form-row">
+            <div class="skeleton-input-group">
+                <div class="skeleton-label"></div>
+                <div class="skeleton-input"></div>
+            </div>
+            <div class="skeleton-input-group">
+                <div class="skeleton-label"></div>
+                <div class="skeleton-input"></div>
+            </div>
+        </div>
+        <div class="skeleton-input-group full">
+            <div class="skeleton-label"></div>
+            <div class="skeleton-input"></div>
+        </div>
+        <div class="skeleton-input-group full">
+            <div class="skeleton-label"></div>
+            <div class="skeleton-input"></div>
+        </div>
+    </div>
+    <div class="skeleton-section">
+        <div class="skeleton-section-label short"></div>
+        <div class="skeleton-form-row">
+            <div class="skeleton-input-group">
+                <div class="skeleton-label"></div>
+                <div class="skeleton-input"></div>
+            </div>
+            <div class="skeleton-input-group">
+                <div class="skeleton-label"></div>
+                <div class="skeleton-input"></div>
+            </div>
+        </div>
+    </div>
+    <div class="skeleton-button"></div>
+</div>
+
+<!-- Profile Form -->
+<div class="profile-details-container" *ngIf="!isLoading && profileForm">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-icon">
+            <fa-icon [icon]="faUser"></fa-icon>
+        </div>
+        <div class="header-text">
+            <h2>Détails du profil</h2>
+            <p>Mettez à jour vos informations personnelles</p>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    <div class="alert success" *ngIf="successMessage">
+        <fa-icon [icon]="faCheckCircle"></fa-icon>
+        <span>{{ successMessage }}</span>
+    </div>
+
+    <div class="alert error" *ngIf="errorMessage">
+        <fa-icon [icon]="faExclamationCircle"></fa-icon>
+        <span>{{ errorMessage }}</span>
+    </div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="save()" class="profile-form">
+        <!-- Personal Information Section -->
+        <div class="form-section">
+            <div class="section-label">
+                <fa-icon [icon]="faInfoCircle"></fa-icon>
+                <span>Informations personnelles</span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>
+                        <fa-icon [icon]="faUser"></fa-icon>
+                        Prénom
+                    </label>
+                    <input type="text" formControlName="firstName" placeholder="Entrez votre prénom">
+                    <div class="error-msg"
+                        *ngIf="profileForm.get('firstName').touched && profileForm.get('firstName').invalid">
+                        Le prénom est obligatoire
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <fa-icon [icon]="faUser"></fa-icon>
+                        Nom
+                    </label>
+                    <input type="text" formControlName="lastName" placeholder="Entrez votre nom">
+                    <div class="error-msg"
+                        *ngIf="profileForm.get('lastName').touched && profileForm.get('lastName').invalid">
+                        Le nom est obligatoire
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <fa-icon [icon]="faEnvelope"></fa-icon>
+                    Adresse Email
+                    <span class="locked-badge">
+                        <fa-icon [icon]="faLock"></fa-icon>
+                    </span>
+                </label>
+                <input type="email" formControlName="email" class="disabled-input">
+                <small>L'adresse email ne peut pas être modifiée directement.</small>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <fa-icon [icon]="faPhone"></fa-icon>
+                    Numéro de téléphone
+                </label>
+                <input type="text" formControlName="phone" placeholder="Ex: +216 XX XXX XXX">
+                <div class="error-msg" *ngIf="profileForm.get('phone').touched && profileForm.get('phone').invalid">
+                    Le numéro de téléphone est obligatoire
+                </div>
+            </div>
+        </div>
+
+        <!-- Address Section -->
+        <div class="form-section">
+            <div class="section-label">
+                <fa-icon [icon]="faMapMarkerAlt"></fa-icon>
+                <span>Adresse de livraison</span>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <fa-icon [icon]="faGlobe"></fa-icon>
+                    Pays
+                </label>
+                <input type="text" formControlName="country" placeholder="Pays">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>
+                        <fa-icon [icon]="faMapMarkerAlt"></fa-icon>
+                        Gouvernorat
+                    </label>
+                    <select formControlName="state" (change)="onGovernorateChange()">
+                        <option value="">Sélectionnez un gouvernorat</option>
+                        <option *ngFor="let gov of governorates" [value]="gov">{{ gov }}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <fa-icon [icon]="faCity"></fa-icon>
+                        Ville / Délégation
+                    </label>
+                    <select formControlName="city">
+                        <option value="">Sélectionnez une ville</option>
+                        <option *ngFor="let city of cities" [value]="city">{{ city }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <fa-icon [icon]="faRoad"></fa-icon>
+                    Rue / Adresse
+                </label>
+                <input type="text" formControlName="street" placeholder="Rue, numéro, appartement...">
+            </div>
+
+            <div class="form-group half-width">
+                <label>
+                    <fa-icon [icon]="faMailBulk"></fa-icon>
+                    Code Postal
+                </label>
+                <input type="text" formControlName="postalCode" placeholder="Ex: 1000">
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+            <button type="submit" class="save-btn" [disabled]="profileForm.invalid || isSaving">
+                <fa-icon [icon]="isSaving ? faSpinner : faSave" [spin]="isSaving"></fa-icon>
+                <span>{{ isSaving ? 'Enregistrement...' : 'Enregistrer les modifications' }}</span>
+            </button>
+        </div>
+    </form>
+</div>

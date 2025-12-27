@@ -1,0 +1,325 @@
+// Variables
+$primary: #3f51b5;
+$primary-dark: #303f9f;
+$primary-light: rgba(63, 81, 181, 0.1);
+$success: #2e7d32;
+$success-dark: #1b5e20;
+$success-light: rgba(46, 125, 50, 0.1);
+$warning: #f57c00;
+$warning-light: rgba(245, 124, 0, 0.1);
+$danger: #c62828;
+$danger-light: rgba(198, 40, 40, 0.1);
+$info: #0288d1;
+$text-primary: #2c3e50;
+$text-secondary: #7f8c8d;
+$border-color: #e8ecef;
+$background: #f5f7fa;
+$white: #ffffff;
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+
+.sell-dialog {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-width: 400px;
+    max-width: 100%;
+
+    @media (max-width: 480px) {
+        min-width: 100%;
+    }
+}
+
+// ============================================
+// DIALOG HEADER
+// ============================================
+.dialog-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 25px;
+    border-radius: $radius-lg $radius-lg 0 0;
+    position: relative;
+
+    &.sell {
+        background: linear-gradient(135deg, $success 0%, $success-dark 100%);
+    }
+
+    &.load {
+        background: linear-gradient(135deg, $warning 0%, darken($warning, 10%) 100%);
+    }
+
+    .header-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        i {
+            font-size: 1.3rem;
+            color: $white;
+        }
+    }
+
+    .header-content {
+        flex: 1;
+
+        h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: $white;
+            margin: 0 0 4px;
+        }
+
+        p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0;
+        }
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 32px;
+        height: 32px;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 50%;
+        color: $white;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    }
+}
+
+// ============================================
+// DIALOG BODY
+// ============================================
+.dialog-body {
+    padding: 25px;
+}
+
+.product-summary {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+
+    .summary-item {
+        flex: 1;
+        padding: 15px;
+        background: $background;
+        border-radius: $radius-sm;
+        text-align: center;
+
+        .label {
+            display: block;
+            font-size: 0.75rem;
+            color: $text-secondary;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: $text-primary;
+
+            &.critical {
+                color: $danger;
+            }
+
+            &.warning {
+                color: $warning;
+            }
+
+            &.price {
+                color: $success;
+            }
+        }
+    }
+}
+
+.form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: $text-secondary;
+        margin-bottom: 8px;
+
+        i {
+            margin-right: 6px;
+            color: $primary;
+        }
+    }
+
+    input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid $border-color;
+        border-radius: $radius-sm;
+        font-size: 1rem;
+        font-family: inherit;
+        background: $white;
+        transition: all 0.2s;
+
+        &:focus {
+            outline: none;
+            border-color: $primary;
+            box-shadow: 0 0 0 3px $primary-light;
+        }
+
+        &.invalid {
+            border-color: $danger;
+            box-shadow: 0 0 0 3px $danger-light;
+        }
+
+        &::placeholder {
+            color: lighten($text-secondary, 15%);
+        }
+    }
+
+    .error-message {
+        display: block;
+        font-size: 0.8rem;
+        color: $danger;
+        margin-top: 6px;
+    }
+
+    .stock-warning {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        background: $warning-light;
+        border-radius: $radius-sm;
+        margin-top: 10px;
+        font-size: 0.85rem;
+        color: $warning;
+
+        i {
+            font-size: 0.9rem;
+        }
+    }
+}
+
+.input-with-suffix {
+    position: relative;
+
+    input {
+        padding-right: 50px;
+    }
+
+    .suffix {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.9rem;
+        color: $text-secondary;
+        font-weight: 500;
+    }
+}
+
+.total-preview {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, rgba($primary, 0.1) 0%, rgba($primary, 0.05) 100%);
+    border-radius: $radius-md;
+    border: 1px solid rgba($primary, 0.2);
+
+    .total-label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: $text-secondary;
+    }
+
+    .total-value {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: $primary;
+    }
+}
+
+// ============================================
+// DIALOG ACTIONS
+// ============================================
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 25px;
+    background: $background;
+    border-radius: 0 0 $radius-lg $radius-lg;
+
+    .btn-cancel {
+        padding: 12px 24px;
+        background: $white;
+        border: 1px solid $border-color;
+        border-radius: $radius-sm;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: $text-primary;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: $text-secondary;
+        }
+    }
+
+    .btn-confirm {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border: none;
+        border-radius: $radius-sm;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: $white;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &.sell {
+            background: linear-gradient(135deg, $success 0%, $success-dark 100%);
+
+            &:hover {
+                box-shadow: 0 4px 15px rgba($success, 0.4);
+            }
+        }
+
+        &.load {
+            background: linear-gradient(135deg, $warning 0%, darken($warning, 10%) 100%);
+
+            &:hover {
+                box-shadow: 0 4px 15px rgba($warning, 0.4);
+            }
+        }
+    }
+}
+
+// ============================================
+// Override Material Dialog padding
+// ============================================
+::ng-deep .mat-mdc-dialog-container .mdc-dialog__surface {
+    padding: 0 !important;
+    border-radius: $radius-lg !important;
+    overflow: hidden;
+}

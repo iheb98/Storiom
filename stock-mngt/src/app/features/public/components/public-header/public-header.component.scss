@@ -1,0 +1,314 @@
+:host {
+  display: block;
+  --nav-height: 70px;
+  --primary-color: #3f51b5;
+}
+
+.navbar {
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  height: var(--nav-height);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 900;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.navbar-brand a {
+  font-size: 1.8rem;
+  font-weight: 800;
+  text-decoration: none;
+  background: linear-gradient(45deg, var(--primary-color), #673ab7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #333;
+  cursor: pointer;
+}
+
+.mobile-header-actions {
+  display: none;
+}
+
+.search-bar {
+  display: flex;
+  flex: 1;
+  max-width: 500px;
+  position: relative;
+  margin: 0 20px;
+
+  input {
+    width: 100%;
+    padding: 12px 20px;
+    padding-right: 50px;
+    border: 2px solid #f0f0f0;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      background: white;
+      box-shadow: 0 0 0 4px rgba(63, 81, 181, 0.1);
+    }
+  }
+
+  button {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 8px 12px;
+    border: none;
+    background: none;
+    color: #888;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: color 0.3s;
+
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+
+  a:not(.nav-icon) {
+    text-decoration: none;
+    cursor: pointer;
+    color: #555;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color 0.3s;
+    position: relative;
+
+    &:hover,
+    &.active {
+      color: var(--primary-color);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary-color);
+      transition: width 0.3s;
+    }
+
+    &:hover::after,
+    &.active::after {
+      width: 100%;
+    }
+  }
+}
+
+.icon-links {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-left: 1px solid #eee;
+  padding-left: 20px;
+
+  .nav-icon {
+    font-size: 1.2rem;
+    color: #333;
+    padding: 10px;
+    border-radius: 50%;
+    transition: background 0.3s, color 0.3s;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    text-decoration: none; // Remove underline
+
+    &:hover {
+      background: #f0f0f0;
+      color: var(--primary-color);
+    }
+
+    .link-text {
+      display: none; // Hidden on desktop
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    height: auto !important;
+    padding: 10px 0;
+  }
+
+  .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 15px !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+  }
+
+  .navbar-brand {
+    order: 1;
+    flex: 0 1 auto;
+    margin-right: 0 !important;
+  }
+
+  // Wrapper acts as spacer and container for the toggle
+  .mobile-header-actions {
+    display: flex;
+    order: 2;
+    flex-grow: 1;
+    justify-content: flex-end;
+  }
+
+  .menu-toggle {
+    display: block;
+    color: #333;
+    font-size: 1.8rem;
+    padding: 5px;
+    margin: 0; // Removing global margin logic
+  }
+
+  .search-bar {
+    display: flex !important;
+    order: 3;
+    width: 100% !important;
+    flex: 0 0 100% !important;
+    margin: 15px 0 5px 0 !important;
+
+    input {
+      padding: 12px 20px;
+      width: 100%;
+    }
+
+    button {
+      right: 15px;
+    }
+  }
+
+  .navbar-links {
+    display: flex !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 85vw;
+    height: 100vh;
+    background: white;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    gap: 0;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1100;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
+    border-top: none;
+    overflow-y: auto; // Allow scrolling on short screens
+
+    &.open {
+      transform: translateX(0);
+    }
+
+    // Standard text links
+    a:not(.nav-icon) {
+      width: 100%;
+      padding: 15px 0;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 1.1rem;
+
+      &::after {
+        display: none;
+      }
+    }
+
+    // Icon links transformed to list items
+    .icon-links {
+      width: 100%;
+      border-left: none;
+      padding-left: 0;
+      margin-top: 0;
+      background: transparent;
+      padding: 0;
+      border-radius: 0;
+
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+
+      a.nav-icon {
+        width: 100%;
+        padding: 15px 0;
+        border-bottom: 1px solid #f5f5f5;
+        font-size: 1.1rem;
+
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 15px; // Space between icon and text
+        color: #555;
+        font-weight: 600;
+
+        fa-icon {
+          // Target the actual icon component
+          font-size: 1.2rem;
+          width: 25px; // Fixed width for alignment of icons
+          display: flex;
+          justify-content: center;
+          color: #333;
+        }
+
+        .link-text {
+          display: block; // Visible on mobile
+        }
+
+        &:hover {
+          color: var(--primary-color);
+          background: transparent;
+
+          fa-icon {
+            color: var(--primary-color);
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+<nav class="navbar">
+    <div class="overlay" *ngIf="isMenuOpen" (click)="isMenuOpen = false"></div>
+    <div class="container">
+        <div class="navbar-brand">
+            <a routerLink="/">Storiom</a>
+        </div>
+
+        <div class="mobile-header-actions">
+            <button class="menu-toggle" (click)="toggleMenu()">
+                <fa-icon [icon]="menuIcon"></fa-icon>
+            </button>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" placeholder="Rechercher des produits uniques..." [(ngModel)]="searchText"
+                (keyup.enter)="onSearch()">
+            <button (click)="onSearch()">
+                <fa-icon [icon]="searchIcon"></fa-icon>
+            </button>
+        </div>
+
+        <div class="navbar-links" [class.open]="isMenuOpen">
+            <a routerLink="/publicProducts" routerLinkActive="active" (click)="isMenuOpen = false">Produits</a>
+            <a routerLink="/stores" routerLinkActive="active" (click)="isMenuOpen = false">Boutiques</a>
+            <a (click)="goToSellerSpace()" class="seller-link" [class.active]="isSellerActive()">Espace Vendeur</a>
+
+            <div class="icon-links">
+                <a (click)="goToCart(); isMenuOpen = false" class="nav-icon" title="Panier">
+                    <fa-icon [icon]="cartIcon"></fa-icon>
+                    <span class="link-text">Panier</span>
+                    <!-- <span class="badge">2</span> -->
+                </a>
+                <a (click)="goToProfile(); isMenuOpen = false" class="nav-icon" title="Compte">
+                    <fa-icon [icon]="userIcon"></fa-icon>
+                    <span class="link-text">Compte</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>

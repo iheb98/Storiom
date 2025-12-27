@@ -1,0 +1,255 @@
+<div class="products-page-container">
+
+    <!-- Hero Header -->
+    <div class="page-hero">
+        <div class="hero-content">
+            <h1 *ngIf="category">{{ category.name }}</h1>
+            <h1 *ngIf="!category && searchQuery">Résultats pour "{{ searchQuery }}"</h1>
+            <h1 *ngIf="!category && !searchQuery">Découvrez Nos Produits</h1>
+            <p class="hero-subtitle" *ngIf="!category && !searchQuery">Explorez notre sélection de produits de qualité
+            </p>
+        </div>
+    </div>
+
+    <!-- Mobile Filter Toggle -->
+    <button class="mobile-filter-toggle" (click)="toggleMobileFilters()">
+        <i class="fa fa-filter"></i> Filtrer
+        <span class="active-filters-count" *ngIf="activeFiltersCount > 0">{{ activeFiltersCount }}</span>
+    </button>
+
+    <div class="content-layout">
+        <!-- Filters Sidebar -->
+        <aside class="filters-sidebar" [class.open]="mobileFiltersOpen">
+            <div class="sidebar-header">
+                <h2><i class="fa fa-sliders-h"></i> Filtres</h2>
+                <button class="close-filters" (click)="toggleMobileFilters()">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Search -->
+            <div class="filter-section" [class.collapsed]="collapsedSections.search">
+                <div class="section-header" (click)="toggleSection('search')">
+                    <h3><i class="fa fa-search"></i> Rechercher</h3>
+                    <i class="fa" [class.fa-chevron-down]="collapsedSections.search"
+                        [class.fa-chevron-up]="!collapsedSections.search"></i>
+                </div>
+                <div class="section-content">
+                    <div class="search-box">
+                        <input type="text" placeholder="Nom du produit..." [(ngModel)]="searchable"
+                            (keyup.enter)="applyFilters()">
+                        <button (click)="applyFilters()"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="filter-section" [class.collapsed]="collapsedSections.category">
+                <div class="section-header" (click)="toggleSection('category')">
+                    <h3><i class="fa fa-tags"></i> Catégories</h3>
+                    <i class="fa" [class.fa-chevron-down]="collapsedSections.category"
+                        [class.fa-chevron-up]="!collapsedSections.category"></i>
+                </div>
+                <div class="section-content">
+                    <!-- "All Categories" option -->
+                    <div class="category-item root-category" [class.active]="!filters.category"
+                        (click)="filters.category = null; applyFilters()">
+                        <span class="category-name">Toutes les catégories</span>
+                    </div>
+
+                    <!-- Category Tree -->
+                    <div class="category-tree">
+                        <ng-container *ngFor="let cat of categories">
+                            <div class="category-item level-0" [class.active]="filters.category === cat.id"
+                                [class.has-children]="hasSubCategories(cat)">
+                                <span class="expand-icon" *ngIf="hasSubCategories(cat)"
+                                    (click)="toggleCategoryExpand(cat.id, $event)">
+                                    <i class="fa" [class.fa-chevron-right]="!isCategoryExpanded(cat.id)"
+                                        [class.fa-chevron-down]="isCategoryExpanded(cat.id)"></i>
+                                </span>
+                                <span class="category-name" (click)="selectCategory(cat.id)">{{ cat.name }}</span>
+                            </div>
+
+                            <!-- Level 1 subcategories -->
+                            <div class="subcategory-container"
+                                *ngIf="hasSubCategories(cat) && isCategoryExpanded(cat.id)">
+                                <ng-container *ngFor="let sub1 of cat.subCategories">
+                                    <div class="category-item level-1" [class.active]="filters.category === sub1.id"
+                                        [class.has-children]="hasSubCategories(sub1)">
+                                        <span class="expand-icon" *ngIf="hasSubCategories(sub1)"
+                                            (click)="toggleCategoryExpand(sub1.id, $event)">
+                                            <i class="fa" [class.fa-chevron-right]="!isCategoryExpanded(sub1.id)"
+                                                [class.fa-chevron-down]="isCategoryExpanded(sub1.id)"></i>
+                                        </span>
+                                        <span class="category-name" (click)="selectCategory(sub1.id)">{{ sub1.name
+                                            }}</span>
+                                    </div>
+
+                                    <!-- Level 2 subcategories -->
+                                    <div class="subcategory-container"
+                                        *ngIf="hasSubCategories(sub1) && isCategoryExpanded(sub1.id)">
+                                        <ng-container *ngFor="let sub2 of sub1.subCategories">
+                                            <div class="category-item level-2"
+                                                [class.active]="filters.category === sub2.id"
+                                                [class.has-children]="hasSubCategories(sub2)">
+                                                <span class="expand-icon" *ngIf="hasSubCategories(sub2)"
+                                                    (click)="toggleCategoryExpand(sub2.id, $event)">
+                                                    <i class="fa"
+                                                        [class.fa-chevron-right]="!isCategoryExpanded(sub2.id)"
+                                                        [class.fa-chevron-down]="isCategoryExpanded(sub2.id)"></i>
+                                                </span>
+                                                <span class="category-name" (click)="selectCategory(sub2.id)">{{
+                                                    sub2.name }}</span>
+                                            </div>
+
+                                            <!-- Level 3 subcategories -->
+                                            <div class="subcategory-container"
+                                                *ngIf="hasSubCategories(sub2) && isCategoryExpanded(sub2.id)">
+                                                <div class="category-item level-3"
+                                                    *ngFor="let sub3 of sub2.subCategories"
+                                                    [class.active]="filters.category === sub3.id"
+                                                    (click)="selectCategory(sub3.id)">
+                                                    <span class="category-name">{{ sub3.name }}</span>
+                                                </div>
+                                            </div>
+                                        </ng-container>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price Range -->
+            <div class="filter-section" [class.collapsed]="collapsedSections.price">
+                <div class="section-header" (click)="toggleSection('price')">
+                    <h3><i class="fa fa-money-bill-wave"></i> Prix (TND)</h3>
+                    <i class="fa" [class.fa-chevron-down]="collapsedSections.price"
+                        [class.fa-chevron-up]="!collapsedSections.price"></i>
+                </div>
+                <div class="section-content">
+                    <div class="price-inputs">
+                        <div class="price-field">
+                            <label>Min</label>
+                            <input type="number" placeholder="0" [(ngModel)]="filters.minPrice">
+                        </div>
+                        <span class="price-separator">—</span>
+                        <div class="price-field">
+                            <label>Max</label>
+                            <input type="number" placeholder="∞" [(ngModel)]="filters.maxPrice">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location Filter -->
+            <div class="filter-section" [class.collapsed]="collapsedSections.location">
+                <div class="section-header" (click)="toggleSection('location')">
+                    <h3><i class="fa fa-map-marker-alt"></i> Localisation</h3>
+                    <i class="fa" [class.fa-chevron-down]="collapsedSections.location"
+                        [class.fa-chevron-up]="!collapsedSections.location"></i>
+                </div>
+                <div class="section-content">
+                    <ng-select [items]="governorates" placeholder="Tous les gouvernorats" [(ngModel)]="filters.state"
+                        [clearable]="true" (change)="onStateChange()">
+                    </ng-select>
+                    <ng-select [items]="cities" placeholder="Toutes les villes" [(ngModel)]="filters.city"
+                        [clearable]="true" [disabled]="!filters.state" class="city-select" (change)="onCityChange()">
+                    </ng-select>
+                </div>
+            </div>
+
+            <!-- Store Filter -->
+            <div class="filter-section" [class.collapsed]="collapsedSections.store">
+                <div class="section-header" (click)="toggleSection('store')">
+                    <h3><i class="fa fa-store"></i> Boutique</h3>
+                    <i class="fa" [class.fa-chevron-down]="collapsedSections.store"
+                        [class.fa-chevron-up]="!collapsedSections.store"></i>
+                </div>
+                <div class="section-content">
+                    <ng-select [items]="stores" bindLabel="name" bindValue="id" placeholder="Toutes les boutiques"
+                        [(ngModel)]="filters.store" [clearable]="true">
+                    </ng-select>
+                </div>
+            </div>
+
+            <!-- Filter Actions -->
+            <div class="filter-actions">
+                <button class="btn-apply" (click)="applyFilters(); mobileFiltersOpen = false">
+                    <i class="fa fa-check"></i> Appliquer
+                </button>
+                <button class="btn-reset" (click)="resetFilters()">
+                    <i class="fa fa-undo"></i> Réinitialiser
+                </button>
+            </div>
+        </aside>
+
+        <!-- Mobile Overlay -->
+        <div class="mobile-overlay" *ngIf="mobileFiltersOpen" (click)="toggleMobileFilters()"></div>
+
+        <!-- Products Area -->
+        <div class="products-area">
+            <!-- Results Bar -->
+            <div class="results-bar">
+                <div class="results-count">
+                    <span class="count">{{ count }}</span> produits trouvés
+                </div>
+                <div class="sort-options">
+                    <label>Trier par:</label>
+                    <select [(ngModel)]="filters.sort" (change)="applyFilters()">
+                        <option [value]="null">Pertinence</option>
+                        <option value="priceAsc">Prix croissant</option>
+                        <option value="priceDesc">Prix décroissant</option>
+                        <option value="latest">Plus récents</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Active Filters Tags -->
+            <div class="active-filters" *ngIf="hasActiveFilters()">
+                <span class="filter-tag" *ngIf="searchable">
+                    Recherche: "{{ searchable }}"
+                    <i class="fa fa-times" (click)="searchable = ''; applyFilters()"></i>
+                </span>
+                <span class="filter-tag" *ngIf="filters.category">
+                    Catégorie: {{ getCategoryName(filters.category) }}
+                    <i class="fa fa-times" (click)="filters.category = null; applyFilters()"></i>
+                </span>
+                <span class="filter-tag" *ngIf="filters.minPrice || filters.maxPrice">
+                    Prix: {{ filters.minPrice || 0 }} - {{ filters.maxPrice || '∞' }} TND
+                    <i class="fa fa-times"
+                        (click)="filters.minPrice = null; filters.maxPrice = null; applyFilters()"></i>
+                </span>
+                <span class="filter-tag" *ngIf="filters.store">
+                    Magasin: {{ getStoreName(filters.store) }}
+                    <i class="fa fa-times" (click)="filters.store = null; applyFilters()"></i>
+                </span>
+                <button class="clear-all" (click)="resetFilters()">Effacer tout</button>
+            </div>
+
+            <!-- Products Grid Skeleton -->
+            <div class="products-grid-skeleton" *ngIf="isLoading">
+                <div class="skeleton-product" *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12]"></div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="products-grid" *ngIf="!isLoading && products.length > 0">
+                <app-product-card *ngFor="let product of products" [product]="product"></app-product-card>
+            </div>
+
+            <!-- No Products (only show when not loading) -->
+            <div class="no-products" *ngIf="!isLoading && products.length === 0">
+                <i class="fa fa-box-open"></i>
+                <h3>Aucun produit trouvé</h3>
+                <p>Essayez de modifier vos filtres ou recherchez autre chose.</p>
+                <button (click)="resetFilters()">Réinitialiser les filtres</button>
+            </div>
+
+            <!-- Pagination -->
+            <mat-paginator [length]="count" [pageSize]="currentSize" [pageSizeOptions]="[12, 24, 48]"
+                (page)="handlePageEvent($event)" [pageIndex]="currentPage" *ngIf="count > 0" class="custom-paginator">
+            </mat-paginator>
+        </div>
+    </div>
+</div>

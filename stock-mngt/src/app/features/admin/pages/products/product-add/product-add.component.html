@@ -1,0 +1,232 @@
+<div class="product-form-page">
+
+    <!-- Loading Skeleton -->
+    <div class="loading-skeleton" *ngIf="isLoading">
+        <div class="skeleton-nav"></div>
+        <div class="skeleton-header"></div>
+        <div class="skeleton-form-layout">
+            <div class="skeleton-section"></div>
+            <div class="skeleton-section-right">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submitting Overlay -->
+    <div class="action-overlay" *ngIf="isSubmitting">
+        <div class="action-spinner">
+            <div class="spinner"></div>
+            <span>Enregistrement en cours...</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="page-content" *ngIf="!isLoading">
+
+        <!-- Navigation -->
+        <div class="page-navigation">
+            <a class="nav-link" (click)="navigateTo('/products')">
+                <fa-icon [icon]="faArrowLeft"></fa-icon>
+                <span>Retour aux produits</span>
+            </a>
+            <a class="nav-link" *ngIf="productId" (click)="navigateTo('/products/view/' + product?.id)">
+                <fa-icon [icon]="faEye"></fa-icon>
+                <span>Consulter</span>
+            </a>
+        </div>
+
+        <!-- Page Header -->
+        <header class="page-header">
+            <div class="header-icon">
+                <fa-icon [icon]="faBox"></fa-icon>
+            </div>
+            <div class="header-text">
+                <h1>{{ productId ? 'Modifier' : 'Ajouter' }} un produit</h1>
+                <p>{{ productId ? 'Modifiez les informations du produit' : 'Renseignez les informations du nouveau
+                    produit' }}</p>
+            </div>
+        </header>
+
+        <form [formGroup]="form" (ngSubmit)="productId ? update() : create()">
+            <div class="form-layout">
+                <!-- Left Column: Main Info -->
+                <div class="form-section">
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h2><fa-icon [icon]="faInfoCircle"></fa-icon> Informations générales</h2>
+                        </div>
+                        <div class="section-body">
+                            <div class="form-group">
+                                <label for="name">Nom du produit <span class="required">*</span></label>
+                                <input type="text" id="name" formControlName="name" placeholder="Ex: iPhone 15 Pro Max"
+                                    [class.invalid]="submitted && !form.get('name').value">
+                                <span class="error-message" *ngIf="submitted && !form.get('name').value">
+                                    Le nom est obligatoire
+                                </span>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="category"><fa-icon [icon]="faFolder"></fa-icon> Catégorie</label>
+                                    <ng-select formControlName="categoryId" id="category" placeholder="Sélectionner...">
+                                        <ng-option *ngFor="let element of categories" [value]="element?.id">
+                                            {{ element?.name }}
+                                        </ng-option>
+                                    </ng-select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="brand"><fa-icon [icon]="faTag"></fa-icon> Marque</label>
+                                    <ng-select formControlName="brandId" id="brand" placeholder="Sélectionner...">
+                                        <ng-option *ngFor="let element of brands" [value]="element?.id">
+                                            {{ element?.name }}
+                                        </ng-option>
+                                    </ng-select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="supplier"><fa-icon [icon]="faTruck"></fa-icon> Fournisseur</label>
+                                <ng-select formControlName="supplierId" id="supplier"
+                                    placeholder="Sélectionner un fournisseur...">
+                                    <ng-option *ngFor="let element of suppliers" [value]="element?.id">
+                                        {{ element.firstName + ' ' + element.lastName }}
+                                    </ng-option>
+                                </ng-select>
+                            </div>
+
+                            <div class="settings-grid">
+                                <div class="toggle-setting">
+                                    <div class="toggle-info">
+                                        <fa-icon [icon]="faEye" class="setting-icon"></fa-icon>
+                                        <div class="toggle-text">
+                                            <span class="toggle-title">Visible au public</span>
+                                            <span class="toggle-desc">Le produit sera visible sur le marketplace</span>
+                                        </div>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" formControlName="toDisplay">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description"><fa-icon [icon]="faAlignLeft"></fa-icon> Description</label>
+                                <quill-editor formControlName="description" [styles]="{height: '200px'}"
+                                    placeholder="Décrivez votre produit avec du texte enrichi..."
+                                    [modules]="quillModules">
+                                </quill-editor>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Pricing & Images -->
+                <div class="form-section">
+                    <!-- Pricing Card -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h2><fa-icon [icon]="faCoins"></fa-icon> Prix et stock</h2>
+                        </div>
+                        <div class="section-body">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="buyingPrice"><fa-icon [icon]="faArrowDown" class="text-info"></fa-icon>
+                                        Prix
+                                        d'achat</label>
+                                    <div class="input-with-suffix">
+                                        <input type="number" id="buyingPrice" formControlName="buyingPrice"
+                                            placeholder="0.00">
+                                        <span class="suffix">DT</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="sellingPrice"><fa-icon [icon]="faArrowUp"
+                                            class="text-success"></fa-icon> Prix de
+                                        vente</label>
+                                    <div class="input-with-suffix">
+                                        <input type="number" id="sellingPrice" formControlName="sellingPrice"
+                                            placeholder="0.00">
+                                        <span class="suffix">DT</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="profit-indicator"
+                                *ngIf="form.get('buyingPrice').value && form.get('sellingPrice').value">
+                                <fa-icon [icon]="faChartLine"></fa-icon>
+                                <span>Marge: <strong>{{ (form.get('sellingPrice').value - form.get('buyingPrice').value)
+                                        |
+                                        number:'1.2-2' }} DT</strong></span>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group" *ngIf="!productId">
+                                    <label for="quantity"><fa-icon [icon]="faCubes"></fa-icon> Quantité initiale</label>
+                                    <input type="number" id="quantity" formControlName="quantity" placeholder="0">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="criticalStockIndicator"><fa-icon [icon]="faExclamationTriangle"
+                                            class="text-warning"></fa-icon> Seuil critique</label>
+                                    <input type="number" id="criticalStockIndicator"
+                                        formControlName="criticalStockIndicator" placeholder="5">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Images Card -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h2><fa-icon [icon]="faImages"></fa-icon> Images du produit</h2>
+                            <span class="image-count">{{ (images?.length || 0) + selectedFiles.length }}/3</span>
+                        </div>
+                        <div class="section-body">
+                            <div class="images-grid" *ngIf="images?.length > 0 || selectedFiles.length > 0">
+                                <!-- Existing images (already uploaded) -->
+                                <div class="image-preview" *ngFor="let item of images">
+                                    <img [src]="environment.backend + '/' + item" alt="Product image">
+                                    <button type="button" class="delete-image" (click)="deleteImage(item)">
+                                        <fa-icon [icon]="faTimes"></fa-icon>
+                                    </button>
+                                </div>
+
+                                <!-- Selected files (pending upload) -->
+                                <div class="image-preview pending" *ngFor="let item of selectedFiles; let i = index">
+                                    <img [src]="item.preview" alt="Selected image">
+                                    <span class="pending-badge">En attente</span>
+                                    <button type="button" class="delete-image" (click)="removeSelectedFile(i)">
+                                        <fa-icon [icon]="faTimes"></fa-icon>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="upload-zone" *ngIf="(images?.length || 0) + selectedFiles.length < 3">
+                                <input #fileInput type="file" id="fileUpload" (change)="process($event)"
+                                    accept="image/x-png,image/gif,image/jpeg" multiple hidden>
+                                <label for="fileUpload" class="upload-label">
+                                    <fa-icon [icon]="faCloudUploadAlt"></fa-icon>
+                                    <span>Cliquez pour ajouter des images</span>
+                                    <small>PNG, JPG ou GIF (max 3 images)</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-actions">
+                <button type="button" class="btn-cancel" (click)="navigateTo('/products')">Annuler</button>
+                <button type="submit" class="btn-submit" [disabled]="isSubmitting">
+                    <fa-icon [icon]="productId ? faSave : faPlus"></fa-icon>
+                    {{ productId ? 'Enregistrer les modifications' : 'Ajouter le produit' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

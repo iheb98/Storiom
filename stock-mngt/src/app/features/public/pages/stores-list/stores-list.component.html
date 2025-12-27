@@ -1,0 +1,211 @@
+<div class="stores-page">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Découvrez nos boutiques</h1>
+            <p>Explorez une variété de magasins locaux et trouvez des produits uniques près de chez vous.</p>
+
+            <div class="search-bar">
+                <i class="fa fa-search"></i>
+                <input type="text" placeholder="Rechercher par nom ou ville..." [(ngModel)]="searchText"
+                    (input)="filterStores()">
+                <button class="filter-toggle-btn" (click)="toggleFilters()"
+                    [class.active]="showFilters || activeFiltersCount > 0">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="4" y1="6" x2="20" y2="6"></line>
+                        <line x1="4" y1="12" x2="20" y2="12"></line>
+                        <line x1="4" y1="18" x2="20" y2="18"></line>
+                        <circle cx="8" cy="6" r="2" fill="currentColor"></circle>
+                        <circle cx="16" cy="12" r="2" fill="currentColor"></circle>
+                        <circle cx="10" cy="18" r="2" fill="currentColor"></circle>
+                    </svg>
+                    <span class="filter-text">Filtres</span>
+                    <span class="filter-count" *ngIf="activeFiltersCount > 0">{{ activeFiltersCount }}</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters Panel -->
+    <section class="filters-panel" [class.open]="showFilters">
+        <div class="filters-container">
+            <div class="filters-header">
+                <h3><fa-icon [icon]="faFilter"></fa-icon> Filtres avancés</h3>
+                <button class="clear-filters-btn" (click)="clearFilters()" *ngIf="activeFiltersCount > 0">
+                    <fa-icon [icon]="faTimes"></fa-icon> Effacer tout
+                </button>
+            </div>
+
+            <div class="filters-grid">
+                <!-- Governorate Filter (Autocomplete) -->
+                <div class="filter-group autocomplete-group">
+                    <label><fa-icon [icon]="faMap"></fa-icon> Gouvernorat</label>
+                    <div class="autocomplete-wrapper">
+                        <input type="text" [(ngModel)]="governorateSearchText" (input)="onGovernorateSearch()"
+                            (focus)="showGovernorateSuggestions = true" (blur)="hideGovernorateSuggestionsDelayed()"
+                            placeholder="Rechercher un gouvernorat..." autocomplete="off">
+                        <fa-icon [icon]="faChevronDown" class="dropdown-icon"
+                            (click)="toggleGovernorateSuggestions()"></fa-icon>
+                        <div class="suggestions-dropdown"
+                            *ngIf="showGovernorateSuggestions && filteredGovernorates.length > 0">
+                            <div class="suggestion-item" *ngFor="let gov of filteredGovernorates"
+                                (mousedown)="selectGovernorate(gov)">
+                                {{ gov }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- City Filter (Autocomplete) -->
+                <div class="filter-group autocomplete-group">
+                    <label><fa-icon [icon]="faCity"></fa-icon> Ville / Délégation</label>
+                    <div class="autocomplete-wrapper">
+                        <input type="text" [(ngModel)]="citySearchText" (input)="onCitySearch()"
+                            (focus)="showCitySuggestions = true" (blur)="hideCitySuggestionsDelayed()"
+                            placeholder="Rechercher une ville..." autocomplete="off">
+                        <fa-icon [icon]="faChevronDown" class="dropdown-icon"
+                            (click)="toggleCitySuggestions()"></fa-icon>
+                        <div class="suggestions-dropdown" *ngIf="showCitySuggestions && filteredCities.length > 0">
+                            <div class="suggestion-item" *ngFor="let city of filteredCities"
+                                (mousedown)="selectCity(city)">
+                                {{ city }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Type Filter -->
+                <div class="filter-group">
+                    <label><fa-icon [icon]="faTag"></fa-icon> Type de boutique</label>
+                    <select [(ngModel)]="selectedType" (change)="filterStores()">
+                        <option value="">Tous les types</option>
+                        <option *ngFor="let type of availableTypes" [value]="type">{{ type }}</option>
+                    </select>
+                </div>
+
+                <!-- Has Website Toggle -->
+                <div class="filter-group toggle-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" [(ngModel)]="hasWebsiteOnly" (change)="filterStores()">
+                        <span class="toggle-switch"></span>
+                        <span class="toggle-text"><fa-icon [icon]="faGlobe"></fa-icon> Avec site web</span>
+                    </label>
+                </div>
+
+                <!-- Supports Delivery Toggle -->
+                <div class="filter-group toggle-group">
+                    <label class="toggle-label">
+                        <input type="checkbox" [(ngModel)]="supportsDeliveryOnly" (change)="filterStores()">
+                        <span class="toggle-switch"></span>
+                        <span class="toggle-text"><fa-icon [icon]="faTruck"></fa-icon> Livraison disponible</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-number">{{ filteredStores.length }}</span>
+            <span class="stat-label">Boutiques trouvées</span>
+        </div>
+        <div class="stat-item" *ngIf="activeFiltersCount > 0">
+            <span class="stat-number">{{ activeFiltersCount }}</span>
+            <span class="stat-label">Filtres actifs</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">{{ availableGovernorates.length }}</span>
+            <span class="stat-label">Gouvernorats</span>
+        </div>
+    </section>
+
+    <!-- Stores Grid -->
+    <section class="stores-section">
+        <!-- Stores Grid Skeleton -->
+        <div class="stores-grid-skeleton" *ngIf="isLoading">
+            <div class="skeleton-store" *ngFor="let i of [1,2,3,4,5,6]"></div>
+        </div>
+
+        <div class="stores-grid" *ngIf="!isLoading && filteredStores.length > 0">
+            <article class="store-card" *ngFor="let store of filteredStores" [routerLink]="['/stores', store.id]">
+                <!-- Cover Image / Pattern -->
+                <div class="card-cover"
+                    [ngStyle]="{'background-image': store.coverImage ? 'url(' + environment.backend + '/' + store.coverImage + ')' : 'linear-gradient(135deg, #5a5a7e 0%, #6a7a9e 50%, #7a8abe 100%)'}">
+                    <div class="logo-container">
+                        <img *ngIf="store.logo" [src]="environment.backend + '/' + store.logo"
+                            [alt]="store.name + ' logo'" class="store-logo">
+                        <div *ngIf="!store.logo" class="logo-placeholder">
+                            <i class="fa fa-store"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Body -->
+                <div class="card-body">
+                    <!-- Badges -->
+                    <div class="store-badges">
+                        <span class="store-badge" *ngIf="store.type">{{ store.type }}</span>
+                        <span class="store-badge delivery-badge" *ngIf="store.isSupportingDeliveries">
+                            <i class="fa fa-truck"></i> Livraison
+                        </span>
+                        <span class="store-badge no-delivery-badge" *ngIf="!store.isSupportingDeliveries">
+                            <i class="fa fa-times"></i> Pas de livraison
+                        </span>
+                    </div>
+
+                    <h3 class="store-name">{{ store.name }}</h3>
+
+                    <p class="store-location" *ngIf="store.address">
+                        <i class="fa fa-map-marker-alt"></i>
+                        <span class="full-address">
+                            <span *ngIf="store.address.street">{{ store.address.street }}, </span>
+                            {{ store.address.city }}
+                            <span *ngIf="store.address.state">, {{ store.address.state }}</span>
+                            <span *ngIf="store.address.postalCode"> {{ store.address.postalCode }}</span>
+                        </span>
+                    </p>
+
+                    <div class="store-description" *ngIf="store.description" [innerHTML]="store.description | safeHtml">
+                    </div>
+                    <p class="store-description" *ngIf="!store.description">Découvrez notre sélection de produits
+                        uniques.</p>
+
+                    <!-- Contact Info -->
+                    <div class="store-contact">
+                        <span *ngIf="store.phone" class="contact-item" title="Téléphone">
+                            <i class="fa fa-phone"></i> {{ store.phone }}
+                        </span>
+                        <span *ngIf="store.email" class="contact-item" title="Email">
+                            <i class="fa fa-envelope"></i> {{ store.email }}
+                        </span>
+                        <a *ngIf="store.site" class="contact-item clickable"
+                            [href]="store.site.startsWith('http') ? store.site : 'https://' + store.site"
+                            target="_blank" (click)="$event.stopPropagation()" title="Visiter le site">
+                            <i class="fa fa-globe"></i> Site Web
+                        </a>
+                    </div>
+
+                    <div class="card-footer">
+                        <button class="visit-btn">
+                            <span>Visiter</span>
+                            <i class="fa fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <!-- Empty State (only show when not loading) -->
+        <div class="empty-state" *ngIf="!isLoading && filteredStores.length === 0">
+            <div class="empty-icon">
+                <i class="fa fa-store-slash"></i>
+            </div>
+            <h3>Aucune boutique trouvée</h3>
+            <p>Essayez de modifier vos filtres ou effectuez une autre recherche.</p>
+            <button class="reset-btn" (click)="clearFilters()">
+                <i class="fa fa-redo"></i> Réinitialiser les filtres
+            </button>
+        </div>
+    </section>
+</div>
