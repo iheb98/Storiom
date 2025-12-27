@@ -41,7 +41,7 @@ const storage = multer.diskStorage(
 require('dotenv/config');
 
 // **************************************** CORS ****************************************
-var allowedDomains = ['http://localhost:4200', 'http://145.223.103.252', 'https://storiom.com'];
+var allowedDomains = ['http://localhost:4200', 'http://145.223.103.252', 'https://storiom.com', 'https://www.storiom.com'];
 
 /*
 var corsOptions = {
