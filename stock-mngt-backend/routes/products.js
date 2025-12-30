@@ -124,7 +124,7 @@ router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
 })
 
 router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
-    const { id, name, color, quantity, unit, images, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay } = req.body
+    const { id, name, color, quantity, unit, images, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, activateCriticalStockIndicator } = req.body
     Product.findOne(
         {
             where: {
@@ -146,6 +146,7 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
         product.buyingPrice = buyingPrice
         product.toDisplay = toDisplay
         product.criticalStockIndicator = criticalStockIndicator
+        product.activateCriticalStockIndicator = activateCriticalStockIndicator
         product.size = size
         product.save().then(
             savedProduct => {
@@ -486,6 +487,7 @@ router.get('/store/:id/critical', utility.authenticate, checkSubscription, (req,
             store_id: id,
             creatorUserId: req.user.id,
             isVisible: true,
+            activate_critical_stock_indicator: true,
             [Op.and]: [
                 literal('"quantity" <= "critical_stock_indicator"')
             ]

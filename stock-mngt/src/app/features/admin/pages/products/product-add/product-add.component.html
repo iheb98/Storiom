@@ -169,6 +169,15 @@
                                     <input type="number" id="quantity" formControlName="quantity" placeholder="0">
                                 </div>
 
+                                <div class="form-group toggle-group">
+                                    <label><fa-icon [icon]="faExclamationTriangle" class="text-warning"></fa-icon>
+                                        Activer le seuil critique</label>
+                                    <mat-slide-toggle
+                                        formControlName="activateCriticalStockIndicator"></mat-slide-toggle>
+                                </div>
+                            </div>
+
+                            <div class="form-row" *ngIf="form.get('activateCriticalStockIndicator').value">
                                 <div class="form-group">
                                     <label for="criticalStockIndicator"><fa-icon [icon]="faExclamationTriangle"
                                             class="text-warning"></fa-icon> Seuil critique</label>

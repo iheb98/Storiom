@@ -152,6 +152,8 @@ export class AddProductFromReceiptComponent implements OnInit {
       buyingPrice: [null],
       sellingPrice: [null],
       toDisplay: [defaultVisibility],
+      criticalStockIndicator: [0],
+      activateCriticalStockIndicator: [false],
       images: [null]
     });
   }

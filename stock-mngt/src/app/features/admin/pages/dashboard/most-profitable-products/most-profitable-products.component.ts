@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { faCoins, faBox, faChartLine } from '@fortawesome/free-solid-svg-icons';
+import { MatDialog } from '@angular/material/dialog';
+import { faCoins, faBox, faChartLine, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StatService } from 'src/app/core/services/stat.service';
+import { AllProfitableProductsModalComponent } from '../all-profitable-products-modal/all-profitable-products-modal.component';
 
 @Component({
   selector: 'app-most-profitable-products',
@@ -13,6 +15,7 @@ export class MostProfitableProductsComponent implements OnInit {
   faCoins = faCoins;
   faBox = faBox;
   faChartLine = faChartLine;
+  faArrowRight = faArrowRight;
 
   user;
   products;
@@ -23,7 +26,8 @@ export class MostProfitableProductsComponent implements OnInit {
 
   constructor(
     private statService: StatService,
-    private authService: AuthService
+    private authService: AuthService,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -42,5 +46,14 @@ export class MostProfitableProductsComponent implements OnInit {
         this.isLoading = false;
       }
     );
+  }
+
+  openAllProductsModal() {
+    this.dialog.open(AllProfitableProductsModalComponent, {
+      width: '90vw',
+      maxWidth: '850px',
+      maxHeight: '90vh',
+      panelClass: 'dark-modal'
+    });
   }
 }

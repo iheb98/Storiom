@@ -307,3 +307,19 @@ table {
 .product-card .reviews {
     color: #fbc02d;
 }
+
+// ============================================
+// DARK MODAL PANEL CLASS
+// ============================================
+.dark-modal {
+    .mat-dialog-container {
+        background: transparent;
+        padding: 0;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .modal-container {
+        max-width: 100%;
+    }
+}

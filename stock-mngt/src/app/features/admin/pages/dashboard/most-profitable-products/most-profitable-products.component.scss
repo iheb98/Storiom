@@ -255,3 +255,43 @@ $radius-md: 12px;
         margin: 0;
     }
 }
+
+// ============================================
+// VIEW ALL BUTTON
+// ============================================
+.view-all-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 20px;
+    margin-top: 16px;
+    border: none;
+    border-radius: $radius-md;
+    background: linear-gradient(135deg, $success 0%, darken($success, 10%) 100%);
+    color: $white;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba($success, 0.3);
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba($success, 0.4);
+
+        fa-icon {
+            transform: translateX(4px);
+        }
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    fa-icon {
+        transition: transform 0.3s ease;
+    }
+}

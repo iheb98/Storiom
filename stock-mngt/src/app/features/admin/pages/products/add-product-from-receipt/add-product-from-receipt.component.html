@@ -133,6 +133,22 @@
                     <span>Marge: <strong>{{ (form.get('sellingPrice').value - form.get('buyingPrice').value) |
                             number:'1.2-2' }} DT</strong></span>
                 </div>
+
+                <div class="form-row" style="margin-top: 1rem;">
+                    <div class="form-group toggle-group">
+                        <label><i class="fa fa-exclamation-triangle text-warning"></i> Activer le seuil critique</label>
+                        <mat-slide-toggle formControlName="activateCriticalStockIndicator"></mat-slide-toggle>
+                    </div>
+                </div>
+
+                <div class="form-row" *ngIf="form.get('activateCriticalStockIndicator').value">
+                    <div class="form-group">
+                        <label for="criticalStockIndicator"><i class="fa fa-exclamation-triangle text-warning"></i>
+                            Seuil critique</label>
+                        <input type="number" id="criticalStockIndicator" formControlName="criticalStockIndicator"
+                            placeholder="5">
+                    </div>
+                </div>
             </div>
 
             <!-- Description -->

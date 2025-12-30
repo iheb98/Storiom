@@ -57,6 +57,25 @@
                 </div>
             </div>
 
+            <!-- Full Width Charts -->
+            <div class="dashboard-card full-width">
+                <div class="card-header">
+                    <h2><fa-icon [icon]="faChartLine"></fa-icon> Statistiques des Opérations</h2>
+                </div>
+                <div class="card-body chart-container">
+                    <app-operation-stats></app-operation-stats>
+                </div>
+            </div>
+
+            <div class="dashboard-card full-width">
+                <div class="card-header">
+                    <h2><fa-icon [icon]="faChartBar"></fa-icon> Statistiques par Catégorie</h2>
+                </div>
+                <div class="card-body chart-container">
+                    <app-category-stats></app-category-stats>
+                </div>
+            </div>
+
             <!-- Two Column Layout -->
             <div class="dashboard-card">
                 <div class="card-header">
@@ -100,24 +119,7 @@
                 </div>
             </div>
 
-            <!-- Full Width Charts -->
-            <div class="dashboard-card full-width">
-                <div class="card-header">
-                    <h2><fa-icon [icon]="faChartLine"></fa-icon> Statistiques des Opérations</h2>
-                </div>
-                <div class="card-body chart-container">
-                    <app-operation-stats></app-operation-stats>
-                </div>
-            </div>
 
-            <div class="dashboard-card full-width">
-                <div class="card-header">
-                    <h2><fa-icon [icon]="faChartBar"></fa-icon> Statistiques par Catégorie</h2>
-                </div>
-                <div class="card-body chart-container">
-                    <app-category-stats></app-category-stats>
-                </div>
-            </div>
         </section>
     </div>
 </div>

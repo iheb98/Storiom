@@ -6,7 +6,7 @@ import {
   faEye, faInfoCircle, faTag, faFolder, faTruck, faCoins, faArrowDown,
   faArrowUp, faAlignLeft, faImages, faCloudUploadAlt, faPlus, faSave, faBox
 } from '@fortawesome/free-solid-svg-icons';
-import { EMPTY } from 'rxjs';
+import { EMPTY, forkJoin } from 'rxjs';
 import { expand, map } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { BrandService } from 'src/app/core/services/brand.service';
@@ -196,6 +196,7 @@ export class ProductAddComponent implements OnInit {
         this.form.get('size').setValue(response?.size);
         this.form.get('toDisplay').setValue(response?.toDisplay);
         this.form.get('criticalStockIndicator').setValue(response?.criticalStockIndicator);
+        this.form.get('activateCriticalStockIndicator').setValue(response?.activateCriticalStockIndicator || false);
         this.images = response?.images || [];
         this.isLoading = false;
       },
@@ -218,6 +219,7 @@ export class ProductAddComponent implements OnInit {
     this.form = this.formBuilder.group({
       name: [null, Validators.required],
       criticalStockIndicator: [0],
+      activateCriticalStockIndicator: [false],
       supplierId: [null],
       brandId: [null],
       categoryId: [null],
@@ -237,13 +239,10 @@ export class ProductAddComponent implements OnInit {
   create() {
     this.submitted = true;
     this.emailError = false;
-    let fileName = null;
-    const imageNames = [];
-    let counter = 1;
 
-    const filesToUpload = this.selectedFiles.map(sf => sf.file);
+    const originalFiles = this.selectedFiles.map(sf => sf.file);
 
-    if ((this.images?.length || 0) + filesToUpload.length > 3) {
+    if ((this.images?.length || 0) + originalFiles.length > 3) {
       Swal.fire({
         icon: 'error',
         title: 'Vous pouvez selectionnez seulement 3 images',
@@ -253,51 +252,107 @@ export class ProductAddComponent implements OnInit {
       return;
     }
 
-    for (let item of filesToUpload) {
-      fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + (counter++) + item?.name.substring(item.name.lastIndexOf('.'));
-      imageNames.push(fileName);
-    }
-
     if (this.form.valid) {
       this.isSubmitting = true;
-      this.uploadFilesFromArray(filesToUpload, imageNames).subscribe(
-        response => {
-          const filenames = response.files.map(file => file.location.split('/').pop());
-          this.form.get('images').setValue(filenames);
-          this.productService.addProduct({ ...this.form.getRawValue(), storeId: this.user?.store })
-            .subscribe(
-              response => {
-                this.isSubmitting = false;
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Produit ajouté !',
-                  showConfirmButton: false,
-                  timer: 1500
-                });
-                this.router.navigate(['products']);
-              },
-              error => {
-                this.isSubmitting = false;
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Une erreur est survenue ! Merci de réessayer plus tard',
-                  showConfirmButton: false,
-                  timer: 1500
-                });
-              }
+
+      // Compress all images to WebP before upload
+      if (originalFiles.length > 0) {
+        const compressionObservables = originalFiles.map(file =>
+          this.compressor.compress(file, 1200, 0.85)
+        );
+
+        forkJoin(compressionObservables).subscribe({
+          next: (compressedFiles: File[]) => {
+            // Generate WebP filenames
+            const imageNames = compressedFiles.map((file, index) =>
+              `${this.authService.getConnectedUser().id}-${new Date().getTime()}${index + 1}.webp`
             );
-        },
-        error => {
-          this.isSubmitting = false;
-          Swal.fire({
-            icon: 'error',
-            title: 'Erreur lors du téléchargement des images',
-            showConfirmButton: false,
-            timer: 1500
-          });
-        }
-      );
+
+            this.uploadAndSaveProduct(compressedFiles, imageNames);
+          },
+          error: (err) => {
+            this.isSubmitting = false;
+            console.error('Compression error:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Erreur lors de la compression des images',
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        });
+      } else {
+        // No images to upload
+        this.uploadAndSaveProduct([], []);
+      }
     }
+  }
+
+  private uploadAndSaveProduct(filesToUpload: File[], imageNames: string[]) {
+    if (filesToUpload.length === 0) {
+      // No new images to upload, just save the product
+      this.productService.addProduct({ ...this.form.getRawValue(), storeId: this.user?.store })
+        .subscribe(
+          response => {
+            this.isSubmitting = false;
+            Swal.fire({
+              icon: 'success',
+              title: 'Produit ajouté !',
+              showConfirmButton: false,
+              timer: 1500
+            });
+            this.router.navigate(['products']);
+          },
+          error => {
+            this.isSubmitting = false;
+            Swal.fire({
+              icon: 'error',
+              title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        );
+      return;
+    }
+
+    this.uploadFilesFromArray(filesToUpload, imageNames).subscribe(
+      response => {
+        const filenames = response.files.map(file => file.location.split('/').pop());
+        this.form.get('images').setValue(filenames);
+        this.productService.addProduct({ ...this.form.getRawValue(), storeId: this.user?.store })
+          .subscribe(
+            response => {
+              this.isSubmitting = false;
+              Swal.fire({
+                icon: 'success',
+                title: 'Produit ajouté !',
+                showConfirmButton: false,
+                timer: 1500
+              });
+              this.router.navigate(['products']);
+            },
+            error => {
+              this.isSubmitting = false;
+              Swal.fire({
+                icon: 'error',
+                title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+                showConfirmButton: false,
+                timer: 1500
+              });
+            }
+          );
+      },
+      error => {
+        this.isSubmitting = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur lors du téléchargement des images',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
+    );
   }
 
   update() {

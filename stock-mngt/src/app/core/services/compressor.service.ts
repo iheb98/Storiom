@@ -6,36 +6,61 @@ import { Observable } from 'rxjs';
 })
 export class CompressorService {
   constructor() { }
-  compress(file: File): Observable<any> {
-    const width = 600; // For scaling relative to width
+
+  compress(file: File, maxWidth: number = 800, quality: number = 0.85): Observable<File> {
     const reader = new FileReader();
-    reader.readAsDataURL(file);
-    return Observable.create(observer => {
+
+    return new Observable(observer => {
       reader.onload = ev => {
         const img = new Image();
         img.src = (ev.target as any).result;
-        (img.onload = () => {
-          const elem = document.createElement('canvas'); // Use Angular's Renderer2 method
-          const scaleFactor = width / img.width;
+
+        img.onload = () => {
+          const elem = document.createElement('canvas');
+
+          // Calculate dimensions maintaining aspect ratio
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth) {
+            const scaleFactor = maxWidth / width;
+            width = maxWidth;
+            height = height * scaleFactor;
+          }
+
           elem.width = width;
-          elem.height = img.height * scaleFactor;
+          elem.height = height;
+
           const ctx = <CanvasRenderingContext2D>elem.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Convert to WebP format for smaller file size
           ctx.canvas.toBlob(
             blob => {
-              observer.next(
-                new File([blob], file.name, {
-                  type: 'image/jpeg',
-                  lastModified: Date.now(),
-                }),
-              );
+              if (blob) {
+                // Change extension to .webp
+                const originalName = file.name.replace(/\.[^/.]+$/, '');
+                observer.next(
+                  new File([blob], `${originalName}.webp`, {
+                    type: 'image/webp',
+                    lastModified: Date.now(),
+                  }),
+                );
+                observer.complete();
+              } else {
+                observer.error('Failed to convert image to WebP');
+              }
             },
-            'image/jpeg',
-            1,
+            'image/webp',
+            quality,
           );
-        }),
-          (reader.onerror = error => observer.error(error));
+        };
+
+        img.onerror = error => observer.error('Failed to load image');
       };
+
+      reader.onerror = error => observer.error(error);
+      reader.readAsDataURL(file);
     });
   }
 }

@@ -88,6 +88,12 @@ module.exports = (sequelize, DataTypes) => {
     discount: {
       type: DataTypes.FLOAT
     },
+    activateCriticalStockIndicator: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+      field: 'activate_critical_stock_indicator'
+    },
   }, {
     sequelize,
     tableName: 'products',

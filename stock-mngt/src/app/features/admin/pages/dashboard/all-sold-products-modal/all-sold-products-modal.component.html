@@ -1,0 +1,87 @@
+<div class="modal-container">
+    <!-- Header -->
+    <div class="modal-header">
+        <div class="header-content">
+            <div class="header-icon">
+                <fa-icon [icon]="faTrophy"></fa-icon>
+            </div>
+            <div class="header-text">
+                <h2>Produits les Plus Vendus</h2>
+                <p>{{ allProducts.length }} produits classés par ventes</p>
+            </div>
+        </div>
+        <button class="close-btn" (click)="close()">
+            <fa-icon [icon]="faTimes"></fa-icon>
+        </button>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-content">
+        <!-- Loading -->
+        <div class="loading-state" *ngIf="isLoading">
+            <div class="spinner"></div>
+            <p>Chargement des produits...</p>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="products-grid" *ngIf="!isLoading && displayedProducts.length > 0">
+            <div class="product-card" *ngFor="let operation of displayedProducts; let i = index"
+                [class.top-three]="getGlobalRank(i) <= 3">
+
+                <!-- Rank Badge -->
+                <div class="rank-badge" [ngClass]="getRankClass(getGlobalRank(i))">
+                    <span class="rank-number">{{ getGlobalRank(i) }}</span>
+                    <fa-icon *ngIf="getGlobalRank(i) <= 3" [icon]="faTrophy"></fa-icon>
+                </div>
+
+                <!-- Product Info -->
+                <div class="product-content">
+                    <h3 class="product-name">{{ operation?.product?.name }}</h3>
+                    <div class="product-price">{{ operation?.product?.sellingPrice | number:'1.2-2' }} DT</div>
+                </div>
+
+                <!-- Stats -->
+                <div class="product-stats">
+                    <div class="stat-item sold">
+                        <fa-icon [icon]="faFire"></fa-icon>
+                        <div class="stat-details">
+                            <span class="stat-value">{{ operation?.total_amount }}</span>
+                            <span class="stat-label">Vendus</span>
+                        </div>
+                    </div>
+                    <div class="stat-item stock" [class.low-stock]="operation?.product?.quantity < 10">
+                        <fa-icon [icon]="faBox"></fa-icon>
+                        <div class="stat-details">
+                            <span class="stat-value">{{ operation?.product?.quantity }}</span>
+                            <span class="stat-label">En stock</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="!isLoading && allProducts.length === 0">
+            <fa-icon [icon]="faFire"></fa-icon>
+            <h3>Aucun produit vendu</h3>
+            <p>Les statistiques apparaîtront une fois que vous aurez effectué des ventes.</p>
+        </div>
+    </div>
+
+    <!-- Footer with Pagination -->
+    <div class="modal-footer" *ngIf="!isLoading && totalPages > 1">
+        <div class="pagination">
+            <button class="page-btn" [disabled]="currentPage === 1" (click)="previousPage()">
+                <fa-icon [icon]="faChevronLeft"></fa-icon>
+            </button>
+
+            <div class="page-info">
+                Page <span class="current">{{ currentPage }}</span> sur <span class="total">{{ totalPages }}</span>
+            </div>
+
+            <button class="page-btn" [disabled]="currentPage === totalPages" (click)="nextPage()">
+                <fa-icon [icon]="faChevronRight"></fa-icon>
+            </button>
+        </div>
+    </div>
+</div>

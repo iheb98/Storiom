@@ -86,6 +86,12 @@ module.exports = {
         defaultValue: 0,
         field: 'critical_stock_indicator'
       },
+      activateCriticalStockIndicator: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+        field: 'activate_critical_stock_indicator'
+      },
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE

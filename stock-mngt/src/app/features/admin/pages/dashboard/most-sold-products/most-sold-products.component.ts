@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { faFire, faBox, faFireAlt } from '@fortawesome/free-solid-svg-icons';
+import { MatDialog } from '@angular/material/dialog';
+import { faFire, faBox, faFireAlt, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StatService } from 'src/app/core/services/stat.service';
+import { AllSoldProductsModalComponent } from '../all-sold-products-modal/all-sold-products-modal.component';
 
 @Component({
   selector: 'app-most-sold-products',
@@ -13,6 +15,7 @@ export class MostSoldProductsComponent implements OnInit {
   faFire = faFire;
   faBox = faBox;
   faFireAlt = faFireAlt;
+  faArrowRight = faArrowRight;
 
   user;
   products;
@@ -23,7 +26,8 @@ export class MostSoldProductsComponent implements OnInit {
 
   constructor(
     private statService: StatService,
-    private authService: AuthService
+    private authService: AuthService,
+    private dialog: MatDialog
   ) { }
 
   ngOnInit(): void {
@@ -42,5 +46,14 @@ export class MostSoldProductsComponent implements OnInit {
         this.isLoading = false;
       }
     );
+  }
+
+  openAllProductsModal() {
+    this.dialog.open(AllSoldProductsModalComponent, {
+      width: '90vw',
+      maxWidth: '850px',
+      maxHeight: '90vh',
+      panelClass: 'dark-modal'
+    });
   }
 }

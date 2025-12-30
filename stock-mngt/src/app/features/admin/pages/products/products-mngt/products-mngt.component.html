@@ -205,14 +205,14 @@
                     <button class="btn-action edit" (click)="navigateTo('/products/edit/' + item?.id)" title="Modifier">
                         <fa-icon [icon]="faEdit"></fa-icon>
                     </button>
-                    <button class="btn-action sell" (click)="sell(item)" title="Vendre">
-                        <fa-icon [icon]="faShoppingCart"></fa-icon>
+                    <button class="btn-action delete" (click)="deleteProduct(item)" title="Supprimer">
+                        <fa-icon [icon]="faTrash"></fa-icon>
                     </button>
                     <button class="btn-action load" (click)="load(item)" title="Charger">
                         <fa-icon [icon]="faTruck"></fa-icon>
                     </button>
-                    <button class="btn-action delete" (click)="deleteProduct(item)" title="Supprimer">
-                        <fa-icon [icon]="faTrash"></fa-icon>
+                    <button class="btn-action sell" (click)="sell(item)" title="Vendre">
+                        <fa-icon [icon]="faShoppingCart"></fa-icon>
                     </button>
                 </div>
             </div>

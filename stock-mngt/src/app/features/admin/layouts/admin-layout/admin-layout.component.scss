@@ -59,7 +59,11 @@ $transition-speed: 0.3s;
     flex-direction: column;
     z-index: 1000;
     transition: width $transition-speed ease;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
+    touch-action: pan-y; // Allow vertical touch scroll
+    user-select: none; // Prevent text selection interfering with scroll
 
     .sidebar-collapsed & {
         width: $sidebar-collapsed-width;
@@ -232,6 +236,8 @@ $transition-speed: 0.3s;
     padding: 15px 0;
     overflow-y: auto;
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
 
     &::-webkit-scrollbar {
         width: 4px;
@@ -560,6 +566,9 @@ $transition-speed: 0.3s;
 @media (max-width: 992px) {
     .sidebar {
         transform: translateX(-100%);
+        max-height: 100vh;
+        overflow-y: scroll !important;
+        -webkit-overflow-scrolling: touch;
     }
 
     // When mobile menu is open, show sidebar regardless of collapsed state

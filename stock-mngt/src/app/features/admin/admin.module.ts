@@ -16,6 +16,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { NgxMatFileInputModule } from '@angular-material-components/file-input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatInputModule } from '@angular/material/input';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxLoadingXModule } from 'ngx-loading-x';
@@ -48,6 +49,8 @@ import { ReceiptResultTableComponent } from './pages/dashboard/receipt-result-ta
 import { ProductResultTableComponent } from './pages/dashboard/product-result-table/product-result-table.component';
 import { MostSoldProductsComponent } from './pages/dashboard/most-sold-products/most-sold-products.component';
 import { MostProfitableProductsComponent } from './pages/dashboard/most-profitable-products/most-profitable-products.component';
+import { AllSoldProductsModalComponent } from './pages/dashboard/all-sold-products-modal/all-sold-products-modal.component';
+import { AllProfitableProductsModalComponent } from './pages/dashboard/all-profitable-products-modal/all-profitable-products-modal.component';
 import { OperationStatsComponent } from './pages/dashboard/operation-stats/operation-stats.component';
 import { HeaderComponent } from 'src/app/market/header/header.component';
 import { FooterComponent } from 'src/app/market/footer/footer.component';
@@ -121,7 +124,9 @@ import { UserSettingsComponent } from './pages/settings/user-settings/user-setti
     OrdersMngtComponent,
     ReceiptInvoiceComponent,
     StoreOnboardingComponent,
-    UserSettingsComponent
+    UserSettingsComponent,
+    AllSoldProductsModalComponent,
+    AllProfitableProductsModalComponent
   ],
   imports: [
     CommonModule,
@@ -160,7 +165,8 @@ import { UserSettingsComponent } from './pages/settings/user-settings/user-setti
     ChartModule,
     MatMenuModule,
     QuillModule.forRoot(),
-    SharedModule
+    SharedModule,
+    MatSlideToggleModule
   ]
 })
 export class AdminModule { }
