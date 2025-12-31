@@ -170,8 +170,8 @@
 
                 <!-- Product Image -->
                 <div class="product-image"
-                    (click)="openImage(item?.images[0] ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png')">
-                    <img [src]="item?.images[0] ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png'"
+                    (click)="openImage(item?.images?.length > 0 ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png')">
+                    <img [src]="item?.images?.length > 0 ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png'"
                         alt="{{ item?.name }}">
                     <div class="image-overlay">
                         <fa-icon [icon]="faSearchPlus"></fa-icon>

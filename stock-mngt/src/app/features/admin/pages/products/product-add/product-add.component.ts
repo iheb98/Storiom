@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, NgZone, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -111,7 +111,9 @@ export class ProductAddComponent implements OnInit {
     private fileService: FileService,
     private brandService: BrandService,
     private compressor: CompressorService,
-    private userSettingsService: UserSettingsService
+    private userSettingsService: UserSettingsService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
   ) { }
 
   ngOnInit(): void {
@@ -301,7 +303,7 @@ export class ProductAddComponent implements OnInit {
               showConfirmButton: false,
               timer: 1500
             });
-            this.router.navigate(['products']);
+            this.router.navigate(['products'])
           },
           error => {
             this.isSubmitting = false;
@@ -324,16 +326,20 @@ export class ProductAddComponent implements OnInit {
           .subscribe(
             response => {
               this.isSubmitting = false;
+              this.cdr.detectChanges();
               Swal.fire({
                 icon: 'success',
                 title: 'Produit ajouté !',
                 showConfirmButton: false,
                 timer: 1500
               });
-              this.router.navigate(['products']);
+              this.ngZone.run(() => { // Wrapped navigation in ngZone.run()
+                this.router.navigateByUrl('/products', { replaceUrl: true });
+              });
             },
             error => {
               this.isSubmitting = false;
+              this.cdr.detectChanges();
               Swal.fire({
                 icon: 'error',
                 title: 'Une erreur est survenue ! Merci de réessayer plus tard',
@@ -512,14 +518,14 @@ export class ProductAddComponent implements OnInit {
   }
 
   public process(event: any) {
-    this.data = event.target.files;
-    this.compressedImages = [];
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
     const currentCount = (this.images?.length || 0) + this.selectedFiles.length;
     const maxAllowed = 3 - currentCount;
 
-    for (let i = 0; i < Math.min(this.data.length, maxAllowed); i++) {
-      const file = this.data[i];
+    for (let i = 0; i < Math.min(files.length, maxAllowed); i++) {
+      const file = files[i];
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.selectedFiles.push({
@@ -530,7 +536,7 @@ export class ProductAddComponent implements OnInit {
       reader.readAsDataURL(file);
     }
 
-    if (this.data.length > maxAllowed) {
+    if (files.length > maxAllowed) {
       Swal.fire({
         icon: 'warning',
         title: `Seulement ${maxAllowed} image(s) ajoutée(s). Maximum 3 au total.`,
@@ -542,18 +548,5 @@ export class ProductAddComponent implements OnInit {
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
     }
-
-    const compress = this.recursiveCompress(this.data[0], 0, this.data).pipe(
-      expand(res => {
-        return res.index > res.array.length - 1
-          ? EMPTY
-          : this.recursiveCompress(this.data[res.index], res.index, this.data);
-      }),
-    );
-    compress.subscribe(res => {
-      if (res.index > res.array.length - 1) {
-        console.log('Compression successful');
-      }
-    });
   }
 }
