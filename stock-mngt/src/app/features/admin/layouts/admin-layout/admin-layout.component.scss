@@ -608,6 +608,21 @@ $transition-speed: 0.3s;
         }
     }
 
+    // Mobile touch scroll fixes
+    .sidebar-nav {
+        overflow-y: visible;
+        overflow-x: visible;
+    }
+
+    .nav-item,
+    .nav-link,
+    .nav-list,
+    .sidebar-footer,
+    .logout-link {
+        touch-action: pan-y !important;
+        -webkit-user-drag: none;
+    }
+
     .mobile-overlay {
         .mobile-open & {
             display: block;
