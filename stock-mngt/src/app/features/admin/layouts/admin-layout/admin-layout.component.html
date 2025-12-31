@@ -29,8 +29,8 @@
         <span class="nav-section-title">Menu Principal</span>
         <ul class="nav-list">
           <li *ngFor="let item of menu" class="nav-item">
-            <a [routerLink]="['/' + item.link]" routerLinkActive="active" class="nav-link"
-              [matTooltip]="sidebarCollapsed ? item.label : ''">
+            <a [routerLink]="['/' + item.link]" routerLinkActive="active" class="nav-link" [matTooltip]="item.label"
+              [matTooltipDisabled]="!sidebarCollapsed || mobileMenuOpen">
               <fa-icon [icon]="item.icon" class="nav-icon"></fa-icon>
               <span class="nav-label">{{ item.label }}</span>
             </a>
@@ -41,7 +41,8 @@
 
     <!-- Sidebar Footer -->
     <div class="sidebar-footer">
-      <a class="nav-link logout-link" (click)="logout()" [matTooltip]="sidebarCollapsed ? 'Déconnexion' : ''">
+      <a class="nav-link logout-link" (click)="logout()" matTooltip="Déconnexion"
+        [matTooltipDisabled]="!sidebarCollapsed || mobileMenuOpen">
         <fa-icon [icon]="powerIcon" class="nav-icon"></fa-icon>
         <span class="nav-label">Déconnexion</span>
       </a>
