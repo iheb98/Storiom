@@ -40,6 +40,10 @@ import { RegisterComponent } from 'src/app/general/register/register.component';
 import { ReviewListComponent } from './components/review-list/review-list.component';
 import { ReviewFormComponent } from './components/review-form/review-form.component';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { StoreServicesComponent } from './pages/store-services/store-services.component';
+import { MyServiceRequestsComponent } from './pages/my-service-requests/my-service-requests.component';
+import { TrackRequestComponent } from './pages/track-request/track-request.component';
+import { AllServicesComponent } from './pages/all-services/all-services.component';
 
 @NgModule({
   declarations: [
@@ -61,7 +65,11 @@ import { SharedModule } from 'src/app/shared/shared.module';
     LoginComponent,
     RegisterComponent,
     ReviewListComponent,
-    ReviewFormComponent
+    ReviewFormComponent,
+    StoreServicesComponent,
+    MyServiceRequestsComponent,
+    TrackRequestComponent,
+    AllServicesComponent
   ],
   imports: [
     CommonModule,

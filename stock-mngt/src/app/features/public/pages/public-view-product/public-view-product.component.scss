@@ -167,6 +167,10 @@ $radius-lg: 16px;
     height: 100%;
     object-fit: contain;
     transition: transform 0.3s;
+
+    &.default-image {
+      opacity: 0.05;
+    }
   }
 
   &:hover .main-image {

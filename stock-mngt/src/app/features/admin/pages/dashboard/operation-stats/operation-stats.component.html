@@ -2,40 +2,12 @@
 
     <!-- Loading Skeleton -->
     <div class="loading-skeleton" *ngIf="isLoading">
-        <div class="skeleton-filters"></div>
         <div class="skeleton-legend"></div>
         <div class="skeleton-chart"></div>
     </div>
 
     <!-- Main Content -->
     <div class="page-content" *ngIf="!isLoading">
-
-        <!-- Filters Section -->
-        <div class="filters-section">
-            <div class="filter-group">
-                <label><fa-icon [icon]="faCalendarAlt"></fa-icon> Période</label>
-                <select class="filter-select" [(ngModel)]="selectedDateType" (change)="getOperationStats()">
-                    <option *ngFor="let type of typesOfDate" [value]="type">{{ type }}</option>
-                </select>
-            </div>
-
-            <div class="filter-group date-filter">
-                <label><fa-icon [icon]="faClock"></fa-icon> Date</label>
-                <input *ngIf="selectedDateType === 'Quotidien'" type="date" class="filter-input" [(ngModel)]="dayFilter"
-                    (change)="getOperationStats()">
-
-                <input *ngIf="selectedDateType === 'WEEKLY'" type="week" class="filter-input" [(ngModel)]="weekFilter"
-                    (change)="getOperationStats()">
-
-                <input *ngIf="selectedDateType === 'Mensuel'" type="month" class="filter-input"
-                    [(ngModel)]="monthFilter" (change)="getOperationStats()">
-
-                <select *ngIf="selectedDateType === 'Annuel'" class="filter-select" [(ngModel)]="yearFilter"
-                    (change)="getOperationStats()">
-                    <option *ngFor="let year of years" [value]="year">{{ year }}</option>
-                </select>
-            </div>
-        </div>
 
         <!-- Legend -->
         <div class="chart-legend">

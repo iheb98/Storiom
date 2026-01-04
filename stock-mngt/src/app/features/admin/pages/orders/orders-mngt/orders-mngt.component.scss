@@ -643,6 +643,70 @@ $radius-lg: 16px;
     }
 }
 
+// Delivery Worker Section
+.delivery-section {
+    .delivery-worker-select {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .delivery-dropdown {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid $border-color;
+        border-radius: $radius-sm;
+        font-size: 0.95rem;
+        background: $white;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: $primary;
+        }
+
+        &:focus {
+            outline: none;
+            border-color: $primary;
+            box-shadow: 0 0 0 3px rgba($primary, 0.1);
+        }
+    }
+
+    .current-worker {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        padding: 12px 15px;
+        background: rgba($success, 0.08);
+        border-radius: $radius-sm;
+        border-left: 3px solid $success;
+
+        .worker-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            color: $text-primary;
+
+            fa-icon {
+                color: $success;
+            }
+        }
+
+        .worker-phone {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: $text-secondary;
+
+            fa-icon {
+                font-size: 0.8rem;
+            }
+        }
+    }
+}
+
 // Items Section
 .items-list {
     background: $background;

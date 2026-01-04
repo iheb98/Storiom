@@ -33,6 +33,11 @@ module.exports = {
                 references: { model: "stores", key: "id" },
                 onDelete: "CASCADE"
             },
+            deliveryWorkerId: {
+                type: DataTypes.INTEGER,
+                field: 'delivery_worker_id',
+                allowNull: true
+            },
             createdAt: {
                 allowNull: false,
                 type: DataTypes.DATE

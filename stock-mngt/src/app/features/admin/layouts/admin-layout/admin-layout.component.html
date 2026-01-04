@@ -74,13 +74,16 @@
 
         <!-- User Profile -->
         <div class="user-profile" (click)="toggleUserMenu()">
-          <div class="avatar-wrapper">
-            <div class="skeleton-avatar" *ngIf="!store"></div>
-            <img *ngIf="store" [src]="store?.logo ? backend_URL + '/' + store?.logo : 'assets/default_store.png'"
-              alt="Profile" class="user-avatar loaded">
+          <div class="user-icon-circle">
+            <i class="fa fa-user"></i>
           </div>
-          <span class="user-name">{{ connectedUser?.name || 'Admin' }}</span>
-          <i class="fa fa-chevron-down"></i>
+          <div class="user-info">
+            <span class="user-name">{{ connectedUser?.name || 'Admin' }}</span>
+            <span class="user-role">Administrateur</span>
+          </div>
+          <div class="dropdown-arrow">
+            <i class="fa fa-chevron-down"></i>
+          </div>
         </div>
 
         <!-- User Dropdown -->

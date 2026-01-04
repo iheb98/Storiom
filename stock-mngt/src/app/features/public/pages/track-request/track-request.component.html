@@ -1,0 +1,123 @@
+<div class="track-page">
+    <!-- Hero Section -->
+    <div class="track-hero">
+        <div class="hero-content">
+            <div class="hero-icon">
+                <fa-icon [icon]="faSearch"></fa-icon>
+            </div>
+            <h1>Suivre ma demande</h1>
+            <p>Entrez votre numéro de téléphone et votre code de suivi pour consulter l'état de votre demande de
+                service.</p>
+        </div>
+    </div>
+
+    <!-- Search Form -->
+    <div class="search-section">
+        <div class="search-card">
+            <div class="form-group">
+                <label>
+                    <fa-icon [icon]="faPhone"></fa-icon>
+                    Numéro de téléphone
+                </label>
+                <input type="tel" [(ngModel)]="phone" placeholder="Ex: 12345678" (keyup.enter)="search()">
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <fa-icon [icon]="faKey"></fa-icon>
+                    Code de suivi
+                </label>
+                <input type="text" [(ngModel)]="code" placeholder="Ex: ABC12345" maxlength="8"
+                    style="text-transform: uppercase;" (keyup.enter)="search()">
+            </div>
+
+            <div class="error-message" *ngIf="errorMessage">
+                {{ errorMessage }}
+            </div>
+
+            <button class="btn-search" (click)="search()" [disabled]="isSearching">
+                <fa-icon [icon]="faSearch" *ngIf="!isSearching"></fa-icon>
+                <div class="spinner" *ngIf="isSearching"></div>
+                {{ isSearching ? 'Recherche...' : 'Rechercher' }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-section" *ngIf="hasSearched && requests.length > 0">
+        <h2>
+            <fa-icon [icon]="faClipboardList"></fa-icon>
+            Vos demandes
+        </h2>
+
+        <div class="requests-list">
+            <div class="request-card" *ngFor="let request of requests">
+                <!-- Status Badge -->
+                <div class="status-header">
+                    <span class="status-badge" [ngClass]="getStatusInfo(request.status).color">
+                        <fa-icon [icon]="getStatusInfo(request.status).icon"></fa-icon>
+                        {{ getStatusInfo(request.status).label }}
+                    </span>
+                    <span class="request-date">
+                        <fa-icon [icon]="faCalendar"></fa-icon>
+                        {{ request.createdAt | date:'dd/MM/yyyy' }}
+                    </span>
+                </div>
+
+                <!-- Service Info -->
+                <div class="service-info">
+                    <h3>{{ request.service?.name }}</h3>
+                    <p class="store-name" *ngIf="request.store">
+                        <fa-icon [icon]="faStore"></fa-icon>
+                        {{ request.store.name }}
+                    </p>
+                </div>
+
+                <!-- Price -->
+                <div class="price-section">
+                    <span class="label">Prix</span>
+                    <span class="price">{{ request.price | number:'1.2-2' }} DT</span>
+                </div>
+
+                <!-- Notes -->
+                <div class="notes-section" *ngIf="request.customerNote || request.adminNote">
+                    <div class="note" *ngIf="request.customerNote">
+                        <label>Ma note:</label>
+                        <p>{{ request.customerNote }}</p>
+                    </div>
+                    <div class="note admin" *ngIf="request.adminNote">
+                        <label>Réponse du vendeur:</label>
+                        <p>{{ request.adminNote }}</p>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="timeline" *ngIf="request.startedAt || request.completedAt">
+                    <div class="timeline-item" *ngIf="request.startedAt">
+                        <fa-icon [icon]="faSpinner"></fa-icon>
+                        <span>Démarré le {{ request.startedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                    <div class="timeline-item" *ngIf="request.completedAt">
+                        <fa-icon [icon]="faCheckCircle"></fa-icon>
+                        <span>Terminé le {{ request.completedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-new-search" (click)="clearSearch()">
+            <fa-icon [icon]="faSearch"></fa-icon>
+            Nouvelle recherche
+        </button>
+    </div>
+
+    <!-- No Results -->
+    <div class="no-results" *ngIf="hasSearched && requests.length === 0 && !errorMessage">
+        <div class="empty-icon">
+            <fa-icon [icon]="faClipboardList"></fa-icon>
+        </div>
+        <h3>Aucune demande trouvée</h3>
+        <p>Vérifiez votre numéro de téléphone et votre code de suivi.</p>
+        <button class="btn-retry" (click)="clearSearch()">Réessayer</button>
+    </div>
+</div>

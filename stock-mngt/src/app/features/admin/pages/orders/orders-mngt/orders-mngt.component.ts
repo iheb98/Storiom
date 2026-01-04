@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { OrderService } from 'src/app/core/services/order.service';
 import { StoreService } from 'src/app/core/services/store.service';
+import { DeliveryWorkerService } from 'src/app/core/services/delivery-worker.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 import {
@@ -21,6 +22,7 @@ export class OrdersMngtComponent implements OnInit {
     orders: any[] = [];
     filteredOrders: any[] = [];
     store: any;
+    deliveryWorkers: any[] = [];
 
     // UI State
     activeFilter: string = '';
@@ -56,6 +58,7 @@ export class OrdersMngtComponent implements OnInit {
         private orderService: OrderService,
         private authService: AuthService,
         private storeService: StoreService,
+        private deliveryWorkerService: DeliveryWorkerService
     ) { }
 
     ngOnInit(): void {
@@ -67,6 +70,7 @@ export class OrdersMngtComponent implements OnInit {
                 store => {
                     this.store = store;
                     this.loadOrders();
+                    this.loadDeliveryWorkers();
                 },
                 error => {
                     this.isLoading = false;
@@ -98,6 +102,47 @@ export class OrdersMngtComponent implements OnInit {
                     title: 'Erreur lors du chargement des commandes',
                     showConfirmButton: false,
                     timer: 2000
+                });
+            }
+        );
+    }
+
+    loadDeliveryWorkers() {
+        this.deliveryWorkerService.getByStoreId(this.store.id).subscribe(
+            (res) => {
+                this.deliveryWorkers = res;
+            },
+            (err) => {
+                console.error('Error loading delivery workers:', err);
+            }
+        );
+    }
+
+    updateDeliveryWorker(order: any, workerId: string) {
+        const deliveryWorkerId = workerId ? parseInt(workerId) : null;
+
+        this.isActionLoading = true;
+        this.orderService.updateDeliveryWorker(order.id, deliveryWorkerId).subscribe(
+            (res) => {
+                this.isActionLoading = false;
+                if (res.success) {
+                    order.deliveryWorkerId = res.order.deliveryWorkerId;
+                    order.deliveryWorker = res.order.deliveryWorker;
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Livreur mis à jour !',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            },
+            (err) => {
+                this.isActionLoading = false;
+                console.error(err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur',
+                    text: 'Impossible de mettre à jour le livreur'
                 });
             }
         );

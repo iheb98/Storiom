@@ -1,0 +1,104 @@
+<div class="my-requests-page">
+    <!-- Header -->
+    <header class="page-header">
+        <button class="btn-back" (click)="goBack()">
+            <fa-icon [icon]="faArrowLeft"></fa-icon>
+        </button>
+        <div class="header-content">
+            <h1>Mes Demandes de Services</h1>
+            <p>{{ requests?.length || 0 }} demande(s)</p>
+        </div>
+    </header>
+
+    <!-- Status Tabs -->
+    <div class="status-tabs" *ngIf="requests?.length > 0">
+        <button class="tab-btn" [class.active]="activeFilter === ''" (click)="filterByStatus('')">
+            Toutes
+        </button>
+        <button class="tab-btn pending" [class.active]="activeFilter === 'PENDING'" (click)="filterByStatus('PENDING')">
+            <fa-icon [icon]="faClock"></fa-icon>
+            En attente ({{ getStatusCount('PENDING') }})
+        </button>
+        <button class="tab-btn in-progress" [class.active]="activeFilter === 'IN_PROGRESS'"
+            (click)="filterByStatus('IN_PROGRESS')">
+            <fa-icon [icon]="faSpinner"></fa-icon>
+            En cours ({{ getStatusCount('IN_PROGRESS') }})
+        </button>
+        <button class="tab-btn completed" [class.active]="activeFilter === 'COMPLETED'"
+            (click)="filterByStatus('COMPLETED')">
+            <fa-icon [icon]="faCheckCircle"></fa-icon>
+            Terminé ({{ getStatusCount('COMPLETED') }})
+        </button>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-skeleton" *ngIf="isLoading">
+        <div class="skeleton-card" *ngFor="let i of [1,2,3]"></div>
+    </div>
+
+    <!-- Requests List -->
+    <div class="requests-list" *ngIf="!isLoading && filteredRequests?.length > 0">
+        <div class="request-card" *ngFor="let request of filteredRequests">
+            <!-- Status Badge -->
+            <div class="status-badge" [ngClass]="getStatusInfo(request.status).color">
+                <fa-icon [icon]="getStatusInfo(request.status).icon"></fa-icon>
+                {{ getStatusInfo(request.status).label }}
+            </div>
+
+            <!-- Service Info -->
+            <div class="service-info">
+                <h3>{{ request.service?.name }}</h3>
+                <p class="store-name" *ngIf="request.store">
+                    <fa-icon [icon]="faStore"></fa-icon>
+                    {{ request.store.name }}
+                </p>
+            </div>
+
+            <!-- Details -->
+            <div class="request-details">
+                <div class="detail">
+                    <span class="label">Prix</span>
+                    <span class="value">{{ request.price | number:'1.2-2' }} DT</span>
+                </div>
+                <div class="detail">
+                    <span class="label">Date</span>
+                    <span class="value">{{ request.createdAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+            </div>
+
+            <!-- Customer Note -->
+            <div class="note" *ngIf="request.customerNote">
+                <label>Ma note:</label>
+                <p>{{ request.customerNote }}</p>
+            </div>
+
+            <!-- Admin Note -->
+            <div class="note admin" *ngIf="request.adminNote">
+                <label>Note du vendeur:</label>
+                <p>{{ request.adminNote }}</p>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline" *ngIf="request.startedAt || request.completedAt">
+                <div class="timeline-item" *ngIf="request.startedAt">
+                    <fa-icon [icon]="faSpinner"></fa-icon>
+                    <span>Démarré le {{ request.startedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+                <div class="timeline-item" *ngIf="request.completedAt">
+                    <fa-icon [icon]="faCheckCircle"></fa-icon>
+                    <span>Terminé le {{ request.completedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && requests?.length === 0">
+        <div class="empty-icon">
+            <fa-icon [icon]="faClipboardList"></fa-icon>
+        </div>
+        <h3>Aucune demande</h3>
+        <p>Vous n'avez pas encore fait de demande de service.</p>
+        <button class="btn-explore" (click)="goBack()">Explorer les boutiques</button>
+    </div>
+</div>

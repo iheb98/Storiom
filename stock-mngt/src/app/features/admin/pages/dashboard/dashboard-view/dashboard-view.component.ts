@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {
     faArrowDown, faBoxes, faBoxOpen, faHandHoldingUsd, faMoneyBill,
     faCalendarAlt, faChartPie, faReceipt, faArrowRight, faExclamationTriangle,
-    faFire, faCoins, faChartLine, faChartBar, faTachometerAlt, faArrowUp
+    faFire, faCoins, faChartLine, faChartBar, faTachometerAlt, faArrowUp, faClock, faSync
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StatService } from 'src/app/core/services/stat.service';
@@ -31,12 +31,25 @@ export class DashboardViewComponent implements OnInit {
     faChartLine = faChartLine;
     faChartBar = faChartBar;
     faTachometerAlt = faTachometerAlt;
+    faClock = faClock;
+    faSync = faSync;
 
     // Data
     user;
     widgets;
     widgetsList = [];
     currentDate = new Date();
+
+    // Global Date Filter
+    typesOfDate = ['Quotidien', 'Mensuel', 'Annuel'];
+    selectedDateType = 'Mensuel';
+    dayFilter: string;
+    monthFilter: string;
+    yearFilter: number;
+    years: number[] = [];
+
+    // Filter object to pass to child components
+    dateFilter: { type: string; value: string } = { type: 'Mensuel', value: '' };
 
     // Loading States
     isLoading = true;
@@ -48,7 +61,50 @@ export class DashboardViewComponent implements OnInit {
 
     ngOnInit(): void {
         this.user = this.authService.getConnectedUser();
+        this.initializeDateFilters();
         this.getWidgets();
+    }
+
+    initializeDateFilters() {
+        const now = new Date();
+
+        // Generate years from 2000 to current year
+        for (let i = 2000; i <= now.getFullYear(); i++) {
+            this.years.push(i);
+        }
+
+        // Set default values
+        this.dayFilter = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        this.monthFilter = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        this.yearFilter = now.getFullYear();
+
+        // Initialize the date filter object
+        this.updateDateFilter();
+    }
+
+    updateDateFilter() {
+        let value = '';
+        switch (this.selectedDateType) {
+            case 'Quotidien':
+                value = this.dayFilter;
+                break;
+            case 'Mensuel':
+                value = this.monthFilter;
+                break;
+            case 'Annuel':
+                value = String(this.yearFilter);
+                break;
+        }
+        // Create a new object to trigger change detection
+        this.dateFilter = { type: this.selectedDateType, value };
+    }
+
+    onDateTypeChange() {
+        this.updateDateFilter();
+    }
+
+    onDateValueChange() {
+        this.updateDateFilter();
     }
 
     getWidgets() {

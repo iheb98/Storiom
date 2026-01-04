@@ -139,6 +139,42 @@
       width: 100%;
     }
   }
+
+  // Track request link with special styling
+  .track-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(79, 70, 229, 0.1));
+    border-radius: 20px;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    transition: all 0.3s;
+
+    fa-icon {
+      font-size: 0.9rem;
+      color: #6366f1;
+    }
+
+    span {
+      font-size: 0.85rem;
+    }
+
+    &:hover,
+    &.active {
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: white;
+      border-color: transparent;
+
+      fa-icon {
+        color: white;
+      }
+
+      &::after {
+        display: none;
+      }
+    }
+  }
 }
 
 .icon-links {

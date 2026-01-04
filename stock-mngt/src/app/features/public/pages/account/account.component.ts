@@ -3,8 +3,10 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { Router } from '@angular/router';
 import {
     faUser, faShoppingBag, faSignOutAlt, faCog, faChevronRight,
-    faEnvelope, faPhone, faMapMarkerAlt, faCalendarAlt, faEdit
+    faEnvelope, faPhone, faMapMarkerAlt, faCalendarAlt, faEdit,
+    faClipboardList, faClock, faSpinner, faCheckCircle, faTimesCircle, faStore
 } from '@fortawesome/free-solid-svg-icons';
+import { ServiceRequestService } from 'src/app/core/services/service-request.service';
 
 @Component({
     selector: 'app-account',
@@ -13,9 +15,13 @@ import {
 })
 export class AccountComponent implements OnInit {
 
-    activeTab: 'profile' | 'orders' = 'profile';
+    activeTab: 'profile' | 'orders' | 'services' = 'profile';
     user: any;
     isLoading = true;
+
+    // Service Requests
+    serviceRequests: any[] = [];
+    isLoadingRequests = false;
 
     // Icons
     faUser = faUser;
@@ -28,10 +34,25 @@ export class AccountComponent implements OnInit {
     faMapMarkerAlt = faMapMarkerAlt;
     faCalendarAlt = faCalendarAlt;
     faEdit = faEdit;
+    faClipboardList = faClipboardList;
+    faClock = faClock;
+    faSpinner = faSpinner;
+    faCheckCircle = faCheckCircle;
+    faTimesCircle = faTimesCircle;
+    faStore = faStore;
+
+    // Status config
+    statuses = [
+        { value: 'PENDING', label: 'En attente', icon: faClock, color: 'pending' },
+        { value: 'IN_PROGRESS', label: 'En cours', icon: faSpinner, color: 'in-progress' },
+        { value: 'COMPLETED', label: 'Terminé', icon: faCheckCircle, color: 'completed' },
+        { value: 'CANCELLED', label: 'Annulé', icon: faTimesCircle, color: 'cancelled' }
+    ];
 
     constructor(
         private authService: AuthService,
-        private router: Router
+        private router: Router,
+        private serviceRequestService: ServiceRequestService
     ) { }
 
     ngOnInit(): void {
@@ -57,8 +78,30 @@ export class AccountComponent implements OnInit {
         }
     }
 
-    switchTab(tab: 'profile' | 'orders') {
+    loadServiceRequests() {
+        if (this.serviceRequests.length > 0) return; // Already loaded
+        this.isLoadingRequests = true;
+        this.serviceRequestService.getMyRequests().subscribe({
+            next: (requests) => {
+                this.serviceRequests = requests;
+                this.isLoadingRequests = false;
+            },
+            error: (err) => {
+                console.error(err);
+                this.isLoadingRequests = false;
+            }
+        });
+    }
+
+    switchTab(tab: 'profile' | 'orders' | 'services') {
         this.activeTab = tab;
+        if (tab === 'services') {
+            this.loadServiceRequests();
+        }
+    }
+
+    getStatusInfo(status: string) {
+        return this.statuses.find(s => s.value === status) || this.statuses[0];
     }
 
     logout() {
@@ -91,3 +134,4 @@ export class AccountComponent implements OnInit {
         });
     }
 }
+

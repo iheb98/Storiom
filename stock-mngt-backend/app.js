@@ -190,6 +190,9 @@ const statsRoute = require('./routes/stats');
 const workersRoute = require('./routes/workers');
 const publicRoutes = require('./routes/public');
 const ordersRoute = require('./routes/orders');
+const deliveryWorkersRoute = require('./routes/delivery-workers');
+const storeServicesRoute = require('./routes/store-services');
+const serviceRequestsRoute = require('./routes/service-requests');
 
 app.use('/api/receipts', receiptsRoute)
 app.use('/api/credits', creditsRoute)
@@ -204,6 +207,9 @@ app.use('/api/stats', statsRoute)
 app.use('/api/workers', workersRoute)
 app.use('/api/public', publicRoutes)
 app.use('/api/orders', ordersRoute)
+app.use('/api/delivery-workers', deliveryWorkersRoute)
+app.use('/api/store-services', storeServicesRoute)
+app.use('/api/service-requests', serviceRequestsRoute)
 
 //require('./config/passport')(passport);
 

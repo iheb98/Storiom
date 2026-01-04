@@ -485,4 +485,54 @@ router.post('/reviews', utility.authenticate, async (req, res) => {
     }
 });
 
+/**
+ * @route   GET /api/public/allServices
+ * @desc    Get all active services from all active stores
+ * @access  Public
+ */
+router.get('/allServices', async (req, res) => {
+    const { StoreService, Store } = require('../models');
+    const searchable = req.query.searchable || '';
+
+    try {
+        let whereClause = { isActive: true };
+
+        // Add search filter if provided
+        if (searchable) {
+            whereClause = {
+                ...whereClause,
+                [Op.or]: [
+                    { name: { [Op.iLike]: `%${searchable}%` } },
+                    { description: { [Op.iLike]: `%${searchable}%` } }
+                ]
+            };
+        }
+
+        const services = await StoreService.findAll({
+            where: whereClause,
+            include: [{
+                model: Store,
+                as: 'store',
+                attributes: ['id', 'name', 'logo'],
+                where: {
+                    isVisibleToPublic: true,
+                    active: true
+                },
+                required: true,
+                include: [{
+                    model: Address,
+                    as: 'address',
+                    attributes: ['state', 'city']
+                }]
+            }],
+            order: [['name', 'ASC']]
+        });
+
+        res.json(services);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.toString() });
+    }
+});
+
 module.exports = router;

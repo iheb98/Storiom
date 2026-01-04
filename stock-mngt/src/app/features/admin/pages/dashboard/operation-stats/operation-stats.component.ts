@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { faCalendarAlt, faClock } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StatService } from 'src/app/core/services/stat.service';
@@ -8,7 +8,9 @@ import { StatService } from 'src/app/core/services/stat.service';
   templateUrl: './operation-stats.component.html',
   styleUrls: ['./operation-stats.component.scss']
 })
-export class OperationStatsComponent implements OnInit {
+export class OperationStatsComponent implements OnInit, OnChanges {
+  // Input from parent for global date filter
+  @Input() dateFilter: { type: string; value: string };
   // Icons
   faCalendarAlt = faCalendarAlt;
   faClock = faClock;
@@ -92,6 +94,31 @@ export class OperationStatsComponent implements OnInit {
       }
     };
     this.getOperationStats();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['dateFilter'] && changes['dateFilter'].currentValue) {
+      const filter = changes['dateFilter'].currentValue;
+      this.selectedDateType = filter.type;
+
+      // Update local filter values based on parent filter
+      switch (filter.type) {
+        case 'Quotidien':
+          this.dayFilter = filter.value;
+          break;
+        case 'Mensuel':
+          this.monthFilter = filter.value;
+          break;
+        case 'Annuel':
+          this.yearFilter = parseInt(filter.value);
+          break;
+      }
+
+      // Only update if not the first change (ngOnInit handles initial load)
+      if (!changes['dateFilter'].firstChange) {
+        this.getOperationStats();
+      }
+    }
   }
 
   getMensuel() {

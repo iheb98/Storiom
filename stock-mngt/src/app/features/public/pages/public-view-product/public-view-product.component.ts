@@ -27,6 +27,7 @@ export class PublicViewProductComponent implements OnInit {
   id: string | null = null;
   selectedImage: string | null = null;
   selectedImageIndex: number = 0;
+  isDefaultImage: boolean = false;
   userReview: any;
   quantity: number = 1;
   lightboxOpen: boolean = false;
@@ -91,11 +92,14 @@ export class PublicViewProductComponent implements OnInit {
         if (this.product.images.length > 0) {
           this.selectedImage = environment.backend + '/' + this.product.images[0];
           this.selectedImageIndex = 0;
+          this.isDefaultImage = false;
         } else {
           this.selectedImage = 'assets/default_product.png';
+          this.isDefaultImage = true;
         }
       } else {
         this.selectedImage = 'assets/default_product.png';
+        this.isDefaultImage = true;
       }
     }, () => {
       //

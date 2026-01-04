@@ -4,7 +4,7 @@
     <!-- <span class="badge new" *ngIf="isNew(product)">New</span> -->
 
     <img [src]="product?.images?.length ? environment.backend + '/' + product?.images[0] : 'assets/default_product.png'"
-      [alt]="product.name" loading="lazy">
+      [alt]="product.name" loading="lazy" [class.default-image]="!product?.images?.length">
 
     <!-- Overlay Utils -->
     <div class="overlay-utils">

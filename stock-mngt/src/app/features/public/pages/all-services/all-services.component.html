@@ -1,0 +1,153 @@
+<div class="all-services-page">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>
+                <fa-icon [icon]="faWrench"></fa-icon>
+                Tous les Services
+            </h1>
+            <p>Découvrez tous les services proposés par nos partenaires</p>
+
+            <!-- Search Bar -->
+            <div class="search-container">
+                <div class="search-box">
+                    <fa-icon [icon]="faSearch" class="search-icon"></fa-icon>
+                    <input type="text" [(ngModel)]="searchText"
+                        placeholder="Rechercher un service par nom ou description..." (keyup.enter)="onSearch()">
+                    <button class="btn-clear" *ngIf="searchText" (click)="clearSearch()">×</button>
+                    <button class="btn-search" (click)="onSearch()">
+                        Rechercher
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Track Request Banner -->
+    <div class="track-request-banner">
+        <div class="banner-content">
+            <div class="banner-left">
+                <fa-icon [icon]="faClipboardList" class="banner-icon"></fa-icon>
+                <div class="banner-text">
+                    <span class="banner-title">Vous avez déjà une demande en cours ?</span>
+                    <span class="banner-subtitle">Suivez l'état de votre demande de service</span>
+                </div>
+            </div>
+            <a routerLink="/track-request" class="banner-btn">
+                <span>Suivre ma demande</span>
+                <fa-icon [icon]="faArrowRight"></fa-icon>
+            </a>
+        </div>
+    </div>
+
+    <!-- Location Filter -->
+    <div class="location-filter-section">
+        <div class="filter-container">
+            <div class="filter-header">
+                <fa-icon [icon]="faMapMarkerAlt" class="filter-icon"></fa-icon>
+                <span class="filter-title">Filtrer par localisation</span>
+            </div>
+            <div class="filter-controls">
+                <div class="select-wrapper">
+                    <ng-select [items]="governorates" placeholder="Tous les gouvernorats"
+                        [(ngModel)]="selectedGovernorate" [clearable]="true" (change)="onGovernorateChange()"
+                        class="location-select">
+                    </ng-select>
+                </div>
+                <div class="select-wrapper">
+                    <ng-select [items]="cities" placeholder="Toutes les villes" [(ngModel)]="selectedCity"
+                        [clearable]="true" [disabled]="!selectedGovernorate" (change)="onCityChange()"
+                        class="location-select city-select">
+                    </ng-select>
+                </div>
+                <button class="btn-clear-filter" *ngIf="hasLocationFilter()" (click)="clearLocationFilter()">
+                    <fa-icon [icon]="faTimes"></fa-icon>
+                    Effacer
+                </button>
+            </div>
+            <!-- Active Location Filter Tag -->
+            <div class="active-location-filter" *ngIf="hasLocationFilter()">
+                <span class="filter-tag">
+                    <fa-icon [icon]="faMapMarkerAlt"></fa-icon>
+                    {{ selectedGovernorate }}{{ selectedCity ? ', ' + selectedCity : '' }}
+                    <button class="tag-clear" (click)="clearLocationFilter()">×</button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Info -->
+    <div class="results-info" *ngIf="!isLoading">
+        <span class="count">{{ filteredServices.length }} service(s) trouvé(s)</span>
+        <span class="search-term" *ngIf="searchText">pour "{{ searchText }}"</span>
+        <span class="location-term" *ngIf="hasLocationFilter()">
+            à {{ selectedGovernorate }}{{ selectedCity ? ', ' + selectedCity : '' }}
+        </span>
+    </div>
+
+    <!-- Loading Skeleton -->
+    <div class="services-grid skeleton" *ngIf="isLoading">
+        <div class="service-card skeleton-card" *ngFor="let i of [1,2,3,4,5,6,7,8]"></div>
+    </div>
+
+    <!-- Services Grid -->
+    <div class="services-grid" *ngIf="!isLoading && filteredServices.length > 0">
+        <div class="service-card" *ngFor="let service of filteredServices">
+            <!-- Image Placeholder -->
+            <div class="card-placeholder">
+                <fa-icon [icon]="faWrench" class="placeholder-icon"></fa-icon>
+                <div class="category-badge" *ngIf="service.category">
+                    <fa-icon [icon]="faTag"></fa-icon>
+                    {{ translateCategory(service.category) }}
+                </div>
+            </div>
+
+            <!-- Card Content -->
+            <div class="card-content">
+                <div class="card-main">
+                    <h3 class="service-name">{{ service.name }}</h3>
+                    <p class="service-description" *ngIf="service.description">
+                        {{ service.description | slice:0:100 }}{{ service.description?.length > 100 ? '...' : '' }}
+                    </p>
+
+                    <!-- Price & Duration -->
+                    <div class="service-meta">
+                        <div class="price" *ngIf="service.price">
+                            <span class="amount">{{ service.price }}</span>
+                            <span class="currency">DT</span>
+                            <span class="variable" *ngIf="service.isPriceVariable">(variable)</span>
+                        </div>
+                        <div class="duration" *ngIf="service.estimatedDuration">
+                            <fa-icon [icon]="faClock"></fa-icon>
+                            {{ service.estimatedDuration }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Store Info - Fixed at bottom -->
+                <div class="store-info" (click)="goToStore(service.store?.id)">
+                    <img [src]="getStoreImage(service.store)" [alt]="service.store?.name" class="store-logo"
+                        onerror="this.src='assets/default_store.png'">
+                    <div class="store-details">
+                        <span class="store-label">Proposé par</span>
+                        <span class="store-name">{{ service.store?.name }}</span>
+                    </div>
+                    <fa-icon [icon]="faStore" class="store-icon"></fa-icon>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && filteredServices.length === 0">
+        <div class="empty-icon">
+            <fa-icon [icon]="faWrench"></fa-icon>
+        </div>
+        <h3>Aucun service trouvé</h3>
+        <p *ngIf="searchText">Aucun service ne correspond à "{{ searchText }}"</p>
+        <p *ngIf="!searchText">Aucun service n'est disponible pour le moment</p>
+        <button class="btn-retry" *ngIf="searchText" (click)="clearSearch()">
+            Effacer la recherche
+        </button>
+    </div>
+</div>

@@ -1,0 +1,70 @@
+<div class="store-services-page">
+    <!-- Header -->
+    <header class="page-header">
+        <button class="btn-back" (click)="goBack()">
+            <fa-icon [icon]="faArrowLeft"></fa-icon>
+        </button>
+        <div class="header-content">
+            <div class="store-info" *ngIf="store">
+                <fa-icon [icon]="faStore"></fa-icon>
+                <span>{{ store.name }}</span>
+            </div>
+            <h1>Services Disponibles</h1>
+        </div>
+    </header>
+
+    <!-- Loading -->
+    <div class="loading-skeleton" *ngIf="isLoading">
+        <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
+    </div>
+
+    <!-- Requesting Overlay -->
+    <div class="requesting-overlay" *ngIf="isRequesting">
+        <div class="spinner"></div>
+        <span>Envoi en cours...</span>
+    </div>
+
+    <!-- Services Grid -->
+    <div class="services-grid" *ngIf="!isLoading && services?.length > 0">
+        <div class="service-card" *ngFor="let service of services">
+            <!-- Category Badge -->
+            <div class="category-badge" [ngClass]="service.category || 'general'">
+                <fa-icon [icon]="getCategoryIcon(service.category)"></fa-icon>
+                {{ getCategoryLabel(service.category) }}
+            </div>
+
+            <!-- Service Info -->
+            <h3 class="service-name">{{ service.name }}</h3>
+            <p class="service-description" *ngIf="service.description">
+                {{ service.description }}
+            </p>
+
+            <!-- Details -->
+            <div class="service-details">
+                <div class="detail price">
+                    <span class="label">Prix</span>
+                    <span class="value">{{ service.price | number:'1.2-2' }} DT</span>
+                </div>
+                <div class="detail duration" *ngIf="service.estimatedDuration">
+                    <fa-icon [icon]="faClock"></fa-icon>
+                    <span>{{ service.estimatedDuration }} heures</span>
+                </div>
+            </div>
+
+            <!-- Action -->
+            <button class="btn-request" (click)="requestService(service)">
+                <fa-icon [icon]="faShoppingCart"></fa-icon>
+                Demander ce service
+            </button>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && services?.length === 0">
+        <div class="empty-icon">
+            <fa-icon [icon]="faCog"></fa-icon>
+        </div>
+        <h3>Aucun service disponible</h3>
+        <button class="btn-back-link" (click)="goBack()">Retour à la boutique</button>
+    </div>
+</div>

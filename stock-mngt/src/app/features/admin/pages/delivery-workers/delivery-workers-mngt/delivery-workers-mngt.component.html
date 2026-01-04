@@ -1,0 +1,107 @@
+<div class="delivery-workers-page">
+    <!-- Loading Skeleton -->
+    <div class="loading-skeleton" *ngIf="isLoading">
+        <div class="skeleton-header"></div>
+        <div class="skeleton-grid">
+            <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="page-content" *ngIf="!isLoading">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="header-left">
+                <div class="title-section">
+                    <fa-icon [icon]="faTruck" class="title-icon"></fa-icon>
+                    <div>
+                        <h1>Livreurs</h1>
+                        <p class="subtitle">{{ filteredWorkers.length }} livreur(s)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <fa-icon [icon]="faSearch"></fa-icon>
+                    <input type="text" placeholder="Rechercher..." [(ngModel)]="searchTerm"
+                        (ngModelChange)="filterWorkers()">
+                </div>
+                <button class="btn-add" (click)="addNew()">
+                    <fa-icon [icon]="faPlus"></fa-icon>
+                    <span>Ajouter</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Workers Grid -->
+        <div class="workers-grid" *ngIf="filteredWorkers.length > 0">
+            <div class="worker-card" *ngFor="let worker of filteredWorkers">
+                <!-- Avatar -->
+                <div class="worker-avatar">
+                    {{ getInitials(worker.firstName, worker.lastName) }}
+                </div>
+
+                <!-- Info -->
+                <div class="worker-info">
+                    <h3 class="worker-name">{{ worker.firstName }} {{ worker.lastName }}</h3>
+
+                    <div class="contact-row" *ngIf="worker.phone">
+                        <fa-icon [icon]="faPhone"></fa-icon>
+                        <span>{{ worker.phone }}</span>
+                    </div>
+
+                    <div class="contact-row" *ngIf="worker.whatsapp">
+                        <fa-icon [icon]="faWhatsapp"></fa-icon>
+                        <span>{{ worker.whatsapp }}</span>
+                    </div>
+
+                    <div class="contact-row" *ngIf="worker.email">
+                        <fa-icon [icon]="faEnvelope"></fa-icon>
+                        <span>{{ worker.email }}</span>
+                    </div>
+
+                    <!-- States Badge -->
+                    <div class="states-section" *ngIf="worker.supportedStates?.length > 0">
+                        <fa-icon [icon]="faMapMarkerAlt"></fa-icon>
+                        <div class="states-list">
+                            <span class="state-badge" *ngFor="let state of worker.supportedStates.slice(0, 3)">
+                                {{ state }}
+                            </span>
+                            <span class="state-more" *ngIf="worker.supportedStates.length > 3">
+                                +{{ worker.supportedStates.length - 3 }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="worker-actions">
+                    <button class="action-btn edit" (click)="edit(worker.id)" title="Modifier">
+                        <fa-icon [icon]="faEdit"></fa-icon>
+                    </button>
+                    <button class="action-btn delete" (click)="delete(worker)" title="Supprimer">
+                        <fa-icon [icon]="faTrash"></fa-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="filteredWorkers.length === 0 && !searchTerm">
+            <div class="empty-icon">
+                <fa-icon [icon]="faTruck"></fa-icon>
+            </div>
+            <h3>Aucun livreur trouvé</h3>
+            <p>Essayez de modifier vos critères de recherche ou ajoutez un nouveau livreur</p>
+        </div>
+
+        <!-- No Results -->
+        <div class="empty-state" *ngIf="filteredWorkers.length === 0 && searchTerm">
+            <div class="empty-icon">
+                <fa-icon [icon]="faSearch"></fa-icon>
+            </div>
+            <h3>Aucun résultat</h3>
+            <p>Aucun livreur ne correspond à "{{ searchTerm }}"</p>
+        </div>
+    </div>
+</div>

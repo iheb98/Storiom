@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { faBars, faBoxOpen, faCartPlus, faSearch, faShieldAlt, faShoppingCart, faStore, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faBoxOpen, faCartPlus, faClipboardList, faSearch, faShieldAlt, faShoppingCart, faStore, faUser } from '@fortawesome/free-solid-svg-icons';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
 
@@ -15,6 +15,7 @@ export class PublicHeaderComponent implements OnInit {
   cartIcon = faShoppingCart;
   userIcon = faUser;
   menuIcon = faBars;
+  trackIcon = faClipboardList;
   searchText = '';
   searchable;
 

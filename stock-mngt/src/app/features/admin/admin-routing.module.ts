@@ -32,6 +32,11 @@ import { AdminLayoutComponent } from 'src/app/features/admin/layouts/admin-layou
 import { BrandsMngtComponent } from './pages/brands/brands-mngt/brands-mngt.component';
 import { OrdersMngtComponent } from './pages/orders/orders-mngt/orders-mngt.component';
 import { UserSettingsComponent } from './pages/settings/user-settings/user-settings.component';
+import { DeliveryWorkersMngtComponent } from './pages/delivery-workers/delivery-workers-mngt/delivery-workers-mngt.component';
+import { DeliveryWorkerAddComponent } from './pages/delivery-workers/delivery-worker-add/delivery-worker-add.component';
+import { ServicesMngtComponent } from './pages/services/services-mngt/services-mngt.component';
+import { ServiceAddComponent } from './pages/services/service-add/service-add.component';
+import { ServiceRequestsMngtComponent } from './pages/services/service-requests-mngt/service-requests-mngt.component';
 
 const routes: Routes = [
   {
@@ -75,6 +80,11 @@ const routes: Routes = [
       { path: 'workers/add', component: WorkerAddComponent },
       { path: 'workers/edit/:id', component: WorkerAddComponent },
 
+      // ------------ Delivery Workers ------------
+      { path: 'delivery-workers', component: DeliveryWorkersMngtComponent },
+      { path: 'delivery-workers/add', component: DeliveryWorkerAddComponent },
+      { path: 'delivery-workers/edit/:id', component: DeliveryWorkerAddComponent },
+
       // ------------ Products ------------
       { path: 'products', component: ProductsMngtComponent },
       { path: 'products/add', component: ProductAddComponent },
@@ -95,6 +105,12 @@ const routes: Routes = [
 
       // ------------ Orders ------------
       { path: 'orders', component: OrdersMngtComponent },
+
+      // ------------ Services ------------
+      { path: 'services', component: ServicesMngtComponent },
+      { path: 'services/add', component: ServiceAddComponent },
+      { path: 'services/edit/:id', component: ServiceAddComponent },
+      { path: 'service-requests', component: ServiceRequestsMngtComponent },
 
       // ------------ Settings ------------
       { path: 'settings', component: UserSettingsComponent },

@@ -1,0 +1,347 @@
+<div class="requests-page">
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="header-content">
+            <div class="header-icon">
+                <fa-icon [icon]="faClipboardList"></fa-icon>
+            </div>
+            <div class="header-text">
+                <h1>Demandes de Services</h1>
+                <p>{{ requests?.length || 0 }} demande(s) au total</p>
+            </div>
+        </div>
+        <button class="btn-add-guest" (click)="createGuestRequest()">
+            <fa-icon [icon]="faPlus"></fa-icon>
+            Client externe
+        </button>
+    </header>
+
+    <!-- Status Tabs -->
+    <div class="status-tabs" *ngIf="requests?.length > 0">
+        <button class="tab-btn active-tab" [class.active]="activeFilter === 'ACTIVE'"
+            (click)="filterByStatus('ACTIVE')">
+            Actives ({{ getStatusCount('PENDING') + getStatusCount('IN_PROGRESS') }})
+        </button>
+        <button class="tab-btn pending" [class.active]="activeFilter === 'PENDING'" (click)="filterByStatus('PENDING')">
+            <fa-icon [icon]="faClock"></fa-icon>
+            En attente ({{ getStatusCount('PENDING') }})
+        </button>
+        <button class="tab-btn in-progress" [class.active]="activeFilter === 'IN_PROGRESS'"
+            (click)="filterByStatus('IN_PROGRESS')">
+            <fa-icon [icon]="faSpinner"></fa-icon>
+            En cours ({{ getStatusCount('IN_PROGRESS') }})
+        </button>
+        <button class="tab-btn completed" [class.active]="activeFilter === 'COMPLETED'"
+            (click)="filterByStatus('COMPLETED')">
+            <fa-icon [icon]="faCheckCircle"></fa-icon>
+            Terminé ({{ getStatusCount('COMPLETED') }})
+        </button>
+        <button class="tab-btn cancelled" [class.active]="activeFilter === 'CANCELLED'"
+            (click)="filterByStatus('CANCELLED')">
+            <fa-icon [icon]="faTimesCircle"></fa-icon>
+            Annulé ({{ getStatusCount('CANCELLED') }})
+        </button>
+        <button class="tab-btn" [class.active]="activeFilter === ''" (click)="filterByStatus('')">
+            Toutes ({{ requests.length }})
+        </button>
+    </div>
+
+    <!-- Loading Skeleton -->
+    <div class="requests-list skeleton" *ngIf="isLoading">
+        <div class="request-card skeleton-card" *ngFor="let i of [1,2,3,4]"></div>
+    </div>
+
+    <!-- Updating Overlay -->
+    <div class="updating-overlay" *ngIf="isUpdating">
+        <div class="spinner"></div>
+        <span>Mise à jour...</span>
+    </div>
+
+    <!-- Requests List -->
+    <div class="requests-list" *ngIf="!isLoading && filteredRequests?.length > 0">
+        <div class="request-card" *ngFor="let request of filteredRequests">
+
+            <!-- Card Header -->
+            <div class="card-header">
+                <div class="request-info">
+                    <span class="request-id">#{{ request.id }}</span>
+                    <!--<span class="guest-badge" *ngIf="isGuestRequest(request)">
+                        <fa-icon [icon]="faUser"></fa-icon> Client
+                    </span>-->
+                    <span class="request-date">
+                        <fa-icon [icon]="faCalendar"></fa-icon>
+                        {{ request.createdAt | date:'dd MMM yyyy, HH:mm' }}
+                    </span>
+                </div>
+                <div class="status-badge" [ngClass]="getStatusInfo(request.status).color">
+                    <fa-icon [icon]="getStatusInfo(request.status).icon"></fa-icon>
+                    {{ getStatusInfo(request.status).label }}
+                </div>
+            </div>
+
+            <!-- Service Info -->
+            <div class="service-info">
+                <div class="service-icon">
+                    <fa-icon [icon]="faCog"></fa-icon>
+                </div>
+                <div class="service-details">
+                    <h3>{{ request.service?.name }}</h3>
+                    <span class="service-price">{{ request.price | number:'1.2-2' }} DT</span>
+                </div>
+            </div>
+
+            <!-- Customer Info (Registered User) -->
+            <div class="customer-info" *ngIf="request.user">
+                <div class="customer-avatar">
+                    {{ request.user.firstName?.charAt(0) }}{{ request.user.lastName?.charAt(0) }}
+                </div>
+                <div class="customer-details">
+                    <span class="customer-name">{{ request.user.firstName }} {{ request.user.lastName }}</span>
+                    <span class="customer-contact" *ngIf="request.user.phone">
+                        <fa-icon [icon]="faPhone"></fa-icon> {{ request.user.phone }}
+                    </span>
+                    <span class="customer-contact" *ngIf="request.user.email">
+                        <fa-icon [icon]="faEnvelope"></fa-icon> {{ request.user.email }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Customer Info (Guest) -->
+            <div class="customer-info guest" *ngIf="isGuestRequest(request)">
+                <div class="customer-avatar guest">
+                    <fa-icon [icon]="faUser"></fa-icon>
+                </div>
+                <div class="customer-details">
+                    <span class="customer-name">{{ request.guestName || 'Client externe' }}</span>
+                    <span class="customer-contact">
+                        <fa-icon [icon]="faPhone"></fa-icon> {{ request.guestPhone }}
+                    </span>
+                    <span class="customer-contact" *ngIf="request.guestEmail">
+                        <fa-icon [icon]="faEnvelope"></fa-icon> {{ request.guestEmail }}
+                    </span>
+                </div>
+                <button class="btn-tracking-code" (click)="showTrackingCode(request)" *ngIf="request.trackingCode">
+                    <fa-icon [icon]="faKey"></fa-icon>
+                    Code
+                </button>
+            </div>
+
+            <!-- Customer Note -->
+            <div class="note-section" *ngIf="request.customerNote">
+                <label>Note du client:</label>
+                <p>{{ request.customerNote }}</p>
+            </div>
+
+            <!-- Admin Note -->
+            <div class="note-section admin" *ngIf="request.adminNote">
+                <label>Note admin:</label>
+                <p>{{ request.adminNote }}</p>
+            </div>
+
+            <!-- Actions -->
+            <div class="card-actions">
+                <div class="status-actions">
+                    <button class="action-btn pending" *ngIf="request.status !== 'PENDING'"
+                        (click)="updateStatus(request, 'PENDING')">
+                        <fa-icon [icon]="faClock"></fa-icon>
+                    </button>
+                    <button class="action-btn in-progress" *ngIf="request.status !== 'IN_PROGRESS'"
+                        (click)="updateStatus(request, 'IN_PROGRESS')">
+                        <fa-icon [icon]="faSpinner"></fa-icon>
+                    </button>
+                    <button class="action-btn completed" *ngIf="request.status !== 'COMPLETED'"
+                        (click)="updateStatus(request, 'COMPLETED')">
+                        <fa-icon [icon]="faCheckCircle"></fa-icon>
+                    </button>
+                    <button class="action-btn cancelled" *ngIf="request.status !== 'CANCELLED'"
+                        (click)="updateStatus(request, 'CANCELLED')">
+                        <fa-icon [icon]="faTimesCircle"></fa-icon>
+                    </button>
+                </div>
+                <button class="btn-note" (click)="addNote(request)">
+                    <fa-icon [icon]="faEdit"></fa-icon>
+                    Note
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && requests?.length === 0">
+        <div class="empty-icon">
+            <fa-icon [icon]="faClipboardList"></fa-icon>
+        </div>
+        <h3>Aucune demande</h3>
+        <p>Vous n'avez pas encore reçu de demandes de services.</p>
+        <button class="btn-add-empty" (click)="createGuestRequest()">
+            <fa-icon [icon]="faPlus"></fa-icon>
+            Créer une demande pour un client externe
+        </button>
+    </div>
+
+    <!-- No Filtered Results -->
+    <div class="empty-state" *ngIf="!isLoading && requests?.length > 0 && filteredRequests?.length === 0">
+        <div class="empty-icon">
+            <fa-icon [icon]="getStatusInfo(activeFilter).icon"></fa-icon>
+        </div>
+        <h3>Aucune demande {{ getStatusInfo(activeFilter).label.toLowerCase() }}</h3>
+        <button class="btn-clear" (click)="filterByStatus('')">Voir toutes les demandes</button>
+    </div>
+</div>
+
+<!-- Guest Request Modal -->
+<div class="modal-overlay" *ngIf="showGuestModal" (click)="closeGuestModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+
+        <!-- Form State -->
+        <div class="modal-content" *ngIf="!showSuccessState">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <div class="header-decoration"></div>
+                <div class="header-content">
+                    <div class="header-icon">
+                        <fa-icon [icon]="faUserSlash"></fa-icon>
+                    </div>
+                    <h2>Nouvelle demande</h2>
+                    <p>Créer une demande pour un client</p>
+                </div>
+                <button class="close-btn" (click)="closeGuestModal()">
+                    <fa-icon [icon]="faTimes"></fa-icon>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <!-- Service Selection -->
+                <div class="form-group" [class.has-error]="formErrors.serviceId">
+                    <label>
+                        <span class="label-icon">🛠️</span>
+                        Service <span class="required">*</span>
+                    </label>
+                    <div class="select-wrapper ng-select-wrapper">
+                        <ng-select [(ngModel)]="guestForm.serviceId" [items]="services" bindLabel="name" bindValue="id"
+                            placeholder="Choisir un service..." [clearable]="false" [searchable]="true"
+                            notFoundText="Aucun service trouvé" class="custom-ng-select">
+                            <ng-template ng-label-tmp let-item="item">
+                                <div class="ng-select-label">
+                                    <span class="service-name">{{ item.name }}</span>
+                                    <span class="service-price" *ngIf=" item?.price">{{ item.price }} DT</span>
+                                </div>
+                            </ng-template>
+                            <ng-template ng-option-tmp let-item="item">
+                                <div class="ng-option-content">
+                                    <span class="option-name">{{ item.name }}</span>
+                                    <span class="option-price" *ngIf=" item?.price">{{ item.price }} DT</span>
+                                </div>
+                            </ng-template>
+                        </ng-select>
+                    </div>
+                    <span class="error-message" *ngIf="formErrors.serviceId">
+                        ⚠️ {{ formErrors.serviceId }}
+                    </span>
+
+                    <!-- Selected Service Preview -->
+                    <div class="service-preview" *ngIf="getSelectedService()">
+                        <div class="preview-icon">
+                            <fa-icon [icon]="faWrench"></fa-icon>
+                        </div>
+                        <div class="preview-info">
+                            <span class="preview-name">{{ getSelectedService().name }}</span>
+                            <span class="preview-price" *ngIf=" getSelectedService().price">{{
+                                getSelectedService().price }} DT</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Name & Phone Row -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>
+                            <span class="label-icon">👤</span>
+                            Nom du client
+                        </label>
+                        <input type="text" [(ngModel)]="guestForm.guestName" placeholder="Ex: Ahmed">
+                    </div>
+                    <div class="form-group" [class.has-error]="formErrors.guestPhone">
+                        <label>
+                            <span class="label-icon">📱</span>
+                            Téléphone <span class="required">*</span>
+                        </label>
+                        <input type="tel" [(ngModel)]="guestForm.guestPhone" placeholder="Ex: 12 345 678">
+                        <span class="error-message" *ngIf="formErrors.guestPhone">
+                            ⚠️ {{ formErrors.guestPhone }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label>
+                        <span class="label-icon">✉️</span>
+                        Email <span class="optional">(optionnel)</span>
+                    </label>
+                    <input type="email" [(ngModel)]="guestForm.guestEmail" placeholder="client@email.com">
+                </div>
+
+                <!-- Note -->
+                <div class="form-group">
+                    <label>
+                        <span class="label-icon">📝</span>
+                        Note ou description
+                    </label>
+                    <textarea [(ngModel)]="guestForm.customerNote" rows="3"
+                        placeholder="Décrivez les détails de la demande..."></textarea>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button class="btn-cancel" (click)="closeGuestModal()">
+                    Annuler
+                </button>
+                <button class="btn-submit" (click)="submitGuestRequest()" [disabled]="isSubmitting">
+                    <span class="btn-spinner" *ngIf="isSubmitting"></span>
+                    <span *ngIf="!isSubmitting">Créer la demande</span>
+                    <span *ngIf="isSubmitting">Création...</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Success State -->
+        <div class="modal-content success-content" *ngIf="showSuccessState">
+            <button class="close-btn success" (click)="closeGuestModal()">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+
+            <div class="success-body">
+                <div class="success-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                </div>
+
+                <h2>Demande créée ! 🎉</h2>
+                <p class="success-text">La demande a été enregistrée avec succès.</p>
+
+                <div class="tracking-box">
+                    <div class="tracking-label">
+                        <fa-icon [icon]="faKey"></fa-icon>
+                        Code de suivi
+                    </div>
+                    <div class="tracking-code">{{ createdRequest?.trackingCode }}</div>
+                    <button class="copy-btn" (click)="copyTrackingCode()">
+                        <fa-icon [icon]="faCopy"></fa-icon>
+                        Copier le code
+                    </button>
+                </div>
+
+                <p class="hint-text">💡 Partagez ce code avec le client pour qu'il puisse suivre sa demande</p>
+
+                <button class="btn-done" (click)="closeGuestModal()">
+                    Fermer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

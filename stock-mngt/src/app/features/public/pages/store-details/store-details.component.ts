@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PublicService } from 'src/app/core/services/public.service';
 
 import { environment } from 'src/environments/environment';
@@ -7,6 +7,8 @@ import { ProductService } from 'src/app/core/services/product.service';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CartService } from 'src/app/core/services/cart.service';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { StoreServiceService } from 'src/app/core/services/store-service.service';
+import { ServiceRequestService } from 'src/app/core/services/service-request.service';
 
 @Component({
     selector: 'app-store-details',
@@ -18,8 +20,12 @@ export class StoreDetailsComponent implements OnInit, AfterViewChecked {
 
     store: any;
     products: any[] = [];
+    services: any[] = [];
     environment = environment;
     storeId: string;
+
+    // Active tab
+    activeTab: 'products' | 'services' = 'products';
 
     // Filters
     categories: any[] = [];
@@ -46,16 +52,28 @@ export class StoreDetailsComponent implements OnInit, AfterViewChecked {
     };
     isStoreLoading = true;
     isProductsLoading = true;
+    isServicesLoading = true;
     isDescriptionOverflowing = false;
+    isRequesting = false;
+
+    // Modal State
+    showModal = false;
+    modalMode: 'login' | 'request' | 'success' | 'error' = 'request';
+    selectedService: any = null;
+    customerNote = '';
+    trackingCode = '';
+    errorMessage = '';
 
     constructor(
         private route: ActivatedRoute,
+        private router: Router,
         private publicService: PublicService,
-
         private productService: ProductService,
         private authService: AuthService,
         private cartService: CartService,
-        private toastService: ToastService
+        private toastService: ToastService,
+        private storeServiceService: StoreServiceService,
+        private serviceRequestService: ServiceRequestService
     ) { }
 
     ngOnInit(): void {
@@ -66,6 +84,7 @@ export class StoreDetailsComponent implements OnInit, AfterViewChecked {
                 this.loadStoreDetails();
                 this.loadCategories();
                 this.loadProducts();
+                this.loadServices();
             }
         });
     }
@@ -202,5 +221,94 @@ export class StoreDetailsComponent implements OnInit, AfterViewChecked {
             this.cartService.addToCart(product, 1);
             this.toastService.showSuccess('Produit ajouté au panier (Local)');
         }
+    }
+
+    // Services
+    loadServices() {
+        this.isServicesLoading = true;
+        this.storeServiceService.getActiveByStoreId(parseInt(this.storeId)).subscribe(
+            (services) => {
+                this.services = services;
+                this.isServicesLoading = false;
+            },
+            (error) => {
+                console.error('Error loading services:', error);
+                this.isServicesLoading = false;
+            }
+        );
+    }
+
+    setActiveTab(tab: 'products' | 'services') {
+        this.activeTab = tab;
+    }
+
+    requestService(service: any) {
+        this.selectedService = service;
+        this.customerNote = '';
+        this.trackingCode = '';
+        this.errorMessage = '';
+
+        if (!this.authService.isLoggedIn()) {
+            this.modalMode = 'login';
+            this.showModal = true;
+            return;
+        }
+
+        this.modalMode = 'request';
+        this.showModal = true;
+    }
+
+    closeModal() {
+        this.showModal = false;
+        this.selectedService = null;
+        this.customerNote = '';
+    }
+
+    goToLogin() {
+        this.closeModal();
+        this.router.navigate(['/login']);
+    }
+
+    confirmRequest() {
+        if (!this.selectedService) return;
+
+        this.isRequesting = true;
+        this.serviceRequestService.create({
+            storeServiceId: this.selectedService.id,
+            customerNote: this.customerNote
+        }).subscribe(
+            (response: any) => {
+                this.isRequesting = false;
+                this.trackingCode = response.trackingCode;
+                this.modalMode = 'success';
+            },
+            (error) => {
+                this.isRequesting = false;
+                this.errorMessage = error.error?.message || 'Une erreur est survenue';
+                this.modalMode = 'error';
+            }
+        );
+    }
+
+    getCategoryIcon(category: string): string {
+        const icons: any = {
+            'repair': 'fa-wrench',
+            'internet': 'fa-wifi',
+            'mobile': 'fa-mobile-alt',
+            'computer': 'fa-laptop',
+            'general': 'fa-cog'
+        };
+        return icons[category] || 'fa-cog';
+    }
+
+    getCategoryLabel(category: string): string {
+        const labels: any = {
+            'repair': 'Réparation',
+            'internet': 'Internet',
+            'mobile': 'Mobile',
+            'computer': 'Informatique',
+            'general': 'Général'
+        };
+        return labels[category] || 'Général';
     }
 }

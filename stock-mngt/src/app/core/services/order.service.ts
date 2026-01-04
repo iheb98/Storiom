@@ -30,4 +30,9 @@ export class OrderService {
     createOrder(): Observable<any> {
         return this.http.post(`${this.BASE_PATH}/orders/create`, {});
     }
+
+    // Update order delivery worker
+    updateDeliveryWorker(orderId: number, deliveryWorkerId: number | null): Observable<any> {
+        return this.http.put(`${this.BASE_PATH}/orders/${orderId}/delivery-worker`, { deliveryWorkerId });
+    }
 }

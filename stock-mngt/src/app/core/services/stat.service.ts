@@ -71,7 +71,7 @@ export class StatService {
     });
   }
 
-   getCategoriesTotalSold(id, type, value): Observable<any> {
+  getCategoriesTotalSold(id, type, value): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'store/' + id + '/total-sold-pie', {
       params: {
         type,
@@ -89,8 +89,21 @@ export class StatService {
     });
   }
 
-    getParentCateoriesStats(id): Observable<any> {
+  getParentCateoriesStats(id): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'store/' + id + '/parentCategoriesStats');
+  }
+
+  // Service Requests Stats
+  getServiceRequestsCompletedRevenue(storeId, type?, value?): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'store/' + storeId + '/service-requests/completed-revenue-pie', {
+      params: type && value ? { type, value } : {}
+    });
+  }
+
+  getServiceRequestsByStatus(storeId, type?, value?): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'store/' + storeId + '/service-requests/requests-by-status-pie', {
+      params: type && value ? { type, value } : {}
+    });
   }
 
 }

@@ -74,6 +74,12 @@ import { StoreOnboardingComponent } from './pages/stores/store-onboarding/store-
 import { QuillModule } from 'ngx-quill';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { UserSettingsComponent } from './pages/settings/user-settings/user-settings.component';
+import { DeliveryWorkersMngtComponent } from './pages/delivery-workers/delivery-workers-mngt/delivery-workers-mngt.component';
+import { DeliveryWorkerAddComponent } from './pages/delivery-workers/delivery-worker-add/delivery-worker-add.component';
+import { ServicesMngtComponent } from './pages/services/services-mngt/services-mngt.component';
+import { ServiceAddComponent } from './pages/services/service-add/service-add.component';
+import { ServiceRequestsMngtComponent } from './pages/services/service-requests-mngt/service-requests-mngt.component';
+import { ServiceRequestsStatsComponent } from './pages/dashboard/service-requests-stats/service-requests-stats.component';
 
 @NgModule({
   declarations: [
@@ -126,7 +132,13 @@ import { UserSettingsComponent } from './pages/settings/user-settings/user-setti
     StoreOnboardingComponent,
     UserSettingsComponent,
     AllSoldProductsModalComponent,
-    AllProfitableProductsModalComponent
+    AllProfitableProductsModalComponent,
+    DeliveryWorkersMngtComponent,
+    DeliveryWorkerAddComponent,
+    ServicesMngtComponent,
+    ServiceAddComponent,
+    ServiceRequestsMngtComponent,
+    ServiceRequestsStatsComponent
   ],
   imports: [
     CommonModule,

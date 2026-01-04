@@ -581,7 +581,7 @@ router.post('/forgot-password', async (req, res) => {
                                     <a href="mailto:support@storiom.com" style="color: #3f51b5; text-decoration: none; font-weight: 500;">support@storiom.com</a>
                                 </p>
                                 <p style="margin: 0; color: #bdc3c7; font-size: 12px;">
-                                    © 2025 Storiom. Tous droits réservés.<br>
+                                    © 2026 Storiom. Tous droits réservés.<br>
                                     Cet email a été envoyé à ${email}
                                 </p>
                             </td>

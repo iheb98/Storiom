@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import {
   faCalendarAlt, faClock, faChartPie, faCoins, faFire
 } from '@fortawesome/free-solid-svg-icons';
@@ -10,7 +10,10 @@ import { StatService } from 'src/app/core/services/stat.service';
   templateUrl: './category-stats.component.html',
   styleUrls: ['./category-stats.component.scss']
 })
-export class CategoryStatsComponent implements OnInit {
+export class CategoryStatsComponent implements OnInit, OnChanges {
+  // Input from parent for global date filter
+  @Input() dateFilter: { type: string; value: string };
+
   // Icons
   faCalendarAlt = faCalendarAlt;
   faClock = faClock;
@@ -31,6 +34,7 @@ export class CategoryStatsComponent implements OnInit {
   pieChartOptions;
 
   operations: any = [];
+  // Local filter values (used when no parent filter is provided)
   typesOfDate = ["Quotidien", "Mensuel", "Annuel"];
   selectedDateType = 'Mensuel';
 
@@ -124,6 +128,31 @@ export class CategoryStatsComponent implements OnInit {
     };
 
     this.updateOperationStats();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['dateFilter'] && changes['dateFilter'].currentValue) {
+      const filter = changes['dateFilter'].currentValue;
+      this.selectedDateType = filter.type;
+
+      // Update local filter values based on parent filter
+      switch (filter.type) {
+        case 'Quotidien':
+          this.dayFilter = filter.value;
+          break;
+        case 'Mensuel':
+          this.monthFilter = filter.value;
+          break;
+        case 'Annuel':
+          this.yearFilter = parseInt(filter.value);
+          break;
+      }
+
+      // Only update if not the first change (ngOnInit handles initial load)
+      if (!changes['dateFilter'].firstChange) {
+        this.updateOperationStats();
+      }
+    }
   }
 
   updateChart() {

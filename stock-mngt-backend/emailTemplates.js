@@ -329,5 +329,116 @@ function resendConfirmationEmail(userName, confirmUrl) {
 module.exports = {
   accountConfirmationEmail,
   expiredLinkEmail,
-  resendConfirmationEmail
+  resendConfirmationEmail,
+  serviceRequestStatusEmail,
+  emailWrapper
 };
+
+/**
+ * Service request status change email
+ */
+function serviceRequestStatusEmail(data) {
+  const { customerName, serviceName, storeName, status, statusLabel, trackingCode, adminNote, trackUrl } = data;
+
+  // Status-specific styling
+  const statusStyles = {
+    PENDING: { color: '#f59e0b', bg: '#fef3c7', icon: '⏳', border: '#f59e0b' },
+    IN_PROGRESS: { color: '#0ea5e9', bg: '#e0f2fe', icon: '🔧', border: '#0ea5e9' },
+    COMPLETED: { color: '#10b981', bg: '#d1fae5', icon: '✅', border: '#10b981' },
+    CANCELLED: { color: '#ef4444', bg: '#fee2e2', icon: '❌', border: '#ef4444' }
+  };
+
+  const style = statusStyles[status] || statusStyles.PENDING;
+  const firstName = customerName ? customerName.split(' ')[0] : 'Client';
+
+  const content = `
+    <!-- Status Icon -->
+    <div style="text-align: center; margin-bottom: 30px;">
+      <div style="display: inline-block; width: 80px; height: 80px; background: ${style.bg}; border-radius: 50%; line-height: 80px; border: 3px solid ${style.border};">
+        <span style="font-size: 36px;">${style.icon}</span>
+      </div>
+    </div>
+    
+    <!-- Greeting -->
+    <h2 style="margin: 0 0 10px; font-size: 22px; font-weight: 600; color: #1a202c; text-align: center;">
+      Mise à jour de votre demande
+    </h2>
+    
+    <p style="margin: 0 0 25px; font-size: 15px; color: #4a5568; text-align: center; line-height: 1.6;">
+      Bonjour ${firstName}, le statut de votre demande de service a été mis à jour.
+    </p>
+    
+    <!-- Status badge -->
+    <div style="text-align: center; margin-bottom: 25px;">
+      <span style="display: inline-block; background: ${style.bg}; color: ${style.color}; font-size: 16px; font-weight: 700; padding: 12px 28px; border-radius: 50px; border: 2px solid ${style.border};">
+        ${style.icon} ${statusLabel}
+      </span>
+    </div>
+    
+    <!-- Request details card -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px;">
+      <tr>
+        <td style="background-color: #f8fafc; border-radius: 16px; padding: 24px; border: 1px solid #e2e8f0;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding-bottom: 16px; border-bottom: 1px solid #e2e8f0;">
+                <p style="margin: 0 0 4px; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Service</p>
+                <p style="margin: 0; font-size: 18px; font-weight: 600; color: #1e293b;">${serviceName}</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding: 16px 0; border-bottom: 1px solid #e2e8f0;">
+                <p style="margin: 0 0 4px; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Boutique</p>
+                <p style="margin: 0; font-size: 16px; font-weight: 500; color: #334155;">🏪 ${storeName}</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding-top: 16px;">
+                <p style="margin: 0 0 4px; font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px;">Code de suivi</p>
+                <p style="margin: 0; font-size: 20px; font-weight: 700; color: #6366f1; letter-spacing: 2px; font-family: 'SF Mono', Monaco, Consolas, monospace;">${trackingCode}</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    
+    ${adminNote ? `
+    <!-- Admin note -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px;">
+      <tr>
+        <td style="background-color: #eff6ff; border-radius: 12px; padding: 16px 20px; border-left: 4px solid #3b82f6;">
+          <table role="presentation" cellpadding="0" cellspacing="0">
+            <tr>
+              <td style="padding-right: 12px; vertical-align: top;">
+                <span style="font-size: 20px;">💬</span>
+              </td>
+              <td>
+                <p style="margin: 0 0 4px; font-size: 12px; font-weight: 600; color: #1e40af; text-transform: uppercase;">Message de la boutique</p>
+                <p style="margin: 0; font-size: 14px; color: #1e40af; line-height: 1.5;">${adminNote}</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    ` : ''}
+    
+    <!-- CTA Button -->
+    <div style="text-align: center; margin: 35px 0;">
+      <a href="${trackUrl}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; padding: 16px 40px; border-radius: 50px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);">
+        📋 Voir ma demande
+      </a>
+    </div>
+    
+    <!-- Help section -->
+    <div style="margin-top: 30px; text-align: center; padding-top: 25px; border-top: 1px solid #e8ecef;">
+      <p style="margin: 0; font-size: 13px; color: #718096;">
+        Des questions ? Contactez directement la boutique ou écrivez-nous à <a href="mailto:support@storiom.com" style="color: #667eea; text-decoration: none;">support@storiom.com</a>
+      </p>
+    </div>
+  `;
+
+  return emailWrapper(content);
+}
+

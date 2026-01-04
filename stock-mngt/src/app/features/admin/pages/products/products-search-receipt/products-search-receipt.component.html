@@ -76,8 +76,8 @@
             </div>
 
             <div class="product-image">
-                <img [src]="item?.images[0] ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png'"
-                    [alt]="item?.name">
+                <img [src]="item?.images?.length > 0 ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png'"
+                    [alt]="item?.name" [class.default-image]="!item?.images?.length">
             </div>
 
             <div class="product-info">

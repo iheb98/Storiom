@@ -17,7 +17,8 @@
         <!-- Image Gallery -->
         <div class="gallery-section">
             <div class="main-image-container" (click)="openImage(selectedImage)">
-                <img [src]="selectedImage" [alt]="product?.name" class="main-image">
+                <img [src]="selectedImage" [alt]="product?.name" class="main-image"
+                    [class.default-image]="isDefaultImage">
                 <div class="zoom-hint">
                     <fa-icon [icon]="faSearchPlus"></fa-icon>
                 </div>

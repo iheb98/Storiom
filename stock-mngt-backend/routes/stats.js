@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Product, Operation, Credit, Category, Receipt } = require('../models');
+const { Product, Operation, Credit, Category, Receipt, ServiceRequest, StoreService } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 const sequelize = require('sequelize');
@@ -57,7 +57,8 @@ router.get('/store/:id/widgets', utility.authenticate, checkSubscription, async 
         products.forEach(element => {
             totalValue += element.quantity * element.sellingPrice
             stockValue += element.quantity * element.buyingPrice
-            criticalStock += element.quantity <= element.criticalStockIndicator ? 1 : 0
+            criticalStock += element.activateCriticalStockIndicator &&
+                element.quantity <= element.criticalStockIndicator ? 1 : 0
         });
 
         credits.forEach(element => {
@@ -211,7 +212,7 @@ router.get('/store/:id/operationStats', utility.authenticate, checkSubscription,
 
                 value = value.trim(); // Remove extra spaces
 
-                // Ensure the month is always two digits (e.g., "2025-02" instead of "2025-2")
+                // Ensure the month is always two digits (e.g., "2026-02" instead of "2026-2")
                 let [year, month] = value.split('-');
 
                 if (!year || !month) {
@@ -324,7 +325,7 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, c
 
                 value = value.trim(); // Remove extra spaces
 
-                // Ensure the month is always two digits (e.g., "2025-02" instead of "2025-2")
+                // Ensure the month is always two digits (e.g., "2026-02" instead of "2026-2")
                 let [year, month] = value.split('-');
 
                 if (!year || !month) {
@@ -485,7 +486,7 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, checkSu
 
                 value = value.trim(); // Remove extra spaces
 
-                // Ensure the month is always two digits (e.g., "2025-02" instead of "2025-2")
+                // Ensure the month is always two digits (e.g., "2026-02" instead of "2026-2")
                 let [year, month] = value.split('-');
 
                 if (!year || !month) {
@@ -649,7 +650,7 @@ router.get('/store/:id/operationStats/product', utility.authenticate, checkSubsc
 
                 value = value.trim(); // Remove extra spaces
 
-                // Ensure the month is always two digits (e.g., "2025-02" instead of "2025-2")
+                // Ensure the month is always two digits (e.g., "2026-02" instead of "2026-2")
                 let [year, month] = value.split('-');
 
                 if (!year || !month) {
@@ -1264,5 +1265,151 @@ async function getAllDescendantCategoryIds(categoryId, allCategories) {
     recurse(categoryId);
     return descendants;
 }
+
+// ============================================
+// SERVICE REQUESTS STATS
+// ============================================
+
+// Helper function to build date filter for service requests
+function buildServiceRequestDateFilter(type, value) {
+    if (!type || !value) return {};
+
+    let startDate, endDate;
+
+    switch (type) {
+        case 'Quotidien':
+            startDate = new Date(value);
+            startDate.setHours(0, 0, 0, 0);
+            endDate = new Date(value);
+            endDate.setHours(23, 59, 59, 999);
+            break;
+        case 'Mensuel':
+            const [year, month] = value.split('-').map(Number);
+            startDate = new Date(year, month - 1, 1);
+            endDate = new Date(year, month, 0, 23, 59, 59, 999);
+            break;
+        case 'Annuel':
+            const yearNum = parseInt(value);
+            startDate = new Date(yearNum, 0, 1);
+            endDate = new Date(yearNum, 11, 31, 23, 59, 59, 999);
+            break;
+        default:
+            return {};
+    }
+
+    return {
+        createdAt: {
+            [Op.between]: [startDate, endDate]
+        }
+    };
+}
+
+// Pie chart: Sum of prices for completed requests, grouped by service
+router.get('/store/:id/service-requests/completed-revenue-pie', utility.authenticate, async (req, res) => {
+    try {
+        const storeId = req.params.id;
+        const { type, value } = req.query;
+
+        // Build where clause with date filter
+        const whereClause = {
+            storeId: storeId,
+            status: 'COMPLETED',
+            ...buildServiceRequestDateFilter(type, value)
+        };
+
+        // Get all completed requests for this store, grouped by service
+        const requests = await ServiceRequest.findAll({
+            where: whereClause,
+            include: [{
+                model: StoreService,
+                as: 'service',
+                attributes: ['id', 'name']
+            }],
+            attributes: [
+                'storeServiceId',
+                [utility.Sequelize.fn('SUM', utility.Sequelize.col('ServiceRequest.price')), 'totalPrice']
+            ],
+            group: ['storeServiceId', 'service.id', 'service.name'],
+            raw: true,
+            nest: true
+        });
+
+        const result = requests.map(r => ({
+            label: r.service?.name || 'Service inconnu',
+            value: parseFloat(r.totalPrice) || 0
+        })).filter(r => r.value > 0);
+
+        const backgroundColors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#0ea5e9', '#8b5cf6', '#ec4899', '#14b8a6'];
+
+        res.json({
+            labels: result.map(r => r.label),
+            datasets: [{
+                data: result.map(r => r.value),
+                backgroundColor: backgroundColors.slice(0, result.length)
+            }]
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// Pie chart: Count of requests by status
+router.get('/store/:id/service-requests/requests-by-status-pie', utility.authenticate, async (req, res) => {
+    try {
+        const storeId = req.params.id;
+        const { type, value } = req.query;
+
+        // Build where clause with date filter
+        const whereClause = {
+            storeId: storeId,
+            ...buildServiceRequestDateFilter(type, value)
+        };
+
+        const statusCounts = await ServiceRequest.findAll({
+            where: whereClause,
+            attributes: [
+                'status',
+                [utility.Sequelize.fn('COUNT', utility.Sequelize.col('id')), 'count']
+            ],
+            group: ['status'],
+            raw: true
+        });
+
+        const statusLabels = {
+            'PENDING': 'En attente',
+            'IN_PROGRESS': 'En cours',
+            'COMPLETED': 'Terminé',
+            'CANCELLED': 'Annulé'
+        };
+
+        const statusColors = {
+            'PENDING': '#f59e0b',
+            'IN_PROGRESS': '#0ea5e9',
+            'COMPLETED': '#10b981',
+            'CANCELLED': '#ef4444'
+        };
+
+        const result = statusCounts.map(s => ({
+            status: s.status,
+            label: statusLabels[s.status] || s.status,
+            value: parseInt(s.count) || 0,
+            color: statusColors[s.status] || '#64748b'
+        }));
+
+        res.json({
+            labels: result.map(r => r.label),
+            datasets: [{
+                data: result.map(r => r.value),
+                backgroundColor: result.map(r => r.color)
+            }]
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
 
 module.exports = router;

@@ -59,6 +59,13 @@
         </div>
       </div>
 
+      <div class="form-group">
+        <label for="operationDate">
+          <i class="fa fa-calendar-alt"></i> Date de l'opération
+        </label>
+        <input type="datetime-local" id="operationDate" [(ngModel)]="operationDate">
+      </div>
+
       <!-- Total Preview -->
       <div class="total-preview" *ngIf="amount && price">
         <span class="total-label">Total</span>

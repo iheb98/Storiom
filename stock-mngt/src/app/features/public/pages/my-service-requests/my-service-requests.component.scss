@@ -1,0 +1,328 @@
+// Variables
+$primary: #3f51b5;
+$primary-dark: #303f9f;
+$primary-light: rgba(63, 81, 181, 0.1);
+$success: #2e7d32;
+$warning: #f57c00;
+$info: #0288d1;
+$danger: #c62828;
+$text-primary: #1a1a2e;
+$text-secondary: #64748b;
+$border-color: #e2e8f0;
+$background: #f8fafc;
+$white: #ffffff;
+$radius-sm: 8px;
+$radius-md: 12px;
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+// Page Container
+.my-requests-page {
+    min-height: 100vh;
+    background: $background;
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+
+    @media (max-width: 768px) {
+        padding: 15px;
+    }
+}
+
+// Page Header
+.page-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+
+    .btn-back {
+        width: 40px;
+        height: 40px;
+        background: $white;
+        border: 1px solid $border-color;
+        border-radius: $radius-sm;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: $text-secondary;
+
+        &:hover {
+            background: $primary;
+            border-color: $primary;
+            color: $white;
+        }
+    }
+
+    .header-content {
+        h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: $text-primary;
+            margin: 0;
+
+            @media (max-width: 768px) {
+                font-size: 1.1rem;
+            }
+        }
+
+        p {
+            font-size: 0.85rem;
+            color: $text-secondary;
+            margin: 4px 0 0;
+        }
+    }
+}
+
+// Status Tabs
+.status-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+
+    .tab-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        background: $white;
+        border: 1px solid $border-color;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        color: $text-secondary;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: $primary;
+        }
+
+        &.active {
+            background: $primary;
+            border-color: $primary;
+            color: $white;
+        }
+
+        &.pending.active {
+            background: $warning;
+            border-color: $warning;
+        }
+
+        &.in-progress.active {
+            background: $info;
+            border-color: $info;
+        }
+
+        &.completed.active {
+            background: $success;
+            border-color: $success;
+        }
+    }
+}
+
+// Loading Skeleton
+.loading-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .skeleton-card {
+        height: 180px;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        border-radius: $radius-md;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+// Requests List
+.requests-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+// Request Card
+.request-card {
+    background: $white;
+    border-radius: $radius-md;
+    padding: 20px;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-color;
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 15px;
+
+        &.pending {
+            background: rgba($warning, 0.15);
+            color: $warning;
+        }
+
+        &.in-progress {
+            background: rgba($info, 0.15);
+            color: $info;
+        }
+
+        &.completed {
+            background: rgba($success, 0.15);
+            color: $success;
+        }
+
+        &.cancelled {
+            background: rgba($danger, 0.15);
+            color: $danger;
+        }
+    }
+
+    .service-info {
+        margin-bottom: 15px;
+
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: $text-primary;
+            margin: 0 0 6px;
+        }
+
+        .store-name {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            color: $text-secondary;
+            margin: 0;
+        }
+    }
+
+    .request-details {
+        display: flex;
+        gap: 30px;
+        padding: 15px 0;
+        border-top: 1px solid $border-color;
+        border-bottom: 1px solid $border-color;
+
+        .detail {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+
+            .label {
+                font-size: 0.75rem;
+                color: $text-secondary;
+                text-transform: uppercase;
+            }
+
+            .value {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: $primary;
+            }
+        }
+    }
+
+    .note {
+        padding: 12px 0;
+        border-bottom: 1px solid $border-color;
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: $text-secondary;
+        }
+
+        p {
+            font-size: 0.9rem;
+            color: $text-primary;
+            margin: 4px 0 0;
+        }
+
+        &.admin {
+            background: rgba($primary, 0.03);
+            margin: 0 -20px;
+            padding: 12px 20px;
+            border-bottom: none;
+        }
+    }
+
+    .timeline {
+        margin-top: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: $text-secondary;
+
+            fa-icon {
+                color: $success;
+            }
+        }
+    }
+}
+
+// Empty State
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    text-align: center;
+
+    .empty-icon {
+        font-size: 4rem;
+        color: $border-color;
+        margin-bottom: 20px;
+    }
+
+    h3 {
+        font-size: 1.3rem;
+        color: $text-primary;
+        margin: 0 0 10px;
+    }
+
+    p {
+        font-size: 0.95rem;
+        color: $text-secondary;
+        margin: 0 0 25px;
+    }
+
+    .btn-explore {
+        padding: 12px 28px;
+        background: $primary;
+        border: none;
+        border-radius: $radius-sm;
+        color: $white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            background: $primary-dark;
+        }
+    }
+}

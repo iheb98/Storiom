@@ -600,3 +600,266 @@ $radius-xl: 24px;
         }
     }
 }
+
+// ============================================
+// SERVICES SECTION
+// ============================================
+.services-section {
+    padding: 30px;
+
+    @media (max-width: 768px) {
+        padding: 20px;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid $border-color;
+
+        h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: $text-primary;
+            margin: 0;
+
+            fa-icon {
+                color: $primary;
+            }
+        }
+
+        .requests-count {
+            font-size: 0.9rem;
+            color: $text-secondary;
+            background: $background;
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+    }
+}
+
+// Loading skeleton for requests
+.requests-loading {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .skeleton-request {
+        height: 180px;
+        background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+        border-radius: $radius-md;
+    }
+}
+
+// Requests list
+.requests-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.request-card {
+    background: $white;
+    border-radius: $radius-md;
+    padding: 25px;
+    border: 1px solid $border-color;
+    box-shadow: $shadow-sm;
+    transition: all 0.3s ease;
+
+    &:hover {
+        box-shadow: $shadow-md;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-bottom: 18px;
+
+        &.pending {
+            background: rgba(#f59e0b, 0.15);
+            color: #f59e0b;
+        }
+
+        &.in-progress {
+            background: rgba(#0ea5e9, 0.15);
+            color: #0ea5e9;
+        }
+
+        &.completed {
+            background: rgba($success, 0.15);
+            color: $success;
+        }
+
+        &.cancelled {
+            background: rgba($danger, 0.15);
+            color: $danger;
+        }
+    }
+
+    .service-info {
+        margin-bottom: 18px;
+
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: $text-primary;
+            margin: 0 0 8px;
+        }
+
+        .store-name {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            color: $text-secondary;
+            margin: 0;
+
+            fa-icon {
+                font-size: 0.85rem;
+            }
+        }
+    }
+
+    .request-details {
+        display: flex;
+        gap: 40px;
+        padding: 18px 0;
+        border-top: 1px solid $border-color;
+        border-bottom: 1px solid $border-color;
+
+        .detail {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+
+            .label {
+                font-size: 0.75rem;
+                color: $text-muted;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .value {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: $primary;
+            }
+        }
+    }
+
+    .notes-section {
+        padding: 15px 0;
+        border-bottom: 1px solid $border-color;
+
+        .note {
+            margin-bottom: 12px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            label {
+                font-size: 0.8rem;
+                font-weight: 500;
+                color: $text-secondary;
+            }
+
+            p {
+                font-size: 0.9rem;
+                color: $text-primary;
+                margin: 4px 0 0;
+                line-height: 1.5;
+            }
+
+            &.admin {
+                background: $primary-light;
+                margin: 0 -25px -15px;
+                padding: 12px 25px;
+                border-radius: 0 0 $radius-md $radius-md;
+            }
+        }
+    }
+
+    .timeline {
+        padding-top: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: $text-secondary;
+
+            fa-icon {
+                color: $success;
+            }
+        }
+    }
+}
+
+// Empty state for requests
+.empty-requests {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    background: $white;
+    border-radius: $radius-lg;
+    border: 2px dashed $border-color;
+
+    .empty-icon {
+        font-size: 3.5rem;
+        color: $border-color;
+        margin-bottom: 20px;
+    }
+
+    h3 {
+        font-size: 1.2rem;
+        color: $text-primary;
+        margin: 0 0 8px;
+    }
+
+    p {
+        font-size: 0.95rem;
+        color: $text-secondary;
+        margin: 0 0 25px;
+    }
+
+    .btn-explore {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+        border: none;
+        border-radius: $radius-sm;
+        color: $white;
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover {
+            box-shadow: 0 6px 20px rgba($primary, 0.35);
+            transform: translateY(-2px);
+        }
+    }
+}

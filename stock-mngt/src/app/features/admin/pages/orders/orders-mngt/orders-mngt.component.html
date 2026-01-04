@@ -137,6 +137,29 @@
                         </div>
                     </div>
 
+                    <!-- Delivery Worker Section -->
+                    <div class="details-section delivery-section">
+                        <h4><fa-icon [icon]="faTruck"></fa-icon> Livreur</h4>
+                        <div class="delivery-worker-select">
+                            <select #workerSelect [value]="order.deliveryWorkerId || ''"
+                                (change)="updateDeliveryWorker(order, workerSelect.value)" class="delivery-dropdown">
+                                <option value="">-- Sélectionner un livreur --</option>
+                                <option *ngFor="let worker of deliveryWorkers" [value]="worker.id">
+                                    {{ worker.firstName }} {{ worker.lastName }}
+                                </option>
+                            </select>
+                            <div class="current-worker" *ngIf="order.deliveryWorker">
+                                <span class="worker-name">
+                                    <fa-icon [icon]="faUser"></fa-icon>
+                                    {{ order.deliveryWorker.firstName }} {{ order.deliveryWorker.lastName }}
+                                </span>
+                                <span class="worker-phone" *ngIf="order.deliveryWorker.phone">
+                                    <fa-icon [icon]="faPhone"></fa-icon> {{ order.deliveryWorker.phone }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Items Section -->
                     <div class="details-section items-section">
                         <h4><fa-icon [icon]="faShoppingBag"></fa-icon> Articles ({{ order.items?.length }})</h4>

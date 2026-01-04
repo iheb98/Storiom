@@ -1,0 +1,108 @@
+<div class="services-page">
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="header-content">
+            <div class="header-icon">
+                <fa-icon [icon]="faCog"></fa-icon>
+            </div>
+            <div class="header-text">
+                <h1>Gestion des Services</h1>
+                <p>{{ services?.length || 0 }} service(s) au total</p>
+            </div>
+        </div>
+        <button class="btn-add" (click)="addNew()">
+            <fa-icon [icon]="faPlus"></fa-icon>
+            Nouveau Service
+        </button>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="search-bar" *ngIf="services?.length > 0">
+        <div class="search-input">
+            <fa-icon [icon]="faSearch"></fa-icon>
+            <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="filterServices()"
+                placeholder="Rechercher un service...">
+        </div>
+    </div>
+
+    <!-- Loading Skeleton -->
+    <div class="services-grid skeleton" *ngIf="isLoading">
+        <div class="service-card skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
+    </div>
+
+    <!-- Services Grid -->
+    <div class="services-grid" *ngIf="!isLoading && filteredServices?.length > 0">
+        <div class="service-card" *ngFor="let service of filteredServices" [class.inactive]="!service.isActive">
+
+            <!-- Card Header -->
+            <div class="card-header">
+                <div class="category-badge" [ngClass]="service.category || 'general'">
+                    <fa-icon [icon]="getCategoryIcon(service.category)"></fa-icon>
+                    {{ getCategoryLabel(service.category) }}
+                </div>
+                <div class="status-toggle" (click)="toggleActive(service)">
+                    <span class="toggle-label">{{ service.isActive ? 'Actif' : 'Inactif' }}</span>
+                    <div class="toggle-switch" [class.active]="service.isActive">
+                        <div class="toggle-knob"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body">
+                <h3 class="service-name">{{ service.name }}</h3>
+                <p class="service-description" *ngIf="service.description">
+                    {{ service.description | slice:0:100 }}{{ service.description?.length > 100 ? '...' : '' }}
+                </p>
+
+                <div class="service-details">
+                    <div class="detail-item price">
+                        <ng-container *ngIf="service.isPriceVariable && !service.price">
+                            <span class="price-variable">Prix variable</span>
+                        </ng-container>
+                        <ng-container *ngIf="!(service.isPriceVariable && !service.price)">
+                            <span class="detail-value">{{ service.price | number:'1.2-2' }} DT</span>
+                        </ng-container>
+                    </div>
+                    <div class="detail-item duration" *ngIf="service.estimatedDuration">
+                        <fa-icon [icon]="faClock"></fa-icon>
+                        <span>{{ service.estimatedDuration }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Actions -->
+            <div class="card-actions">
+                <button class="btn-action edit" (click)="edit(service.id)">
+                    <fa-icon [icon]="faEdit"></fa-icon>
+                    Modifier
+                </button>
+                <button class="btn-action delete" (click)="delete(service)">
+                    <fa-icon [icon]="faTrash"></fa-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && services?.length === 0">
+        <div class="empty-icon">
+            <fa-icon [icon]="faCog"></fa-icon>
+        </div>
+        <h3>Aucun service</h3>
+        <p>Commencez par ajouter les services que votre boutique propose.</p>
+        <button class="btn-add-empty" (click)="addNew()">
+            <fa-icon [icon]="faPlus"></fa-icon>
+            Ajouter un service
+        </button>
+    </div>
+
+    <!-- No Results -->
+    <div class="empty-state" *ngIf="!isLoading && services?.length > 0 && filteredServices?.length === 0">
+        <div class="empty-icon">
+            <fa-icon [icon]="faSearch"></fa-icon>
+        </div>
+        <h3>Aucun résultat</h3>
+        <p>Aucun service ne correspond à votre recherche.</p>
+    </div>
+</div>

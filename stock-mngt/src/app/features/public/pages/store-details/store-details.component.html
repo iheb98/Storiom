@@ -64,13 +64,28 @@
         </div>
     </div>
 
-    <!-- Mobile Filter Toggle -->
-    <button class="mobile-filter-toggle" (click)="toggleMobileFilters()">
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+        <button class="tab-btn" [class.active]="activeTab === 'products'" (click)="setActiveTab('products')">
+            <i class="fa fa-box"></i>
+            <span>Produits</span>
+            <span class="tab-count" *ngIf="totalProducts > 0">{{ totalProducts }}</span>
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 'services'" (click)="setActiveTab('services')">
+            <i class="fa fa-cog"></i>
+            <span>Services</span>
+            <span class="tab-count" *ngIf="services.length > 0">{{ services.length }}</span>
+        </button>
+    </div>
+
+    <!-- Mobile Filter Toggle (Products only) -->
+    <button class="mobile-filter-toggle" (click)="toggleMobileFilters()" *ngIf="activeTab === 'products'">
         <i class="fa fa-filter"></i> Filtrer
         <span class="active-filters-count" *ngIf="activeFiltersCount > 0">{{ activeFiltersCount }}</span>
     </button>
 
-    <div class="content-layout">
+    <!-- Products Tab Content -->
+    <div class="content-layout" *ngIf="activeTab === 'products'">
         <!-- Sidebar Filters -->
         <aside class="filters-sidebar" [class.open]="mobileFiltersOpen">
             <div class="sidebar-header">
@@ -207,5 +222,185 @@
                 (page)="onPageChange($event)" *ngIf="totalProducts > 0" class="custom-paginator">
             </mat-paginator>
         </div>
+    </div>
+
+    <!-- Services Tab Content -->
+    <div class="services-section" *ngIf="activeTab === 'services'">
+        <!-- Services Loading Skeleton -->
+        <div class="services-loading" *ngIf="isServicesLoading">
+            <div class="service-skeleton" *ngFor="let i of [1,2,3,4,5,6]">
+                <div class="skeleton-shimmer"></div>
+            </div>
+        </div>
+
+        <!-- Services Grid -->
+        <div class="services-grid" *ngIf="!isServicesLoading && services.length > 0">
+            <div class="service-card" *ngFor="let service of services">
+                <!-- Category Badge -->
+                <div class="category-badge" [ngClass]="service.category || 'general'">
+                    <i class="fa" [ngClass]="getCategoryIcon(service.category)"></i>
+                    <span>{{ getCategoryLabel(service.category) }}</span>
+                </div>
+
+                <!-- Service Info -->
+                <h3 class="service-name">{{ service.name }}</h3>
+                <p class="service-description" *ngIf="service.description">
+                    {{ service.description }}
+                </p>
+
+                <!-- Price & Duration -->
+                <div class="service-meta">
+                    <div class="service-price">
+                        <span class="price-variable" *ngIf="service.isPriceVariable">Le prix peut varier</span>
+                        <span class="price-value" *ngIf="!service.isPriceVariable">{{ service.price | number:'1.2-2' }}
+                            DT</span>
+                    </div>
+                    <div class="service-duration" *ngIf="service.estimatedDuration">
+                        <i class="fa fa-clock"></i>
+                        <span>{{ service.estimatedDuration }} h</span>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <!--<button class="btn-request" (click)="requestService(service)">
+                    <i class="fa fa-paper-plane"></i>
+                    Demander ce service
+                </button>-->
+            </div>
+        </div>
+
+        <!-- No Services -->
+        <div class="no-services" *ngIf="!isServicesLoading && services.length === 0">
+            <i class="fa fa-wrench"></i>
+            <h3>Aucun service disponible</h3>
+            <p>Cette boutique n'a pas encore ajouté de services.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Service Request Modal -->
+<div class="service-modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="service-modal" (click)="$event.stopPropagation()">
+
+        <!-- Login Required Mode -->
+        <ng-container *ngIf="modalMode === 'login'">
+            <div class="modal-header login-header">
+                <div class="modal-icon">
+                    <i class="fa fa-user-lock"></i>
+                </div>
+                <button class="modal-close" (click)="closeModal()">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h2>Connexion requise</h2>
+                <p>Veuillez vous connecter pour demander ce service.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="closeModal()">Annuler</button>
+                <button class="btn-primary" (click)="goToLogin()">
+                    <i class="fa fa-sign-in-alt"></i> Se connecter
+                </button>
+            </div>
+        </ng-container>
+
+        <!-- Request Mode -->
+        <ng-container *ngIf="modalMode === 'request'">
+            <div class="modal-header request-header">
+                <div class="modal-icon">
+                    <i class="fa fa-cog"></i>
+                </div>
+                <button class="modal-close" (click)="closeModal()">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h2>Demander ce service</h2>
+                <p class="subtitle">Confirmez votre demande de prestation</p>
+
+                <!-- Service Card -->
+                <div class="service-info-card">
+                    <div class="service-name">{{ selectedService?.name }}</div>
+                    <div class="service-price-display">
+                        <span class="price-variable" *ngIf="selectedService?.isPriceVariable">Le prix peut varier</span>
+                        <span class="price-value" *ngIf="!selectedService?.isPriceVariable">{{ selectedService?.price |
+                            number:'1.2-2' }} DT</span>
+                    </div>
+                    <div class="service-duration" *ngIf="selectedService?.estimatedDuration">
+                        <i class="fa fa-clock"></i> {{ selectedService?.estimatedDuration }} heures
+                    </div>
+                </div>
+
+                <!-- Note Input -->
+                <div class="note-input">
+                    <label>
+                        <i class="fa fa-comment-alt"></i>
+                        Note ou détails supplémentaires
+                    </label>
+                    <textarea [(ngModel)]="customerNote" placeholder="Décrivez votre besoin, précisez des détails..."
+                        rows="3"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" (click)="closeModal()" [disabled]="isRequesting">
+                    Annuler
+                </button>
+                <button class="btn-primary" (click)="confirmRequest()" [disabled]="isRequesting">
+                    <i class="fa fa-spinner fa-spin" *ngIf="isRequesting"></i>
+                    <i class="fa fa-paper-plane" *ngIf="!isRequesting"></i>
+                    {{ isRequesting ? 'Envoi...' : 'Confirmer la demande' }}
+                </button>
+            </div>
+        </ng-container>
+
+        <!-- Success Mode -->
+        <ng-container *ngIf="modalMode === 'success'">
+            <div class="modal-header success-header">
+                <div class="modal-icon success-icon">
+                    <i class="fa fa-check"></i>
+                </div>
+            </div>
+            <div class="modal-body success-body">
+                <h2>Demande envoyée ! 🎉</h2>
+                <p>Votre demande a été transmise avec succès.</p>
+
+                <div class="tracking-code-box">
+                    <span class="tracking-label">
+                        <i class="fa fa-key"></i> Code de suivi
+                    </span>
+                    <code class="tracking-code">{{ trackingCode }}</code>
+                </div>
+
+                <p class="tracking-hint">
+                    <i class="fa fa-lightbulb"></i>
+                    Conservez ce code pour suivre votre demande
+                </p>
+            </div>
+            <div class="modal-footer center">
+                <button class="btn-primary" (click)="closeModal()">
+                    <i class="fa fa-check"></i> Compris !
+                </button>
+            </div>
+        </ng-container>
+
+        <!-- Error Mode -->
+        <ng-container *ngIf="modalMode === 'error'">
+            <div class="modal-header error-header">
+                <div class="modal-icon error-icon">
+                    <i class="fa fa-exclamation-triangle"></i>
+                </div>
+            </div>
+            <div class="modal-body error-body">
+                <h2>Erreur</h2>
+                <p>{{ errorMessage }}</p>
+            </div>
+            <div class="modal-footer center">
+                <button class="btn-secondary" (click)="closeModal()">Fermer</button>
+                <button class="btn-primary" (click)="modalMode = 'request'">
+                    <i class="fa fa-redo"></i> Réessayer
+                </button>
+            </div>
+        </ng-container>
+
     </div>
 </div>

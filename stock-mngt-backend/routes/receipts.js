@@ -56,9 +56,9 @@ router.post('/create', utility.authenticate, checkSubscription, async (req, res)
 
 
 router.post('/sell/single', utility.authenticate, checkSubscription, async (req, res) => {
-    let { amount, price, id } = req.body
+    let { amount, price, id, date } = req.body
     Operation.create({
-        amount, type: "SOLD", price, date: new Date(), productId: id,
+        amount, type: "SOLD", price, date: date ? new Date(date) : new Date(), productId: id,
         receiptId: null, creatorUserId: req.user.id
     }).then(
         async createdOperation => {
@@ -83,9 +83,9 @@ router.post('/sell/single', utility.authenticate, checkSubscription, async (req,
 
 
 router.post('/load/single', utility.authenticate, checkSubscription, async (req, res) => {
-    let { amount, price, id } = req.body
+    let { amount, price, id, date } = req.body
     Operation.create({
-        amount, type: "LOADED", price, date: new Date(), productId: id,
+        amount, type: "LOADED", price, date: date ? new Date(date) : new Date(), productId: id,
         receiptId: null, creatorUserId: req.user.id
     }).then(
         async createdOperation => {
@@ -141,7 +141,7 @@ router.get('/operations', utility.authenticate, checkSubscription, async (req, r
     })
 })
 
-router.get('/allOperations',  async (req, res) => {
+router.get('/allOperations', async (req, res) => {
     Operation.findAll({
         include: [{
             model: Product,

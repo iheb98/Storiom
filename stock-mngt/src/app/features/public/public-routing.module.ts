@@ -18,6 +18,10 @@ import { ConfirmAccountComponent } from 'src/app/general/confirm-account/confirm
 import { ForgotPasswordComponent } from 'src/app/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from 'src/app/reset-password/reset-password.component';
 import { TermsComponent } from 'src/app/pages/terms/terms.component';
+import { StoreServicesComponent } from './pages/store-services/store-services.component';
+import { MyServiceRequestsComponent } from './pages/my-service-requests/my-service-requests.component';
+import { TrackRequestComponent } from './pages/track-request/track-request.component';
+import { AllServicesComponent } from './pages/all-services/all-services.component';
 
 const routes: Routes = [
   {
@@ -29,6 +33,10 @@ const routes: Routes = [
       { path: 'publicProduct/:id', component: PublicViewProductComponent },
       { path: 'stores', component: StoresListComponent },
       { path: 'stores/:id', component: StoreDetailsComponent },
+      { path: 'services', component: AllServicesComponent },
+      { path: 'store/:storeId/services', component: StoreServicesComponent },
+      { path: 'my-service-requests', component: MyServiceRequestsComponent, canActivate: [AuthGuard] },
+      { path: 'track-request', component: TrackRequestComponent },
       { path: 'seller-onboarding', component: SellerOnboardingComponent },
       { path: 'create-store', component: CreateStoreComponent, canActivate: [AuthGuard] },
       { path: 'cart', component: CartComponent },

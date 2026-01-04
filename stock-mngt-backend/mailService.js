@@ -17,15 +17,28 @@ const transporter = nodemailer.createTransport({
  * @param {string} to - Recipient's email address
  * @param {string} subject - Email subject
  * @param {string} html - HTML content of the email
+ * @param {object} options - Optional settings (cc, bcc, etc.)
  */
-async function sendMail(to, subject, html) {
+async function sendMail(to, subject, html, options = {}) {
   try {
-    const info = await transporter.sendMail({
+    const mailOptions = {
       from: 'noreply@storiom.com',
       to,
       subject,
       html
-    });
+    };
+
+    // Add CC if provided
+    if (options.cc) {
+      mailOptions.cc = options.cc;
+    }
+
+    // Add BCC if provided
+    if (options.bcc) {
+      mailOptions.bcc = options.bcc;
+    }
+
+    const info = await transporter.sendMail(mailOptions);
 
     console.log('Email sent:', info.messageId);
   } catch (error) {

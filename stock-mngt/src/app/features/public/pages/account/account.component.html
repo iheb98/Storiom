@@ -12,6 +12,7 @@
             <div class="skeleton-nav">
                 <div class="skeleton-nav-item"></div>
                 <div class="skeleton-nav-item"></div>
+                <div class="skeleton-nav-item"></div>
                 <div class="skeleton-separator"></div>
                 <div class="skeleton-nav-item"></div>
             </div>
@@ -41,7 +42,7 @@
     <div class="account-header">
         <div class="header-content">
             <h1>Mon Compte</h1>
-            <p>Gérez votre profil et consultez vos commandes</p>
+            <p>Gérez votre profil et consultez vos demandes</p>
         </div>
     </div>
 
@@ -90,6 +91,11 @@
                     <span>Mes Commandes</span>
                     <fa-icon [icon]="faChevronRight" class="arrow"></fa-icon>
                 </button>
+                <button [class.active]="activeTab === 'services'" (click)="switchTab('services')">
+                    <fa-icon [icon]="faClipboardList"></fa-icon>
+                    <span>Mes Demandes</span>
+                    <fa-icon [icon]="faChevronRight" class="arrow"></fa-icon>
+                </button>
                 <div class="nav-separator"></div>
                 <button class="logout-btn" (click)="logout()">
                     <fa-icon [icon]="faSignOutAlt"></fa-icon>
@@ -115,6 +121,92 @@
                     <p>Cette fonctionnalité sera bientôt disponible.</p>
                 </div>
             </div>
+
+            <!-- SERVICES TAB -->
+            <div class="tab-content" *ngIf="activeTab === 'services'">
+                <div class="services-section">
+                    <div class="section-header">
+                        <h2><fa-icon [icon]="faClipboardList"></fa-icon> Mes Demandes de Services</h2>
+                        <span class="requests-count" *ngIf="serviceRequests.length > 0">
+                            {{ serviceRequests.length }} demande(s)
+                        </span>
+                    </div>
+
+                    <!-- Loading -->
+                    <div class="requests-loading" *ngIf="isLoadingRequests">
+                        <div class="skeleton-request" *ngFor="let i of [1,2,3]"></div>
+                    </div>
+
+                    <!-- Requests List -->
+                    <div class="requests-list" *ngIf="!isLoadingRequests && serviceRequests.length > 0">
+                        <div class="request-card" *ngFor="let request of serviceRequests">
+                            <!-- Status Badge -->
+                            <div class="status-badge" [ngClass]="getStatusInfo(request.status).color">
+                                <fa-icon [icon]="getStatusInfo(request.status).icon"></fa-icon>
+                                {{ getStatusInfo(request.status).label }}
+                            </div>
+
+                            <!-- Service Info -->
+                            <div class="service-info">
+                                <h3>{{ request.service?.name }}</h3>
+                                <p class="store-name" *ngIf="request.store">
+                                    <fa-icon [icon]="faStore"></fa-icon>
+                                    {{ request.store.name }}
+                                </p>
+                            </div>
+
+                            <!-- Details -->
+                            <div class="request-details">
+                                <div class="detail">
+                                    <span class="label">Prix</span>
+                                    <span class="value">{{ request.price | number:'1.2-2' }} DT</span>
+                                </div>
+                                <div class="detail">
+                                    <span class="label">Date</span>
+                                    <span class="value">{{ request.createdAt | date:'dd/MM/yyyy' }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Notes -->
+                            <div class="notes-section" *ngIf="request.customerNote || request.adminNote">
+                                <div class="note" *ngIf="request.customerNote">
+                                    <label>Ma note:</label>
+                                    <p>{{ request.customerNote }}</p>
+                                </div>
+                                <div class="note admin" *ngIf="request.adminNote">
+                                    <label>Réponse du vendeur:</label>
+                                    <p>{{ request.adminNote }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Timeline -->
+                            <div class="timeline" *ngIf="request.startedAt || request.completedAt">
+                                <div class="timeline-item" *ngIf="request.startedAt">
+                                    <fa-icon [icon]="faSpinner"></fa-icon>
+                                    <span>Démarré le {{ request.startedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                                </div>
+                                <div class="timeline-item" *ngIf="request.completedAt">
+                                    <fa-icon [icon]="faCheckCircle"></fa-icon>
+                                    <span>Terminé le {{ request.completedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="empty-requests" *ngIf="!isLoadingRequests && serviceRequests.length === 0">
+                        <div class="empty-icon">
+                            <fa-icon [icon]="faClipboardList"></fa-icon>
+                        </div>
+                        <h3>Aucune demande</h3>
+                        <p>Vous n'avez pas encore fait de demande de service.</p>
+                        <a routerLink="/stores" class="btn-explore">
+                            <fa-icon [icon]="faStore"></fa-icon>
+                            Explorer les boutiques
+                        </a>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 </div>
@@ -128,6 +220,10 @@
     <button [class.active]="activeTab === 'orders'" (click)="switchTab('orders')">
         <fa-icon [icon]="faShoppingBag"></fa-icon>
         <span>Commandes</span>
+    </button>
+    <button [class.active]="activeTab === 'services'" (click)="switchTab('services')">
+        <fa-icon [icon]="faClipboardList"></fa-icon>
+        <span>Demandes</span>
     </button>
     <button class="logout" (click)="logout()">
         <fa-icon [icon]="faSignOutAlt"></fa-icon>

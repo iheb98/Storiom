@@ -57,22 +57,53 @@
                 </div>
             </div>
 
-            <!-- Full Width Charts -->
-            <div class="dashboard-card full-width">
-                <div class="card-header">
-                    <h2><fa-icon [icon]="faChartLine"></fa-icon> Statistiques des Opérations</h2>
-                </div>
-                <div class="card-body chart-container">
-                    <app-operation-stats></app-operation-stats>
-                </div>
-            </div>
+            <!-- Global Date Filter Section -->
+            <div class="dashboard-card full-width charts-section">
+                <div class="card-header charts-header">
+                    <h2><fa-icon [icon]="faChartLine"></fa-icon> Statistiques des Graphiques</h2>
 
-            <div class="dashboard-card full-width">
-                <div class="card-header">
-                    <h2><fa-icon [icon]="faChartBar"></fa-icon> Statistiques par Catégorie</h2>
+                    <div class="global-filters">
+                        <div class="filter-group">
+                            <label><fa-icon [icon]="faCalendarAlt"></fa-icon> Période</label>
+                            <select class="filter-select" [(ngModel)]="selectedDateType" (change)="onDateTypeChange()">
+                                <option *ngFor="let type of typesOfDate" [value]="type">{{ type }}</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label><fa-icon [icon]="faClock"></fa-icon> Date</label>
+                            <input *ngIf="selectedDateType === 'Quotidien'" type="date" class="filter-input"
+                                [(ngModel)]="dayFilter" (change)="onDateValueChange()">
+                            <input *ngIf="selectedDateType === 'Mensuel'" type="month" class="filter-input"
+                                [(ngModel)]="monthFilter" (change)="onDateValueChange()">
+                            <select *ngIf="selectedDateType === 'Annuel'" class="filter-select" [(ngModel)]="yearFilter"
+                                (change)="onDateValueChange()">
+                                <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body chart-container">
-                    <app-category-stats></app-category-stats>
+
+                <div class="card-body charts-body">
+                    <!-- Operation Stats -->
+                    <div class="chart-section">
+                        <h3 class="section-title"><fa-icon [icon]="faChartLine"></fa-icon> Statistiques des Opérations
+                        </h3>
+                        <app-operation-stats [dateFilter]="dateFilter"></app-operation-stats>
+                    </div>
+
+                    <!-- Category Stats -->
+                    <div class="chart-section">
+                        <h3 class="section-title"><fa-icon [icon]="faChartBar"></fa-icon> Statistiques par Catégorie
+                        </h3>
+                        <app-category-stats [dateFilter]="dateFilter"></app-category-stats>
+                    </div>
+
+                    <!-- Service Requests Stats -->
+                    <div class="chart-section">
+                        <h3 class="section-title"><fa-icon [icon]="faChartPie"></fa-icon> Demandes de Services</h3>
+                        <app-service-requests-stats [dateFilter]="dateFilter"></app-service-requests-stats>
+                    </div>
                 </div>
             </div>
 
@@ -118,7 +149,6 @@
                     <app-most-profitable-products></app-most-profitable-products>
                 </div>
             </div>
-
 
         </section>
     </div>
