@@ -289,6 +289,7 @@ $shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 
     padding: 0 30px;
 
     .filter-container {
+        margin-top: 20px;
         background: linear-gradient(135deg, rgba($primary, 0.04) 0%, rgba($primary, 0.02) 100%);
         border: 1px solid rgba($primary, 0.1);
         border-radius: 16px;

@@ -23,7 +23,8 @@
 
         <!-- Product Image -->
         <div class="item-image" [routerLink]="['/publicProduct', item.product?.id]">
-          <img [src]="getProductImage(item.product)" [alt]="item.product?.name">
+          <img [src]="getProductImage(item.product)" [alt]="item.product?.name"
+            [class.default-image]="isDefaultImage(item.product)">
         </div>
 
         <!-- Product Details -->

@@ -111,6 +111,22 @@ export class CartComponent implements OnInit {
     return 'assets/default_product.png';
   }
 
+  isDefaultImage(product: any): boolean {
+    if (!product?.images) return true;
+
+    let images = product.images;
+
+    if (typeof images === 'string') {
+      try {
+        images = JSON.parse(images);
+      } catch {
+        return true;
+      }
+    }
+
+    return !Array.isArray(images) || images.length === 0;
+  }
+
   increaseQty(item: CartItem) {
     if (this.authService.isLoggedIn()) {
       const newQty = item.quantity + 1;
