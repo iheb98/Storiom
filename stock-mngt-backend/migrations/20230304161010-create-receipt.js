@@ -30,6 +30,11 @@ module.exports = {
       visible: {
         type: DataTypes.BOOLEAN
       },
+      impactStock: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        field: 'impact_stock'
+      },
       storeId: {
         type: DataTypes.INTEGER,
         field: 'store_id'

@@ -201,6 +201,10 @@
 
     .totals-box {
         width: 300px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+        background-color: #f8fafc;
 
         @media (max-width: 576px) {
             width: 100%; // Full width on mobile
@@ -213,9 +217,15 @@
             color: #64748b;
             font-size: 0.95rem;
             white-space: nowrap; // Prevent wrapping for "TVA (19%)" etc.
+            border-bottom: 1px dashed #e2e8f0;
+
+            &:last-child {
+                border-bottom: none;
+            }
 
             &.final {
-                border-top: 2px solid #cbd5e1;
+                border-top: 2px solid #3f51b5;
+                border-bottom: none;
                 margin-top: 0.5rem;
                 padding-top: 1rem;
                 color: #0f172a;

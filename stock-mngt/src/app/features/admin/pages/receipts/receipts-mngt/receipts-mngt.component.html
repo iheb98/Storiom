@@ -113,11 +113,20 @@
                 <div class="receipt-info">
                     <div class="receipt-header">
                         <span class="receipt-code">#{{ receipt?.code }}</span>
-                        <span class="receipt-badge" [class.sold]="receipt?.type === 'SOLD'"
-                            [class.loaded]="receipt?.type === 'LOADED'" [class.returned]="receipt?.type === 'RETURNED'">
-                            {{ receipt?.type === 'SOLD' ? 'Vente' : (receipt?.type === 'LOADED' ? 'Chargement' :
-                            'Retour') }}
-                        </span>
+                        <div class="receipt-badges">
+                            <span class="receipt-badge" [class.sold]="receipt?.type === 'SOLD'"
+                                [class.loaded]="receipt?.type === 'LOADED'"
+                                [class.returned]="receipt?.type === 'RETURNED'">
+                                {{ receipt?.type === 'SOLD' ? 'Vente' : (receipt?.type === 'LOADED' ? 'Chargement' :
+                                'Retour') }}
+                            </span>
+                            <span class="stock-badge" [class.impacted]="receipt?.impactStock !== false"
+                                [class.not-impacted]="receipt?.impactStock === false">
+                                <i class="fa" [class.fa-check]="receipt?.impactStock !== false"
+                                    [class.fa-times]="receipt?.impactStock === false"></i>
+                                {{ receipt?.impactStock !== false ? 'Stock impacté' : 'Stock non impacté' }}
+                            </span>
+                        </div>
                     </div>
                     <div class="receipt-details">
                         <span class="receipt-name">

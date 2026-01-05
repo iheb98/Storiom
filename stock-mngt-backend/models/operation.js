@@ -33,6 +33,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     creatorUserId: {
       type: DataTypes.INTEGER
+    },
+    impactStock: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      field: 'impact_stock'
     }
   }, {
     sequelize,

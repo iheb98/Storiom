@@ -214,7 +214,6 @@ export class OperationsMngtComponent implements OnInit {
   deleteOperation(operation) {
     Swal.fire({
       title: 'Supprimer cette opération ?',
-      text: `ID: ${operation.id}`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Supprimer',

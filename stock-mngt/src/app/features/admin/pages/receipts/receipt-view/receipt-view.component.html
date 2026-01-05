@@ -16,9 +16,9 @@
             <button class="btn-action btn-back" (click)="back()">
                 <fa-icon [icon]="backIcon"></fa-icon> Retour
             </button>
-            <button class="btn-action btn-print" (click)="print()">
+            <!--<button class="btn-action btn-print" (click)="print()">
                 <fa-icon [icon]="printIcon"></fa-icon> Imprimer
-            </button>
+            </button>-->
             <button class="btn-action btn-download" (click)="downloadAsPDF()">
                 <fa-icon [icon]="pdfIcon"></fa-icon> Télécharger PDF
             </button>
@@ -60,14 +60,15 @@
                         </div>
                         <br *ngIf="store?.address">
                         <div *ngIf="store?.phone" class="contact-line">
-                            <span class="contact-label">Tél :</span> <span class="contact-value">{{store?.phone}}</span>
+                            <span class="contact-label">Tél : </span> <span
+                                class="contact-value">{{store?.phone}}</span>
                         </div>
                         <div *ngIf="store?.email" class="contact-line">
-                            <span class="contact-label">Email :</span> <span
+                            <span class="contact-label">Email : </span> <span
                                 class="contact-value">{{store?.email}}</span>
                         </div>
                         <div *ngIf="store?.site" class="contact-line">
-                            <span class="contact-label">Web :</span> <span class="contact-value">{{store?.site}}</span>
+                            <span class="contact-label">Web : </span> <span class="contact-value">{{store?.site}}</span>
                         </div>
                     </div>
                 </div>
@@ -134,5 +135,12 @@
                 <div>Contactez-nous à {{store?.email}} pour toute question.</div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Hidden Printable Invoice Template (for PDF generation) -->
+<div style="position: absolute; left: -9999px; top: 0;">
+    <div #printingInvoice>
+        <app-receipt-invoice *ngIf="receipt" [receipt]="receipt" [store]="store"></app-receipt-invoice>
     </div>
 </div>

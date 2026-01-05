@@ -21,6 +21,11 @@ module.exports = {
       date: {
         type: DataTypes.DATE
       },
+      impactStock: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        field: 'impact_stock'
+      },
       receiptId: {
         type: DataTypes.INTEGER,
         field: 'receipt_id'

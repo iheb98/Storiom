@@ -157,16 +157,21 @@
         <!-- Products Grid -->
         <div class="products-grid" *ngIf="!isLoading && products?.length > 0">
             <div class="product-card" *ngFor="let item of products" [class.selected]="isSelected(item?.id)">
-                <!-- Selection Checkbox -->
-                <label class="product-checkbox" (click)="$event.stopPropagation()">
-                    <input type="checkbox" [checked]="isSelected(item?.id)" (change)="toggleSelection(item?.id)">
-                    <span class="checkmark"></span>
-                </label>
 
-                <!-- Visibility Badge -->
-                <span class="visibility-badge" [class.visible]="item?.toDisplay" [class.hidden]="!item?.toDisplay">
-                    <fa-icon [icon]="item?.toDisplay ? faEye : faEyeSlash"></fa-icon>
-                </span>
+                <!-- Card Header Row -->
+                <div class="card-header-row">
+                    <label class="product-checkbox" (click)="$event.stopPropagation()">
+                        <input type="checkbox" [checked]="isSelected(item?.id)" (change)="toggleSelection(item?.id)">
+                        <span class="checkmark"></span>
+                    </label>
+                    <span class="quantity-badge" [class.critical]="item?.quantity <= 5"
+                        [class.warning]="item?.quantity > 5 && item?.quantity <= 10" [class.good]="item?.quantity > 10">
+                        {{ item?.quantity }} en stock
+                    </span>
+                    <span class="visibility-badge" [class.visible]="item?.toDisplay" [class.hidden]="!item?.toDisplay">
+                        <fa-icon [icon]="item?.toDisplay ? faEye : faEyeSlash"></fa-icon>
+                    </span>
+                </div>
 
                 <!-- Product Image -->
                 <div class="product-image"
@@ -176,10 +181,6 @@
                     <div class="image-overlay">
                         <fa-icon [icon]="faSearchPlus"></fa-icon>
                     </div>
-                    <span class="quantity-badge" [class.critical]="item?.quantity <= 5"
-                        [class.warning]="item?.quantity > 5 && item?.quantity <= 10" [class.good]="item?.quantity > 10">
-                        {{ item?.quantity }} en stock
-                    </span>
                 </div>
 
                 <!-- Product Info -->

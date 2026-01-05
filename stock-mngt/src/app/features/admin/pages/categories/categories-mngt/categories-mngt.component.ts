@@ -79,11 +79,12 @@ export class CategoriesMngtComponent implements OnInit {
     const dialogRef = this.dialog.open(AddCategoryComponent);
 
     dialogRef.afterClosed().subscribe(result => {
-      let inputCategory = result;
       if (result) {
         this.isActionLoading = true;
         this.categoryService.addCategory({
-          name: inputCategory,
+          name: result.name,
+          image: result.image,
+          icon: result.icon,
           storeId: this.storeId
         }).subscribe(
           response => {
@@ -114,11 +115,12 @@ export class CategoriesMngtComponent implements OnInit {
     const dialogRef = this.dialog.open(AddCategoryComponent);
 
     dialogRef.afterClosed().subscribe(result => {
-      let inputCategory = result;
       if (result) {
         this.isActionLoading = true;
         this.categoryService.addCategory({
-          name: inputCategory,
+          name: result.name,
+          image: result.image,
+          icon: result.icon,
           parentCategoryId: parentCategory.id
         }).subscribe(
           response => {
@@ -247,11 +249,18 @@ export class CategoriesMngtComponent implements OnInit {
   }
 
   updateCategory(category: any) {
-    const dialogRef = this.dialog.open(AddCategoryComponent, { data: category.name });
+    const dialogRef = this.dialog.open(AddCategoryComponent, {
+      data: { name: category.name, image: category.image, icon: category.icon }
+    });
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.isActionLoading = true;
-        this.categoryService.updateCategory({ name: result, id: category.id }).subscribe(response => {
+        this.categoryService.updateCategory({
+          id: category.id,
+          name: result.name,
+          image: result.image,
+          icon: result.icon
+        }).subscribe(response => {
           this.isActionLoading = false;
           Swal.fire({
             icon: 'success',

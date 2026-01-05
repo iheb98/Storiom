@@ -108,12 +108,20 @@
                 <div class="operation-info">
                     <div class="operation-header">
                         <span class="operation-product">{{ operation?.product?.name || 'Produit inconnu' }}</span>
-                        <span class="operation-badge" [class.sold]="operation?.type === 'SOLD'"
-                            [class.loaded]="operation?.type === 'LOADED'"
-                            [class.returned]="operation?.type === 'RETURNED'">
-                            {{ operation?.type === 'SOLD' ? 'Vente' : (operation?.type === 'LOADED' ? 'Chargement' :
-                            'Retour') }}
-                        </span>
+                        <div class="operation-badges">
+                            <span class="operation-badge" [class.sold]="operation?.type === 'SOLD'"
+                                [class.loaded]="operation?.type === 'LOADED'"
+                                [class.returned]="operation?.type === 'RETURNED'">
+                                {{ operation?.type === 'SOLD' ? 'Vente' : (operation?.type === 'LOADED' ? 'Chargement' :
+                                'Retour') }}
+                            </span>
+                            <span class="stock-badge" [class.impacted]="operation?.impactStock !== false"
+                                [class.not-impacted]="operation?.impactStock === false">
+                                <i class="fa" [class.fa-check]="operation?.impactStock !== false"
+                                    [class.fa-times]="operation?.impactStock === false"></i>
+                                {{ operation?.impactStock !== false ? 'Stock impacté' : 'Stock non impacté' }}
+                            </span>
+                        </div>
                     </div>
                     <div class="operation-details">
                         <span class="detail-item">

@@ -5,10 +5,11 @@
       <i class="fa fa-folder"></i>
     </div>
     <div class="header-text">
-      <h2>{{ data ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}</h2>
-      <p>{{ data ? 'Modifiez le nom de cette catégorie' : 'Ajoutez une nouvelle catégorie à votre arborescence' }}</p>
+      <h2>{{ data?.name ? 'Modifier la catégorie' : 'Nouvelle catégorie' }}</h2>
+      <p>{{ data?.name ? 'Modifiez les informations de cette catégorie' : 'Ajoutez une nouvelle catégorie à votre
+        arborescence' }}</p>
     </div>
-    <button class="close-btn" (click)="onNoClick()">
+    <button class="close-btn" (click)="onNoClick()" [disabled]="isUploading">
       <i class="fa fa-times"></i>
     </button>
   </div>
@@ -17,19 +18,65 @@
   <div class="dialog-content">
     <div class="form-group">
       <label for="categoryName">
-        <i class="fa fa-folder-open"></i> Nom de la catégorie
+        <i class="fa fa-folder-open"></i> Nom de la catégorie *
       </label>
-      <input type="text" id="categoryName" [(ngModel)]="categoryName"
+      <input type="text" id="categoryName" [(ngModel)]="categoryData.name"
         placeholder="Ex: Électronique, Vêtements, Alimentation..." autofocus>
     </div>
+    <!--
+    <div class="form-group">
+      <label for="categoryIcon">
+        <i class="fa fa-icons"></i> Icône (classe FontAwesome)
+      </label>
+      <input type="text" id="categoryIcon" [(ngModel)]="categoryData.icon"
+        placeholder="Ex: fa-laptop, fa-tshirt, fa-utensils...">
+      <span class="hint" *ngIf="categoryData.icon">
+        Aperçu: <i class="fa" [ngClass]="categoryData.icon"></i>
+      </span>
+    </div>
+
+    <div class="form-group">
+      <label>
+        <i class="fa fa-image"></i> Image de la catégorie
+      </label>
+
+      <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+
+      <div class="image-upload-zone" *ngIf="!selectedFile && !categoryData.image" (click)="triggerFileInput()">
+        <i class="fa fa-cloud-upload-alt upload-icon"></i>
+        <span class="upload-text">Cliquez pour choisir une image</span>
+        <span class="upload-hint">PNG, JPG, WEBP (max 5MB)</span>
+      </div>
+
+      <div class="image-preview-container" *ngIf="selectedFile || categoryData.image">
+        <img [src]="selectedFile?.preview || environment.backend + '/' + categoryData.image" alt="Aperçu"
+          class="image-preview">
+        <button class="btn-remove-image" (click)="removeImage()" [disabled]="isUploading">
+          <i class="fa fa-times"></i>
+        </button>
+        <span class="image-status new" *ngIf="selectedFile">Nouvelle image</span>
+        <span class="image-status existing" *ngIf="!selectedFile && categoryData.image">Image actuelle</span>
+      </div>
+
+      <div class="upload-error" *ngIf="uploadError">
+        <i class="fa fa-exclamation-circle"></i> {{ uploadError }}
+      </div>
+
+  </div>-->
   </div>
 
   <!-- Dialog Actions -->
   <div class="dialog-actions">
-    <button class="btn-cancel" (click)="onNoClick()">Annuler</button>
-    <button class="btn-submit" [mat-dialog-close]="categoryName" [disabled]="!categoryName">
-      <i class="fa" [class.fa-plus]="!data" [class.fa-save]="data"></i>
-      {{ data ? 'Enregistrer' : 'Ajouter' }}
+    <button class="btn-cancel" (click)="onNoClick()" [disabled]="isUploading">Annuler</button>
+    <button class="btn-submit" (click)="submit()" [disabled]="!categoryData.name || isUploading">
+      <span *ngIf="!isUploading">
+        <i class="fa" [class.fa-plus]="!data?.name" [class.fa-save]="data?.name"></i>
+        {{ data?.name ? 'Enregistrer' : 'Ajouter' }}
+      </span>
+      <span *ngIf="isUploading">
+        <i class="fa fa-spinner fa-spin"></i>
+        Téléchargement...
+      </span>
     </button>
   </div>
 </div>

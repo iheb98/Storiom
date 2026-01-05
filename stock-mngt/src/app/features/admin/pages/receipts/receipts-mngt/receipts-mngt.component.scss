@@ -556,12 +556,20 @@ $radius-lg: 16px;
         align-items: center;
         gap: 10px;
         margin-bottom: 6px;
+        flex-wrap: wrap;
     }
 
     .receipt-code {
         font-size: 1rem;
         font-weight: 600;
         color: $text-primary;
+    }
+
+    .receipt-badges {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
     }
 
     .receipt-badge {
@@ -585,6 +593,30 @@ $radius-lg: 16px;
         &.returned {
             background: $purple-light;
             color: $purple;
+        }
+    }
+
+    .stock-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+
+        i {
+            font-size: 0.65rem;
+        }
+
+        &.impacted {
+            background: $info-light;
+            color: $info;
+        }
+
+        &.not-impacted {
+            background: rgba($text-secondary, 0.1);
+            color: $text-secondary;
         }
     }
 

@@ -611,61 +611,89 @@ $radius-lg: 16px;
         box-shadow: 0 0 0 2px rgba($primary, 0.2);
     }
 
-    .product-checkbox {
-        position: absolute;
-        top: 12px;
-        left: 12px;
-        z-index: 10;
+    // Card Header Row
+    .card-header-row {
         display: flex;
         align-items: center;
-        justify-content: center;
-        width: 24px;
-        height: 24px;
-        background: $white;
-        border: 2px solid $border-color;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.2s;
+        justify-content: space-between;
+        padding: 10px 12px;
+        background: $background;
+        border-bottom: 1px solid $border-color;
+        gap: 10px;
 
-        &:hover {
-            border-color: $primary;
-        }
-
-        input[type="checkbox"] {
-            width: 100%;
-            height: 100%;
+        .product-checkbox {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: $white;
+            border: 2px solid $border-color;
+            border-radius: 6px;
             cursor: pointer;
-            accent-color: $primary;
-            margin: 0;
+            transition: all 0.2s;
+            flex-shrink: 0;
+
+            &:hover {
+                border-color: $primary;
+            }
+
+            input[type="checkbox"] {
+                width: 100%;
+                height: 100%;
+                cursor: pointer;
+                accent-color: $primary;
+                margin: 0;
+            }
+
+            .checkmark {
+                display: none;
+            }
         }
 
-        .checkmark {
-            display: none;
+        .quantity-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            white-space: nowrap;
+
+            &.good {
+                background: $success-light;
+                color: $success;
+            }
+
+            &.warning {
+                background: $warning-light;
+                color: $warning;
+            }
+
+            &.critical {
+                background: $danger-light;
+                color: $danger;
+            }
         }
-    }
 
-    .visibility-badge {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        z-index: 10;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        font-size: 0.8rem;
-        transition: all 0.2s;
+        .visibility-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
 
-        &.visible {
-            background: $success;
-            color: $white;
-        }
+            &.visible {
+                background: $success;
+                color: $white;
+            }
 
-        &.hidden {
-            background: $text-secondary;
-            color: $white;
+            &.hidden {
+                background: $text-secondary;
+                color: $white;
+            }
         }
     }
 }
@@ -708,31 +736,6 @@ $radius-lg: 16px;
         fa-icon {
             color: $white;
             font-size: 2rem;
-        }
-    }
-
-    .quantity-badge {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-
-        &.good {
-            background: $success;
-            color: $white;
-        }
-
-        &.warning {
-            background: $warning;
-            color: $white;
-        }
-
-        &.critical {
-            background: $danger;
-            color: $white;
         }
     }
 }

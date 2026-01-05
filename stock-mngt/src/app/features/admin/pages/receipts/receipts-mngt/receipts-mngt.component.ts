@@ -269,8 +269,13 @@ export class ReceiptsMngtComponent implements OnInit {
       setTimeout(() => {
         try {
           const content = this.printingInvoice.nativeElement;
+          const storeName = this.store?.name || '';
+          const storePhone = this.store?.phone || '';
+          const storeEmail = this.store?.email || '';
+          const footerText = `${storeName} | Tél: ${storePhone} | ${storeEmail}`;
+
           const options = {
-            margin: [0, 0, 0, 0],
+            margin: [10, 10, 20, 10], // top, left, bottom, right - extra bottom margin for footer
             filename: this.printingReceipt?.code + '.pdf',
             image: { type: 'png', quality: 0.98 },
             html2canvas: { scale: 2, windowWidth: 1200 },
@@ -280,10 +285,28 @@ export class ReceiptsMngtComponent implements OnInit {
           html2pdf()
             .from(content)
             .set(options)
-            .save()
-            .then(() => {
+            .toPdf()
+            .get('pdf')
+            .then((pdf) => {
+              const totalPages = pdf.internal.getNumberOfPages();
+              const pageWidth = pdf.internal.pageSize.getWidth();
+              const pageHeight = pdf.internal.pageSize.getHeight();
+
+              for (let i = 1; i <= totalPages; i++) {
+                pdf.setPage(i);
+                pdf.setFontSize(8);
+                pdf.setTextColor(128, 128, 128); // Gray color
+
+                // Add footer text centered at bottom
+                pdf.text(footerText, pageWidth / 2, pageHeight - 8, { align: 'center' });
+
+                // Add page number
+                pdf.text(`Page ${i} / ${totalPages}`, pageWidth - 15, pageHeight - 8, { align: 'right' });
+              }
+
               this.printingReceipt = null;
             })
+            .save()
             .catch((err) => {
               console.error("PDF Generation Error:", err);
               this.printingReceipt = null;

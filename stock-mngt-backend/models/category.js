@@ -22,6 +22,14 @@ module.exports = (sequelize, DataTypes) => {
   }
   Category.init({
     name: DataTypes.STRING,
+    image: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    icon: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     parentCategoryId: {
       type: DataTypes.INTEGER,
       field: 'parent_categorie_id'
@@ -33,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
     creatorUserId: {
       type: DataTypes.INTEGER
     },
-    static :{
+    static: {
       type: DataTypes.BOOLEAN
     }
   }, {

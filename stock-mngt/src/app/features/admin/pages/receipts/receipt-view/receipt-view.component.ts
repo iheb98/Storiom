@@ -27,6 +27,9 @@ export class ReceiptViewComponent implements OnInit {
   @ViewChild('receiptSection')
   receiptSection!: ElementRef;
 
+  // Hidden invoice for PDF generation
+  @ViewChild('printingInvoice') printingInvoice!: ElementRef;
+
   // Icons
   pdfIcon = faFilePdf;
   printIcon = faPrint;
@@ -86,15 +89,55 @@ export class ReceiptViewComponent implements OnInit {
   }
 
   downloadAsPDF() {
-    const content = this.receiptSection.nativeElement;
-    const options = {
-      margin: [0, 0, 0, 0],
-      filename: this.receipt?.code + '.pdf',
-      image: { type: 'png', quality: 0.98 },
-      html2canvas: { scale: 2, windowWidth: 1200 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().from(content).set(options).save();
+    // Use the hidden invoice component for PDF generation (same approach as receipts-mngt)
+    setTimeout(() => {
+      try {
+        const content = this.printingInvoice.nativeElement;
+        const storeName = this.store?.name || '';
+        const storePhone = this.store?.phone || '';
+        const storeEmail = this.store?.email || '';
+        const footerText = `${storeName} | Tél: ${storePhone} | ${storeEmail}`;
+
+        const options = {
+          margin: [10, 10, 20, 10], // top, left, bottom, right - extra bottom margin for footer
+          filename: this.receipt?.code + '.pdf',
+          image: { type: 'png', quality: 0.98 },
+          html2canvas: { scale: 2, windowWidth: 1200 },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        html2pdf()
+          .from(content)
+          .set(options)
+          .toPdf()
+          .get('pdf')
+          .then((pdf) => {
+            const totalPages = pdf.internal.getNumberOfPages();
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+
+            for (let i = 1; i <= totalPages; i++) {
+              pdf.setPage(i);
+              pdf.setFontSize(8);
+              pdf.setTextColor(128, 128, 128); // Gray color
+
+              // Add footer text centered at bottom
+              pdf.text(footerText, pageWidth / 2, pageHeight - 8, { align: 'center' });
+
+              // Add page number
+              pdf.text(`Page ${i} / ${totalPages}`, pageWidth - 15, pageHeight - 8, { align: 'right' });
+            }
+          })
+          .save()
+          .catch((err) => {
+            console.error("PDF Generation Error:", err);
+            Swal.fire('Erreur', 'Erreur lors de la génération du PDF.', 'error');
+          });
+      } catch (e) {
+        console.error("PDF Setup Error:", e);
+        Swal.fire('Erreur', 'Erreur lors de la préparation du PDF.', 'error');
+      }
+    }, 100);
   }
 
   back() {

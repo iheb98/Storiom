@@ -12,6 +12,14 @@ module.exports = {
       name: {
         type: DataTypes.STRING
       },
+      image: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      icon: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
       parentCategoryId: {
         type: DataTypes.INTEGER,
         field: 'parent_categorie_id'

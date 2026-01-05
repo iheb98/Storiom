@@ -6,8 +6,8 @@ const checkSubscription = require('../checkSubscription');
 const { Op } = require('sequelize');
 
 router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
-    const { name, parentCategoryId, storeId } = req.body
-    Category.create({ name, parentCategoryId, storeId, static: true }).then(createdCategory => {
+    const { name, parentCategoryId, storeId, image, icon } = req.body
+    Category.create({ name, parentCategoryId, storeId, image, icon, static: true }).then(createdCategory => {
         res.json(createdCategory)
     }).catch(err => {
         res.status(500).json({
@@ -18,7 +18,7 @@ router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
 })
 
 router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
-    const { id, name } = req.body;
+    const { id, name, image, icon } = req.body;
     Category.findOne(
         {
             where: {
@@ -33,6 +33,8 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
             })
         } else {
             category.name = name
+            if (image !== undefined) category.image = image
+            if (icon !== undefined) category.icon = icon
             category.save().then(
                 savedCategory => {
                     res.json({ message: 'Catégorie modifié', success: true })

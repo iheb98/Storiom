@@ -82,6 +82,21 @@
                                 </ng-option>
                             </ng-select>
                         </div>
+
+                        <!-- Impact Stock Toggle -->
+                        <div class="form-group toggle-group">
+                            <label class="toggle-label">
+                                <input type="checkbox" formControlName="impactStock">
+                                <span class="toggle-switch"></span>
+                                <span class="toggle-text">
+                                    <i class="fa fa-boxes"></i>
+                                    Impacter le stock
+                                </span>
+                            </label>
+                            <span class="field-hint">
+                                Si activé, les quantités des produits seront mises à jour automatiquement
+                            </span>
+                        </div>
                     </div>
                 </div>
 
@@ -156,7 +171,8 @@
                     <div class="total-section" *ngIf="selectedProducts?.length > 0">
                         <div class="total-row">
                             <span class="total-label">Total HT</span>
-                            <span class="total-value">{{ total | number:'1.2-2' }} DT</span>
+                            <span class="total-value">{{ total / (1 + (form.get('tva').value || 0) / 100) |
+                                number:'1.2-2' }} DT</span>
                         </div>
                         <div class="total-row tva">
                             <span class="total-label">TVA ({{ form.get('tva').value || 0 }}%)</span>
@@ -165,7 +181,7 @@
                         </div>
                         <div class="total-row grand">
                             <span class="total-label">Total TTC</span>
-                            <span class="total-value">{{ (total * (1 + (form.get('tva').value || 0) / 100)) |
+                            <span class="total-value">{{ (total) |
                                 number:'1.2-2' }} DT</span>
                         </div>
                     </div>

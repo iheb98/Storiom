@@ -6,7 +6,7 @@ const checkSubscription = require('../checkSubscription');
 const { Op } = require('sequelize');
 
 router.post('/create', utility.authenticate, checkSubscription, async (req, res) => {
-    const { code, tva, type, name, date, userId, storeId, supplierId, operations } = req.body
+    const { code, tva, type, name, date, userId, storeId, supplierId, operations, impactStock } = req.body
     let total = 0;
     operations.forEach(item => {
         total += item.price * item.amount
@@ -17,24 +17,48 @@ router.post('/create', utility.authenticate, checkSubscription, async (req, res)
             creatorUserId: req.user.id
         }
     }).then(countReceipts => {
-        Receipt.create({ code: codeFormater(countReceipts + 1), total, tva, type, name, date, userId: req.user.id, storeId, supplierId, creatorUserId: req.user.id }).then(createdReceipt => {
+        Receipt.create({
+            code: codeFormater(countReceipts + 1),
+            total,
+            tva,
+            type,
+            name,
+            date,
+            userId: req.user.id,
+            storeId,
+            supplierId,
+            impactStock: impactStock !== false, // defaults to true
+            creatorUserId: req.user.id
+        }).then(createdReceipt => {
             let total = 0;
             operations.forEach(async item => {
                 let { amount, price, id } = item
-                Operation.create({ amount, type, price, date, productId: id, receiptId: createdReceipt.id, creatorUserId: req.user.id }).then(
+                Operation.create({
+                    amount,
+                    type,
+                    price,
+                    date,
+                    productId: id,
+                    receiptId: createdReceipt.id,
+                    impactStock: impactStock !== false,
+                    creatorUserId: req.user.id
+                }).then(
                     createdOperation => {
                         total += createdOperation.price * amount
                     }
                 )
-                let product = await Product.findOne({
-                    where: {
-                        id
-                    }
-                })
-                if (type == 'SOLD')
-                    await product.update({ quantity: product.quantity - item.amount })
-                else
-                    await product.update({ quantity: product.quantity + item.amount })
+                // Only update stock if impactStock is true
+                if (impactStock !== false) {
+                    let product = await Product.findOne({
+                        where: {
+                            id
+                        }
+                    })
+                    if (type == 'SOLD')
+                        await product.update({ quantity: product.quantity - item.amount })
+                    else
+                        await product.update({ quantity: product.quantity + item.amount })
+                }
             })
             res.json({
                 receipt: createdReceipt
@@ -247,6 +271,30 @@ router.delete('/operations/:id', utility.authenticate, checkSubscription, (req, 
 
 });
 
+// Get last 5 receipts for dashboard
+router.get('/store/:id/last', utility.authenticate, checkSubscription, (req, res, next) => {
+    const id = req.params.id;
+    Receipt.findAll({
+        where: {
+            store_id: id,
+            visible: true,
+            creatorUserId: req.user.id
+        },
+        include: ['supplier'],
+        order: [
+            ['date', 'DESC']
+        ],
+        limit: 5
+    }).then(receipts => {
+        res.json(receipts)
+    }).catch(err => {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        })
+    })
+});
+
 router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Receipt.findAll(utility.paginate({
@@ -348,32 +396,6 @@ router.put('/operations/edit', utility.authenticate, checkSubscription, async (r
         res.status(500).json(JSON.stringify(err))
     })
 })
-
-router.get('/store/:id/last', utility.authenticate, checkSubscription, (req, res, next) => {
-    const id = req.params.id;
-    console.log(id)
-    Receipt.findAll({
-        where: {
-
-            store_id: id,
-            creatorUserId: req.user.id,
-            [utility.Op.and]: [
-                utility.Sequelize.where(utility.Sequelize.fn('date', utility.Sequelize.col('date')), '=', utility.getSimpleDate(new Date()))
-            ]
-        },
-        limit: req.query.limit ? Number(req.query.limit) : null,
-        order: [
-            ['date', 'DESC']
-        ]
-    }).then(operations => {
-        res.json(operations)
-    }).catch(err => {
-        res.status(500).json({
-            success: false,
-            message: err.toString()
-        })
-    })
-});
 
 router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;

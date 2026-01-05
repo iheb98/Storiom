@@ -96,8 +96,8 @@ export class ReceiptAddComponent implements OnInit {
       supplierId: [null],
       name: [null],
       tva: [19],
-      date: [(new Date()).toISOString().substring(0, 16)]
-
+      date: [(new Date()).toISOString().substring(0, 16)],
+      impactStock: [true]
     });
   }
 
@@ -131,6 +131,7 @@ export class ReceiptAddComponent implements OnInit {
               supplierId: form.supplierId,
               date: form.date,
               tva: form.tva,
+              impactStock: form.impactStock,
               operations: this.selectedProducts,
               storeId: this.authService.getConnectedUser()?.store
             }
@@ -155,6 +156,7 @@ export class ReceiptAddComponent implements OnInit {
           supplierId: form.supplierId,
           date: form.date,
           tva: form.tva,
+          impactStock: form.impactStock,
           operations: this.selectedProducts,
           storeId: this.authService.getConnectedUser()?.store
         }
@@ -178,6 +180,7 @@ export class ReceiptAddComponent implements OnInit {
           supplierId: form.supplierId,
           date: form.date,
           tva: form.tva,
+          impactStock: form.impactStock,
           operations: this.selectedProducts,
           storeId: this.authService.getConnectedUser()?.store
         }
