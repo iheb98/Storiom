@@ -19,7 +19,8 @@ router.get('/store/:id/widgets', utility.authenticate, checkSubscription, async 
         const credits = await Credit.findAll({
             where: {
                 store_id: id,
-                creatorUserId: req.user.id
+                creatorUserId: req.user.id,
+                status: false
             }
         })
         const operations = await Operation.findAll({

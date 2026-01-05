@@ -28,7 +28,8 @@
             </div>
             <!-- Stats Content -->
             <div class="stats-grid" *ngIf="!isLoading">
-                <div class="stat-card" *ngFor="let w of widgetsList">
+                <div class="stat-card" *ngFor="let w of widgetsList" [class.clickable]="w.route"
+                    (click)="navigateToWidget(w)">
                     <div class="stat-icon" [ngClass]="w.class">
                         <fa-icon [icon]="w.icon"></fa-icon>
                     </div>

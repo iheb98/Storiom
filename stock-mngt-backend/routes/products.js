@@ -237,7 +237,7 @@ router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, nex
 
     if (req.query.critical === 'true') {
         whereClause[Op.and] = [
-            literal('"quantity" <= "critical_stock_indicator"')
+            literal('"quantity" <= "critical_stock_indicator" AND "activate_critical_stock_indicator" = true')
         ];
     }
 

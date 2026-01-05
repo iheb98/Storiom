@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   faArrowLeft, faUser, faEnvelope, faPhone, faHandHoldingUsd,
-  faCoins, faCalendarPlus, faCalendarCheck, faComment, faPlus, faSave
+  faCoins, faCalendarPlus, faCalendarCheck, faComment, faPlus, faSave, faCheck
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CreditService } from 'src/app/core/services/credit.service';
@@ -28,6 +28,7 @@ export class CreditAddComponent implements OnInit {
   faComment = faComment;
   faPlus = faPlus;
   faSave = faSave;
+  faCheck = faCheck;
 
   // Form
   form: FormGroup;
@@ -74,6 +75,7 @@ export class CreditAddComponent implements OnInit {
         this.form.get('returnDate').setValue(response.returnDate?.substring(0, 10) || null);
         this.form.get('amount').setValue(response.amount);
         this.form.get('comment').setValue(response.comment);
+        this.form.get('status').setValue(response.status || false);
         this.isLoading = false;
       },
       error => {
@@ -97,7 +99,8 @@ export class CreditAddComponent implements OnInit {
       comment: [''],
       amount: [''],
       givenDate: [null],
-      returnDate: [null]
+      returnDate: [null],
+      status: [false]
     });
   }
 

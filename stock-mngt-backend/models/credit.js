@@ -38,6 +38,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       field: 'return_date'
     },
+    status: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     storeId: {
       type: DataTypes.INTEGER,
       field: 'store_id'

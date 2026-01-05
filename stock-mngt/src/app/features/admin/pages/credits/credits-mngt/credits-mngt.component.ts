@@ -40,6 +40,7 @@ export class CreditsMngtComponent implements OnInit {
   toGivenDateFilter: string | null = null;
   fromReturnDateFilter: string | null = null;
   toReturnDateFilter: string | null = null;
+  statusFilter: boolean | null = false;
 
   // Data
   borrowers: any[] = [];
@@ -101,6 +102,7 @@ export class CreditsMngtComponent implements OnInit {
     this.toGivenDateFilter = null;
     this.fromReturnDateFilter = null;
     this.toReturnDateFilter = null;
+    this.statusFilter = null;
     this.filter();
   }
 
@@ -126,6 +128,8 @@ export class CreditsMngtComponent implements OnInit {
       query += query ? ",returnDate > '" + this.fromReturnDateFilter + "'" : "returnDate > '" + this.fromReturnDateFilter + "'";
     if (this.toReturnDateFilter)
       query += query ? ",returnDate < '" + this.toReturnDateFilter + "'" : "returnDate < '" + this.toReturnDateFilter + "'";
+    if (this.statusFilter !== null)
+      query += query ? ",status = '" + this.statusFilter + "'" : "status = '" + this.statusFilter + "'";
     return query;
   }
 
@@ -211,7 +215,7 @@ export class CreditsMngtComponent implements OnInit {
   }
 
   editBorrower(borrower: any) {
-    this.router.navigate(['credits/' + borrower.id]);
+    this.router.navigate(['/admin/credits/edit/' + borrower.id]);
   }
 
   handlePageEvent(event: any) {

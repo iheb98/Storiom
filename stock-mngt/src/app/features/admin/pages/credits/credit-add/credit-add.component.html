@@ -104,6 +104,20 @@
                             <input type="date" id="returnDate" formControlName="returnDate">
                         </div>
                     </div>
+
+                    <!-- Status Toggle (Only visible when editing) -->
+                    <div class="form-group status-toggle-group" *ngIf="borrowerId">
+                        <label><fa-icon [icon]="faCheck"></fa-icon> Statut du crédit</label>
+                        <div class="status-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" formControlName="status">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label" [class.claimed]="form.get('status').value">
+                                {{ form.get('status').value ? 'Réclamé' : 'Non réclamé' }}
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Comment Section -->

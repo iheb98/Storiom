@@ -6,6 +6,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StatService } from 'src/app/core/services/stat.service';
+import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -57,6 +58,7 @@ export class DashboardViewComponent implements OnInit {
     constructor(
         private authService: AuthService,
         private statService: StatService,
+        private router: Router
     ) { }
 
     ngOnInit(): void {
@@ -129,7 +131,9 @@ export class DashboardViewComponent implements OnInit {
                         label: 'Produits avec stock critique',
                         value: response?.criticalStock ?? '--',
                         icon: faArrowDown,
-                        class: 'critical-stock'
+                        class: 'critical-stock',
+                        route: '/products',
+                        queryParams: { filter: 'critical' }
                     },
                     {
                         label: 'Ventes du Jour',
@@ -141,7 +145,8 @@ export class DashboardViewComponent implements OnInit {
                         label: 'Total des crédits',
                         value: response?.totalCredits ? response.totalCredits + ' DT' : '--',
                         icon: this.faHand,
-                        class: 'credit'
+                        class: 'credit',
+                        route: '/credits'
                     }
                 ];
                 this.isLoading = false;
@@ -156,5 +161,15 @@ export class DashboardViewComponent implements OnInit {
                 });
             }
         );
+    }
+
+    navigateToWidget(widget: any) {
+        if (widget.route) {
+            if (widget.queryParams) {
+                this.router.navigate([widget.route], { queryParams: widget.queryParams });
+            } else {
+                this.router.navigate([widget.route]);
+            }
+        }
     }
 }

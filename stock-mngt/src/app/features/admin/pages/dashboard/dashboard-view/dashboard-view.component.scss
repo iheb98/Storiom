@@ -221,6 +221,14 @@ $radius-lg: 16px;
     transform: translateY(-3px);
     box-shadow: $shadow-md;
   }
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      border-color: $primary;
+    }
+  }
 }
 
 .stat-icon {

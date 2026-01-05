@@ -338,6 +338,24 @@ $radius-lg: 16px;
         }
     }
 
+    select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid $border-color;
+        border-radius: $radius-sm;
+        font-size: 0.9rem;
+        font-family: inherit;
+        background: $white;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:focus {
+            outline: none;
+            border-color: $primary;
+            box-shadow: 0 0 0 3px $primary-light;
+        }
+    }
+
     &.range-group {
         .range-inputs {
             display: flex;
@@ -434,13 +452,36 @@ $radius-lg: 16px;
     min-width: 0;
 
     .credit-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
         margin-bottom: 6px;
+        flex-wrap: wrap;
     }
 
     .borrower-name {
         font-size: 1rem;
         font-weight: 600;
         color: $text-primary;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+
+        &.claimed {
+            background: rgba($success, 0.1);
+            color: $success;
+        }
+
+        &.not-claimed {
+            background: rgba(#f57c00, 0.1);
+            color: #f57c00;
+        }
     }
 
     .credit-details {

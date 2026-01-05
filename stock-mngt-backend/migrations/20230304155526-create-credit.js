@@ -37,9 +37,13 @@ module.exports = {
         type: DataTypes.DATE,
         field: 'return_date'
       },
-      storeId:{
-        type:DataTypes.INTEGER,
-        field:'store_id'
+      status: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+      },
+      storeId: {
+        type: DataTypes.INTEGER,
+        field: 'store_id'
       },
       creatorUserId: {
         type: DataTypes.INTEGER
