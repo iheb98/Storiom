@@ -80,6 +80,7 @@ import { ServicesMngtComponent } from './pages/services/services-mngt/services-m
 import { ServiceAddComponent } from './pages/services/service-add/service-add.component';
 import { ServiceRequestsMngtComponent } from './pages/services/service-requests-mngt/service-requests-mngt.component';
 import { ServiceRequestsStatsComponent } from './pages/dashboard/service-requests-stats/service-requests-stats.component';
+import { ZXingScannerModule } from '@zxing/ngx-scanner';
 
 @NgModule({
   declarations: [
@@ -178,7 +179,8 @@ import { ServiceRequestsStatsComponent } from './pages/dashboard/service-request
     MatMenuModule,
     QuillModule.forRoot(),
     SharedModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    ZXingScannerModule
   ]
 })
 export class AdminModule { }

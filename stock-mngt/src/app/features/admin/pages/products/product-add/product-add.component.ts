@@ -6,7 +6,7 @@ import {
   faEye, faInfoCircle, faTag, faFolder, faTruck, faCoins, faArrowDown,
   faArrowUp, faAlignLeft, faImages, faCloudUploadAlt, faPlus, faSave, faBox, faBarcode, faCamera
 } from '@fortawesome/free-solid-svg-icons';
-import Quagga from 'quagga';
+import { BarcodeFormat } from '@zxing/library';
 import { EMPTY, forkJoin } from 'rxjs';
 import { expand, map } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -560,55 +560,54 @@ export class ProductAddComponent implements OnInit {
   }
 
   // Barcode Scanner Methods
+  // Barcode Scanner Methods
+  allowedFormats = [
+    BarcodeFormat.EAN_13,
+    BarcodeFormat.EAN_8,
+    BarcodeFormat.CODE_128,
+    BarcodeFormat.CODE_39,
+    BarcodeFormat.UPC_A,
+    BarcodeFormat.UPC_E,
+    BarcodeFormat.ITF
+  ];
+
   startScanner() {
     this.scannerActive = true;
     this.scannerError = '';
-
-    setTimeout(() => {
-      Quagga.init({
-        inputStream: {
-          name: "Live",
-          type: "LiveStream",
-          target: document.querySelector('#scanner-container'),
-          constraints: {
-            facingMode: "environment"
-          }
-        },
-        decoder: {
-          readers: ["ean_reader", "ean_8_reader", "code_128_reader", "code_39_reader", "upc_reader", "upc_e_reader"]
-        }
-      }, (err) => {
-        if (err) {
-          console.error('Quagga initialization error:', err);
-          this.scannerError = 'Impossible d\'accéder à la caméra. Veuillez vérifier les permissions.';
-          this.scannerActive = false;
-          return;
-        }
-
-        Quagga.start();
-
-        Quagga.onDetected((result) => {
-          if (result && result.codeResult) {
-            const code = result.codeResult.code;
-            this.ngZone.run(() => {
-              this.form.get('code').setValue(code);
-              this.stopScanner();
-              Swal.fire({
-                icon: 'success',
-                title: 'Code-barres détecté !',
-                text: code,
-                showConfirmButton: false,
-                timer: 1500
-              });
-            });
-          }
-        });
-      });
-    }, 100);
   }
 
   stopScanner() {
     this.scannerActive = false;
-    Quagga.stop();
+  }
+
+  handleScanSuccess(result: string) {
+    if (result) {
+      this.ngZone.run(() => {
+        this.form.get('code').setValue(result);
+        this.stopScanner();
+        Swal.fire({
+          icon: 'success',
+          title: 'Code-barres détecté !',
+          text: result,
+          showConfirmButton: false,
+          timer: 1500
+        });
+      });
+    }
+  }
+
+  onCamerasFound(devices: MediaDeviceInfo[]): void {
+    if (!devices || devices.length === 0) {
+      this.scannerError = 'Aucune caméra trouvée';
+    }
+  }
+
+  onDeviceChange(device: MediaDeviceInfo): void {
+    // Handle device change if needed
+  }
+
+  onScanError(error: any): void {
+    console.error(error);
+    // this.scannerError = 'Erreur lors du scan';
   }
 }

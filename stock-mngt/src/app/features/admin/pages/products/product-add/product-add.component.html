@@ -87,7 +87,13 @@
                                         </button>
                                     </div>
                                     <div class="scanner-body">
-                                        <div id="scanner-container"></div>
+                                        <div id="scanner-container">
+                                            <zxing-scanner *ngIf="scannerActive" [formats]="allowedFormats"
+                                                (scanSuccess)="handleScanSuccess($event)"
+                                                (camerasFound)="onCamerasFound($event)"
+                                                (scanError)="onScanError($event)"
+                                                (deviceChange)="onDeviceChange($event)"></zxing-scanner>
+                                        </div>
                                         <p class="scanner-hint">Placez le code-barres devant la caméra</p>
                                         <p class="scanner-error" *ngIf="scannerError">{{ scannerError }}</p>
                                     </div>
