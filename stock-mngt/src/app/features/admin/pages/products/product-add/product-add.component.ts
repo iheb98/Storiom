@@ -4,8 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   faArrowLeft, faEdit, faTimes, faChartLine, faCubes, faExclamationTriangle,
   faEye, faInfoCircle, faTag, faFolder, faTruck, faCoins, faArrowDown,
-  faArrowUp, faAlignLeft, faImages, faCloudUploadAlt, faPlus, faSave, faBox
+  faArrowUp, faAlignLeft, faImages, faCloudUploadAlt, faPlus, faSave, faBox, faBarcode, faCamera
 } from '@fortawesome/free-solid-svg-icons';
+import Quagga from 'quagga';
 import { EMPTY, forkJoin } from 'rxjs';
 import { expand, map } from 'rxjs/operators';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -48,6 +49,12 @@ export class ProductAddComponent implements OnInit {
   faPlus = faPlus;
   faSave = faSave;
   faBox = faBox;
+  faBarcode = faBarcode;
+  faCamera = faCamera;
+
+  // Barcode Scanner
+  scannerActive = false;
+  scannerError = '';
 
   // Loading States
   isLoading = true;
@@ -199,6 +206,7 @@ export class ProductAddComponent implements OnInit {
         this.form.get('toDisplay').setValue(response?.toDisplay);
         this.form.get('criticalStockIndicator').setValue(response?.criticalStockIndicator);
         this.form.get('activateCriticalStockIndicator').setValue(response?.activateCriticalStockIndicator || false);
+        this.form.get('code').setValue(response?.code);
         this.images = response?.images || [];
         this.isLoading = false;
       },
@@ -220,6 +228,7 @@ export class ProductAddComponent implements OnInit {
 
     this.form = this.formBuilder.group({
       name: [null, Validators.required],
+      code: [null],
       criticalStockIndicator: [0],
       activateCriticalStockIndicator: [false],
       supplierId: [null],
@@ -548,5 +557,58 @@ export class ProductAddComponent implements OnInit {
     if (this.fileInput) {
       this.fileInput.nativeElement.value = '';
     }
+  }
+
+  // Barcode Scanner Methods
+  startScanner() {
+    this.scannerActive = true;
+    this.scannerError = '';
+
+    setTimeout(() => {
+      Quagga.init({
+        inputStream: {
+          name: "Live",
+          type: "LiveStream",
+          target: document.querySelector('#scanner-container'),
+          constraints: {
+            facingMode: "environment"
+          }
+        },
+        decoder: {
+          readers: ["ean_reader", "ean_8_reader", "code_128_reader", "code_39_reader", "upc_reader", "upc_e_reader"]
+        }
+      }, (err) => {
+        if (err) {
+          console.error('Quagga initialization error:', err);
+          this.scannerError = 'Impossible d\'accéder à la caméra. Veuillez vérifier les permissions.';
+          this.scannerActive = false;
+          return;
+        }
+
+        Quagga.start();
+
+        Quagga.onDetected((result) => {
+          if (result && result.codeResult) {
+            const code = result.codeResult.code;
+            this.ngZone.run(() => {
+              this.form.get('code').setValue(code);
+              this.stopScanner();
+              Swal.fire({
+                icon: 'success',
+                title: 'Code-barres détecté !',
+                text: code,
+                showConfirmButton: false,
+                timer: 1500
+              });
+            });
+          }
+        });
+      });
+    }, 100);
+  }
+
+  stopScanner() {
+    this.scannerActive = false;
+    Quagga.stop();
   }
 }

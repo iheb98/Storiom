@@ -124,7 +124,7 @@ router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
 })
 
 router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
-    const { id, name, color, quantity, unit, images, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, activateCriticalStockIndicator } = req.body
+    const { id, name, code, color, quantity, unit, images, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, activateCriticalStockIndicator } = req.body
     Product.findOne(
         {
             where: {
@@ -134,6 +134,7 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
         }
     ).then(product => {
         product.name = name
+        product.code = code
         product.color = color
         product.images = JSON.stringify(images)
         product.quantity = quantity

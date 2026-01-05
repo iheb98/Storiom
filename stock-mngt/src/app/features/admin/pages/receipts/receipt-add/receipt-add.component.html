@@ -147,7 +147,8 @@
                                     <div class="input-group">
                                         <label>Qté</label>
                                         <input type="number" class="qty-input" [(ngModel)]="product.amount"
-                                            [ngModelOptions]="{standalone: true}" (change)="calculateTotal()"
+                                            [ngModelOptions]="{standalone: true}" (change)="enforceMinQuantity(product)"
+                                            min="1"
                                             [class.warning]="product.amount > product.quantity && form.get('type').value === 'SOLD'">
                                     </div>
                                 </div>

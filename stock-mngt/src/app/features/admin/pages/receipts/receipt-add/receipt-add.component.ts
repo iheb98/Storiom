@@ -212,13 +212,6 @@ export class ReceiptAddComponent implements OnInit {
     this.currentSize = event.pageSize;
   }
 
-  deleteProduct(id) {
-
-  }
-  viewProduct(id) {
-
-  }
-
   checkQuantity() {
     let test = false
     this.selectedProducts.forEach(item => {
@@ -230,6 +223,18 @@ export class ReceiptAddComponent implements OnInit {
 
   navigateTo(link: string) {
     this.router.navigate([link])
+  }
+
+  deleteProduct(product: any) {
+    this.selectedProducts = this.selectedProducts.filter(p => p.id !== product.id);
+    this.calculateTotal();
+  }
+
+  enforceMinQuantity(product: any) {
+    if (product.amount < 1) {
+      product.amount = 1;
+    }
+    this.calculateTotal();
   }
 
 }
