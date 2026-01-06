@@ -35,6 +35,19 @@
                 <input type="text" placeholder="Rechercher un produit..." [(ngModel)]="searchable"
                     [ngModelOptions]="{standalone: true}" (keyup)="search()">
             </div>
+
+            <!-- Barcode Quick Access -->
+            <div class="barcode-quick-access-inline">
+                <div class="barcode-input-wrapper">
+                    <fa-icon [icon]="faBarcode" class="input-icon"></fa-icon>
+                    <input type="text" [(ngModel)]="codeFilter" placeholder="Code-barres..."
+                        (keyup.enter)="searchByBarcode()">
+                </div>
+                <button class="btn-scan-inline" (click)="startScanner()" title="Scanner avec la caméra">
+                    <fa-icon [icon]="faCamera"></fa-icon>
+                </button>
+            </div>
+
             <div class="action-buttons">
                 <button class="btn-filter" [class.active]="!filtersCollapsed" (click)="toggleFilters()">
                     <fa-icon [icon]="faFilter"></fa-icon>
@@ -176,8 +189,9 @@
                 <!-- Product Image -->
                 <div class="product-image"
                     (click)="openImage(item?.images?.length > 0 ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png')">
-                    <img [src]="item?.images?.length > 0 ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png'"
-                        alt="{{ item?.name }}" [class.default-image]="!item?.images?.length">
+                    <img [src]="(item?.thumbnails?.length > 0 ? environment.backend + '/' + item?.thumbnails[0] : (item?.images?.length > 0 ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png'))"
+                        alt="{{ item?.name }}"
+                        [class.default-image]="!item?.images?.length && !item?.thumbnails?.length">
                     <div class="image-overlay">
                         <fa-icon [icon]="faSearchPlus"></fa-icon>
                     </div>
@@ -239,4 +253,26 @@
 <div class="image-popup" *ngIf="selectedImage" (click)="closeImage()">
     <img [src]="selectedImage" alt="Zoomed Image">
     <button class="close-popup"><fa-icon [icon]="faTimes"></fa-icon></button>
+</div>
+
+<!-- Barcode Scanner Modal -->
+<div class="scanner-overlay" *ngIf="scannerActive">
+    <div class="scanner-modal">
+        <div class="scanner-header">
+            <h3><fa-icon [icon]="faBarcode"></fa-icon> Scanner un code-barres</h3>
+            <button type="button" class="btn-close-scanner" (click)="stopScanner()">
+                <fa-icon [icon]="faTimes"></fa-icon>
+            </button>
+        </div>
+        <div class="scanner-body">
+            <div id="scanner-container">
+                <zxing-scanner *ngIf="scannerActive" [formats]="allowedFormats"
+                    (scanSuccess)="handleScanSuccess($event)" (camerasFound)="onCamerasFound($event)"
+                    (scanError)="onScanError($event)">
+                </zxing-scanner>
+            </div>
+            <p class="scanner-hint">Placez le code-barres devant la caméra</p>
+            <p class="scanner-error" *ngIf="scannerError">{{ scannerError }}</p>
+        </div>
+    </div>
 </div>

@@ -3,8 +3,10 @@
     <!-- New Badge (conditional) -->
     <!-- <span class="badge new" *ngIf="isNew(product)">New</span> -->
 
-    <img [src]="product?.images?.length ? environment.backend + '/' + product?.images[0] : 'assets/default_product.png'"
-      [alt]="product.name" loading="lazy" [class.default-image]="!product?.images?.length">
+    <img
+      [src]="(product?.thumbnails?.length ? environment.backend + '/' + product?.thumbnails[0] : (product?.images?.length ? environment.backend + '/' + product?.images[0] : 'assets/default_product.png'))"
+      [alt]="product.name" loading="lazy"
+      [class.default-image]="!product?.images?.length && !product?.thumbnails?.length">
 
     <!-- Overlay Utils -->
     <div class="overlay-utils">

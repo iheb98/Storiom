@@ -21,7 +21,18 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     toJSON() {
-      return { ...this.get(), images: this.images ? JSON.parse(this.images) : [], brandId: undefined, brand_id: undefined, store_id: undefined, supplierId: undefined, supplier_id: undefined, categoryId: undefined, category_id: undefined }
+      return {
+        ...this.get(),
+        images: this.images ? JSON.parse(this.images) : [],
+        thumbnails: this.thumbnails ? JSON.parse(this.thumbnails) : [],
+        brandId: undefined,
+        brand_id: undefined,
+        store_id: undefined,
+        supplierId: undefined,
+        supplier_id: undefined,
+        categoryId: undefined,
+        category_id: undefined
+      }
     }
   }
   Product.init({
@@ -48,6 +59,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     size: DataTypes.STRING,
     images: DataTypes.STRING(5000),
+    thumbnails: DataTypes.STRING(5000),
     quantity: DataTypes.FLOAT,
     unit: {
       type: DataTypes.STRING,

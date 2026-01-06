@@ -4,8 +4,10 @@ import { Router, ActivatedRoute } from '@angular/router';
 import {
   faEdit, faTrash, faEye, faArrowUp, faArrowDown, faPlus, faSearch,
   faFilter, faUndo, faTag, faAlignLeft, faTruck, faFolder, faCubes,
-  faEyeSlash, faGlobe, faLock, faSearchPlus, faShoppingCart, faTimes, faBox
+  faEyeSlash, faGlobe, faLock, faSearchPlus, faShoppingCart, faTimes, faBox,
+  faBarcode, faCamera
 } from '@fortawesome/free-solid-svg-icons';
+import { BarcodeFormat } from '@zxing/library';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CategoryService } from 'src/app/core/services/category.service';
 import { ProductService } from 'src/app/core/services/product.service';
@@ -46,6 +48,8 @@ export class ProductsMngtComponent implements OnInit {
   faShoppingCart = faShoppingCart;
   faTimes = faTimes;
   faBox = faBox;
+  faBarcode = faBarcode;
+  faCamera = faCamera;
 
   // Loading States
   isLoading = true;
@@ -63,6 +67,20 @@ export class ProductsMngtComponent implements OnInit {
   colorFilter = '';
   supplierFilter: number = null;
   categoryFilter: number = null;
+  codeFilter = '';
+
+  // Scanner
+  scannerActive = false;
+  scannerError = '';
+  allowedFormats = [
+    BarcodeFormat.EAN_13,
+    BarcodeFormat.EAN_8,
+    BarcodeFormat.CODE_128,
+    BarcodeFormat.CODE_39,
+    BarcodeFormat.UPC_A,
+    BarcodeFormat.UPC_E,
+    BarcodeFormat.ITF
+  ];
 
   // Data
   suppliers: any[] = [];
@@ -137,6 +155,8 @@ export class ProductsMngtComponent implements OnInit {
       query += query ? ",sellingPrice > '" + this.minSellingPriceFilter + "'" : "sellingPrice > '" + this.minSellingPriceFilter + "'";
     if (this.maxSellingPriceFilter != null)
       query += query ? ",sellingPrice < '" + this.maxSellingPriceFilter + "'" : "sellingPrice < '" + this.maxSellingPriceFilter + "'";
+    if (this.codeFilter)
+      query += query ? ",code = '" + this.codeFilter + "'" : "code = '" + this.codeFilter + "'";
     return query;
   }
 
@@ -204,6 +224,7 @@ export class ProductsMngtComponent implements OnInit {
     this.minSellingPriceFilter = null;
     this.maxSellingPriceFilter = null;
     this.searchable = '';
+    this.codeFilter = '';
     this.filter();
   }
 
@@ -405,5 +426,46 @@ export class ProductsMngtComponent implements OnInit {
         );
       }
     });
+  }
+
+  // Barcode Scanner Methods
+  startScanner() {
+    this.scannerActive = true;
+    this.scannerError = '';
+  }
+
+  stopScanner() {
+    this.scannerActive = false;
+  }
+
+  handleScanSuccess(result: string) {
+    if (result) {
+      this.codeFilter = result;
+      this.stopScanner();
+      this.filter();
+      Swal.fire({
+        icon: 'success',
+        title: 'Code-barres détecté !',
+        text: result,
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }
+  }
+
+  onCamerasFound(devices: MediaDeviceInfo[]): void {
+    if (!devices || devices.length === 0) {
+      this.scannerError = 'Aucune caméra trouvée';
+    }
+  }
+
+  onScanError(error: any): void {
+    console.error('Scanner error:', error);
+  }
+
+  searchByBarcode() {
+    if (this.codeFilter) {
+      this.filter();
+    }
   }
 }

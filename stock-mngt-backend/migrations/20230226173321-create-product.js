@@ -39,6 +39,9 @@ module.exports = {
       images: {
         type: DataTypes.STRING(5000)
       },
+      thumbnails: {
+        type: DataTypes.STRING(5000)
+      },
       quantity: {
         type: DataTypes.FLOAT
       },

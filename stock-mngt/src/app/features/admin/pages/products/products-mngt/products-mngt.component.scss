@@ -333,6 +333,15 @@ $radius-lg: 16px;
     .action-buttons {
         display: flex;
         gap: 10px;
+
+        @media (max-width: 576px) {
+            width: 100%;
+            justify-content: flex-end;
+        }
+    }
+
+    @media (max-width: 576px) {
+        gap: 10px;
     }
 
     .btn-filter,
@@ -365,6 +374,106 @@ $radius-lg: 16px;
     .btn-reset {
         padding: 14px 16px;
     }
+
+    // Inline Barcode Quick Access
+    .barcode-quick-access-inline {
+        display: flex;
+        gap: 8px;
+        align-items: stretch;
+
+        .barcode-input-wrapper {
+            position: relative;
+            min-width: 200px;
+
+            .input-icon {
+                position: absolute;
+                left: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: $primary;
+                font-size: 0.9rem;
+            }
+
+            input {
+                width: 100%;
+                padding: 14px 14px 14px 40px;
+                border: 2px solid rgba($primary, 0.3);
+                border-radius: $radius-md;
+                font-size: 0.9rem;
+                font-family: inherit;
+                background: linear-gradient(135deg, rgba($primary, 0.02) 0%, rgba($primary-dark, 0.05) 100%);
+                transition: all 0.3s;
+
+                &::placeholder {
+                    color: $text-secondary;
+                    font-size: 0.85rem;
+                }
+
+                &:focus {
+                    outline: none;
+                    border-color: $primary;
+                    box-shadow: 0 0 0 4px rgba($primary, 0.15);
+                    background: $white;
+                }
+            }
+
+            @media (max-width: 768px) {
+                min-width: 150px;
+            }
+
+            @media (max-width: 576px) {
+                min-width: 100%;
+            }
+        }
+
+        .btn-scan-inline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+            color: $white;
+            border: none;
+            border-radius: $radius-md;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex-shrink: 0;
+
+            fa-icon {
+                font-size: 1.1rem;
+            }
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba($primary, 0.4);
+            }
+
+            &:active {
+                transform: translateY(0);
+            }
+
+            @media (max-width: 576px) {
+                width: 44px;
+                height: 44px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            width: 100%;
+            order: -1;
+
+            .barcode-input-wrapper {
+                flex: 1;
+                min-width: 0;
+
+                input {
+                    padding: 12px 12px 12px 38px;
+                    font-size: 0.85rem;
+                }
+            }
+        }
+    }
 }
 
 // ============================================
@@ -381,6 +490,229 @@ $radius-lg: 16px;
 
     &.collapsed {
         display: none;
+    }
+}
+
+// ============================================
+// BARCODE QUICK ACCESS
+// ============================================
+.barcode-quick-access {
+    background: linear-gradient(135deg, rgba($primary, 0.05) 0%, rgba($primary-dark, 0.1) 100%);
+    border: 1px solid rgba($primary, 0.2);
+    border-radius: $radius-md;
+    padding: 20px;
+    margin-bottom: 25px;
+
+    .barcode-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        color: $primary-dark;
+        font-weight: 600;
+        font-size: 0.95rem;
+
+        fa-icon {
+            font-size: 1.1rem;
+        }
+    }
+
+    .barcode-input-group {
+        display: flex;
+        gap: 12px;
+        align-items: stretch;
+
+        @media (max-width: 576px) {
+            flex-direction: column;
+        }
+    }
+
+    .barcode-input-wrapper {
+        flex: 1;
+        position: relative;
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: $text-secondary;
+            font-size: 1rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px 14px 45px;
+            border: 2px solid rgba($primary, 0.2);
+            border-radius: $radius-md;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background: $white;
+            transition: all 0.3s;
+
+            &::placeholder {
+                color: $text-secondary;
+            }
+
+            &:focus {
+                outline: none;
+                border-color: $primary;
+                box-shadow: 0 0 0 4px rgba($primary, 0.15);
+            }
+        }
+    }
+
+    .btn-scan {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 24px;
+        background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+        color: $white;
+        border: none;
+        border-radius: $radius-md;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        white-space: nowrap;
+
+        fa-icon {
+            font-size: 1rem;
+        }
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba($primary, 0.4);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 576px) {
+            width: 100%;
+        }
+    }
+}
+
+// ============================================
+// SCANNER MODAL
+// ============================================
+.scanner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+.scanner-modal {
+    background: $white;
+    border-radius: $radius-lg;
+    overflow: hidden;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.scanner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+    color: $white;
+
+    h3 {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .btn-close-scanner {
+        width: 38px;
+        height: 38px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        border-radius: 50%;
+        color: $white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(1.1);
+        }
+    }
+}
+
+.scanner-body {
+    padding: 25px;
+    text-align: center;
+
+    #scanner-container {
+        width: 100%;
+        height: 300px;
+        background: #111;
+        border-radius: $radius-md;
+        overflow: hidden;
+        margin-bottom: 15px;
+
+        zxing-scanner {
+            width: 100%;
+            height: 100%;
+            display: block;
+
+            video {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+    }
+
+    .scanner-hint {
+        font-size: 0.9rem;
+        color: $text-secondary;
+        margin: 0;
+    }
+
+    .scanner-error {
+        font-size: 0.9rem;
+        color: $danger;
+        margin: 12px 0 0;
+        padding: 12px;
+        background: $danger-light;
+        border-radius: $radius-sm;
     }
 }
 

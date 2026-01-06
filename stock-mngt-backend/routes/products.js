@@ -99,8 +99,8 @@ router.delete('/cart/:productId', utility.authenticate, async (req, res) => {
 });
 
 router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
-    const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, quantity, unit, storeId, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay } = req.body
-    Product.create({ name, code, buyingPrice, sellingPrice, currency, color, size, description, images: JSON.stringify(images), quantity, unit, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id, criticalStockIndicator, toDisplay }).then(createdProduct => {
+    const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, thumbnails, quantity, unit, storeId, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay } = req.body
+    Product.create({ name, code, buyingPrice, sellingPrice, currency, color, size, description, images: JSON.stringify(images), thumbnails: JSON.stringify(thumbnails || []), quantity, unit, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id, criticalStockIndicator, toDisplay }).then(createdProduct => {
         console.log(quantity)
         if (quantity > 0) {
             Operation.create({ receiptId: null, type: "LOADED", productId: createdProduct.id, amount: quantity, price: createdProduct.buyingPrice, date: new Date(), creatorUserId: req.user.id })
@@ -124,7 +124,7 @@ router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
 })
 
 router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
-    const { id, name, code, color, quantity, unit, images, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, activateCriticalStockIndicator } = req.body
+    const { id, name, code, color, quantity, unit, images, thumbnails, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, activateCriticalStockIndicator } = req.body
     Product.findOne(
         {
             where: {
@@ -137,6 +137,7 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
         product.code = code
         product.color = color
         product.images = JSON.stringify(images)
+        product.thumbnails = JSON.stringify(thumbnails || [])
         product.quantity = quantity
         product.unit = unit
         product.supplierId = supplierId
@@ -262,6 +263,7 @@ router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, nex
                 [Op.or]: [
                     { name: { [Op.iLike]: `%${searchable}%` } },
                     { '$category.name$': { [Op.iLike]: `%${searchable}%` } },
+                    { code: { [Op.iLike]: `%${searchable}%` } }
                 ]
             }
             : {};

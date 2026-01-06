@@ -83,6 +83,7 @@ export class ProductAddComponent implements OnInit {
 
   // Images
   images: string[] = [];
+  thumbnails: string[] = [];
   compressedImages: any[] = [];
   data: any;
   selectedCategory = '';
@@ -208,6 +209,7 @@ export class ProductAddComponent implements OnInit {
         this.form.get('activateCriticalStockIndicator').setValue(response?.activateCriticalStockIndicator || false);
         this.form.get('code').setValue(response?.code);
         this.images = response?.images || [];
+        this.thumbnails = response?.thumbnails || [];
         this.isLoading = false;
       },
       error => {
@@ -266,27 +268,37 @@ export class ProductAddComponent implements OnInit {
     if (this.form.valid) {
       this.isSubmitting = true;
 
-      // Compress all images to WebP before upload
       if (originalFiles.length > 0) {
+        const timestamp = new Date().getTime();
+        const userId = this.authService.getConnectedUser().id;
+
+        // Generate filenames for originals (keep extension)
+        const originalNames = originalFiles.map((file, index) => {
+          const ext = file.name.substring(file.name.lastIndexOf('.'));
+          return `${userId}-${timestamp}${index + 1}${ext}`;
+        });
+
+        // Generate filenames for WebP thumbnails
+        const thumbnailNames = originalFiles.map((file, index) =>
+          `${userId}-${timestamp}${index + 1}-thumb.webp`
+        );
+
+        // Create WebP thumbnails
         const compressionObservables = originalFiles.map(file =>
-          this.compressor.compress(file, 1200, 0.85)
+          this.compressor.compress(file, 800, 0.8)
         );
 
         forkJoin(compressionObservables).subscribe({
-          next: (compressedFiles: File[]) => {
-            // Generate WebP filenames
-            const imageNames = compressedFiles.map((file, index) =>
-              `${this.authService.getConnectedUser().id}-${new Date().getTime()}${index + 1}.webp`
-            );
-
-            this.uploadAndSaveProduct(compressedFiles, imageNames);
+          next: (thumbnailFiles: File[]) => {
+            // Upload both originals and thumbnails
+            this.uploadDualImages(originalFiles, originalNames, thumbnailFiles, thumbnailNames);
           },
           error: (err) => {
             this.isSubmitting = false;
             console.error('Compression error:', err);
             Swal.fire({
               icon: 'error',
-              title: 'Erreur lors de la compression des images',
+              title: 'Erreur lors de la création des miniatures',
               showConfirmButton: false,
               timer: 1500
             });
@@ -294,13 +306,82 @@ export class ProductAddComponent implements OnInit {
         });
       } else {
         // No images to upload
-        this.uploadAndSaveProduct([], []);
+        this.uploadAndSaveProduct([], [], [], []);
       }
     }
   }
 
-  private uploadAndSaveProduct(filesToUpload: File[], imageNames: string[]) {
-    if (filesToUpload.length === 0) {
+  private uploadDualImages(
+    originalFiles: File[],
+    originalNames: string[],
+    thumbnailFiles: File[],
+    thumbnailNames: string[]
+  ) {
+    // Combine all files for upload
+    const allFiles = [...originalFiles, ...thumbnailFiles];
+    const allNames = [...originalNames, ...thumbnailNames];
+    const originalCount = originalFiles.length;
+
+    this.uploadFilesFromArray(allFiles, allNames).subscribe(
+      response => {
+        // Extract filenames from upload response (backend adds timestamp prefix)
+        const allFilenames = response.files.map(file => file.location.split('/').pop());
+
+        // Split response back into originals and thumbnails
+        const uploadedOriginals = allFilenames.slice(0, originalCount);
+        const uploadedThumbnails = allFilenames.slice(originalCount);
+
+        this.form.get('images').setValue(uploadedOriginals);
+        this.form.addControl('thumbnails', this.formBuilder.control(uploadedThumbnails));
+
+        this.productService.addProduct({
+          ...this.form.getRawValue(),
+          storeId: this.user?.store
+        }).subscribe(
+          response => {
+            this.isSubmitting = false;
+            this.cdr.detectChanges();
+            Swal.fire({
+              icon: 'success',
+              title: 'Produit ajouté !',
+              showConfirmButton: false,
+              timer: 1500
+            });
+            this.ngZone.run(() => {
+              this.router.navigateByUrl('/products', { replaceUrl: true });
+            });
+          },
+          error => {
+            this.isSubmitting = false;
+            this.cdr.detectChanges();
+            Swal.fire({
+              icon: 'error',
+              title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        );
+      },
+      error => {
+        this.isSubmitting = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur lors du téléchargement des images',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
+    );
+  }
+
+  private uploadAndSaveProduct(
+    originalFiles: File[],
+    originalNames: string[],
+    thumbnailFiles: File[],
+    thumbnailNames: string[]
+  ) {
+    if (originalFiles.length === 0) {
       // No new images to upload, just save the product
       this.productService.addProduct({ ...this.form.getRawValue(), storeId: this.user?.store })
         .subscribe(
@@ -312,7 +393,9 @@ export class ProductAddComponent implements OnInit {
               showConfirmButton: false,
               timer: 1500
             });
-            this.router.navigate(['products'])
+            this.ngZone.run(() => {
+              this.router.navigateByUrl('/products', { replaceUrl: true });
+            });
           },
           error => {
             this.isSubmitting = false;
@@ -327,28 +410,132 @@ export class ProductAddComponent implements OnInit {
       return;
     }
 
-    this.uploadFilesFromArray(filesToUpload, imageNames).subscribe(
-      response => {
-        const filenames = response.files.map(file => file.location.split('/').pop());
-        this.form.get('images').setValue(filenames);
-        this.productService.addProduct({ ...this.form.getRawValue(), storeId: this.user?.store })
+    // Use uploadDualImages for file uploads
+    this.uploadDualImages(originalFiles, originalNames, thumbnailFiles, thumbnailNames);
+  }
+
+  update() {
+    this.submitted = true;
+    this.emailError = false;
+
+    const originalFiles = this.selectedFiles.map(sf => sf.file);
+
+    if ((this.images?.length || 0) + originalFiles.length > 3) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Vous pouvez selectionnez seulement 3 images',
+        showConfirmButton: false,
+        timer: 1500
+      });
+      return;
+    }
+
+    if (this.form.valid) {
+      this.isSubmitting = true;
+
+      if (originalFiles.length > 0) {
+        const timestamp = new Date().getTime();
+        const userId = this.authService.getConnectedUser().id;
+
+        // Generate filenames for originals (keep extension)
+        const originalNames = originalFiles.map((file, index) => {
+          const ext = file.name.substring(file.name.lastIndexOf('.'));
+          return `${userId}-${timestamp}${index + 1}${ext}`;
+        });
+
+        // Generate filenames for WebP thumbnails
+        const thumbnailNames = originalFiles.map((file, index) =>
+          `${userId}-${timestamp}${index + 1}-thumb.webp`
+        );
+
+        // Create WebP thumbnails
+        const compressionObservables = originalFiles.map(file =>
+          this.compressor.compress(file, 800, 0.8)
+        );
+
+        forkJoin(compressionObservables).subscribe({
+          next: (thumbnailFiles: File[]) => {
+            this.uploadDualImagesForUpdate(originalFiles, originalNames, thumbnailFiles, thumbnailNames);
+          },
+          error: (err) => {
+            this.isSubmitting = false;
+            console.error('Compression error:', err);
+            Swal.fire({
+              icon: 'error',
+              title: 'Erreur lors de la création des miniatures',
+              showConfirmButton: false,
+              timer: 1500
+            });
+          }
+        });
+      } else {
+        // No new images, just update the product
+        this.form.get('images').setValue(this.images);
+        this.form.addControl('thumbnails', this.formBuilder.control(this.thumbnails));
+        this.productService.updateProduct({ ...this.form.getRawValue(), storeId: this.user?.store, id: this.product?.id })
           .subscribe(
             response => {
               this.isSubmitting = false;
-              this.cdr.detectChanges();
               Swal.fire({
                 icon: 'success',
-                title: 'Produit ajouté !',
+                title: 'Produit modifié !',
                 showConfirmButton: false,
                 timer: 1500
               });
-              this.ngZone.run(() => { // Wrapped navigation in ngZone.run()
+              this.ngZone.run(() => {
                 this.router.navigateByUrl('/products', { replaceUrl: true });
               });
             },
             error => {
               this.isSubmitting = false;
-              this.cdr.detectChanges();
+              Swal.fire({
+                icon: 'error',
+                title: 'Une erreur est survenue ! Merci de réessayer plus tard',
+                showConfirmButton: false,
+                timer: 1500
+              });
+            }
+          );
+      }
+    }
+  }
+
+  private uploadDualImagesForUpdate(
+    originalFiles: File[],
+    originalNames: string[],
+    thumbnailFiles: File[],
+    thumbnailNames: string[]
+  ) {
+    const allFiles = [...originalFiles, ...thumbnailFiles];
+    const allNames = [...originalNames, ...thumbnailNames];
+    const originalCount = originalFiles.length;
+
+    this.uploadFilesFromArray(allFiles, allNames).subscribe(
+      response => {
+        const allFilenames = response.files.map(file => file.location.split('/').pop());
+        const uploadedOriginals = allFilenames.slice(0, originalCount);
+        const uploadedThumbnails = allFilenames.slice(originalCount);
+
+        // Merge with existing images and thumbnails
+        this.form.get('images').setValue([...this.images, ...uploadedOriginals]);
+        this.form.addControl('thumbnails', this.formBuilder.control([...this.thumbnails, ...uploadedThumbnails]));
+
+        this.productService.updateProduct({ ...this.form.getRawValue(), storeId: this.user?.store, id: this.product?.id })
+          .subscribe(
+            response => {
+              this.isSubmitting = false;
+              Swal.fire({
+                icon: 'success',
+                title: 'Produit modifié !',
+                showConfirmButton: false,
+                timer: 1500
+              });
+              this.ngZone.run(() => {
+                this.router.navigateByUrl('/products', { replaceUrl: true });
+              });
+            },
+            error => {
+              this.isSubmitting = false;
               Swal.fire({
                 icon: 'error',
                 title: 'Une erreur est survenue ! Merci de réessayer plus tard',
@@ -368,72 +555,6 @@ export class ProductAddComponent implements OnInit {
         });
       }
     );
-  }
-
-  update() {
-    this.submitted = true;
-    this.emailError = false;
-
-    const filesToUpload = this.selectedFiles.map(sf => sf.file);
-    const newImageNames = [];
-    let counter = 1;
-    let fileName = null;
-
-    if ((this.images?.length || 0) + filesToUpload.length > 3) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Vous pouvez selectionnez seulement 3 images',
-        showConfirmButton: false,
-        timer: 1500
-      });
-      return;
-    }
-
-    for (let item of filesToUpload) {
-      fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + (counter++) + item?.name.substring(item.name.lastIndexOf('.'));
-      newImageNames.push(fileName);
-    }
-
-    if (this.form.valid) {
-      this.isSubmitting = true;
-      this.uploadFilesFromArray(filesToUpload, newImageNames).subscribe(
-        response => {
-          const filenames = response.files.map(file => file.location.split('/').pop());
-          this.form.get('images').setValue([...this.images, ...filenames]);
-          this.productService.updateProduct({ ...this.form.getRawValue(), storeId: this.user?.store, id: this.product?.id })
-            .subscribe(
-              response => {
-                this.isSubmitting = false;
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Produit modifié !',
-                  showConfirmButton: false,
-                  timer: 1500
-                });
-                this.router.navigate(['products']);
-              },
-              error => {
-                this.isSubmitting = false;
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Une erreur est survenue ! Merci de réessayer plus tard',
-                  showConfirmButton: false,
-                  timer: 1500
-                });
-              }
-            );
-        },
-        error => {
-          this.isSubmitting = false;
-          Swal.fire({
-            icon: 'error',
-            title: 'Erreur lors du téléchargement des images',
-            showConfirmButton: false,
-            timer: 1500
-          });
-        }
-      );
-    }
   }
 
   getLastCategory() {
@@ -486,7 +607,16 @@ export class ProductAddComponent implements OnInit {
   }
 
   deleteImage(item: string) {
-    this.images = this.images.filter(element => element != item);
+    // Find the index of the image to delete
+    const index = this.images.indexOf(item);
+    if (index > -1) {
+      // Remove the image
+      this.images = this.images.filter(element => element != item);
+      // Remove the corresponding thumbnail at the same index
+      if (this.thumbnails && this.thumbnails.length > index) {
+        this.thumbnails.splice(index, 1);
+      }
+    }
   }
 
   removeSelectedFile(index: number) {
