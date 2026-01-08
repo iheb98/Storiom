@@ -28,7 +28,26 @@
       </div>
       <div class="summary-item">
         <span class="label">Prix {{ data.operationType === 'SOLD' ? 'de vente' : "d'achat" }}</span>
-        <span class="value price">{{ price | number:'1.2-2' }} DT</span>
+        <span class="value price">
+          <span class="original-price" *ngIf="hasDiscount && applyDiscount">{{ originalPrice | number:'1.2-2' }}
+            DT</span>
+          {{ price | number:'1.2-2' }} DT
+        </span>
+      </div>
+    </div>
+
+    <!-- Discount Toggle (only for SOLD with discount) -->
+    <div class="discount-toggle" *ngIf="hasDiscount">
+      <label class="toggle-label">
+        <input type="checkbox" [(ngModel)]="applyDiscount" (ngModelChange)="onApplyDiscountChange()">
+        <span class="toggle-switch"></span>
+        <span class="toggle-text">
+          Appliquer la réduction (-{{ product?.discount }}%)
+        </span>
+      </label>
+      <div class="discount-info">
+        <span class="original">Prix original: {{ originalPrice | number:'1.2-2' }} DT</span>
+        <span class="discounted">Prix réduit: {{ discountedPrice | number:'1.2-2' }} DT</span>
       </div>
     </div>
 

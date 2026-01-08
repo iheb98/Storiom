@@ -6,7 +6,7 @@
         <div class="store-logo-wrapper">
           <div class="skeleton-logo" *ngIf="!store"></div>
           <img *ngIf="store" [src]="store?.logo ? backend_URL + '/' + store?.logo : 'assets/default_store.png'"
-            alt="Logo" class="store-logo loaded">
+            alt="Logo" class="store-logo loaded" [class.default-image]="!store?.logo">
         </div>
         <span class="store-name">{{ store?.name || 'Storiom' }}</span>
       </div>
@@ -16,12 +16,13 @@
     </div>
 
     <!-- Subscription Badge -->
-    <div class="subscription-badge" *ngIf="subscriptionStatus" [class.active]="subscriptionStatus === 'Active'"
-      [class.expired]="subscriptionStatus === 'Expired'" [matTooltip]="getSubscriptionTooltip()">
+    <a routerLink="/admin/subscription" class="subscription-badge" *ngIf="subscriptionStatus"
+      [class.active]="subscriptionStatus === 'Active'" [class.expired]="subscriptionStatus === 'Expired'"
+      [matTooltip]="getSubscriptionTooltip() + ' - Cliquez pour gérer'">
       <i class="fa" [class.fa-check-circle]="subscriptionStatus === 'Active'"
         [class.fa-exclamation-circle]="subscriptionStatus === 'Expired'"></i>
-      <span>{{ subscriptionDetails?.duration === 'TRIAL' ? 'Demo' : subscriptionDetails?.duration }}</span>
-    </div>
+      <span>{{ subscriptionStatus === 'Active' ? 'Activé' : 'Expiré' }}</span>
+    </a>
 
     <!-- Navigation -->
     <nav class="sidebar-nav">
@@ -66,11 +67,11 @@
 
       <div class="header-right">
         <!-- Subscription Status (Mobile) -->
-        <div class="subscription-status-mobile" *ngIf="subscriptionStatus"
+        <!--<div class="subscription-status-mobile" *ngIf="subscriptionStatus"
           [class.active]="subscriptionStatus === 'Active'" [class.expired]="subscriptionStatus === 'Expired'">
           <i class="fa" [class.fa-check-circle]="subscriptionStatus === 'Active'"
             [class.fa-exclamation-circle]="subscriptionStatus === 'Expired'"></i>
-        </div>
+        </div>-->
 
         <!-- User Profile -->
         <div class="user-profile" (click)="toggleUserMenu()">
@@ -93,6 +94,9 @@
           </a>
           <a routerLink="/admin/settings" class="dropdown-item">
             <i class="fa fa-cog"></i> Paramètres
+          </a>
+          <a routerLink="/admin/subscription" class="dropdown-item subscription-link">
+            <i class="fa fa-credit-card"></i> Abonnement
           </a>
           <div class="dropdown-divider"></div>
           <a (click)="logout()" class="dropdown-item logout">

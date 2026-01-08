@@ -9,6 +9,7 @@ import { CartService } from 'src/app/core/services/cart.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { StoreServiceService } from 'src/app/core/services/store-service.service';
 import { ServiceRequestService } from 'src/app/core/services/service-request.service';
+import { AnalyticsService } from 'src/app/core/services/analytics.service';
 
 @Component({
     selector: 'app-store-details',
@@ -73,7 +74,8 @@ export class StoreDetailsComponent implements OnInit, AfterViewChecked {
         private cartService: CartService,
         private toastService: ToastService,
         private storeServiceService: StoreServiceService,
-        private serviceRequestService: ServiceRequestService
+        private serviceRequestService: ServiceRequestService,
+        private analyticsService: AnalyticsService
     ) { }
 
     ngOnInit(): void {
@@ -212,6 +214,10 @@ export class StoreDetailsComponent implements OnInit, AfterViewChecked {
 
     addToCart(product: any, event: Event) {
         event.stopPropagation();
+
+        // Track cart_add event
+        this.trackEvent(product, 'cart_add');
+
         if (this.authService.isLoggedIn()) {
             this.productService.addToCart(product.id, 1).subscribe({
                 next: () => this.toastService.showSuccess('Produit ajouté au panier'),
@@ -220,6 +226,22 @@ export class StoreDetailsComponent implements OnInit, AfterViewChecked {
         } else {
             this.cartService.addToCart(product, 1);
             this.toastService.showSuccess('Produit ajouté au panier (Local)');
+        }
+    }
+
+    // Track analytics events
+    private trackEvent(product: any, interactionType: 'click' | 'cart_add' | 'view') {
+        if (product?.id) {
+            const userId = this.authService.getConnectedUser()?.id;
+            this.analyticsService.trackEvent({
+                productId: product.id,
+                interactionType,
+                userId,
+                storeId: parseInt(this.storeId),
+                categoryId: product.categoryId || product.category?.id
+            }).subscribe({
+                error: (err) => console.log('Analytics tracking failed:', err)
+            });
         }
     }
 

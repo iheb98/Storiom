@@ -37,6 +37,10 @@ import { DeliveryWorkerAddComponent } from './pages/delivery-workers/delivery-wo
 import { ServicesMngtComponent } from './pages/services/services-mngt/services-mngt.component';
 import { ServiceAddComponent } from './pages/services/service-add/service-add.component';
 import { ServiceRequestsMngtComponent } from './pages/services/service-requests-mngt/service-requests-mngt.component';
+import { SubscriptionComponent } from './pages/subscription/subscription.component';
+import { PaymentOrdersAdminComponent } from '../superadmin/pages/payment-orders-admin/payment-orders-admin.component';
+import { RoleGuard } from 'src/app/core/services/role.guard';
+import { ProductAnalyticsComponent } from './pages/product-analytics/product-analytics.component';
 
 const routes: Routes = [
   {
@@ -90,6 +94,7 @@ const routes: Routes = [
       { path: 'products/add', component: ProductAddComponent },
       { path: 'products/edit/:id', component: ProductAddComponent },
       { path: 'products/view/:id', component: ProductViewComponent },
+      { path: 'analytics', component: ProductAnalyticsComponent },
 
       // ------------ Receipts ------------
       { path: 'receipts', component: ReceiptsMngtComponent },
@@ -111,6 +116,17 @@ const routes: Routes = [
       { path: 'services/add', component: ServiceAddComponent },
       { path: 'services/edit/:id', component: ServiceAddComponent },
       { path: 'service-requests', component: ServiceRequestsMngtComponent },
+
+      // ------------ Subscription ------------
+      { path: 'subscription', component: SubscriptionComponent },
+
+      // ------------ Payment Orders Admin (Admin role only) ------------
+      {
+        path: 'payment-orders',
+        component: PaymentOrdersAdminComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['Admin'] }
+      },
 
       // ------------ Settings ------------
       { path: 'settings', component: UserSettingsComponent },

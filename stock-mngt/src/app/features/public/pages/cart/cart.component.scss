@@ -164,6 +164,7 @@ $radius-lg: 16px;
   overflow: hidden;
   background: $background;
   cursor: pointer;
+  position: relative;
 
   img {
     width: 100%;
@@ -178,6 +179,19 @@ $radius-lg: 16px;
 
   &:hover img:not(.default-image) {
     transform: scale(1.05);
+  }
+
+  .discount-badge {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+    color: white;
+    font-size: 0.7rem;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    z-index: 2;
   }
 
   @media (max-width: 768px) {
@@ -283,16 +297,32 @@ $radius-lg: 16px;
 .item-price {
   text-align: right;
 
+  .original-total {
+    display: block;
+    font-size: 0.85rem;
+    color: $text-secondary;
+    text-decoration: line-through;
+    margin-bottom: 2px;
+  }
+
   .price-value {
     font-size: 1.1rem;
     font-weight: 700;
     color: $text-primary;
+
+    &.discounted {
+      color: #e53935;
+    }
   }
 
   .currency {
     font-size: 0.9rem;
     color: $text-secondary;
     margin-left: 4px;
+
+    &.discounted {
+      color: #e53935;
+    }
   }
 
   .unit-price {

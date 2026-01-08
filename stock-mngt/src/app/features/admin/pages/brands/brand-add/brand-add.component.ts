@@ -16,7 +16,8 @@ export class BrandAddComponent {
   constructor(
     public dialogRef: MatDialogRef<BrandAddComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) {}
+  ) { }
+
 
 
 

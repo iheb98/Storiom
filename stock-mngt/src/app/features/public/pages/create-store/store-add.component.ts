@@ -24,6 +24,7 @@ export class CreateStoreComponent implements OnInit {
   selectedFileName: string = null;
   termsAccepted = false;
   showTermsModal = false;
+  isLoading = false;
   @ViewChild('fileInput', { static: false }) fileInput: ElementRef;
 
   // Icons
@@ -66,6 +67,7 @@ export class CreateStoreComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     // Check if user already has a store
     const user = this.authService.getConnectedUser();
     if (user?.store) {
@@ -194,6 +196,7 @@ export class CreateStoreComponent implements OnInit {
     if (this.fileInput.nativeElement.files[0])
       fileName = this.authService.getConnectedUser().id + '-' + new Date().getTime() + this.fileInput.nativeElement.files[0]?.name.substring(this.fileInput.nativeElement.files[0].name.lastIndexOf('.'))
     if (this.form.valid) {
+      this.isLoading = true;
 
       if (this.fileInput.nativeElement.files[0])
         this.uploadLogo(this.fileInput.nativeElement.files[0], fileName).subscribe(
@@ -210,8 +213,14 @@ export class CreateStoreComponent implements OnInit {
                     this.router.navigate(['/admin/stores/view']);
                   }, 1000);
                 })
+              },
+              error => {
+                this.isLoading = false;
               }
             )
+          },
+          error => {
+            this.isLoading = false;
           }
         )
       else
@@ -226,6 +235,9 @@ export class CreateStoreComponent implements OnInit {
                 this.router.navigate(['/admin/stores/view']);
               }, 1000);
             })
+          },
+          error => {
+            this.isLoading = false;
           }
         )
     }

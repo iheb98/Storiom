@@ -18,7 +18,8 @@ export class SellProductComponent {
 
   product = this.data?.product;
   amount
-  price = this.data?.operationType == "SOLD" ? this.data?.product?.sellingPrice : this.data?.product?.buyingPrice;
+  applyDiscount: boolean = true;
+  price = this.getInitialPrice();
   operationDate: string = this.formatDateTimeLocal(new Date());
   constructor(
     public dialogRef: MatDialogRef<SellProductComponent>,
@@ -31,6 +32,41 @@ export class SellProductComponent {
 
   onNoClick(): void {
     this.dialogRef.close();
+  }
+
+  getInitialPrice(): number {
+    if (this.data?.operationType === "SOLD") {
+      const product = this.data?.product;
+      if (product?.discount && product.discount > 0) {
+        // Apply discount by default
+        return product.sellingPrice * (1 - product.discount / 100);
+      }
+      return product?.sellingPrice || 0;
+    }
+    return this.data?.product?.buyingPrice || 0;
+  }
+
+  get hasDiscount(): boolean {
+    return this.data?.operationType === 'SOLD' &&
+      this.product?.discount &&
+      this.product.discount > 0;
+  }
+
+  get originalPrice(): number {
+    return this.product?.sellingPrice || 0;
+  }
+
+  get discountedPrice(): number {
+    if (!this.product?.discount || this.product.discount <= 0) {
+      return this.product?.sellingPrice || 0;
+    }
+    return this.product.sellingPrice * (1 - this.product.discount / 100);
+  }
+
+  onApplyDiscountChange(): void {
+    if (this.data?.operationType === 'SOLD') {
+      this.price = this.applyDiscount ? this.discountedPrice : this.originalPrice;
+    }
   }
 
   confirm(): void {

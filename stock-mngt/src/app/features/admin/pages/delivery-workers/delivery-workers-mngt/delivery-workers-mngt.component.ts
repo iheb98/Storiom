@@ -43,6 +43,7 @@ export class DeliveryWorkersMngtComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
+        window.scrollTo(0, 0);
         this.user = this.authService.getConnectedUser();
         this.loadDeliveryWorkers();
     }

@@ -545,6 +545,11 @@ $radius-lg: 16px;
         background: $purple-light;
         color: $purple;
     }
+
+    &.cancelled {
+        background: $danger-light;
+        color: $danger;
+    }
 }
 
 .operation-info {
@@ -593,6 +598,11 @@ $radius-lg: 16px;
         &.returned {
             background: $purple-light;
             color: $purple;
+        }
+
+        &.cancelled {
+            background: $danger-light;
+            color: $danger;
         }
     }
 
@@ -661,6 +671,14 @@ $radius-lg: 16px;
 
         .total-value {
             color: $warning;
+        }
+    }
+
+    &.cancelled {
+        background: $danger-light;
+
+        .total-value {
+            color: $danger;
         }
     }
 

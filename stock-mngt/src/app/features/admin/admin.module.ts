@@ -81,6 +81,9 @@ import { ServiceAddComponent } from './pages/services/service-add/service-add.co
 import { ServiceRequestsMngtComponent } from './pages/services/service-requests-mngt/service-requests-mngt.component';
 import { ServiceRequestsStatsComponent } from './pages/dashboard/service-requests-stats/service-requests-stats.component';
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
+import { SubscriptionComponent } from './pages/subscription/subscription.component';
+import { PaymentOrdersAdminComponent } from '../superadmin/pages/payment-orders-admin/payment-orders-admin.component';
+import { ProductAnalyticsComponent } from './pages/product-analytics/product-analytics.component';
 
 @NgModule({
   declarations: [
@@ -139,7 +142,10 @@ import { ZXingScannerModule } from '@zxing/ngx-scanner';
     ServicesMngtComponent,
     ServiceAddComponent,
     ServiceRequestsMngtComponent,
-    ServiceRequestsStatsComponent
+    ServiceRequestsStatsComponent,
+    SubscriptionComponent,
+    PaymentOrdersAdminComponent,
+    ProductAnalyticsComponent
   ],
   imports: [
     CommonModule,

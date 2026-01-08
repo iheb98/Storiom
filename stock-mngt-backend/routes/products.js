@@ -99,11 +99,11 @@ router.delete('/cart/:productId', utility.authenticate, async (req, res) => {
 });
 
 router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
-    const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, thumbnails, quantity, unit, storeId, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay } = req.body
-    Product.create({ name, code, buyingPrice, sellingPrice, currency, color, size, description, images: JSON.stringify(images), thumbnails: JSON.stringify(thumbnails || []), quantity, unit, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id, criticalStockIndicator, toDisplay }).then(createdProduct => {
+    const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, thumbnails, quantity, unit, storeId, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, discount } = req.body
+    Product.create({ name, code, buyingPrice, sellingPrice, discount, currency, color, size, description, images: JSON.stringify(images), thumbnails: JSON.stringify(thumbnails || []), quantity, unit, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id, criticalStockIndicator, toDisplay }).then(createdProduct => {
         console.log(quantity)
         if (quantity > 0) {
-            Operation.create({ receiptId: null, type: "LOADED", productId: createdProduct.id, amount: quantity, price: createdProduct.buyingPrice, date: new Date(), creatorUserId: req.user.id })
+            Operation.create({ receiptId: null, type: "LOADED", productId: createdProduct.id, amount: quantity, price: createdProduct.buyingPrice, date: new Date(), creatorUserId: req.user.id, impactStock: true })
                 .then(createdOperation => {
                     res.json({
                         product: createdProduct
@@ -124,7 +124,7 @@ router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
 })
 
 router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
-    const { id, name, code, color, quantity, unit, images, thumbnails, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, activateCriticalStockIndicator } = req.body
+    const { id, name, code, color, quantity, unit, images, thumbnails, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, activateCriticalStockIndicator, discount } = req.body
     Product.findOne(
         {
             where: {
@@ -146,6 +146,7 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
         product.description = description
         product.sellingPrice = sellingPrice
         product.buyingPrice = buyingPrice
+        product.discount = discount
         product.toDisplay = toDisplay
         product.criticalStockIndicator = criticalStockIndicator
         product.activateCriticalStockIndicator = activateCriticalStockIndicator
@@ -218,6 +219,32 @@ router.get('/all', (req, res, next) => {
         })
     })
 });
+
+// Get ALL products for a store (for analytics - includes stats association)
+router.get('/all/store/:id', utility.authenticate, async (req, res) => {
+    try {
+        const storeId = req.params.id;
+        const { ProductStats } = require('../models');
+
+        const products = await Product.findAll({
+            where: {
+                store_id: storeId,
+                creatorUserId: req.user.id,
+                isVisible: true
+            },
+            include: [
+                { model: ProductStats, as: 'stats', required: false }
+            ],
+            order: [['createdAt', 'DESC']]
+        });
+
+        res.json(products);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.toString() });
+    }
+});
+
 router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
 

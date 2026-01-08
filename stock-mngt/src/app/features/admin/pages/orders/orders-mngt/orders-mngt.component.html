@@ -167,10 +167,17 @@
                             <div class="item-row" *ngFor="let item of order.items">
                                 <div class="item-image">
                                     <img [src]="getProductImage(item.product)" [alt]="item.product?.name">
+                                    <span class="discount-badge" *ngIf="item.product?.discount > 0">-{{
+                                        item.product?.discount }}%</span>
                                 </div>
                                 <div class="item-info">
                                     <span class="item-name">{{ item.product?.name }}</span>
                                     <span class="item-qty">Qté: {{ item.quantity }}</span>
+                                    <span class="item-unit-price" *ngIf="item.product?.discount > 0">
+                                        <span class="original">{{ item.product?.sellingPrice | number:'1.2-2' }}</span>
+                                        <span class="discounted">{{ item.price | number:'1.2-2' }}</span> {{
+                                        store?.currency || 'DT' }}/u
+                                    </span>
                                 </div>
                                 <div class="item-price">
                                     {{ item.price * item.quantity | number:'1.2-2' }} {{ store?.currency || 'DT' }}
@@ -190,23 +197,28 @@
                         <h4><fa-icon [icon]="faCog"></fa-icon> Actions</h4>
                         <div class="status-actions">
                             <button class="action-btn pending" [class.current]="order.status === 'PENDING'"
-                                [disabled]="order.status === 'PENDING'" (click)="updateStatus(order, 'PENDING')">
+                                [disabled]="!canChangeToStatus(order.status, 'PENDING')"
+                                (click)="updateStatus(order, 'PENDING')">
                                 <fa-icon [icon]="faClock"></fa-icon> En attente
                             </button>
                             <button class="action-btn confirmed" [class.current]="order.status === 'CONFIRMED'"
-                                [disabled]="order.status === 'CONFIRMED'" (click)="updateStatus(order, 'CONFIRMED')">
+                                [disabled]="!canChangeToStatus(order.status, 'CONFIRMED')"
+                                (click)="updateStatus(order, 'CONFIRMED')">
                                 <fa-icon [icon]="faCheckCircle"></fa-icon> Confirmer
                             </button>
                             <button class="action-btn shipped" [class.current]="order.status === 'SHIPPED'"
-                                [disabled]="order.status === 'SHIPPED'" (click)="updateStatus(order, 'SHIPPED')">
+                                [disabled]="!canChangeToStatus(order.status, 'SHIPPED')"
+                                (click)="updateStatus(order, 'SHIPPED')">
                                 <fa-icon [icon]="faTruck"></fa-icon> Expédier
                             </button>
                             <button class="action-btn delivered" [class.current]="order.status === 'DELIVERED'"
-                                [disabled]="order.status === 'DELIVERED'" (click)="updateStatus(order, 'DELIVERED')">
+                                [disabled]="!canChangeToStatus(order.status, 'DELIVERED')"
+                                (click)="updateStatus(order, 'DELIVERED')">
                                 <fa-icon [icon]="faBox"></fa-icon> Livrer
                             </button>
                             <button class="action-btn cancelled" [class.current]="order.status === 'CANCELLED'"
-                                [disabled]="order.status === 'CANCELLED'" (click)="updateStatus(order, 'CANCELLED')">
+                                [disabled]="!canChangeToStatus(order.status, 'CANCELLED')"
+                                (click)="updateStatus(order, 'CANCELLED')">
                                 <fa-icon [icon]="faTimesCircle"></fa-icon> Annuler
                             </button>
                         </div>
@@ -232,6 +244,70 @@
             <h3>Aucune commande {{ getStatusLabel(activeFilter).toLowerCase() }}</h3>
             <button class="btn-clear-filter" (click)="filterByStatus('')">
                 <fa-icon [icon]="faTimes"></fa-icon> Effacer le filtre
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Stock Validation Modal -->
+<div class="stock-modal-overlay" *ngIf="showStockModal" (click)="cancelStockModal()">
+    <div class="stock-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header warning">
+            <div class="header-icon">
+                <i class="fa fa-exclamation-triangle"></i>
+            </div>
+            <div class="header-content">
+                <h2>Stock insuffisant</h2>
+                <p>Certains produits n'ont pas assez de stock pour cette commande</p>
+            </div>
+            <button class="close-btn" (click)="cancelStockModal()">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="insufficient-items">
+                <div class="insufficient-item" *ngFor="let item of insufficientItems">
+                    <div class="item-image">
+                        <img [src]="getProductImage(item.product)" [alt]="item.product?.name">
+                    </div>
+                    <div class="item-details">
+                        <span class="item-name">{{ item.product?.name }}</span>
+                        <div class="stock-info">
+                            <span class="requested">
+                                <i class="fa fa-shopping-cart"></i>
+                                Demandé: <strong>{{ item.requested }}</strong>
+                            </span>
+                            <span class="available">
+                                <i class="fa fa-box"></i>
+                                Disponible: <strong [class.zero]="item.available === 0">{{ item.available }}</strong>
+                            </span>
+                            <span class="shortage">
+                                <i class="fa fa-exclamation-circle"></i>
+                                Manquant: <strong>{{ item.shortage }}</strong>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-warning">
+                <i class="fa fa-info-circle"></i>
+                <span>
+                    Si vous confirmez, les opérations de vente seront créées et le stock deviendra
+                    <strong>négatif</strong> pour ces produits.
+                </span>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" (click)="cancelStockModal()">
+                <i class="fa fa-times"></i>
+                Annuler
+            </button>
+            <button class="btn-proceed" (click)="proceedAnyway()">
+                <i class="fa fa-check"></i>
+                Confirmer quand même
             </button>
         </div>
     </div>

@@ -1,0 +1,425 @@
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import {
+    faCreditCard, faCheck, faSpinner, faClock, faTimes,
+    faReceipt, faBuilding, faCopy, faCheckCircle, faExclamationTriangle,
+    faArrowLeft, faInfoCircle, faStar, faRocket, faGem
+} from '@fortawesome/free-solid-svg-icons';
+import { PaymentOrderService, PaymentOrder, PricingInfo, BankInstructions } from 'src/app/core/services/payment-order.service';
+import { AuthService } from 'src/app/core/services/auth.service';
+import Swal from 'sweetalert2';
+
+interface SubscriptionPlan {
+    key: '1M' | '3M' | '6M' | '12M';
+    name: string;
+    price: number;
+    duration: string;
+    discount?: string;
+    popular?: boolean;
+    icon: any;
+}
+
+@Component({
+    selector: 'app-subscription',
+    templateUrl: './subscription.component.html',
+    styleUrls: ['./subscription.component.scss']
+})
+export class SubscriptionComponent implements OnInit {
+    // Icons
+    faCreditCard = faCreditCard;
+    faCheck = faCheck;
+    faSpinner = faSpinner;
+    faClock = faClock;
+    faTimes = faTimes;
+    faReceipt = faReceipt;
+    faBuilding = faBuilding;
+    faCopy = faCopy;
+    faCheckCircle = faCheckCircle;
+    faExclamationTriangle = faExclamationTriangle;
+    faArrowLeft = faArrowLeft;
+    faInfoCircle = faInfoCircle;
+    faStar = faStar;
+    faRocket = faRocket;
+    faGem = faGem;
+
+    // State
+    isLoading = true;
+    isCreatingOrder = false;
+    orders: PaymentOrder[] = [];
+    pricing: PricingInfo | null = null;
+    selectedPlan: SubscriptionPlan | null = null;
+    currentOrder: PaymentOrder | null = null;
+    bankInstructions: BankInstructions | null = null;
+    copiedField: string | null = null;
+
+    // Current subscription
+    currentSubscription: {
+        activationDate: string;
+        expirationDate: string;
+        duration: string;
+        isExpired: boolean;
+        daysRemaining: number;
+        percentRemaining: number;
+        createdAt: string;
+    } | null = null;
+
+    // View state
+    currentView: 'plans' | 'bank-details' | 'orders' = 'plans';
+    showStorageSection = false;
+
+    // Storage plans
+    storagePlans: { [key: number]: { [key: string]: number } } = {};
+    storageGBOptions: number[] = [50, 100, 200];
+    storageDurationOptions: string[] = ['1M', '3M', '6M', '12M'];
+    selectedStorageGB: number = 50;
+    selectedStorageDuration: string = '1M';
+
+    // Plans
+    plans: SubscriptionPlan[] = [];
+
+    constructor(
+        private paymentOrderService: PaymentOrderService,
+        private authService: AuthService,
+        private router: Router,
+        private route: ActivatedRoute
+    ) { }
+
+    ngOnInit(): void {
+        window.scrollTo(0, 0);
+        // Check if coming from storage purchase
+        this.route.queryParams.subscribe(params => {
+            if (params['action'] === 'storage') {
+                this.showStorageSection = true;
+            }
+        });
+        this.loadData();
+    }
+
+    loadData() {
+        this.isLoading = true;
+
+        // Load pricing
+        this.paymentOrderService.getPricing().subscribe(
+            res => {
+                this.pricing = res;
+                if (res.storagePlans) {
+                    this.storagePlans = res.storagePlans;
+                }
+                this.initPlans();
+            },
+            error => {
+                console.error('Error loading pricing:', error);
+                // Initialize with default prices if API fails
+                this.pricing = {
+                    subscription: { '1M': 50, '3M': 140, '6M': 260, '12M': 500 },
+                    storage: { pricePerUnit: 10, unitSizeGB: 50 },
+                    currency: 'TND'
+                };
+                this.storagePlans = {
+                    50: { '1M': 10, '3M': 28, '6M': 52, '12M': 100 },
+                    100: { '1M': 18, '3M': 50, '6M': 94, '12M': 180 },
+                    200: { '1M': 34, '3M': 95, '6M': 178, '12M': 340 }
+                };
+                this.initPlans();
+            }
+        );
+
+        // Load user's orders
+        this.paymentOrderService.getMyOrders().subscribe(
+            res => {
+                this.orders = res.orders || [];
+                this.isLoading = false;
+            },
+            error => {
+                console.error('Error loading orders:', error);
+                this.orders = [];
+                this.isLoading = false;
+            }
+        );
+
+        // Load current subscription
+        this.loadCurrentSubscription();
+    }
+
+    loadCurrentSubscription() {
+        const userId = this.authService.getConnectedUser()?.id;
+        if (!userId) return;
+
+        this.authService.getSubscriptionDetails(userId).subscribe(
+            (response: any) => {
+                if (response.success && response.subscription) {
+                    const sub = response.subscription;
+                    const now = new Date();
+                    const expDate = new Date(sub.expirationDate);
+                    const activDate = new Date(sub.activationDate);
+
+                    // Calculate days remaining
+                    const msPerDay = 24 * 60 * 60 * 1000;
+                    const daysRemaining = Math.max(0, Math.ceil((expDate.getTime() - now.getTime()) / msPerDay));
+
+                    // Calculate percentage remaining
+                    const totalDays = Math.ceil((expDate.getTime() - activDate.getTime()) / msPerDay);
+                    const daysUsed = totalDays - daysRemaining;
+                    const percentRemaining = Math.max(0, Math.min(100, Math.round((daysRemaining / totalDays) * 100)));
+
+                    this.currentSubscription = {
+                        ...sub,
+                        daysRemaining,
+                        percentRemaining
+                    };
+                }
+            },
+            error => console.error('Error loading subscription:', error)
+        );
+    }
+
+    initPlans() {
+        if (!this.pricing) return;
+
+        this.plans = [
+            {
+                key: '1M',
+                name: '1 Mois',
+                price: this.pricing.subscription['1M'],
+                duration: '1 mois',
+                icon: faStar
+            },
+            {
+                key: '3M',
+                name: '3 Mois',
+                price: this.pricing.subscription['3M'],
+                duration: '3 mois',
+                discount: '7%',
+                icon: faRocket
+            },
+            {
+                key: '6M',
+                name: '6 Mois',
+                price: this.pricing.subscription['6M'],
+                duration: '6 mois',
+                discount: '13%',
+                popular: true,
+                icon: faGem
+            },
+            {
+                key: '12M',
+                name: '12 Mois',
+                price: this.pricing.subscription['12M'],
+                duration: '12 mois',
+                discount: '17%',
+                icon: faCreditCard
+            }
+        ];
+    }
+
+    selectPlan(plan: SubscriptionPlan) {
+        this.selectedPlan = plan;
+        this.createOrder();
+    }
+
+    createOrder() {
+        if (!this.selectedPlan) return;
+
+        this.isCreatingOrder = true;
+
+        this.paymentOrderService.createOrder({
+            paymentType: 'SUBSCRIPTION',
+            subscriptionPlan: this.selectedPlan.key
+        }).subscribe(
+            res => {
+                this.isCreatingOrder = false;
+                this.currentOrder = res.order;
+                this.bankInstructions = res.bankInstructions;
+                this.currentView = 'bank-details';
+                this.loadData(); // Refresh orders list
+            },
+            error => {
+                this.isCreatingOrder = false;
+                const errorMessage = error.error?.message || 'Impossible de créer la commande. Veuillez réessayer.';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur',
+                    text: errorMessage,
+                    confirmButtonColor: '#3f51b5'
+                });
+            }
+        );
+    }
+
+    cancelOrder(orderId: number) {
+        Swal.fire({
+            title: 'Annuler la commande ?',
+            text: 'Êtes-vous sûr de vouloir annuler cette commande ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Oui, annuler',
+            cancelButtonText: 'Non',
+            confirmButtonColor: '#f44336'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.paymentOrderService.cancelMyOrder(orderId).subscribe(
+                    res => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Commande annulée',
+                            text: 'Vous pouvez maintenant créer une nouvelle commande.',
+                            confirmButtonColor: '#3f51b5'
+                        });
+                        this.loadData();
+                    },
+                    error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erreur',
+                            text: 'Impossible d\'annuler la commande.',
+                            confirmButtonColor: '#3f51b5'
+                        });
+                    }
+                );
+            }
+        });
+    }
+
+    selectStoragePlan() {
+        this.isCreatingOrder = true;
+
+        this.paymentOrderService.createOrder({
+            paymentType: 'STORAGE_EXTENSION',
+            storageGB: this.selectedStorageGB,
+            storageDuration: this.selectedStorageDuration as '1M' | '3M' | '6M' | '12M'
+        }).subscribe(
+            res => {
+                this.isCreatingOrder = false;
+                this.currentOrder = res.order;
+                this.bankInstructions = res.bankInstructions;
+                this.currentView = 'bank-details';
+                this.showStorageSection = false;
+                this.loadData();
+            },
+            error => {
+                this.isCreatingOrder = false;
+                const errorMessage = error.error?.message || 'Impossible de créer la commande. Veuillez réessayer.';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur',
+                    text: errorMessage,
+                    confirmButtonColor: '#3f51b5'
+                });
+            }
+        );
+    }
+
+    getStoragePrice(): number {
+        if (this.storagePlans && this.storagePlans[this.selectedStorageGB]) {
+            return this.storagePlans[this.selectedStorageGB][this.selectedStorageDuration] || 0;
+        }
+        return 0;
+    }
+
+    getDurationLabel(duration: string): string {
+        const labels: { [key: string]: string } = {
+            '1M': '1 mois', '3M': '3 mois', '6M': '6 mois', '12M': '12 mois'
+        };
+        return labels[duration] || duration;
+    }
+
+    confirmPayment() {
+        if (!this.currentOrder) return;
+
+        Swal.fire({
+            title: 'Confirmer le paiement',
+            html: `
+        <p>Avez-vous bien effectué le virement bancaire de <strong>${this.currentOrder.amount} TND</strong> ?</p>
+        <p class="text-muted">En confirmant, nous serons notifiés et vérifierons la réception du paiement.</p>
+      `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Oui, j\'ai payé',
+            cancelButtonText: 'Pas encore',
+            confirmButtonColor: '#4caf50'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.paymentOrderService.confirmPayment(this.currentOrder!.id).subscribe(
+                    res => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Confirmation envoyée !',
+                            text: 'Nous avons été notifiés. Votre abonnement sera activé après vérification (24-48h).',
+                            confirmButtonColor: '#3f51b5'
+                        });
+                        this.loadData();
+                        this.currentView = 'orders';
+                    },
+                    error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erreur',
+                            text: 'Impossible d\'envoyer la confirmation.',
+                            confirmButtonColor: '#3f51b5'
+                        });
+                    }
+                );
+            }
+        });
+    }
+
+    copyToClipboard(text: string, field: string) {
+        navigator.clipboard.writeText(text);
+        this.copiedField = field;
+        setTimeout(() => this.copiedField = null, 2000);
+    }
+
+    getStatusLabel(status: string): string {
+        const labels: { [key: string]: string } = {
+            'PENDING': 'En attente',
+            'USER_CONFIRMED': 'Paiement à vérifier',
+            'PAID': 'Payé',
+            'CANCELLED': 'Annulé'
+        };
+        return labels[status] || status;
+    }
+
+    getStatusClass(status: string): string {
+        const classes: { [key: string]: string } = {
+            'PENDING': 'status-pending',
+            'USER_CONFIRMED': 'status-confirming',
+            'PAID': 'status-paid',
+            'CANCELLED': 'status-cancelled'
+        };
+        return classes[status] || '';
+    }
+
+    getPlanLabel(plan: string): string {
+        const labels: { [key: string]: string } = {
+            '1M': '1 Mois',
+            '3M': '3 Mois',
+            '6M': '6 Mois',
+            '12M': '12 Mois'
+        };
+        return labels[plan] || plan;
+    }
+
+    viewOrderDetails(order: PaymentOrder) {
+        this.paymentOrderService.getOrder(order.id).subscribe(
+            res => {
+                this.currentOrder = res.order;
+                this.bankInstructions = res.bankInstructions;
+                this.currentView = 'bank-details';
+            }
+        );
+    }
+
+    backToPlans() {
+        this.currentView = 'plans';
+        this.currentOrder = null;
+        this.selectedPlan = null;
+    }
+
+    showOrders() {
+        this.currentView = 'orders';
+    }
+
+    hasPendingOrders(): boolean {
+        return this.orders.length > 0 && this.orders.some(o => o.status === 'PENDING' || o.status === 'USER_CONFIRMED');
+    }
+}

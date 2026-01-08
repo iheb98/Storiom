@@ -198,6 +198,28 @@
                             </div>
 
                             <div class="form-row">
+                                <div class="form-group">
+                                    <label for="discount"><fa-icon [icon]="faPercent" class="text-danger"></fa-icon>
+                                        Réduction</label>
+                                    <div class="input-with-suffix">
+                                        <input type="number" id="discount" formControlName="discount" placeholder="0"
+                                            min="0" max="100">
+                                        <span class="suffix">%</span>
+                                    </div>
+                                </div>
+                                <div class="form-group"
+                                    *ngIf="form.get('discount').value > 0 && form.get('sellingPrice').value">
+                                    <label>Prix après remise</label>
+                                    <div class="discounted-price">
+                                        <span class="old-price">{{ form.get('sellingPrice').value | number:'1.2-2' }}
+                                            DT</span>
+                                        <span class="new-price">{{ form.get('sellingPrice').value * (1 -
+                                            form.get('discount').value / 100) | number:'1.2-2' }} DT</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
                                 <div class="form-group" *ngIf="!productId">
                                     <label for="quantity"><fa-icon [icon]="faCubes"></fa-icon> Quantité initiale</label>
                                     <input type="number" id="quantity" formControlName="quantity" placeholder="0">
@@ -226,7 +248,7 @@
                     <div class="section-card">
                         <div class="section-header">
                             <h2><fa-icon [icon]="faImages"></fa-icon> Images du produit</h2>
-                            <span class="image-count">{{ (images?.length || 0) + selectedFiles.length }}/3</span>
+                            <span class="image-count">{{ (images?.length || 0) + selectedFiles.length }}/10</span>
                         </div>
                         <div class="section-body">
                             <div class="images-grid" *ngIf="images?.length > 0 || selectedFiles.length > 0">
@@ -248,13 +270,13 @@
                                 </div>
                             </div>
 
-                            <div class="upload-zone" *ngIf="(images?.length || 0) + selectedFiles.length < 3">
+                            <div class="upload-zone" *ngIf="(images?.length || 0) + selectedFiles.length < 10">
                                 <input #fileInput type="file" id="fileUpload" (change)="process($event)"
                                     accept="image/x-png,image/gif,image/jpeg" multiple hidden>
                                 <label for="fileUpload" class="upload-label">
                                     <fa-icon [icon]="faCloudUploadAlt"></fa-icon>
                                     <span>Cliquez pour ajouter des images</span>
-                                    <small>PNG, JPG ou GIF (max 3 images)</small>
+                                    <small>PNG, JPG ou GIF (max 10 images)</small>
                                 </label>
                             </div>
                         </div>

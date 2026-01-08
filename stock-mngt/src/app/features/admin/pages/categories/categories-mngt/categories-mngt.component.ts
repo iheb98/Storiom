@@ -51,6 +51,7 @@ export class CategoriesMngtComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     this.storeId = this.authService.getConnectedUser()?.store;
     this.connectedUserRole = this.authService.getConnectedUser()?.role;
     this.getCategories();

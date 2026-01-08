@@ -59,6 +59,7 @@ export class WorkersMngtComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     this.loadData();
   }
 

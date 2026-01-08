@@ -16,6 +16,7 @@ export class LoginComponent implements OnInit {
   submitted: boolean;
   emailError: boolean;
   passwordError: boolean;
+  isLoading = false;
   constructor(
     private router: Router,
     private formBuilder: FormBuilder,
@@ -24,6 +25,7 @@ export class LoginComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     this.initForm();
   }
 
@@ -40,14 +42,19 @@ export class LoginComponent implements OnInit {
     this.emailError = false;
     this.passwordError = false;
     if (this.form.valid) {
+      this.isLoading = true;
 
       this.authService.login({ email: this.form.get('email').value, password: this.form.get('password').value })
         .subscribe(response => {
 
-          if (response.errorType == "EMAIL_ERROR")
+          if (response.errorType == "EMAIL_ERROR") {
             this.emailError = true;
-          else if (response.errorType == "PASSWORD_ERROR")
+            this.isLoading = false;
+          }
+          else if (response.errorType == "PASSWORD_ERROR") {
             this.passwordError = true;
+            this.isLoading = false;
+          }
           else {
             this.authService.registerTokens(response.accessToken, response.refreshToken)
             this.authService.loggedIn.next();
@@ -82,7 +89,7 @@ export class LoginComponent implements OnInit {
           }
         },
           error => {
-
+            this.isLoading = false;
             Swal.fire({
               icon: 'error',
               title: error.error.message || 'Une erreur est survenue ! Merci de réessayer plus tard',

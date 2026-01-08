@@ -37,7 +37,7 @@ export class AuthGuard implements CanActivate {
       }
 
       // Redirect to onboarding for all other admin pages
-      return this.router.parseUrl('/admin/stores/onboarding');
+      return this.router.parseUrl('/seller-onboarding');
     }
 
     this.router.navigate(['login']);

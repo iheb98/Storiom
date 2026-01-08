@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Order, OrderItem, CartItem, Product, Store, User, Address, DeliveryWorker } = require('../models');
+const { Order, OrderItem, CartItem, Product, Store, User, Address, DeliveryWorker, Operation } = require('../models');
 const utility = require('../utility');
 const { Op } = require('sequelize');
 const sendMail = require('../mailService');
@@ -200,7 +200,13 @@ router.post('/create', utility.authenticate, async (req, res) => {
 
             // Create Order Items
             for (const item of items) {
-                const price = item.product.sellingPrice; // Snapshot price
+                // Calculate price with discount if applicable
+                let price = item.product.sellingPrice; // Original price
+                if (item.product.discount && item.product.discount > 0) {
+                    // Apply discount: discountedPrice = sellingPrice * (1 - discount/100)
+                    price = item.product.sellingPrice * (1 - item.product.discount / 100);
+                }
+
                 const lineTotal = price * item.quantity;
                 totalAmount += lineTotal;
 
@@ -208,7 +214,7 @@ router.post('/create', utility.authenticate, async (req, res) => {
                     orderId: order.id,
                     productId: item.product.id,
                     quantity: item.quantity,
-                    price: price
+                    price: price  // This is now the discounted price
                 });
             }
 
@@ -293,10 +299,42 @@ router.put('/:id/status', utility.authenticate, async (req, res) => {
         const { status } = req.body;
         const orderId = req.params.id;
 
-        const order = await Order.findByPk(orderId);
+        const order = await Order.findByPk(orderId, {
+            include: [{
+                model: OrderItem,
+                as: 'items',
+                include: [{ model: Product, as: 'product' }]
+            }]
+        });
         if (!order) return res.status(404).json({ success: false, message: "Order not found" });
 
-        // Add permission check here (Only store owner should update status)
+        const previousStatus = order.status;
+
+        // Handle cancellation - revert product quantities if order was confirmed/shipped
+        if (status === 'CANCELLED' && (previousStatus === 'CONFIRMED' || previousStatus === 'SHIPPED')) {
+            // Revert product quantities and create CANCELLED operations for all items
+            for (const item of order.items) {
+                if (item.product) {
+                    // Add back the quantity that was sold
+                    await Product.update(
+                        { quantity: item.product.quantity + item.quantity },
+                        { where: { id: item.product.id } }
+                    );
+
+                    // Create CANCELLED operation for tracking
+                    await Operation.create({
+                        type: 'CANCELLED',
+                        amount: item.quantity,
+                        price: item.price,
+                        date: new Date(),
+                        productId: item.product.id,
+                        receiptId: null,
+                        creatorUserId: req.user.id,
+                        impactStock: true
+                    });
+                }
+            }
+        }
 
         order.status = status;
         await order.save();

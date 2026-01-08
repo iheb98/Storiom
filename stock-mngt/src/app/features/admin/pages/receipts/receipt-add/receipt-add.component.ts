@@ -50,6 +50,7 @@ export class ReceiptAddComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     this.getSuppliers();
     this.initForm();
   }

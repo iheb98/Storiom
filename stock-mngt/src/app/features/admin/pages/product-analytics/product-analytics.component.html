@@ -1,0 +1,279 @@
+<div class="analytics-page">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-text">
+                <h1><fa-icon [icon]="faChartLine"></fa-icon> Analytique Produits</h1>
+                <p>Suivez les performances de vos produits en temps réel</p>
+            </div>
+            <button class="refresh-btn" (click)="refreshData()" [disabled]="isLoading">
+                <fa-icon [icon]="faSpinner" *ngIf="isLoading" [spin]="true"></fa-icon>
+                <span *ngIf="!isLoading">Actualiser</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-container" *ngIf="isLoading">
+        <div class="loading-spinner">
+            <fa-icon [icon]="faSpinner" [spin]="true"></fa-icon>
+            <p>Chargement des statistiques...</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="analytics-content" *ngIf="!isLoading">
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="summary-card views">
+                <div class="card-icon">
+                    <fa-icon [icon]="faEye"></fa-icon>
+                </div>
+                <div class="card-content">
+                    <span class="card-value">{{ formatNumber(totalViews) }}</span>
+                    <span class="card-label">Vues totales</span>
+                </div>
+            </div>
+
+            <div class="summary-card orders">
+                <div class="card-icon">
+                    <fa-icon [icon]="faBox"></fa-icon>
+                </div>
+                <div class="card-content">
+                    <span class="card-value">{{ formatNumber(totalOrders) }}</span>
+                    <span class="card-label">Commandes</span>
+                </div>
+            </div>
+
+            <div class="summary-card cart">
+                <div class="card-icon">
+                    <fa-icon [icon]="faShoppingCart"></fa-icon>
+                </div>
+                <div class="card-content">
+                    <span class="card-value">{{ formatNumber(totalCartAdds) }}</span>
+                    <span class="card-label">Ajouts au panier</span>
+                </div>
+            </div>
+
+            <div class="summary-card wishlist">
+                <div class="card-icon">
+                    <fa-icon [icon]="faHeart"></fa-icon>
+                </div>
+                <div class="card-content">
+                    <span class="card-value">{{ formatNumber(totalWishlists) }}</span>
+                    <span class="card-label">Favoris</span>
+                </div>
+            </div>
+
+            <div class="summary-card conversion">
+                <div class="card-icon">
+                    <fa-icon [icon]="faPercent"></fa-icon>
+                </div>
+                <div class="card-content">
+                    <span class="card-value">{{ avgConversionRate }}%</span>
+                    <span class="card-label">Taux de conversion</span>
+                </div>
+            </div>
+
+            <div class="summary-card sold">
+                <div class="card-icon">
+                    <fa-icon [icon]="faTrophy"></fa-icon>
+                </div>
+                <div class="card-content">
+                    <span class="card-value">{{ formatNumber(totalQuantitySold) }}</span>
+                    <span class="card-label">Unités vendues</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Products Section -->
+        <div class="section-card top-products" *ngIf="topProducts.length > 0">
+            <div class="section-header">
+                <h2><fa-icon [icon]="faFire"></fa-icon> Produits Populaires</h2>
+                <span class="badge">Top 5</span>
+            </div>
+            <div class="top-products-list">
+                <div class="top-product-item" *ngFor="let item of topProducts; let i = index"
+                    (click)="viewProduct(item.product?.id)">
+                    <div class="rank" [class]="'rank-' + (i + 1)">
+                        <span>{{ i + 1 }}</span>
+                    </div>
+                    <div class="product-image">
+                        <img [src]="getProductImage(item.product)" [alt]="item.product?.name"
+                            [class.default-image]="!hasProductImage(item.product)">
+                    </div>
+                    <div class="product-info">
+                        <h4>{{ item.product?.name || 'Produit inconnu' }}</h4>
+                        <div class="product-stats-mini">
+                            <span class="stat" title="Vues"><fa-icon [icon]="faEye"></fa-icon> {{ item.viewCount || 0
+                                }}</span>
+                            <span class="stat" title="Paniers"><fa-icon [icon]="faShoppingCart"></fa-icon> {{
+                                item.cartAddCount
+                                || 0 }}</span>
+                            <span class="stat" title="Commandes"><fa-icon [icon]="faBox"></fa-icon> {{
+                                item.orderCount || 0 }}</span>
+                        </div>
+                    </div>
+                    <div class="popularity-score">
+                        <div class="score-circle" [class]="getPerformanceLevel(item.popularityScore)">
+                            {{ item.popularityScore | number:'1.0-0' }}
+                        </div>
+                        <span class="score-label">Score</span>
+                    </div>
+                    <fa-icon [icon]="faExternalLinkAlt" class="view-icon"></fa-icon>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Products Analytics Table -->
+        <div class="section-card products-table">
+            <div class="section-header">
+                <h2><fa-icon [icon]="faBox"></fa-icon> Tous les Produits</h2>
+                <span class="count">{{ filteredProducts.length }} / {{ allProductStats.length }} produits</span>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <div class="search-box">
+                    <fa-icon [icon]="faSearch"></fa-icon>
+                    <input type="text" placeholder="Rechercher un produit..." [(ngModel)]="searchTerm"
+                        (ngModelChange)="onFilterChange()">
+                    <button class="clear-btn" *ngIf="searchTerm" (click)="searchTerm = ''; onFilterChange()">
+                        <fa-icon [icon]="faTimes"></fa-icon>
+                    </button>
+                </div>
+                <div class="sort-controls">
+                    <select [(ngModel)]="sortBy" (ngModelChange)="onFilterChange()" class="sort-select">
+                        <option value="popularityScore">Score</option>
+                        <option value="views">Vues</option>
+                        <option value="orders">Commandes</option>
+                        <option value="cartAdds">Paniers</option>
+                        <option value="wishlist">Favoris</option>
+                        <option value="conversion">Conversion</option>
+                        <option value="name">Nom</option>
+                    </select>
+                    <button class="sort-order-btn" (click)="toggleSortOrder(); onFilterChange()"
+                        [title]="sortOrder === 'asc' ? 'Croissant' : 'Décroissant'">
+                        <fa-icon [icon]="sortOrder === 'asc' ? faArrowUp : faArrowDown"></fa-icon>
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container" *ngIf="filteredProducts.length > 0">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th class="text-center">
+                                <fa-icon [icon]="faEye" title="Vues"></fa-icon>
+                                <span class="th-label">Vues</span>
+                            </th>
+                            <th class="text-center">
+                                <fa-icon [icon]="faShoppingCart" title="Paniers"></fa-icon>
+                                <span class="th-label">Paniers</span>
+                            </th>
+                            <th class="text-center">
+                                <fa-icon [icon]="faBox" title="Commandes"></fa-icon>
+                                <span class="th-label">Commandes</span>
+                            </th>
+                            <th class="text-center">
+                                <fa-icon [icon]="faHeart" title="Favoris"></fa-icon>
+                                <span class="th-label">Favoris</span>
+                            </th>
+                            <th class="text-center">
+                                <fa-icon [icon]="faPercent" title="Conversion"></fa-icon>
+                                <span class="th-label">Conversion</span>
+                            </th>
+                            <th class="text-center">
+                                <fa-icon [icon]="faStar" title="Score"></fa-icon>
+                                <span class="th-label">Score</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let product of paginatedProducts" (click)="viewProduct(product.id)"
+                            class="clickable-row">
+                            <td class="product-cell" data-label="">
+                                <div class="product-preview">
+                                    <img [src]="getProductImage(product)" [alt]="product.name"
+                                        [class.default-image]="!hasProductImage(product)">
+                                    <div class="product-name">
+                                        <span>{{ product.name }}</span>
+                                        <small>{{ product.sellingPrice | number:'1.3-3' }} TND</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center" data-label="Vues">
+                                <span class="stat-value">{{ product.stats?.viewCount || 0 }}</span>
+                            </td>
+                            <td class="text-center" data-label="Paniers">
+                                <span class="stat-value">{{ product.stats?.cartAddCount || 0 }}</span>
+                            </td>
+                            <td class="text-center" data-label="Commandes">
+                                <span class="stat-value orders">{{ product.stats?.orderCount || 0 }}</span>
+                            </td>
+                            <td class="text-center" data-label="Favoris">
+                                <span class="stat-value">{{ product.stats?.wishlistCount || 0 }}</span>
+                            </td>
+                            <td class="text-center" data-label="Conversion">
+                                <span class="conversion-badge" [class.good]="getConversionRate(product.stats) >= 5"
+                                    [class.excellent]="getConversionRate(product.stats) >= 10">
+                                    {{ getConversionRate(product.stats) }}%
+                                </span>
+                            </td>
+                            <td class="text-center" data-label="Score">
+                                <span class="score-badge"
+                                    [class]="getPerformanceLevel(product.stats?.popularityScore || 0)">
+                                    {{ product.stats?.popularityScore || 0 | number:'1.0-0' }}
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-bar" *ngIf="filteredProducts.length > 0">
+                <div class="page-size-selector">
+                    <span>Afficher</span>
+                    <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()">
+                        <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+                    </select>
+                    <span>par page</span>
+                </div>
+                <div class="page-info">
+                    {{ (currentPage - 1) * pageSize + 1 }} - {{ currentPage * pageSize > filteredProducts.length ?
+                    filteredProducts.length : currentPage * pageSize }}
+                    sur {{ filteredProducts.length }}
+                </div>
+                <div class="page-controls">
+                    <button class="page-btn" (click)="goToPage(1)" [disabled]="currentPage === 1" title="Première page">
+                        <fa-icon [icon]="faArrowUp" style="transform: rotate(-90deg)"></fa-icon>
+                        <fa-icon [icon]="faArrowUp" style="transform: rotate(-90deg)"></fa-icon>
+                    </button>
+                    <button class="page-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1"
+                        title="Page précédente">
+                        <fa-icon [icon]="faArrowUp" style="transform: rotate(-90deg)"></fa-icon>
+                    </button>
+                    <span class="page-number">{{ currentPage }} / {{ totalPages }}</span>
+                    <button class="page-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages"
+                        title="Page suivante">
+                        <fa-icon [icon]="faArrowUp" style="transform: rotate(90deg)"></fa-icon>
+                    </button>
+                    <button class="page-btn" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages"
+                        title="Dernière page">
+                        <fa-icon [icon]="faArrowUp" style="transform: rotate(90deg)"></fa-icon>
+                        <fa-icon [icon]="faArrowUp" style="transform: rotate(90deg)"></fa-icon>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" *ngIf="allProductStats.length === 0">
+                <fa-icon [icon]="faChartLine"></fa-icon>
+                <h3>Aucune donnée disponible</h3>
+                <p>Les statistiques apparaîtront ici une fois que vos produits seront consultés par les clients.</p>
+            </div>
+        </div>
+    </div>
+</div>

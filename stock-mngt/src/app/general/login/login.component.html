@@ -79,9 +79,11 @@
           </div>
 
           <!-- Submit Button -->
-          <button type="submit" class="submit-btn">
-            <span>Se Connecter</span>
-            <i class="fa fa-arrow-right"></i>
+          <button type="submit" class="submit-btn" [disabled]="isLoading">
+            <span *ngIf="!isLoading">Se Connecter</span>
+            <span *ngIf="isLoading">Connexion en cours...</span>
+            <i class="fa fa-arrow-right" *ngIf="!isLoading"></i>
+            <i class="fa fa-spinner fa-spin" *ngIf="isLoading"></i>
           </button>
 
           <!-- Register Link -->

@@ -109,6 +109,22 @@
                         </div>
                     </div>
 
+                    <div class="info-card" *ngIf="product?.discount > 0">
+                        <div class="info-icon discount">
+                            <fa-icon [icon]="faPercent"></fa-icon>
+                        </div>
+                        <div class="info-content">
+                            <span class="info-label">Réduction</span>
+                            <span class="info-value discount-value">-{{ product?.discount }}%</span>
+                            <span class="discount-prices">
+                                <span class="original-price">{{ product?.sellingPrice | number:'1.2-2' }} {{
+                                    product?.currency || 'DT' }}</span>
+                                <span class="discounted-price">{{ getDiscountedPrice() | number:'1.2-2' }} {{
+                                    product?.currency || 'DT' }}</span>
+                            </span>
+                        </div>
+                    </div>
+
                     <div class="info-card">
                         <div class="info-icon stock">
                             <fa-icon [icon]="faExclamationTriangle"></fa-icon>

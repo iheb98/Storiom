@@ -57,6 +57,7 @@ export class HomeComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     this.loadCategories();
     this.loadFeaturedProducts();
     this.loadFeaturedStores();

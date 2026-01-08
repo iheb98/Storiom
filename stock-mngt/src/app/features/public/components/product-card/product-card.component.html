@@ -1,7 +1,10 @@
 <div class="product-card" (click)="viewDetails()">
   <div class="product-image-container">
-    <!-- New Badge (conditional) -->
-    <!-- <span class="badge new" *ngIf="isNew(product)">New</span> -->
+    <!-- Discount Badge -->
+    <span class="discount-badge" *ngIf="product?.discount > 0">-{{ product?.discount }}%</span>
+
+    <!-- Out of Stock Badge -->
+    <span class="out-of-stock-badge" *ngIf="product?.quantity <= 0">Rupture de stock</span>
 
     <img
       [src]="(product?.thumbnails?.length ? environment.backend + '/' + product?.thumbnails[0] : (product?.images?.length ? environment.backend + '/' + product?.images[0] : 'assets/default_product.png'))"
@@ -10,6 +13,10 @@
 
     <!-- Overlay Utils -->
     <div class="overlay-utils">
+      <button class="util-btn wishlist-btn" [class.active]="isInWishlist"
+        title="{{ isInWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris' }}" (click)="toggleWishlist($event)">
+        <i class="fa" [ngClass]="isInWishlist ? 'fa-heart' : 'fa-heart-o'"></i>
+      </button>
       <button class="util-btn" title="Aperçu Rapide" (click)="$event.stopPropagation(); viewDetails()">
         <i class="fa fa-eye"></i>
       </button>
@@ -34,7 +41,9 @@
     </div>
 
     <div class="price-row">
-      <span class="price">{{ product.sellingPrice }} TND</span>
+      <span class="original-price" *ngIf="product?.discount > 0">{{ product.sellingPrice | number:'1.2-2' }} TND</span>
+      <span class="price" [class.discounted]="product?.discount > 0">{{ getDiscountedPrice() | number:'1.2-2' }}
+        TND</span>
     </div>
 
     <div class="store-name" *ngIf="product.store">

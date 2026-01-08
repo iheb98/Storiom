@@ -46,6 +46,7 @@ export class GenerateReportComponent implements OnInit {
     this.toDate = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0]; // Last day of the month
   }
   ngOnInit(): void {
+    window.scrollTo(0, 0);
   }
 
   generateReport() {

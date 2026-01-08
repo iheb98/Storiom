@@ -52,6 +52,7 @@ export class OperationEditComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     this.initForm();
     this.user = this.authService.getConnectedUser();
     this.route.paramMap.subscribe(paramMap => {

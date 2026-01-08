@@ -57,6 +57,16 @@ module.exports = {
         defaultValue: false,
         field: 'is_supporting_deliveries'
       },
+      storageUsedBytes: {
+        type: DataTypes.BIGINT,
+        defaultValue: 0,
+        field: 'storage_used_bytes'
+      },
+      storageLimitBytes: {
+        type: DataTypes.BIGINT,
+        defaultValue: 53687091200, // 50 GB default (50 * 1024 * 1024 * 1024)
+        field: 'storage_limit_bytes'
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

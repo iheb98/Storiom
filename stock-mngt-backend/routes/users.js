@@ -49,10 +49,7 @@ router.post('/register', async (req, res) => {
             country, street, city, state, postalCode
         });
 
-        await Subscription.create({
-            userId: createdUser.id,
-            duration: 'TRIAL'
-        });
+        // Note: Subscription is created when user creates a store (not during registration)
 
         // Send confirmation email
         const confirmUrl = `https://storiom.com/confirm?token=${confirmationToken}`;
@@ -179,7 +176,7 @@ router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, re
     })
 });
 
-router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
+router.get('/:id', utility.authenticate, (req, res, next) => {
     const id = req.params.id;
     User.findOne({
         where: {
@@ -196,7 +193,7 @@ router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => 
     })
 });
 
-router.put('/edit', utility.authenticate, checkSubscription, (req, res, next) => {
+router.put('/edit', utility.authenticate, (req, res, next) => {
     User.findOne({
         where: {
             [Op.and]: {
@@ -340,7 +337,7 @@ router.get('/', async (req, res, next) => {
 
 
 
-router.get('/profile/:id', utility.authenticate, checkSubscription, async (req, res, next) => {
+router.get('/profile/:id', utility.authenticate, async (req, res, next) => {
     const id = req.params.id;
     try {
         const user = await User.findOne({
@@ -393,6 +390,61 @@ router.get('/checkSubscription/:id', utility.authenticate, checkSubscription, (r
             message: err.toString()
         })
     })
+});
+
+// Get subscription details (full data)
+router.get('/subscription/:id', utility.authenticate, async (req, res) => {
+    try {
+        const id = req.params.id;
+        const user = await User.findOne({
+            where: { id },
+            include: ['subscription']
+        });
+
+        if (!user || !user.subscription) {
+            return res.status(404).json({
+                success: false,
+                message: 'Subscription not found'
+            });
+        }
+
+        let { activationDate, expirationDate, duration, createdAt } = user.subscription;
+
+        // Calculate expiration date if not set
+        let calculatedExpirationDate = expirationDate;
+        if (!expirationDate) {
+            const durationMapping = {
+                "TRIAL": 30,
+                "1M": 30,
+                "3M": 90,
+                "6M": 180,
+                "12M": 365
+            };
+
+            if (durationMapping[duration]) {
+                calculatedExpirationDate = new Date(activationDate);
+                calculatedExpirationDate.setDate(calculatedExpirationDate.getDate() + durationMapping[duration]);
+            }
+        }
+
+        const isExpired = calculatedExpirationDate && new Date() > new Date(calculatedExpirationDate);
+
+        res.json({
+            success: true,
+            subscription: {
+                activationDate,
+                expirationDate: calculatedExpirationDate,
+                duration,
+                isExpired,
+                createdAt
+            }
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        });
+    }
 });
 
 router.put('/extendSubscription/:id', async (req, res) => {

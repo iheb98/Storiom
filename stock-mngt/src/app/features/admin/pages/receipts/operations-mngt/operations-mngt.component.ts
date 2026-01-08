@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import {
   faEdit, faEye, faTrash, faPlus, faFilter, faUndo, faBox, faTag,
   faCoins, faCubes, faCalendar, faSearch, faExchangeAlt, faShoppingCart,
-  faTruck, faUndoAlt
+  faTruck, faUndoAlt, faTimesCircle
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 
@@ -33,7 +33,7 @@ export class OperationsMngtComponent implements OnInit {
   toDateFilter;
   productName;
   typeFilter;
-  types = [{ value: "LOADED", label: "Chargé" }, { value: "SOLD", label: "Vendu" }, { value: "RETURNED", label: "Retourné" }];
+  types = [{ value: "LOADED", label: "Chargé" }, { value: "SOLD", label: "Vendu" }, { value: "RETURNED", label: "Retourné" }, { value: "CANCELLED", label: "Annulé" }];
 
   // Data
   suppliers = [];
@@ -58,6 +58,7 @@ export class OperationsMngtComponent implements OnInit {
   faShoppingCart = faShoppingCart;
   faTruck = faTruck;
   faUndoAlt = faUndoAlt;
+  faTimesCircle = faTimesCircle;
 
   // Pagination
   currentPage = 0;
@@ -81,6 +82,7 @@ export class OperationsMngtComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     this.loadData();
   }
 

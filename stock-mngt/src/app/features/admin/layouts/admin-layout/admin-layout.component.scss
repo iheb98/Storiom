@@ -169,6 +169,10 @@ $transition-speed: 0.3s;
             &.loaded {
                 opacity: 1;
             }
+
+            &.default-image {
+                opacity: 0.15;
+            }
         }
 
         .store-name {
@@ -213,6 +217,7 @@ $transition-speed: 0.3s;
     gap: 10px;
     font-size: 0.85rem;
     font-weight: 500;
+    text-decoration: none;
 
     &.active {
         background: rgba(46, 125, 50, 0.2);

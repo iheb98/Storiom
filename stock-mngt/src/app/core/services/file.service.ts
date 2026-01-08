@@ -21,4 +21,12 @@ export class FileService {
     return this.http.post<any>(this.baseUrl + 'uploadMultipleFiles', files);
   }
 
+  deleteFile(filename: string): Observable<any> {
+    return this.http.delete<any>(this.baseUrl + 'deleteFile', { body: { filename } });
+  }
+
+  getFileInfo(filename: string): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'getFileInfo/' + encodeURIComponent(filename));
+  }
+
 }

@@ -50,6 +50,26 @@ module.exports = (sequelize, DataTypes) => {
       field: 'is_supporting_deliveries'
     },
     selectedCategories: DataTypes.STRING,
+    storageUsedBytes: {
+      type: DataTypes.BIGINT,
+      defaultValue: 0,
+      field: 'storage_used_bytes'
+    },
+    storageLimitBytes: {
+      type: DataTypes.BIGINT,
+      defaultValue: 53687091200, // 50 GB default (50 * 1024 * 1024 * 1024)
+      field: 'storage_limit_bytes'
+    },
+    purchasedStorageBytes: {
+      type: DataTypes.BIGINT,
+      defaultValue: 0,
+      field: 'purchased_storage_bytes'
+    },
+    purchasedStorageExpiresAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: 'purchased_storage_expires_at'
+    },
     creatorUserId: {
       type: DataTypes.INTEGER
     }

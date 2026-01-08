@@ -1,0 +1,190 @@
+<div class="payment-orders-admin">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1>
+                    <fa-icon [icon]="faReceipt"></fa-icon>
+                    Commandes de paiement
+                </h1>
+                <p>Gérez les paiements par virement bancaire</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card pending" [class.active]="statusFilter === 'PENDING'" (click)="filterByStatus('PENDING')">
+            <fa-icon [icon]="faClock"></fa-icon>
+            <div class="stat-info">
+                <span class="stat-value">{{ pendingCount }}</span>
+                <span class="stat-label">En attente</span>
+            </div>
+        </div>
+        <div class="stat-card confirming" [class.active]="statusFilter === 'USER_CONFIRMED'"
+            (click)="filterByStatus('USER_CONFIRMED')">
+            <fa-icon [icon]="faExclamationTriangle"></fa-icon>
+            <div class="stat-info">
+                <span class="stat-value">{{ confirmedCount }}</span>
+                <span class="stat-label">À vérifier</span>
+            </div>
+        </div>
+        <div class="stat-card paid" [class.active]="statusFilter === 'PAID'" (click)="filterByStatus('PAID')">
+            <fa-icon [icon]="faCheckCircle"></fa-icon>
+            <div class="stat-info">
+                <span class="stat-value">{{ paidCount }}</span>
+                <span class="stat-label">Payés</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-bar">
+        <fa-icon [icon]="faSearch"></fa-icon>
+        <input type="text" [(ngModel)]="searchQuery" (input)="onSearch()"
+            placeholder="Rechercher par numéro, nom ou email...">
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-container" *ngIf="isLoading">
+        <fa-icon [icon]="faSpinner" [spin]="true"></fa-icon>
+        <p>Chargement des commandes...</p>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="orders-table-container" *ngIf="!isLoading">
+        <div class="orders-empty" *ngIf="filteredOrders.length === 0">
+            <fa-icon [icon]="faReceipt"></fa-icon>
+            <p>Aucune commande trouvée</p>
+        </div>
+
+        <table class="orders-table" *ngIf="filteredOrders.length > 0">
+            <thead>
+                <tr>
+                    <th>Commande</th>
+                    <th>Client</th>
+                    <th>Type</th>
+                    <th>Montant</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let order of filteredOrders" [class.highlighted]="order.status === 'USER_CONFIRMED'"
+                    (click)="selectOrder(order)">
+                    <td class="order-number">{{ order.orderNumber }}</td>
+                    <td class="user-info" *ngIf="order.user">
+                        <span class="user-name">{{ order.user.firstName }} {{ order.user.lastName }}</span>
+                        <span class="user-email">{{ order.user.email }}</span>
+                    </td>
+                    <td class="order-type">
+                        <span *ngIf="order.paymentType === 'SUBSCRIPTION'">
+                            <fa-icon [icon]="faCreditCard"></fa-icon>
+                            {{ getPlanLabel(order.subscriptionPlan || '') }}
+                        </span>
+                        <span *ngIf="order.paymentType === 'STORAGE_EXTENSION'">
+                            <fa-icon [icon]="faDatabase"></fa-icon>
+                            {{ order.storageGB }} GB
+                        </span>
+                    </td>
+                    <td class="amount">{{ order.amount }} TND</td>
+                    <td>
+                        <span class="status-badge" [ngClass]="getStatusClass(order.status)">
+                            {{ getStatusLabel(order.status) }}
+                        </span>
+                    </td>
+                    <td class="date">{{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td class="actions">
+                        <button class="btn-action view" (click)="selectOrder(order); $event.stopPropagation()">
+                            <fa-icon [icon]="faEye"></fa-icon>
+                        </button>
+                        <button class="btn-action validate"
+                            *ngIf="order.status !== 'PAID' && order.status !== 'CANCELLED'"
+                            (click)="validateOrder(order); $event.stopPropagation()">
+                            <fa-icon [icon]="faCheck"></fa-icon>
+                        </button>
+                        <button class="btn-action cancel"
+                            *ngIf="order.status !== 'PAID' && order.status !== 'CANCELLED'"
+                            (click)="cancelOrder(order); $event.stopPropagation()">
+                            <fa-icon [icon]="faBan"></fa-icon>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div class="modal-overlay" *ngIf="selectedOrder" (click)="closeDetails()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Détails de la commande</h2>
+                <button class="btn-close" (click)="closeDetails()">
+                    <fa-icon [icon]="faTimes"></fa-icon>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-row">
+                    <span class="label">Numéro</span>
+                    <span class="value highlight">{{ selectedOrder.orderNumber }}</span>
+                </div>
+                <div class="detail-row" *ngIf="selectedOrder.user">
+                    <span class="label">Client</span>
+                    <span class="value">
+                        {{ selectedOrder.user.firstName }} {{ selectedOrder.user.lastName }}
+                        <small>({{ selectedOrder.user.email }})</small>
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Type</span>
+                    <span class="value">
+                        {{ selectedOrder.paymentType === 'SUBSCRIPTION'
+                        ? 'Abonnement ' + getPlanLabel(selectedOrder.subscriptionPlan || '')
+                        : 'Stockage ' + selectedOrder.storageGB + ' GB' }}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Montant</span>
+                    <span class="value amount">{{ selectedOrder.amount }} TND</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Statut</span>
+                    <span class="status-badge" [ngClass]="getStatusClass(selectedOrder.status)">
+                        {{ getStatusLabel(selectedOrder.status) }}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Créé le</span>
+                    <span class="value">{{ selectedOrder.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+                <div class="detail-row" *ngIf="selectedOrder.userConfirmedAt">
+                    <span class="label">Confirmé par user</span>
+                    <span class="value">{{ selectedOrder.userConfirmedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+                <div class="detail-row" *ngIf="selectedOrder.bankReference">
+                    <span class="label">Réf. bancaire</span>
+                    <span class="value">{{ selectedOrder.bankReference }}</span>
+                </div>
+                <div class="detail-row" *ngIf="selectedOrder.validatedAt">
+                    <span class="label">Validé le</span>
+                    <span class="value">{{ selectedOrder.validatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+                <div class="detail-row" *ngIf="selectedOrder.notes">
+                    <span class="label">Notes</span>
+                    <span class="value notes">{{ selectedOrder.notes }}</span>
+                </div>
+            </div>
+            <div class="modal-footer" *ngIf="selectedOrder.status !== 'PAID' && selectedOrder.status !== 'CANCELLED'">
+                <button class="btn-validate" (click)="validateOrder(selectedOrder)" [disabled]="isProcessing">
+                    <fa-icon [icon]="isProcessing ? faSpinner : faCheck" [spin]="isProcessing"></fa-icon>
+                    Valider le paiement
+                </button>
+                <button class="btn-cancel" (click)="cancelOrder(selectedOrder)" [disabled]="isProcessing">
+                    <fa-icon [icon]="faBan"></fa-icon>
+                    Annuler
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -13,19 +13,19 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
 
-    toJSON(){
-      return {...this.get(),id:undefined,userId:undefined,user_id:undefined,createdAt:undefined,updatedAt:undefined}
+    toJSON() {
+      return { ...this.get(), id: undefined, userId: undefined, user_id: undefined, updatedAt: undefined }
     }
   }
   Subscription.init({
     paymentDate: {
       type: DataTypes.DATE,
-      defaultValue:DataTypes.NOW,
+      defaultValue: DataTypes.NOW,
       field: 'payment_date'
     },
     activationDate: {
       type: DataTypes.DATE,
-      defaultValue:DataTypes.NOW,
+      defaultValue: DataTypes.NOW,
       field: 'activation_date'
     },
     expirationDate: {
@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     userId: {
       type: DataTypes.INTEGER,
-      field:'user_id'
+      field: 'user_id'
     },
   }, {
     sequelize,

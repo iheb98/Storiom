@@ -195,6 +195,7 @@
                     <div class="image-overlay">
                         <fa-icon [icon]="faSearchPlus"></fa-icon>
                     </div>
+                    <span class="discount-badge" *ngIf="item?.discount > 0">-{{ item?.discount }}%</span>
                 </div>
 
                 <!-- Product Info -->
@@ -205,7 +206,10 @@
                     <div class="product-prices">
                         <div class="price selling">
                             <span class="price-label">Vente</span>
-                            <span class="price-value">{{ item?.sellingPrice | number:'1.2-2' }} {{ item?.currency ||
+                            <span class="price-original" *ngIf="item?.discount > 0">{{ item?.sellingPrice |
+                                number:'1.2-2' }} {{ item?.currency || 'DT' }}</span>
+                            <span class="price-value" [class.discounted]="item?.discount > 0">{{
+                                getDiscountedPrice(item) | number:'1.2-2' }} {{ item?.currency ||
                                 'DT'
                                 }}</span>
                         </div>

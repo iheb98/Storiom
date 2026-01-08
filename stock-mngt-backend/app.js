@@ -12,6 +12,7 @@ const multer = require('multer');
 const sendMail = require('./mailService');
 const { expiredLinkEmail, resendConfirmationEmail } = require('./emailTemplates');
 const multerS3 = require('multer-s3');
+const { DeleteObjectCommand, HeadObjectCommand } = require('@aws-sdk/client-s3');
 const s3 = require('./config/r2');
 
 const upload = multer({
@@ -77,11 +78,13 @@ app.post('/api/uploadFile', upload.single('file'), (req, res) => {
   });
 });
 
-app.post('/api/uploadMultipleFiles', upload.array('file', 10), (req, res) => {
+app.post('/api/uploadMultipleFiles', upload.array('file', 20), (req, res) => {
   // `req.files` is an array of uploaded file info
   const uploadedFiles = req.files.map(file => ({
     originalname: file.originalname,
     location: file.location, // S3/R2 URL
+    size: file.size, // File size in bytes
+    key: file.key, // R2 key for deletion
   }));
 
   res.json({
@@ -89,6 +92,55 @@ app.post('/api/uploadMultipleFiles', upload.array('file', 10), (req, res) => {
     message: "Files uploaded successfully",
     files: uploadedFiles,
   });
+});
+
+// Delete file from R2
+app.delete('/api/deleteFile', async (req, res) => {
+  try {
+    const { filename } = req.body;
+
+    if (!filename) {
+      return res.status(400).json({ success: false, message: 'Filename is required' });
+    }
+
+    const command = new DeleteObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Key: filename,
+    });
+
+    await s3.send(command);
+
+    res.json({
+      success: true,
+      message: 'File deleted successfully',
+    });
+  } catch (error) {
+    console.error('Error deleting file:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete file', error: error.message });
+  }
+});
+
+// Get file info (size) from R2
+app.get('/api/getFileInfo/:filename', async (req, res) => {
+  try {
+    const { filename } = req.params;
+
+    const command = new HeadObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Key: filename,
+    });
+
+    const response = await s3.send(command);
+
+    res.json({
+      success: true,
+      size: response.ContentLength,
+      contentType: response.ContentType,
+    });
+  } catch (error) {
+    console.error('Error getting file info:', error);
+    res.status(500).json({ success: false, message: 'Failed to get file info', error: error.message });
+  }
 });
 
 
@@ -193,6 +245,9 @@ const ordersRoute = require('./routes/orders');
 const deliveryWorkersRoute = require('./routes/delivery-workers');
 const storeServicesRoute = require('./routes/store-services');
 const serviceRequestsRoute = require('./routes/service-requests');
+const paymentOrdersRoute = require('./routes/payment-orders');
+const analyticsRoute = require('./routes/analytics');
+const wishlistRoute = require('./routes/wishlist');
 
 app.use('/api/receipts', receiptsRoute)
 app.use('/api/credits', creditsRoute)
@@ -210,6 +265,9 @@ app.use('/api/orders', ordersRoute)
 app.use('/api/delivery-workers', deliveryWorkersRoute)
 app.use('/api/store-services', storeServicesRoute)
 app.use('/api/service-requests', serviceRequestsRoute)
+app.use('/api/payment-orders', paymentOrdersRoute)
+app.use('/api/analytics', analyticsRoute)
+app.use('/api/wishlist', wishlistRoute)
 
 //require('./config/passport')(passport);
 

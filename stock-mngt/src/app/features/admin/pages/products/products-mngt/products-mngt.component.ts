@@ -10,9 +10,11 @@ import {
 import { BarcodeFormat } from '@zxing/library';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CategoryService } from 'src/app/core/services/category.service';
+import { FileService } from 'src/app/core/services/file.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { QueryService } from 'src/app/core/services/query.service';
 import { ReceiptService } from 'src/app/core/services/receipt.service';
+import { StoreService } from 'src/app/core/services/store.service';
 import { SupplierService } from 'src/app/core/services/supplier.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
@@ -107,6 +109,8 @@ export class ProductsMngtComponent implements OnInit {
     private supplierService: SupplierService,
     private categoryService: CategoryService,
     private authService: AuthService,
+    private fileService: FileService,
+    private storeService: StoreService,
     private router: Router,
     private route: ActivatedRoute,
     private queryService: QueryService,
@@ -114,6 +118,7 @@ export class ProductsMngtComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     this.route.queryParams.subscribe(params => {
       this.isCriticalFilter = params['filter'] === 'critical';
       this.loadInitialData();
@@ -291,6 +296,9 @@ export class ProductsMngtComponent implements OnInit {
         this.isActionLoading = true;
         this.productService.deleteProduct(product.id).subscribe(
           response => {
+            // Delete images and thumbnails from R2 and update storage
+            this.cleanupProductImages(product);
+
             this.isActionLoading = false;
             Swal.fire({
               icon: 'success',
@@ -315,12 +323,57 @@ export class ProductsMngtComponent implements OnInit {
     });
   }
 
+  // Clean up product images from R2 and update storage tracking
+  private cleanupProductImages(product: any) {
+    const storeId = this.authService.getConnectedUser()?.store;
+    const images = product.images || [];
+    const thumbnails = product.thumbnails || [];
+    const allFiles = [...images, ...thumbnails];
+
+    if (allFiles.length === 0) return;
+
+    console.log('Cleaning up', allFiles.length, 'files from deleted product');
+
+    for (const filename of allFiles) {
+      // Get file size and delete from R2
+      this.fileService.getFileInfo(filename).subscribe({
+        next: (info) => {
+          const fileSize = info?.size || 0;
+          this.fileService.deleteFile(filename).subscribe({
+            next: () => {
+              console.log('File deleted from R2:', filename);
+              // Update storage tracking
+              if (fileSize > 0 && storeId) {
+                this.storeService.updateStorageUsage(storeId, fileSize, 'subtract').subscribe({
+                  next: () => console.log('Storage updated for:', filename),
+                  error: (err) => console.error('Failed to update storage:', err)
+                });
+              }
+            },
+            error: (err) => console.error('Failed to delete file from R2:', err)
+          });
+        },
+        error: () => {
+          // Still try to delete even if we can't get size
+          this.fileService.deleteFile(filename).subscribe();
+        }
+      });
+    }
+  }
+
   openImage(image: string) {
     this.selectedImage = image;
   }
 
   closeImage() {
     this.selectedImage = null;
+  }
+
+  getDiscountedPrice(product: any): number {
+    if (!product?.discount || product.discount <= 0) {
+      return product?.sellingPrice || 0;
+    }
+    return product.sellingPrice * (1 - product.discount / 100);
   }
 
   search() {

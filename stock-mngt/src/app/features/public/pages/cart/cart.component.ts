@@ -4,6 +4,7 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { CartService } from 'src/app/core/services/cart.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { OrderService } from 'src/app/core/services/order.service';
+import { AnalyticsService } from 'src/app/core/services/analytics.service';
 import { environment } from 'src/environments/environment';
 import { ToastService } from 'src/app/core/services/toast.service';
 import {
@@ -48,10 +49,12 @@ export class CartComponent implements OnInit {
     private cartService: CartService,
     private productService: ProductService,
     private orderService: OrderService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private analyticsService: AnalyticsService
   ) { }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     if (this.authService.isLoggedIn()) {
       this.loadCartFromApi();
     } else {
@@ -127,6 +130,14 @@ export class CartComponent implements OnInit {
     return !Array.isArray(images) || images.length === 0;
   }
 
+  getDiscountedPrice(product: any): number {
+    if (!product?.discount || product.discount <= 0) {
+      return product?.sellingPrice || 0;
+    }
+    // sellingPrice is the original price, calculate discounted price
+    return product.sellingPrice * (1 - product.discount / 100);
+  }
+
   increaseQty(item: CartItem) {
     if (this.authService.isLoggedIn()) {
       const newQty = item.quantity + 1;
@@ -160,6 +171,9 @@ export class CartComponent implements OnInit {
   }
 
   removeItem(item: CartItem) {
+    // Track cart_remove event
+    this.trackEvent(item.product, 'cart_remove');
+
     if (this.authService.isLoggedIn()) {
       this.productService.removeFromCart(item.product.id).subscribe(res => {
         if (res.success) {
@@ -182,7 +196,7 @@ export class CartComponent implements OnInit {
 
   calculateTotals() {
     this.totalItems = this.cart.reduce((acc, item) => acc + item.quantity, 0);
-    this.totalPrice = this.cart.reduce((acc, item) => acc + item.quantity * item.product.sellingPrice, 0);
+    this.totalPrice = this.cart.reduce((acc, item) => acc + item.quantity * this.getDiscountedPrice(item.product), 0);
   }
 
   goToMarketplace() {
@@ -201,6 +215,11 @@ export class CartComponent implements OnInit {
     this.orderService.createOrder().subscribe(
       (res) => {
         if (res.success) {
+          // Track order event for each item in cart
+          this.cart.forEach(item => {
+            this.trackEvent(item.product, 'order', item.quantity);
+          });
+
           this.toastService.showSuccess("Commande passée avec succès !");
           this.cart = [];
           this.calculateTotals();
@@ -212,5 +231,22 @@ export class CartComponent implements OnInit {
         this.toastService.showError("Échec de la commande : " + (err.error?.message || err.message));
       }
     );
+  }
+
+  // Track analytics events
+  private trackEvent(product: any, interactionType: 'cart_remove' | 'order', quantity: number = 1) {
+    if (product?.id) {
+      const userId = this.authService.getConnectedUser()?.id;
+      this.analyticsService.trackEvent({
+        productId: product.id,
+        interactionType,
+        userId,
+        storeId: product.storeId || product.store?.id,
+        categoryId: product.categoryId || product.category?.id,
+        quantity
+      }).subscribe({
+        error: (err) => console.log('Analytics tracking failed:', err)
+      });
+    }
   }
 }

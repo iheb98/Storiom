@@ -57,13 +57,14 @@
 
             <!-- Price -->
             <div class="price-section">
+                <span class="original-price" *ngIf="product?.discount > 0">
+                    {{ product?.sellingPrice | number:'1.2-2' }} TND
+                </span>
                 <div class="price-main">
-                    <span class="current-price">{{ product?.sellingPrice | number:'1.2-2' }}</span>
+                    <span class="current-price" [class.discounted]="product?.discount > 0">{{ getDiscountedPrice() |
+                        number:'1.2-2' }}</span>
                     <span class="currency">TND</span>
                 </div>
-                <span class="original-price" *ngIf="product?.discount > 0">
-                    {{ getOriginalPrice() | number:'1.2-2' }} TND
-                </span>
             </div>
 
             <!-- Stock Status -->
@@ -92,6 +93,10 @@
                 <button class="add-to-cart-btn" (click)="addToCart(product)" [disabled]="product?.quantity <= 0">
                     <fa-icon [icon]="faShoppingCart"></fa-icon>
                     <span>Ajouter au Panier</span>
+                </button>
+                <button class="wishlist-btn" [class.active]="isInWishlist" (click)="toggleWishlist()"
+                    [title]="isInWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris'">
+                    <fa-icon [icon]="isInWishlist ? faHeart : faHeartEmpty"></fa-icon>
                 </button>
             </div>
 

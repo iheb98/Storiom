@@ -51,6 +51,7 @@ export class SupplierAddComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     this.initForm();
     this.user = this.authService.getConnectedUser();
 

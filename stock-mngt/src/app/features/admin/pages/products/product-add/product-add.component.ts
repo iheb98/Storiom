@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   faArrowLeft, faEdit, faTimes, faChartLine, faCubes, faExclamationTriangle,
   faEye, faInfoCircle, faTag, faFolder, faTruck, faCoins, faArrowDown,
-  faArrowUp, faAlignLeft, faImages, faCloudUploadAlt, faPlus, faSave, faBox, faBarcode, faCamera
+  faArrowUp, faAlignLeft, faImages, faCloudUploadAlt, faPlus, faSave, faBox, faBarcode, faCamera, faPercent
 } from '@fortawesome/free-solid-svg-icons';
 import { BarcodeFormat } from '@zxing/library';
 import { EMPTY, forkJoin } from 'rxjs';
@@ -16,6 +16,7 @@ import { CompressorService } from 'src/app/core/services/compressor.service';
 import { FileService } from 'src/app/core/services/file.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { SupplierService } from 'src/app/core/services/supplier.service';
+import { StoreService } from 'src/app/core/services/store.service';
 import { UserSettingsService } from 'src/app/core/services/user-settings.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
@@ -51,6 +52,7 @@ export class ProductAddComponent implements OnInit {
   faBox = faBox;
   faBarcode = faBarcode;
   faCamera = faCamera;
+  faPercent = faPercent;
 
   // Barcode Scanner
   scannerActive = false;
@@ -88,6 +90,7 @@ export class ProductAddComponent implements OnInit {
   data: any;
   selectedCategory = '';
   selectedFiles: { file: File, preview: string }[] = [];
+  pendingDeletions: { image: string, thumbnail: string | null }[] = []; // Queue for deletions on update
 
   // Edit mode
   edit = false;
@@ -120,11 +123,13 @@ export class ProductAddComponent implements OnInit {
     private brandService: BrandService,
     private compressor: CompressorService,
     private userSettingsService: UserSettingsService,
+    private storeService: StoreService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
   ) { }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     this.editCategory = false;
     this.initForm();
     this.colors = environment.couleurs;
@@ -200,6 +205,7 @@ export class ProductAddComponent implements OnInit {
         this.form.get('brandId').setValue(response?.brand?.id);
         this.form.get('categoryId').setValue(response?.category?.id);
         this.form.get('sellingPrice').setValue(response?.sellingPrice);
+        this.form.get('discount').setValue(response?.discount);
         this.form.get('quantity').setValue(response?.quantity);
         this.form.get('color').setValue(response?.color);
         this.form.get('supplierId').setValue(response?.supplier?.id);
@@ -243,6 +249,7 @@ export class ProductAddComponent implements OnInit {
       description: [''],
       buyingPrice: [null],
       sellingPrice: [null],
+      discount: [0],
       toDisplay: [defaultVisibility],
       images: [null],
       date: [(new Date()).toISOString().substring(0, 16)]
@@ -255,10 +262,10 @@ export class ProductAddComponent implements OnInit {
 
     const originalFiles = this.selectedFiles.map(sf => sf.file);
 
-    if ((this.images?.length || 0) + originalFiles.length > 3) {
+    if ((this.images?.length || 0) + originalFiles.length > 10) {
       Swal.fire({
         icon: 'error',
-        title: 'Vous pouvez selectionnez seulement 3 images',
+        title: 'Vous pouvez selectionnez seulement 10 images',
         showConfirmButton: false,
         timer: 1500
       });
@@ -327,6 +334,9 @@ export class ProductAddComponent implements OnInit {
         // Extract filenames from upload response (backend adds timestamp prefix)
         const allFilenames = response.files.map(file => file.location.split('/').pop());
 
+        // Calculate total uploaded bytes for storage tracking
+        const totalUploadedBytes = response.files.reduce((sum, file) => sum + (file.size || 0), 0);
+
         // Split response back into originals and thumbnails
         const uploadedOriginals = allFilenames.slice(0, originalCount);
         const uploadedThumbnails = allFilenames.slice(originalCount);
@@ -339,6 +349,11 @@ export class ProductAddComponent implements OnInit {
           storeId: this.user?.store
         }).subscribe(
           response => {
+            // Update storage usage after successful product creation
+            if (totalUploadedBytes > 0 && this.user?.store) {
+              this.storeService.updateStorageUsage(this.user.store, totalUploadedBytes, 'add').subscribe();
+            }
+
             this.isSubmitting = false;
             this.cdr.detectChanges();
             Swal.fire({
@@ -420,10 +435,10 @@ export class ProductAddComponent implements OnInit {
 
     const originalFiles = this.selectedFiles.map(sf => sf.file);
 
-    if ((this.images?.length || 0) + originalFiles.length > 3) {
+    if ((this.images?.length || 0) + originalFiles.length > 10) {
       Swal.fire({
         icon: 'error',
-        title: 'Vous pouvez selectionnez seulement 3 images',
+        title: 'Vous pouvez selectionnez seulement 10 images',
         showConfirmButton: false,
         timer: 1500
       });
@@ -475,6 +490,9 @@ export class ProductAddComponent implements OnInit {
         this.productService.updateProduct({ ...this.form.getRawValue(), storeId: this.user?.store, id: this.product?.id })
           .subscribe(
             response => {
+              // Process queued image deletions
+              this.processPendingDeletions();
+
               this.isSubmitting = false;
               Swal.fire({
                 icon: 'success',
@@ -516,6 +534,9 @@ export class ProductAddComponent implements OnInit {
         const uploadedOriginals = allFilenames.slice(0, originalCount);
         const uploadedThumbnails = allFilenames.slice(originalCount);
 
+        // Calculate total uploaded bytes for storage tracking
+        const totalUploadedBytes = response.files.reduce((sum, file) => sum + (file.size || 0), 0);
+
         // Merge with existing images and thumbnails
         this.form.get('images').setValue([...this.images, ...uploadedOriginals]);
         this.form.addControl('thumbnails', this.formBuilder.control([...this.thumbnails, ...uploadedThumbnails]));
@@ -523,6 +544,14 @@ export class ProductAddComponent implements OnInit {
         this.productService.updateProduct({ ...this.form.getRawValue(), storeId: this.user?.store, id: this.product?.id })
           .subscribe(
             response => {
+              // Update storage usage after successful product update
+              if (totalUploadedBytes > 0 && this.user?.store) {
+                this.storeService.updateStorageUsage(this.user.store, totalUploadedBytes, 'add').subscribe();
+              }
+
+              // Process queued image deletions
+              this.processPendingDeletions();
+
               this.isSubmitting = false;
               Swal.fire({
                 icon: 'success',
@@ -610,13 +639,81 @@ export class ProductAddComponent implements OnInit {
     // Find the index of the image to delete
     const index = this.images.indexOf(item);
     if (index > -1) {
-      // Remove the image
+      // Get the corresponding thumbnail before removing
+      const thumbnailToDelete = this.thumbnails && this.thumbnails.length > index ? this.thumbnails[index] : null;
+
+      // Remove from local arrays (UI only)
       this.images = this.images.filter(element => element != item);
-      // Remove the corresponding thumbnail at the same index
       if (this.thumbnails && this.thumbnails.length > index) {
         this.thumbnails.splice(index, 1);
       }
+
+      // Queue for deletion when user clicks Update (only in edit mode)
+      if (this.edit) {
+        this.pendingDeletions.push({ image: item, thumbnail: thumbnailToDelete });
+        console.log('Queued for deletion:', item, thumbnailToDelete ? 'with thumbnail' : 'no thumbnail');
+      }
     }
+  }
+
+  // Process queued deletions after successful product update
+  private processPendingDeletions() {
+    if (this.pendingDeletions.length === 0) return;
+
+    const storeId = this.user?.store;
+    console.log('Processing', this.pendingDeletions.length, 'pending deletions');
+
+    for (const deletion of this.pendingDeletions) {
+      // Delete image from R2 and update storage
+      this.fileService.getFileInfo(deletion.image).subscribe({
+        next: (info) => {
+          const fileSize = info?.size || 0;
+          this.fileService.deleteFile(deletion.image).subscribe({
+            next: () => {
+              console.log('Image deleted from R2:', deletion.image);
+              if (fileSize > 0 && storeId) {
+                this.storeService.updateStorageUsage(storeId, fileSize, 'subtract').subscribe({
+                  next: (res) => console.log('Storage updated:', res),
+                  error: (err) => console.error('Failed to update storage:', err)
+                });
+              }
+            },
+            error: (err) => console.error('Failed to delete image from R2:', err)
+          });
+        },
+        error: () => {
+          // Still try to delete even if we can't get size
+          this.fileService.deleteFile(deletion.image).subscribe();
+        }
+      });
+
+      // Delete thumbnail from R2 and update storage
+      if (deletion.thumbnail) {
+        this.fileService.getFileInfo(deletion.thumbnail).subscribe({
+          next: (info) => {
+            const thumbSize = info?.size || 0;
+            this.fileService.deleteFile(deletion.thumbnail).subscribe({
+              next: () => {
+                console.log('Thumbnail deleted from R2:', deletion.thumbnail);
+                if (thumbSize > 0 && storeId) {
+                  this.storeService.updateStorageUsage(storeId, thumbSize, 'subtract').subscribe({
+                    next: (res) => console.log('Thumbnail storage updated:', res),
+                    error: (err) => console.error('Failed to update thumbnail storage:', err)
+                  });
+                }
+              },
+              error: (err) => console.error('Failed to delete thumbnail from R2:', err)
+            });
+          },
+          error: () => {
+            this.fileService.deleteFile(deletion.thumbnail).subscribe();
+          }
+        });
+      }
+    }
+
+    // Clear the queue
+    this.pendingDeletions = [];
   }
 
   removeSelectedFile(index: number) {
@@ -661,7 +758,8 @@ export class ProductAddComponent implements OnInit {
     if (!files || files.length === 0) return;
 
     const currentCount = (this.images?.length || 0) + this.selectedFiles.length;
-    const maxAllowed = 3 - currentCount;
+    const maxImages = 10;
+    const maxAllowed = maxImages - currentCount;
 
     for (let i = 0; i < Math.min(files.length, maxAllowed); i++) {
       const file = files[i];
@@ -678,7 +776,7 @@ export class ProductAddComponent implements OnInit {
     if (files.length > maxAllowed) {
       Swal.fire({
         icon: 'warning',
-        title: `Seulement ${maxAllowed} image(s) ajoutée(s). Maximum 3 au total.`,
+        title: `Seulement ${maxAllowed} image(s) ajoutée(s). Maximum ${maxImages} au total.`,
         showConfirmButton: false,
         timer: 2000
       });

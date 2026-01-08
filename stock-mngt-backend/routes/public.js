@@ -270,7 +270,42 @@ router.get('/allStores/products', async (req, res) => {
             }, pagination)
         );
 
-        return res.json(products);
+        // -------------------------------
+        // 9. Check wishlist status if authenticated
+        // -------------------------------
+        let userId = null;
+        const authHeader = req.headers.authorization;
+
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            try {
+                const token = authHeader.split(' ')[1];
+                const jwt = require('jsonwebtoken');
+                // Use ignoreExpiration for this non-critical feature (just showing heart icons)
+                const decoded = jwt.verify(token, process.env.SECRET, { ignoreExpiration: true });
+                userId = decoded.id;
+            } catch (e) {
+                // Invalid token, ignore - products will still load, just without wishlist status
+            }
+        }
+
+        let wishlistProductIds = new Set();
+        if (userId) {
+            const { Wishlist } = require('../models');
+            const wishlistItems = await Wishlist.findAll({
+                where: { userId },
+                attributes: ['productId']
+            });
+            wishlistProductIds = new Set(wishlistItems.map(w => w.productId));
+        }
+
+        // Add isInWishlist to each product
+        const productsWithWishlist = products.map(p => {
+            const product = p.toJSON();
+            product.isInWishlist = wishlistProductIds.has(product.id);
+            return product;
+        });
+
+        return res.json(productsWithWishlist);
 
     } catch (err) {
         console.error(err);

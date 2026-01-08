@@ -187,9 +187,11 @@
                     </div>
 
                     <!-- Submit Button -->
-                    <button type="submit" class="submit-btn" [disabled]="form.invalid || !termsAccepted">
-                        <span>Créer Ma Boutique</span>
-                        <i class="fa fa-arrow-right"></i>
+                    <button type="submit" class="submit-btn" [disabled]="form.invalid || !termsAccepted || isLoading">
+                        <span *ngIf="!isLoading">Créer Ma Boutique</span>
+                        <span *ngIf="isLoading">Création en cours...</span>
+                        <i class="fa fa-arrow-right" *ngIf="!isLoading"></i>
+                        <i class="fa fa-spinner fa-spin" *ngIf="isLoading"></i>
                     </button>
                 </form>
             </div>
@@ -207,158 +209,86 @@
             </button>
         </div>
         <div class="modal-content">
-            <p class="update-date"><strong>Dernière mise à jour :</strong> 27 mai 2025</p>
+            <p class="update-date"><strong>Dernière mise à jour :</strong> 7 janvier 2026</p>
 
             <h3>1. Objet</h3>
-            <p>Storiom est une application permettant aux commerçants de gérer leur inventaire (produits, employés,
-                dépenses, fournisseurs, reçus, crédits), de consulter des statistiques, de générer des rapports,
-                et de publier leurs produits dans une marketplace visible par des clients externes.</p>
+            <p>En créant votre boutique sur Storiom, vous accédez à des outils de gestion d'inventaire (produits,
+                employés, dépenses, fournisseurs, reçus, crédits), des statistiques, des rapports, et la possibilité
+                de publier vos produits dans une marketplace visible par des clients externes.</p>
 
-            <h3>2. Acceptation des Conditions</h3>
-            <p>En créant un compte et en utilisant Storiom, vous acceptez l'ensemble des présentes Conditions
-                Générales d'Utilisation (CGU). Si vous êtes en désaccord avec une partie de ces conditions,
-                vous ne devez pas utiliser le service.</p>
-
-            <h3>3. Accès et Sécurité du Compte</h3>
+            <h3>2. Tarification et Abonnement</h3>
             <ul>
-                <li>Vous êtes seul responsable de l'accès à votre compte et de la confidentialité de vos identifiants.
+                <li>Le service nécessite un abonnement payant après une période d'essai gratuite d'un mois.</li>
+                <li>Les prix des abonnements sont indiqués sur notre plateforme et peuvent être modifiés.</li>
+                <li>En cas de modification des tarifs, vous serez informé <strong>au moins 30 jours à l'avance</strong>.
                 </li>
-                <li>Toute activité effectuée depuis votre compte sera considérée comme la vôtre.</li>
-                <li>En cas d'utilisation suspecte de votre compte, vous devez nous en informer immédiatement.</li>
-                <li>Vous devez fournir des informations exactes, complètes et à jour lors de votre inscription.</li>
+                <li>Vous pouvez résilier votre abonnement avant l'entrée en vigueur des nouveaux tarifs.</li>
             </ul>
 
-            <h3>4. Accès au Service et Évolutions</h3>
+            <h3>3. Stockage</h3>
             <ul>
-                <li>Le service est actuellement gratuit.</li>
-                <li>Il deviendra payant dans un délai de 1 à 3 mois, avec une période d'essai gratuite d'un mois.</li>
-                <li>Les utilisateurs seront informés avant tout changement de politique tarifaire.</li>
-                <li>Storiom se réserve le droit de modifier ou suspendre certaines fonctionnalités sans préavis.</li>
+                <li>Votre boutique bénéficie d'un espace de stockage de base de <strong>50 Go</strong> pour les images
+                    de produits.</li>
+                <li>Des extensions de stockage (50 Go, 100 Go, 200 Go) peuvent être achetées pour 1, 3, 6 ou 12 mois.
+                </li>
+                <li>En cas de dépassement de la limite de stockage (ex: expiration d'une extension), vous disposez d'un
+                    <strong>délai de 30 jours</strong> pour régulariser votre situation (achat d'une extension ou
+                    suppression manuelle d'images).
+                </li>
+                <li>Passé ce délai, les <strong>images les plus anciennes</strong> seront automatiquement supprimées
+                    jusqu'à ce que votre utilisation respecte la limite autorisée.</li>
             </ul>
 
-            <h3>5. Responsabilité des Produits (Vendeurs)</h3>
-            <p>En tant que vendeur, vous êtes <strong>entièrement responsable</strong> des produits que vous proposez
-                à la vente, y compris :</p>
+            <h3>4. Responsabilité des Produits</h3>
+            <p>En tant que vendeur, vous êtes <strong>entièrement responsable</strong> de :</p>
             <ul>
-                <li>Leur qualité et leur conformité aux réglementations applicables</li>
-                <li>L'exactitude de leur description et de leurs prix</li>
+                <li>La qualité et la conformité de vos produits aux réglementations applicables</li>
+                <li>L'exactitude des descriptions et des prix</li>
                 <li>Le respect des normes de sécurité et d'hygiène</li>
-                <li>La gestion des réclamations clients relatives à vos produits</li>
+                <li>La gestion des réclamations clients</li>
             </ul>
-            <p><strong>Storiom n'assume aucune responsabilité quant aux produits vendus par les vendeurs.</strong></p>
+            <p><strong>Storiom n'assume aucune responsabilité quant aux produits vendus.</strong></p>
 
-            <h3>6. Données Personnelles</h3>
-            <p>Storiom collecte certaines données personnelles (nom, email, etc.) nécessaires au bon fonctionnement
-                du service. Ces données sont confidentielles et <strong>ne seront jamais vendues à des tiers</strong>.
-            </p>
-            <p>L'utilisateur peut configurer les données de son magasin (produits, informations) pour qu'elles
-                soient visibles ou non dans la partie publique (marketplace).</p>
+            <h3>5. Commandes et Livraison</h3>
+            <ul>
+                <li><strong>Storiom ne gère pas la livraison.</strong> Vous êtes entièrement responsable de l'exécution
+                    de la commande et de la livraison.</li>
+                <li>Le rôle de Storiom se limite à l'affichage des produits et à la transmission de la commande.</li>
+                <li>Toute réclamation concernant la livraison doit être gérée directement par vous.</li>
+            </ul>
 
-            <h3>7. Contenus Interdits</h3>
-            <p>L'utilisateur s'engage à ne pas publier, dans la marketplace ou ailleurs, de contenus :</p>
+            <h3>6. Contenus Interdits</h3>
+            <p>Vous vous engagez à ne pas publier de contenus :</p>
             <ul>
                 <li>À caractère sexuel, violent, haineux, raciste, discriminatoire ou illégal</li>
-                <li>Comportant des propos injurieux, diffamatoires ou inappropriés</li>
-                <li>Contrefaits ou portant atteinte aux droits de propriété intellectuelle d'autrui</li>
+                <li>Contrefaits ou portant atteinte aux droits de propriété intellectuelle</li>
                 <li>Enfreignant les lois en vigueur en Tunisie ou à l'international</li>
             </ul>
-            <p>Storiom se réserve le droit de <strong>supprimer tout contenu inapproprié</strong> et de
-                suspendre le compte de l'utilisateur concerné sans préavis ni compensation.</p>
+            <p>Storiom se réserve le droit de <strong>supprimer tout contenu inapproprié</strong> et de suspendre votre
+                boutique.</p>
 
-            <h3>8. Commandes et Livraison</h3>
-            <p>Storiom agit uniquement comme une vitrine technologique permettant la mise en relation entre vendeurs et
-                acheteurs.</p>
-            <ul>
-                <li><strong>Storiom ne gère pas la livraison.</strong> Le vendeur est entièrement responsable de
-                    l'exécution de la commande et de la livraison des produits au client.</li>
-                <li>Le rôle de Storiom se limite à l'affichage des produits et à la transmission de la commande au
-                    vendeur.</li>
-                <li>Toute réclamation concernant la livraison (retard, non-livraison, produit abîmé) doit être gérée
-                    directement par le vendeur.</li>
-            </ul>
+            <h3>7. Propriété Intellectuelle</h3>
+            <p>Vous conservez tous les droits sur vos contenus. En publiant sur Storiom, vous nous accordez une licence
+                pour afficher et promouvoir vos produits sur notre plateforme.</p>
 
-            <h3>9. Utilisations Interdites</h3>
-            <ul>
-                <li>Utilisation de bots ou systèmes automatisés pour collecter ou interagir avec les données</li>
-                <li>Publication d'informations mensongères ou usurpation d'identité</li>
-                <li>Toute tentative de nuire au fonctionnement de Storiom ou à d'autres utilisateurs</li>
-                <li>Revente ou exploitation commerciale du service sans autorisation</li>
-                <li>Contournement des mesures de sécurité de la plateforme</li>
-            </ul>
-
-            <h3>10. Propriété Intellectuelle</h3>
-            <p>Vous conservez tous les droits de propriété intellectuelle sur vos contenus. En publiant sur
-                Storiom, vous nous accordez une licence non exclusive, gratuite et mondiale pour afficher
-                et promouvoir vos produits sur notre plateforme.</p>
-            <p>Storiom reste propriétaire de tous les droits sur la plateforme, son design, son code et ses
-                fonctionnalités.</p>
-
-            <h3>11. Paiements et Abonnements</h3>
-            <ul>
-                <li>Lors de la mise en place de l'abonnement, les paiements se feront manuellement ou par virement
-                    bancaire.</li>
-                <li>Nous nous réservons le droit d'ajouter d'autres moyens de paiement pour faciliter la souscription.
-                </li>
-                <li>Aucun remboursement ne sera effectué après validation, sauf erreur avérée de notre part.</li>
-                <li>Les modalités de paiement et les tarifs seront communiqués avant tout passage en version payante.
-                </li>
-            </ul>
-
-            <h3>12. Limitation de Responsabilité</h3>
-            <p>Storiom agit uniquement en tant qu'<strong>intermédiaire</strong> entre les vendeurs et les acheteurs.
-                En aucun cas Storiom ne pourra être tenu responsable :</p>
-            <ul>
-                <li>Des dommages directs, indirects, accessoires, spéciaux ou consécutifs</li>
-                <li>Des pertes de données, bugs, erreurs techniques ou interruptions temporaires du service</li>
-                <li>Des transactions entre vendeurs et acheteurs</li>
-                <li>De la qualité, légalité ou conformité des produits vendus</li>
-            </ul>
-            <p>Storiom est fourni <strong>tel quel</strong>, sans garantie d'aucune sorte.
-                Il est recommandé d'exporter régulièrement vos données.</p>
-
-            <h3>13. Indemnisation</h3>
-            <p>Vous acceptez d'indemniser et de dégager Storiom, ses dirigeants, employés et partenaires de
-                toute responsabilité en cas de réclamations, pertes, dommages, frais juridiques ou dépenses
-                résultant de :</p>
-            <ul>
-                <li>Votre utilisation de la plateforme</li>
-                <li>La violation des présentes conditions</li>
-                <li>La violation des droits de tiers</li>
-                <li>Tout litige avec des clients ou d'autres vendeurs</li>
-            </ul>
-
-            <h3>14. Résiliation</h3>
-            <ul>
-                <li>L'utilisateur peut supprimer son compte à tout moment.</li>
-                <li>Storiom se réserve le droit de suspendre ou supprimer un compte en cas de non-respect
-                    des présentes CGU ou en cas d'usage abusif ou frauduleux, sans préavis ni compensation.</li>
-                <li>En cas de résiliation, les données pourront être supprimées après un délai raisonnable.</li>
-            </ul>
-
-            <h3>15. Conformité Légale</h3>
-            <p>Vous vous engagez à respecter toutes les lois et réglementations applicables, notamment en matière de :
-            </p>
+            <h3>8. Conformité Légale</h3>
+            <p>Vous vous engagez à respecter les lois applicables, notamment :</p>
             <ul>
                 <li>Protection des consommateurs</li>
                 <li>Fiscalité et TVA</li>
                 <li>Protection des données personnelles</li>
-                <li>Droit du commerce et de la concurrence</li>
             </ul>
 
-            <h3>16. Modifications des Conditions</h3>
-            <p>Ces CGU peuvent être mises à jour à tout moment. En cas de modification importante,
-                une notification sera envoyée dans l'application ou par email. La poursuite de l'utilisation
-                du service après notification vaut acceptation des nouvelles conditions.</p>
+            <h3>9. Résiliation</h3>
+            <p>Storiom se réserve le droit de suspendre ou supprimer votre boutique en cas de non-respect des présentes
+                conditions, sans préavis ni compensation.</p>
 
-            <h3>17. Loi Applicable et Juridiction</h3>
-            <p>Les présentes CGU sont régies par la <strong>loi tunisienne</strong>. Tout litige relatif
-                à leur interprétation ou à leur exécution relèvera de la <strong>compétence exclusive
-                    des tribunaux de Tunis</strong>.</p>
+            <h3>10. Juridiction</h3>
+            <p>Les présentes conditions sont régies par la <strong>loi tunisienne</strong>. Tout litige relèvera de la
+                compétence des <strong>tribunaux de Tunis</strong>.</p>
 
-            <h3>18. Contact</h3>
-            <p>Pour toute question, demande ou réclamation, vous pouvez nous contacter à :
-                <a href="mailto:support@storiom.com">support@storiom.com</a>
-            </p>
+            <h3>11. Contact</h3>
+            <p>Pour toute question : <a href="mailto:support@storiom.com">support@storiom.com</a></p>
         </div>
         <div class="modal-footer">
             <button class="accept-btn" (click)="termsAccepted = true; showTermsModal = false">

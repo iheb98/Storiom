@@ -80,18 +80,24 @@ router.post('/create', utility.authenticate, checkSubscription, async (req, res)
 
 
 router.post('/sell/single', utility.authenticate, checkSubscription, async (req, res) => {
-    let { amount, price, id, date } = req.body
+    let { amount, price, id, date, impactStock } = req.body
+    // Default impactStock to true if not specified
+    const shouldImpactStock = impactStock !== false;
+
     Operation.create({
         amount, type: "SOLD", price, date: date ? new Date(date) : new Date(), productId: id,
-        receiptId: null, creatorUserId: req.user.id
+        receiptId: null, creatorUserId: req.user.id, impactStock: shouldImpactStock
     }).then(
         async createdOperation => {
-            let product = await Product.findOne({
-                where: {
-                    id
-                }
-            })
-            await product.update({ quantity: product.quantity - amount })
+            // Only update stock if impactStock is true
+            if (shouldImpactStock) {
+                let product = await Product.findOne({
+                    where: {
+                        id
+                    }
+                })
+                await product.update({ quantity: product.quantity - amount })
+            }
             res.json({
                 operation: createdOperation
             })

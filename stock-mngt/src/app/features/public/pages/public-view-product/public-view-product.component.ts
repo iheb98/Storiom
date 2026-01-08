@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { environment } from 'src/environments/environment';
 import { ProductService } from 'src/app/core/services/product.service';
 import { PublicService } from 'src/app/core/services/public.service';
+import { WishlistService } from 'src/app/core/services/wishlist.service';
+import { AnalyticsService } from 'src/app/core/services/analytics.service';
 
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CartService } from 'src/app/core/services/cart.service';
@@ -11,9 +13,9 @@ import { ToastService } from 'src/app/core/services/toast.service';
 import {
   faChevronRight, faChevronLeft, faSearchPlus, faStar, faStarHalfAlt,
   faCheck, faTimes, faMinus, faPlus, faShoppingCart, faTruck, faShieldAlt,
-  faStore, faInfoCircle, faComments, faArrowLeft, faMapMarkerAlt
+  faStore, faInfoCircle, faComments, faArrowLeft, faMapMarkerAlt, faHeart
 } from '@fortawesome/free-solid-svg-icons';
-import { faStar as faStarEmpty } from '@fortawesome/free-regular-svg-icons';
+import { faStar as faStarEmpty, faHeart as faHeartEmpty } from '@fortawesome/free-regular-svg-icons';
 
 @Component({
   selector: 'app-public-view-product',
@@ -31,6 +33,7 @@ export class PublicViewProductComponent implements OnInit {
   userReview: any;
   quantity: number = 1;
   lightboxOpen: boolean = false;
+  isInWishlist = false;
 
   // Icons
   faChevronRight = faChevronRight;
@@ -51,12 +54,16 @@ export class PublicViewProductComponent implements OnInit {
   faComments = faComments;
   faArrowLeft = faArrowLeft;
   faMapMarker = faMapMarkerAlt;
+  faHeart = faHeart;
+  faHeartEmpty = faHeartEmpty;
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private productService: ProductService,
     private publicService: PublicService,
-
+    private wishlistService: WishlistService,
+    private analyticsService: AnalyticsService,
     private cartService: CartService,
     private authService: AuthService,
     private toastService: ToastService,
@@ -79,6 +86,13 @@ export class PublicViewProductComponent implements OnInit {
       //
       this.product = res;
       this.calculateAverageRating();
+
+      // Check wishlist status
+      if (this.authService.isLoggedIn()) {
+        this.wishlistService.checkInWishlist(this.product.id).subscribe(
+          result => this.isInWishlist = result.inWishlist
+        );
+      }
 
       const currentUser = this.authService.getConnectedUser();
       if (currentUser && this.product.reviews) {
@@ -181,15 +195,18 @@ export class PublicViewProductComponent implements OnInit {
   }
 
   // Price
-  getOriginalPrice(): number {
+  getDiscountedPrice(): number {
     if (this.product?.discount && this.product?.sellingPrice) {
-      return this.product.sellingPrice / (1 - this.product.discount / 100);
+      return this.product.sellingPrice * (1 - this.product.discount / 100);
     }
     return this.product?.sellingPrice || 0;
   }
 
   // Cart
   addToCart(product: any) {
+    // Track cart_add event
+    this.trackEvent('cart_add');
+
     if (this.authService.isLoggedIn()) {
       this.productService.addToCart(product.id, this.quantity).subscribe({
         next: () => {
@@ -205,7 +222,49 @@ export class PublicViewProductComponent implements OnInit {
     }
   }
 
+  // Track analytics events
+  private trackEvent(interactionType: 'view' | 'cart_add') {
+    if (this.product?.id) {
+      const userId = this.authService.getConnectedUser()?.id;
+      this.analyticsService.trackEvent({
+        productId: this.product.id,
+        interactionType,
+        userId,
+        storeId: this.product.storeId || this.product.store?.id,
+        categoryId: this.product.categoryId || this.product.category?.id
+      }).subscribe({
+        error: (err) => console.log('Analytics tracking failed:', err)
+      });
+    }
+  }
+
   goBack() {
     this.location.back();
+  }
+
+  toggleWishlist() {
+    if (!this.authService.isLoggedIn()) {
+      this.toastService.showWarning('Connectez-vous pour ajouter aux favoris');
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (this.isInWishlist) {
+      this.wishlistService.removeFromWishlist(this.product.id).subscribe({
+        next: () => {
+          this.isInWishlist = false;
+          this.toastService.showSuccess('Retiré des favoris');
+        },
+        error: () => this.toastService.showError('Échec de la suppression')
+      });
+    } else {
+      this.wishlistService.addToWishlist(this.product.id).subscribe({
+        next: () => {
+          this.isInWishlist = true;
+          this.toastService.showSuccess('Ajouté aux favoris');
+        },
+        error: () => this.toastService.showError('Échec de l\'ajout')
+      });
+    }
   }
 }

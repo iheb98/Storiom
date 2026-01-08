@@ -691,6 +691,28 @@ $radius-lg: 16px;
   }
 }
 
+.discounted-price {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  background: $success-light;
+  border-radius: $radius-sm;
+  border: 1px solid rgba($success, 0.2);
+
+  .old-price {
+    font-size: 0.85rem;
+    color: $text-secondary;
+    text-decoration: line-through;
+  }
+
+  .new-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: $success;
+  }
+}
+
 // ============================================
 // IMAGES
 // ============================================

@@ -174,6 +174,10 @@ $radius-lg: 16px;
             width: 100%;
             height: 100%;
             object-fit: contain;
+
+            &.default-image {
+                opacity: 0.5;
+            }
         }
 
         @media (max-width: 768px) {
@@ -472,6 +476,219 @@ $radius-lg: 16px;
 }
 
 // ============================================
+// STORAGE CARD
+// ============================================
+.storage-card {
+    background: linear-gradient(135deg, $white 0%, #f8fafc 100%);
+    border-radius: $radius-md;
+    border: 1px solid $border-color;
+    padding: 24px;
+    margin-bottom: 30px;
+    box-shadow: $shadow-sm;
+    transition: all 0.3s;
+
+    &:hover {
+        box-shadow: $shadow-md;
+    }
+
+    .storage-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+
+        .storage-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+            border-radius: $radius-sm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: $white;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 15px rgba($primary, 0.3);
+        }
+
+        .storage-title {
+            h3 {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: $text-primary;
+                margin: 0 0 4px;
+            }
+
+            .storage-subtitle {
+                font-size: 0.85rem;
+                color: $text-secondary;
+            }
+        }
+    }
+
+    .storage-body {
+        .storage-progress-container {
+            height: 12px;
+            background: #e8ecef;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            position: relative;
+
+            .storage-progress-bar {
+                height: 100%;
+                background: linear-gradient(90deg, $primary 0%, lighten($primary, 10%) 100%);
+                border-radius: 6px;
+                transition: width 0.6s ease, background 0.3s ease;
+                position: relative;
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: linear-gradient(90deg,
+                            rgba(255, 255, 255, 0) 0%,
+                            rgba(255, 255, 255, 0.3) 50%,
+                            rgba(255, 255, 255, 0) 100%);
+                    animation: shimmerProgress 2s infinite;
+                }
+
+                &.warning {
+                    background: linear-gradient(90deg, $warning 0%, lighten($warning, 10%) 100%);
+                }
+
+                &.danger {
+                    background: linear-gradient(90deg, $danger 0%, lighten($danger, 10%) 100%);
+                }
+            }
+        }
+
+        .storage-stats {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+
+            @media (max-width: 576px) {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .storage-used,
+            .storage-limit,
+            .storage-percentage {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+
+                .storage-value {
+                    font-size: 1.5rem;
+                    font-weight: 700;
+                    color: $text-primary;
+                    line-height: 1;
+
+                    &.warning-text {
+                        color: $warning;
+                    }
+
+                    &.danger-text {
+                        color: $danger;
+                    }
+                }
+
+                .storage-unit {
+                    font-size: 0.8rem;
+                    color: $text-secondary;
+                    margin-top: 4px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+            }
+
+            .storage-divider {
+                width: 1px;
+                height: 40px;
+                background: $border-color;
+
+                @media (max-width: 576px) {
+                    width: 60px;
+                    height: 1px;
+                }
+            }
+        }
+
+        .storage-purchased {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px dashed $border-color;
+
+            .purchased-label {
+                font-size: 0.85rem;
+                color: $text-secondary;
+            }
+
+            .purchased-value {
+                font-size: 0.95rem;
+                font-weight: 600;
+                color: $success;
+            }
+        }
+    }
+
+    .storage-header {
+        .storage-purchase-btn {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: linear-gradient(135deg, $success 0%, darken($success, 10%) 100%);
+            color: $white;
+            border: none;
+            border-radius: $radius-sm;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba($success, 0.3);
+
+            &:hover:not(:disabled) {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba($success, 0.4);
+            }
+
+            &:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+            }
+
+            @media (max-width: 576px) {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+        }
+    }
+}
+
+@keyframes shimmerProgress {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+// ============================================
 // CONTENT GRID
 // ============================================
 .content-grid {
@@ -643,5 +860,182 @@ $radius-lg: 16px;
         max-height: 90%;
         border-radius: $radius-md;
         box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    }
+}
+
+// ============================================
+// STORAGE EXPIRY
+// ============================================
+.storage-expiry {
+    margin-top: 12px;
+    padding: 10px 16px;
+    background: rgba($primary, 0.08);
+    border-radius: $radius-sm;
+    text-align: center;
+
+    .expiry-label {
+        font-size: 0.85rem;
+        color: $text-primary;
+
+        &.expired {
+            color: $danger;
+            font-weight: 600;
+        }
+
+        &.expiring-soon {
+            color: $warning;
+            font-weight: 600;
+        }
+
+        .days-remaining {
+            color: $text-secondary;
+            font-weight: 400;
+            margin-left: 4px;
+        }
+    }
+}
+
+// ============================================
+// STORAGE PURCHASES LIST
+// ============================================
+.storage-details-toggle {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba($primary, 0.08), rgba($primary, 0.15));
+    border-radius: $radius-sm;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba($primary, 0.2);
+
+    &:hover {
+        background: linear-gradient(135deg, rgba($primary, 0.12), rgba($primary, 0.2));
+        transform: translateY(-1px);
+    }
+
+    span {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: $primary;
+    }
+
+    fa-icon {
+        color: $primary;
+        transition: transform 0.3s ease;
+    }
+}
+
+.storage-purchases-list {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: fadeIn 0.3s ease;
+
+    .purchase-item {
+        background: $white;
+        border-radius: $radius-sm;
+        padding: 16px;
+        border: 1px solid $border-color;
+        transition: all 0.2s ease;
+
+        &:hover {
+            box-shadow: $shadow-sm;
+        }
+
+        &.active {
+            border-left: 4px solid $success;
+        }
+
+        &.expired {
+            border-left: 4px solid $danger;
+            opacity: 0.75;
+        }
+
+        .purchase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+
+            .purchase-size {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: $text-primary;
+            }
+
+            .purchase-status {
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+
+                &.active {
+                    background: rgba($success, 0.15);
+                    color: $success;
+                }
+
+                &.expired {
+                    background: rgba($danger, 0.15);
+                    color: $danger;
+                }
+            }
+        }
+
+        .purchase-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 12px;
+
+            .purchase-dates {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+
+                .date-item {
+                    font-size: 0.85rem;
+                    color: $text-secondary;
+
+                    &.expiring-soon {
+                        color: $warning;
+                        font-weight: 500;
+                    }
+
+                    .days-badge {
+                        display: inline-block;
+                        margin-left: 6px;
+                        padding: 2px 8px;
+                        background: rgba($primary, 0.1);
+                        color: $primary;
+                        border-radius: 12px;
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                    }
+                }
+            }
+
+            .purchase-amount {
+                font-size: 1rem;
+                font-weight: 700;
+                color: $primary;
+            }
+        }
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

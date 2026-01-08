@@ -52,9 +52,8 @@ export class AdminLayoutComponent implements OnInit {
     private userSettingsService: UserSettingsService
   ) {
     this.authService.loggedIn.subscribe(() => {
-      this.subscriptionDetails = this.authService.getConnectedUser()?.subscription;
-      this.checkSubscriptionStatus(this.subscriptionDetails);
       this.connectedUser = this.authService.getConnectedUser();
+      this.loadSubscriptionFromBackend();
 
       this.storeService.getStore(this.authService.getConnectedUser()?.store).subscribe(
         store => {
@@ -85,11 +84,8 @@ export class AdminLayoutComponent implements OnInit {
     this.setMenu();
     this.updatePageTitle();
 
-    this.authService.checkSubscription(this.authService.getConnectedUser()?.id).subscribe(isExpired => {
-      if (isExpired) {
-        this.dialog.open(SubscriptionComponent, { width: '400px' });
-      }
-    }, _ => { });
+    // Load subscription from backend
+    this.loadSubscriptionFromBackend();
 
     this.loadStore();
 
@@ -221,11 +217,38 @@ export class AdminLayoutComponent implements OnInit {
     this.subscriptionDetails.expirationDate = calculatedExpirationDate.toISOString();
   }
 
+  loadSubscriptionFromBackend() {
+    const userId = this.authService.getConnectedUser()?.id;
+    if (!userId) return;
+
+    this.authService.getSubscriptionDetails(userId).subscribe(
+      (response: any) => {
+        if (response.success && response.subscription) {
+          this.subscriptionDetails = response.subscription;
+          this.subscriptionStatus = response.subscription.isExpired ? 'Expired' : 'Active';
+
+          // Show expired dialog if subscription expired
+          if (response.subscription.isExpired) {
+            this.dialog.open(SubscriptionComponent, { width: '400px' });
+          }
+        }
+      },
+      error => {
+        console.error('Error loading subscription:', error);
+        // Fallback to token-based subscription details
+        this.subscriptionDetails = this.authService.getConnectedUser()?.subscription;
+        if (this.subscriptionDetails) {
+          this.checkSubscriptionStatus(this.subscriptionDetails);
+        }
+      }
+    );
+  }
+
   getSubscriptionTooltip(): string {
     if (!this.subscriptionDetails) return 'No subscription details available.';
 
-    const { activationDate, expirationDate } = this.subscriptionDetails;
-    return `Abonnement valide du ${new Date(activationDate).toLocaleDateString()} au ${new Date(expirationDate).toLocaleDateString()}`;
+    const { expirationDate } = this.subscriptionDetails;
+    return `Expire le ${new Date(expirationDate).toLocaleDateString('fr-FR')}`;
   }
 
   // ========================================
@@ -237,6 +260,7 @@ export class AdminLayoutComponent implements OnInit {
       { label: 'Statistiques', icon: this.statsIcon, link: 'admin/dashboard' },
       { label: 'Commandes', icon: faShoppingCart, link: 'admin/orders' },
       { label: 'Produits', icon: faBox, link: 'admin/products' },
+      { label: 'Analytique', icon: this.statsIcon, link: 'admin/analytics' },
       { label: 'Catégories', icon: this.categoryIcon, link: 'admin/categories' },
       { label: 'Marques', icon: faImage, link: 'admin/brands' },
       { label: 'Fournisseurs', icon: faShuttleVan, link: 'admin/suppliers' },

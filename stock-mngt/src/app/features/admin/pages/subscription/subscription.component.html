@@ -1,0 +1,333 @@
+<div class="subscription-container">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1>
+                    <fa-icon [icon]="faCreditCard"></fa-icon>
+                    Abonnement
+                </h1>
+                <p>Gérez votre abonnement Storiom</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-orders" (click)="showOrders()" *ngIf="currentView !== 'orders'">
+                    <fa-icon [icon]="faReceipt"></fa-icon>
+                    Mes commandes
+                    <span class="badge" *ngIf="orders.length">{{ orders.length }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-container" *ngIf="isLoading">
+        <fa-icon [icon]="faSpinner" [spin]="true" class="spinner"></fa-icon>
+        <p>Chargement...</p>
+    </div>
+
+    <!-- Plans View -->
+    <div class="plans-section" *ngIf="!isLoading && currentView === 'plans'">
+
+        <!-- Current Subscription Card -->
+        <div class="current-subscription-card" *ngIf="currentSubscription">
+            <div class="subscription-header" [class.active]="!currentSubscription.isExpired"
+                [class.expired]="currentSubscription.isExpired">
+                <div class="status-icon">
+                    <fa-icon [icon]="currentSubscription.isExpired ? faExclamationTriangle : faCheckCircle"></fa-icon>
+                </div>
+                <div class="status-info">
+                    <h3>{{ currentSubscription.isExpired ? 'Abonnement expiré' : 'Abonnement actif' }}</h3>
+                    <p>{{ currentSubscription.duration === 'TRIAL' ? 'Période d\'essai' : '' }}</p>
+                </div>
+                <div class="expiration-badge" [class.expired]="currentSubscription.isExpired">
+                    <span class="label">{{ currentSubscription.isExpired ? 'Expiré le' : 'Expire le' }}</span>
+                    <span class="date">{{ currentSubscription.expirationDate | date:'dd/MM/yyyy' }}</span>
+                </div>
+            </div>
+
+            <div class="subscription-body" *ngIf="!currentSubscription.isExpired">
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span class="days-remaining">
+                            <strong>{{ currentSubscription.daysRemaining }}</strong> jours restants
+                        </span>
+                        <span class="percentage">{{ currentSubscription.percentRemaining }}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" [style.width.%]="currentSubscription.percentRemaining"></div>
+                    </div>
+                </div>
+                <div class="member-since">
+                    <fa-icon [icon]="faStar"></fa-icon>
+                    <span>Membre depuis le {{ currentSubscription.createdAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+            </div>
+
+            <div class="subscription-cta" *ngIf="currentSubscription.isExpired">
+                <p>Renouvelez votre abonnement pour continuer à utiliser Storiom</p>
+            </div>
+        </div>
+
+        <div class="section-intro">
+            <h2>{{ currentSubscription?.isExpired ? 'Renouvelez votre abonnement' : 'Prolongez votre abonnement' }}</h2>
+            <p>Sélectionnez la durée qui vous convient le mieux</p>
+        </div>
+
+        <div class="plans-grid">
+            <div class="plan-card" *ngFor="let plan of plans" [class.popular]="plan.popular"
+                [class.selected]="selectedPlan?.key === plan.key" (click)="selectPlan(plan)">
+
+                <div class="popular-badge" *ngIf="plan.popular">
+                    <fa-icon [icon]="faStar"></fa-icon>
+                    Populaire
+                </div>
+
+                <div class="plan-icon">
+                    <fa-icon [icon]="plan.icon"></fa-icon>
+                </div>
+
+                <h3>{{ plan.name }}</h3>
+
+                <div class="plan-price">
+                    <span class="amount">{{ plan.price }}</span>
+                    <span class="currency">TND</span>
+                </div>
+
+                <div class="plan-duration">{{ plan.duration }}</div>
+
+                <div class="plan-discount" *ngIf="plan.discount">
+                    <fa-icon [icon]="faCheck"></fa-icon>
+                    Économisez {{ plan.discount }}
+                </div>
+
+                <button class="btn-select" [disabled]="isCreatingOrder">
+                    <span *ngIf="!isCreatingOrder || selectedPlan?.key !== plan.key">
+                        Sélectionner
+                    </span>
+                    <span *ngIf="isCreatingOrder && selectedPlan?.key === plan.key">
+                        <fa-icon [icon]="faSpinner" [spin]="true"></fa-icon>
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Storage Purchase Section -->
+        <div class="storage-section" *ngIf="showStorageSection || pricing?.storage">
+            <div class="section-intro storage-intro">
+                <h2>Stockage supplémentaire</h2>
+                <p>Ajoutez de l'espace de stockage à votre boutique</p>
+            </div>
+
+            <div class="storage-configurator">
+                <!-- GB Options -->
+                <div class="config-group">
+                    <label>Espace de stockage</label>
+                    <div class="option-buttons">
+                        <button *ngFor="let gb of storageGBOptions" [class.active]="selectedStorageGB === gb"
+                            (click)="selectedStorageGB = gb">
+                            {{ gb }} GB
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Duration Options -->
+                <div class="config-group">
+                    <label>Durée</label>
+                    <div class="option-buttons">
+                        <button *ngFor="let duration of storageDurationOptions"
+                            [class.active]="selectedStorageDuration === duration"
+                            (click)="selectedStorageDuration = duration">
+                            {{ getDurationLabel(duration) }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Price Display -->
+                <div class="storage-summary">
+                    <div class="summary-item">
+                        <span class="label">Stockage sélectionné</span>
+                        <span class="value">{{ selectedStorageGB }} GB</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Durée</span>
+                        <span class="value">{{ getDurationLabel(selectedStorageDuration) }}</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span class="label">Total</span>
+                        <span class="value">{{ getStoragePrice() }} TND</span>
+                    </div>
+                </div>
+
+                <button class="btn-buy-storage" (click)="selectStoragePlan()" [disabled]="isCreatingOrder">
+                    <span *ngIf="!isCreatingOrder">
+                        <fa-icon [icon]="faRocket"></fa-icon>
+                        Acheter du stockage
+                    </span>
+                    <span *ngIf="isCreatingOrder">
+                        <fa-icon [icon]="faSpinner" [spin]="true"></fa-icon>
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Pending orders alert -->
+        <div class="pending-alert" *ngIf="hasPendingOrders()">
+            <fa-icon [icon]="faExclamationTriangle"></fa-icon>
+            <div class="alert-content">
+                <strong>Commande en cours</strong>
+                <p>Vous avez une commande en attente de paiement.</p>
+            </div>
+            <button class="btn-view" (click)="showOrders()">Voir</button>
+        </div>
+    </div>
+
+    <!-- Bank Details View -->
+    <div class="bank-details-section" *ngIf="!isLoading && currentView === 'bank-details' && currentOrder">
+        <button class="btn-back" (click)="backToPlans()">
+            <fa-icon [icon]="faArrowLeft"></fa-icon>
+            Retour
+        </button>
+
+        <div class="details-card">
+            <div class="card-header success">
+                <fa-icon [icon]="faCheckCircle"></fa-icon>
+                <h2>Commande créée !</h2>
+                <p>Effectuez le virement bancaire pour activer votre abonnement</p>
+            </div>
+
+            <div class="order-summary">
+                <div class="summary-row">
+                    <span class="label">Numéro de commande</span>
+                    <span class="value highlight">{{ currentOrder.orderNumber }}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="label">Forfait</span>
+                    <span class="value">{{ getPlanLabel(currentOrder.subscriptionPlan || '') }}</span>
+                </div>
+                <div class="summary-row total">
+                    <span class="label">Montant à payer</span>
+                    <span class="value">{{ currentOrder.amount }} TND</span>
+                </div>
+            </div>
+
+            <div class="bank-info" *ngIf="bankInstructions">
+                <h3>
+                    <fa-icon [icon]="faBuilding"></fa-icon>
+                    Informations bancaires
+                </h3>
+
+                <div class="bank-field">
+                    <label>Banque</label>
+                    <div class="field-value">
+                        <span>{{ bankInstructions.bankName }}</span>
+                    </div>
+                </div>
+
+                <div class="bank-field">
+                    <label>Titulaire du compte</label>
+                    <div class="field-value">
+                        <span>{{ bankInstructions.accountHolder }}</span>
+                        <button class="btn-copy" (click)="copyToClipboard(bankInstructions.accountHolder, 'holder')">
+                            <fa-icon [icon]="copiedField === 'holder' ? faCheck : faCopy"></fa-icon>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bank-field">
+                    <label>RIB</label>
+                    <div class="field-value rib">
+                        <span>{{ bankInstructions.rib }}</span>
+                        <button class="btn-copy" (click)="copyToClipboard(bankInstructions.rib, 'rib')">
+                            <fa-icon [icon]="copiedField === 'rib' ? faCheck : faCopy"></fa-icon>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bank-field">
+                    <label>Motif du virement</label>
+                    <div class="field-value motif">
+                        <span>{{ currentOrder.orderNumber }}</span>
+                        <button class="btn-copy" (click)="copyToClipboard(currentOrder.orderNumber, 'order')">
+                            <fa-icon [icon]="copiedField === 'order' ? faCheck : faCopy"></fa-icon>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="instructions" *ngIf="bankInstructions">
+                <h3>
+                    <fa-icon [icon]="faInfoCircle"></fa-icon>
+                    Instructions
+                </h3>
+                <ol>
+                    <li *ngFor="let instruction of bankInstructions.instructions">
+                        {{ instruction }}
+                    </li>
+                </ol>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-confirm" (click)="confirmPayment()" *ngIf="currentOrder.status === 'PENDING'">
+                    <fa-icon [icon]="faCheckCircle"></fa-icon>
+                    J'ai effectué le paiement
+                </button>
+
+                <button class="btn-cancel" (click)="cancelOrder(currentOrder.id); $event.stopPropagation()"
+                    *ngIf="currentOrder.status === 'PENDING'">
+                    <fa-icon [icon]="faTimes"></fa-icon>
+                    Annuler la commande
+                </button>
+
+                <div class="status-badge" [ngClass]="getStatusClass(currentOrder.status)"
+                    *ngIf="currentOrder.status !== 'PENDING'">
+                    <fa-icon [icon]="currentOrder.status === 'PAID' ? faCheckCircle : faClock"></fa-icon>
+                    {{ getStatusLabel(currentOrder.status) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders History View -->
+    <div class="orders-section" *ngIf="!isLoading && currentView === 'orders'">
+        <button class="btn-back" (click)="backToPlans()">
+            <fa-icon [icon]="faArrowLeft"></fa-icon>
+            Retour aux forfaits
+        </button>
+
+        <h2>Historique des commandes</h2>
+
+        <div class="orders-empty" *ngIf="orders.length === 0">
+            <fa-icon [icon]="faReceipt"></fa-icon>
+            <p>Aucune commande pour le moment</p>
+            <button class="btn-primary" (click)="backToPlans()">Voir les forfaits</button>
+        </div>
+
+        <div class="orders-list" *ngIf="orders.length > 0">
+            <div class="order-card" *ngFor="let order of orders" (click)="viewOrderDetails(order)">
+                <div class="order-header">
+                    <span class="order-number">{{ order.orderNumber }}</span>
+                    <span class="order-status" [ngClass]="getStatusClass(order.status)">
+                        {{ getStatusLabel(order.status) }}
+                    </span>
+                </div>
+                <div class="order-body">
+                    <div class="order-info">
+                        <span class="order-type">
+                            {{ order.paymentType === 'SUBSCRIPTION' ? getPlanLabel(order.subscriptionPlan || '') :
+                            order.storageGB + ' GB Stockage' }}
+                        </span>
+                        <span class="order-date">{{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                    <div class="order-actions">
+                        <span class="order-amount">{{ order.amount }} TND</span>
+                        <button class="btn-cancel-small" *ngIf="order.status === 'PENDING'"
+                            (click)="cancelOrder(order.id); $event.stopPropagation()">
+                            <fa-icon [icon]="faTimes"></fa-icon>
+                            Annuler
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

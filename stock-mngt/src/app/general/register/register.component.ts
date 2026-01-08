@@ -54,6 +54,7 @@ export class RegisterComponent implements OnInit {
   passwordError: boolean;
   confirmPasswordError: boolean;
   showAddressSection = false;
+  isLoading = false;
 
   // Autocomplete for address
   governorateSearchText = '';
@@ -73,6 +74,7 @@ export class RegisterComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     this.initForm();
     this.initLocationData();
   }
@@ -188,12 +190,14 @@ export class RegisterComponent implements OnInit {
     this.emailError = false;
     this.passwordError = false;
     if (this.form.valid && this.form.get('termsAccepted').value) {
+      this.isLoading = true;
 
       this.authService.registerUser({ ...this.form.getRawValue(), confirmPassword: undefined })
         .subscribe(response => {
 
           if (response.errorType == "EMAIL_FOUND") {
             this.emailFound = true;
+            this.isLoading = false;
             Swal.fire({
               icon: 'error',
               title: `Cette adresse e-mail est déjà utilisée. Veuillez en choisir une autre ou vous connecter à votre compte existant.`,
@@ -213,7 +217,7 @@ export class RegisterComponent implements OnInit {
             this.router.navigate([''])
           }
         }, error => {
-
+          this.isLoading = false;
           Swal.fire({
             icon: 'error',
             title: 'Une erreur est survenue ! Merci de réessayer plus tard',

@@ -4,6 +4,7 @@ import { CategoryService } from 'src/app/core/services/category.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { environment } from 'src/environments/environment.prod';
 import { PublicService } from 'src/app/core/services/public.service';
+import { AnalyticsService } from 'src/app/core/services/analytics.service';
 import { getAllGovernorates, getCitiesForGovernorate } from 'src/app/shared/data/tunisia-locations';
 
 import { faCartPlus } from '@fortawesome/free-solid-svg-icons';
@@ -63,8 +64,8 @@ export class PublicProductsComponent implements OnInit {
     private publicService: PublicService,
     private categoryService: CategoryService,
     private cartService: CartService,
-
-    private authService: AuthService
+    private authService: AuthService,
+    private analyticsService: AnalyticsService
   ) { }
 
   ngOnInit(): void {
@@ -309,6 +310,9 @@ export class PublicProductsComponent implements OnInit {
   }
 
   addToCart(product: any) {
+    // Track cart_add event
+    this.trackEvent(product, 'cart_add');
+
     if (this.authService.isLoggedIn()) {
       this.productService.addToCart(product.id, 1).subscribe(res => {
         console.log('Added to cart (server)');
@@ -319,6 +323,24 @@ export class PublicProductsComponent implements OnInit {
   }
 
   viewProduct(product: any) {
+    // Track click event
+    this.trackEvent(product, 'view');
     this.router.navigate(['/publicProduct', product.id]);
+  }
+
+  // Track analytics events
+  private trackEvent(product: any, interactionType: 'click' | 'cart_add' | 'view') {
+    if (product?.id) {
+      const userId = this.authService.getConnectedUser()?.id;
+      this.analyticsService.trackEvent({
+        productId: product.id,
+        interactionType,
+        userId,
+        storeId: product.storeId || product.store?.id,
+        categoryId: product.categoryId || product.category?.id
+      }).subscribe({
+        error: (err) => console.log('Analytics tracking failed:', err)
+      });
+    }
   }
 }

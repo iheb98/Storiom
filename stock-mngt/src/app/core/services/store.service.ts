@@ -45,4 +45,21 @@ export class StoreService {
   notifyStoreUpdate() {
     this.storeUpdatedSource.next();
   }
+
+  // Storage tracking
+  getStorageUsage(storeId: number): Observable<any> {
+    return this.http.get<any>(this.baseUrl + storeId + '/storage');
+  }
+
+  updateStorageUsage(storeId: number, bytes: number, operation: 'add' | 'subtract'): Observable<any> {
+    return this.http.post<any>(this.baseUrl + storeId + '/storage/update', { bytes, operation });
+  }
+
+  purchaseStorageExtension(storeId: number): Observable<any> {
+    return this.http.post<any>(this.baseUrl + storeId + '/storage/purchase', {});
+  }
+
+  getStoragePurchases(storeId: number): Observable<any> {
+    return this.http.get<any>(this.baseUrl + storeId + '/storage-purchases');
+  }
 }

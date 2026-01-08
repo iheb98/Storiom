@@ -56,6 +56,7 @@ export class StoreServicesComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
+        window.scrollTo(0, 0);
         this.isLoggedIn = this.authService.isLoggedIn();
         this.storeId = Number(this.route.snapshot.paramMap.get('storeId'));
         this.loadStore();

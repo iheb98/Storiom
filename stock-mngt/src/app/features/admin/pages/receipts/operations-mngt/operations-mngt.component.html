@@ -100,9 +100,10 @@
         <div class="operations-list" *ngIf="!isLoading && operations?.length > 0">
             <div class="operation-item" *ngFor="let operation of operations">
                 <div class="operation-type" [class.sold]="operation?.type === 'SOLD'"
-                    [class.loaded]="operation?.type === 'LOADED'" [class.returned]="operation?.type === 'RETURNED'">
+                    [class.loaded]="operation?.type === 'LOADED'" [class.returned]="operation?.type === 'RETURNED'"
+                    [class.cancelled]="operation?.type === 'CANCELLED'">
                     <fa-icon
-                        [icon]="operation?.type === 'SOLD' ? faShoppingCart : (operation?.type === 'LOADED' ? faTruck : faUndoAlt)"></fa-icon>
+                        [icon]="operation?.type === 'SOLD' ? faShoppingCart : (operation?.type === 'LOADED' ? faTruck : (operation?.type === 'CANCELLED' ? faTimesCircle : faUndoAlt))"></fa-icon>
                 </div>
 
                 <div class="operation-info">
@@ -111,9 +112,10 @@
                         <div class="operation-badges">
                             <span class="operation-badge" [class.sold]="operation?.type === 'SOLD'"
                                 [class.loaded]="operation?.type === 'LOADED'"
-                                [class.returned]="operation?.type === 'RETURNED'">
+                                [class.returned]="operation?.type === 'RETURNED'"
+                                [class.cancelled]="operation?.type === 'CANCELLED'">
                                 {{ operation?.type === 'SOLD' ? 'Vente' : (operation?.type === 'LOADED' ? 'Chargement' :
-                                'Retour') }}
+                                (operation?.type === 'CANCELLED' ? 'Annulation' : 'Retour')) }}
                             </span>
                             <span class="stock-badge" [class.impacted]="operation?.impactStock !== false"
                                 [class.not-impacted]="operation?.impactStock === false">
@@ -136,7 +138,7 @@
                 </div>
 
                 <div class="operation-total" [class.sold]="operation?.type === 'SOLD'"
-                    [class.loaded]="operation?.type === 'LOADED'">
+                    [class.loaded]="operation?.type === 'LOADED'" [class.cancelled]="operation?.type === 'CANCELLED'">
                     <span class="total-value">{{ (operation?.price * operation?.amount) | number:'1.2-2' }}</span>
                     <span class="total-currency">DT</span>
                 </div>

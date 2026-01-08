@@ -88,6 +88,10 @@ export class AuthService {
     return this.http.get<any>(this.baseUrl + 'checkSubscription/' + id);
   }
 
+  getSubscriptionDetails(id): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'subscription/' + id);
+  }
+
   forgotPassword(body): Observable<any> {
     return this.http.post(this.baseUrl + 'forgot-password', body);
   }

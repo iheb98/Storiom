@@ -43,7 +43,9 @@ export class TrackRequestComponent implements OnInit {
 
     constructor(private serviceRequestService: ServiceRequestService) { }
 
-    ngOnInit(): void { }
+    ngOnInit(): void {
+        window.scrollTo(0, 0);
+    }
 
     search() {
         if (!this.phone || !this.code) {

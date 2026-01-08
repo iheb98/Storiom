@@ -4,7 +4,7 @@ import { faChartBar } from '@fortawesome/free-regular-svg-icons';
 import {
   faEdit, faFile, faTimes, faArrowDown, faArrowUp, faCoins, faExclamationTriangle,
   faImages, faSearchPlus, faImage, faArrowLeft, faCube, faTag, faAlignLeft,
-  faCalendarAlt, faClock, faBox
+  faCalendarAlt, faClock, faBox, faPercent
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { ProductService } from 'src/app/core/services/product.service';
@@ -36,6 +36,7 @@ export class ProductViewComponent implements OnInit {
   faClock = faClock;
   faTimes = faTimes;
   faBox = faBox;
+  faPercent = faPercent;
   textIcon = faFile;
   chartIcon = faChartBar;
 
@@ -79,6 +80,7 @@ export class ProductViewComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     this.user = this.authService.getConnectedUser();
 
     this.route.paramMap.subscribe(paramMap => {
@@ -318,5 +320,12 @@ export class ProductViewComponent implements OnInit {
 
   closeImage() {
     this.selectedImage = null;
+  }
+
+  getDiscountedPrice(): number {
+    if (!this.product?.discount || this.product.discount <= 0) {
+      return this.product?.sellingPrice || 0;
+    }
+    return this.product.sellingPrice * (1 - this.product.discount / 100);
   }
 }

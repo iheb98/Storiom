@@ -1070,6 +1070,20 @@ $radius-lg: 16px;
             font-size: 2rem;
         }
     }
+
+    .discount-badge {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+        color: white;
+        font-size: 0.75rem;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: 700;
+        z-index: 2;
+        box-shadow: 0 2px 6px rgba(198, 40, 40, 0.3);
+    }
 }
 
 .product-info {
@@ -1108,16 +1122,29 @@ $radius-lg: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
 
             .price-label {
                 font-size: 0.8rem;
                 color: $text-secondary;
             }
 
+            .price-original {
+                font-size: 0.85rem;
+                color: $text-secondary;
+                text-decoration: line-through;
+                margin-right: 4px;
+            }
+
             .price-value {
                 font-size: 1.2rem;
                 font-weight: 700;
                 color: $success;
+
+                &.discounted {
+                    color: #e53935;
+                }
 
                 @media (max-width: 576px) {
                     font-size: 1rem;
