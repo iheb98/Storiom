@@ -330,4 +330,35 @@
             </div>
         </div>
     </div>
+
+    <!-- Support Contact Section -->
+    <div class="support-section" *ngIf="!isLoading">
+        <div class="support-card">
+            <div class="support-header">
+                <fa-icon [icon]="faInfoCircle"></fa-icon>
+                <h3>Besoin d'aide ?</h3>
+            </div>
+            <p>Notre équipe est disponible pour répondre à vos questions concernant les abonnements et le paiement.</p>
+            <div class="support-contacts">
+                <a href="mailto:support@storiom.com" class="contact-item">
+                    <div class="contact-icon email">
+                        <fa-icon [icon]="faEnvelope"></fa-icon>
+                    </div>
+                    <div class="contact-info">
+                        <span class="contact-label">Email</span>
+                        <span class="contact-value">support@storiom.com</span>
+                    </div>
+                </a>
+                <a href="tel:+21612345678" class="contact-item">
+                    <div class="contact-icon phone">
+                        <fa-icon [icon]="faPhone"></fa-icon>
+                    </div>
+                    <div class="contact-info">
+                        <span class="contact-label">Téléphone</span>
+                        <span class="contact-value">+216 XX XXX XXX</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
 </div>

@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import {
     faCreditCard, faCheck, faSpinner, faClock, faTimes,
     faReceipt, faBuilding, faCopy, faCheckCircle, faExclamationTriangle,
-    faArrowLeft, faInfoCircle, faStar, faRocket, faGem
+    faArrowLeft, faInfoCircle, faStar, faRocket, faGem, faEnvelope, faPhone
 } from '@fortawesome/free-solid-svg-icons';
 import { PaymentOrderService, PaymentOrder, PricingInfo, BankInstructions } from 'src/app/core/services/payment-order.service';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -41,6 +41,8 @@ export class SubscriptionComponent implements OnInit {
     faStar = faStar;
     faRocket = faRocket;
     faGem = faGem;
+    faEnvelope = faEnvelope;
+    faPhone = faPhone;
 
     // State
     isLoading = true;

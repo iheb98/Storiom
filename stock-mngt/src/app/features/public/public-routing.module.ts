@@ -22,6 +22,11 @@ import { StoreServicesComponent } from './pages/store-services/store-services.co
 import { MyServiceRequestsComponent } from './pages/my-service-requests/my-service-requests.component';
 import { TrackRequestComponent } from './pages/track-request/track-request.component';
 import { AllServicesComponent } from './pages/all-services/all-services.component';
+import { AboutComponent } from './pages/about/about.component';
+import { ContactComponent } from './pages/contact/contact.component';
+import { PrivacyComponent } from './pages/privacy/privacy.component';
+import { ShippingComponent } from './pages/shipping/shipping.component';
+import { FaqComponent } from './pages/faq/faq.component';
 
 const routes: Routes = [
   {
@@ -48,9 +53,14 @@ const routes: Routes = [
       { path: 'forgot-password', component: ForgotPasswordComponent },
       { path: 'reset-password/:token', component: ResetPasswordComponent },
       { path: 'terms', component: TermsComponent },
-      /*{ path: 'product/:id', component: ProductDetailsComponent },
-     { path: 'cart', component: CartComponent },
-     { path: 'checkout', component: CheckoutComponent }*/
+
+      // Footer pages
+      { path: 'products', redirectTo: 'publicProducts', pathMatch: 'full' },
+      { path: 'about', component: AboutComponent },
+      { path: 'contact', component: ContactComponent },
+      { path: 'privacy', component: PrivacyComponent },
+      { path: 'shipping', component: ShippingComponent },
+      { path: 'faq', component: FaqComponent }
     ]
   }
 ];

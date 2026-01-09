@@ -1,0 +1,58 @@
+<div class="privacy-page">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-icon">
+                <fa-icon [icon]="faShieldAlt"></fa-icon>
+            </div>
+            <h1>Politique de Confidentialité</h1>
+            <p>Dernière mise à jour : {{ lastUpdated }}</p>
+        </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="content-section">
+        <div class="container">
+            <div class="intro-text">
+                <p>
+                    Chez Storiom, la protection de vos données personnelles est une priorité.
+                    Cette politique explique comment nous collectons, utilisons et protégeons
+                    vos informations lorsque vous utilisez notre plateforme.
+                </p>
+            </div>
+
+            <!-- Table of Contents -->
+            <nav class="toc">
+                <h3>Sommaire</h3>
+                <ul>
+                    <li *ngFor="let section of sections">
+                        <a (click)="scrollToSection(section.id)" class="toc-link">
+                            <fa-icon [icon]="faChevronRight"></fa-icon>
+                            {{ section.title }}
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Sections -->
+            <div class="policy-sections">
+                <div class="policy-section" *ngFor="let section of sections; let i = index" [id]="section.id">
+                    <h2>
+                        <span class="section-number">{{ i + 1 }}</span>
+                        {{ section.title }}
+                    </h2>
+                    <div class="section-content" [innerHTML]="section.content"></div>
+                </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="contact-box">
+                <h3>Des questions ?</h3>
+                <p>
+                    Pour toute question concernant cette politique de confidentialité,
+                    contactez notre équipe à <a href="mailto:privacy@storiom.com">privacy@storiom.com</a>
+                </p>
+            </div>
+        </div>
+    </section>
+</div>

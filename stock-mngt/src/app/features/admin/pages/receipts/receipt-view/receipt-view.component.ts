@@ -100,7 +100,7 @@ export class ReceiptViewComponent implements OnInit {
         const footerText = `${storeName} | Tél: ${storePhone} | ${storeEmail}`;
 
         const options = {
-          margin: [10, 10, 20, 10], // top, left, bottom, right - extra bottom margin for footer
+          margin: 0,
           filename: this.receipt?.code + '.pdf',
           image: { type: 'png', quality: 0.98 },
           html2canvas: { scale: 2, windowWidth: 1200 },

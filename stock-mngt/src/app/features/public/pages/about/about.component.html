@@ -1,0 +1,98 @@
+<div class="about-page">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>À Propos de <span class="brand">Storiom</span></h1>
+            <p class="hero-subtitle">
+                Valoriser les commerces locaux et connecter les communautés grâce au commerce digital.
+            </p>
+        </div>
+        <div class="hero-wave">
+            <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+                <path
+                    d="M0,64L60,69.3C120,75,240,85,360,80C480,75,600,53,720,48C840,43,960,53,1080,58.7C1200,64,1320,64,1380,64L1440,64L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z">
+                </path>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card" *ngFor="let stat of stats" [class.loading]="isLoadingStats">
+                    <div class="stat-icon">
+                        <fa-icon [icon]="stat.icon"></fa-icon>
+                    </div>
+                    <span class="stat-value">{{ stat.value }}</span>
+                    <span class="stat-label">{{ stat.label }}</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="mission-section">
+        <div class="container">
+            <div class="mission-content">
+                <div class="mission-text">
+                    <h2>Notre Mission</h2>
+                    <p>
+                        Chez Storiom, nous croyons que le commerce local est le cœur battant de nos communautés.
+                        Notre mission est de créer un pont digital entre les commerçants locaux et les consommateurs,
+                        en offrant une plateforme moderne, sécurisée et accessible.
+                    </p>
+                    <p>
+                        Nous accompagnons les commerces dans leur transformation digitale, leur permettant d'atteindre
+                        de nouveaux clients tout en préservant la proximité et l'authenticité qui font leur force.
+                    </p>
+                </div>
+                <div class="mission-visual">
+                    <div class="icon-circle">
+                        <fa-icon [icon]="faStore"></fa-icon>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="values-section">
+        <div class="container">
+            <h2>Nos Valeurs</h2>
+            <div class="values-grid">
+                <div class="value-card" *ngFor="let value of values">
+                    <div class="value-icon">
+                        <fa-icon [icon]="value.icon"></fa-icon>
+                    </div>
+                    <h3>{{ value.title }}</h3>
+                    <p>{{ value.description }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Section -->
+    <section class="why-section">
+        <div class="container">
+            <h2>Pourquoi Storiom ?</h2>
+            <div class="why-grid">
+                <div class="why-card">
+                    <fa-icon [icon]="faGlobe"></fa-icon>
+                    <h3>Visibilité Locale</h3>
+                    <p>Donnez à votre commerce une présence en ligne professionnelle et atteignez plus de clients.</p>
+                </div>
+                <div class="why-card">
+                    <fa-icon [icon]="faChartLine"></fa-icon>
+                    <h3>Gestion Simplifiée</h3>
+                    <p>Outils puissants pour gérer votre stock, vos commandes et analyser vos performances.</p>
+                </div>
+                <div class="why-card">
+                    <fa-icon [icon]="faHeadset"></fa-icon>
+                    <h3>Support Dédié</h3>
+                    <p>Une équipe à votre écoute pour vous accompagner dans votre réussite.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

@@ -1,0 +1,58 @@
+<div class="faq-page">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-icon">
+                <fa-icon [icon]="faQuestionCircle"></fa-icon>
+            </div>
+            <h1>Foire Aux Questions</h1>
+            <p>Trouvez rapidement les réponses à vos questions</p>
+
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <fa-icon [icon]="faSearch"></fa-icon>
+                <input type="text" [(ngModel)]="searchQuery" placeholder="Rechercher une question...">
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="faq-section">
+        <div class="container">
+            <!-- Categories -->
+            <div class="categories">
+                <button *ngFor="let cat of categories" [class.active]="activeCategory === cat.id"
+                    (click)="activeCategory = cat.id">
+                    <fa-icon [icon]="cat.icon"></fa-icon>
+                    <span>{{ cat.name }}</span>
+                </button>
+            </div>
+
+            <!-- FAQ List -->
+            <div class="faq-list">
+                <div class="faq-item" *ngFor="let faq of filteredFaqs" [class.open]="isOpen(faq.id)">
+                    <button class="faq-question" (click)="toggleQuestion(faq.id)">
+                        <span>{{ faq.question }}</span>
+                        <fa-icon [icon]="faChevronDown" class="arrow"></fa-icon>
+                    </button>
+                    <div class="faq-answer">
+                        <p>{{ faq.answer }}</p>
+                    </div>
+                </div>
+
+                <div class="no-results" *ngIf="filteredFaqs.length === 0">
+                    <fa-icon [icon]="faQuestionCircle"></fa-icon>
+                    <h3>Aucun résultat</h3>
+                    <p>Essayez avec d'autres mots-clés ou parcourez les catégories</p>
+                </div>
+            </div>
+
+            <!-- Contact CTA -->
+            <div class="contact-cta">
+                <h3>Vous n'avez pas trouvé la réponse ?</h3>
+                <p>Notre équipe est là pour vous aider</p>
+                <a routerLink="/contact" class="btn-contact">Contactez-nous</a>
+            </div>
+        </div>
+    </section>
+</div>

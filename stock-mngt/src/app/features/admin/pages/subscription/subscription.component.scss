@@ -1355,3 +1355,136 @@ $shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.15);
         padding: 16px !important;
     }
 }
+
+// Support Section
+.support-section {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid $border-color;
+}
+
+.support-card {
+    max-width: 600px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, rgba($primary, 0.03) 0%, rgba($info, 0.03) 100%);
+    border: 1px solid rgba($primary, 0.1);
+    border-radius: $radius;
+    padding: 32px;
+    text-align: center;
+
+    @media (max-width: 576px) {
+        padding: 24px 16px;
+    }
+
+    .support-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 12px;
+
+        fa-icon {
+            font-size: 1.5rem;
+            color: $primary;
+        }
+
+        h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: $text-primary;
+        }
+    }
+
+    >p {
+        color: $text-secondary;
+        font-size: 0.95rem;
+        margin: 0 0 24px;
+        line-height: 1.6;
+    }
+
+    .support-contacts {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+
+        @media (max-width: 576px) {
+            flex-direction: column;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            background: $white;
+            border-radius: $radius-sm;
+            border: 1px solid $border-color;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 250px;
+
+            @media (max-width: 576px) {
+                max-width: 100%;
+                justify-content: flex-start;
+            }
+
+            &:hover {
+                border-color: $primary;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba($primary, 0.15);
+
+                .contact-icon {
+                    transform: scale(1.1);
+                }
+            }
+
+            .contact-icon {
+                width: 44px;
+                height: 44px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                transition: transform 0.3s ease;
+
+                fa-icon {
+                    font-size: 1.1rem;
+                    color: $white;
+                }
+
+                &.email {
+                    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+                }
+
+                &.phone {
+                    background: linear-gradient(135deg, $success 0%, darken($success, 15%) 100%);
+                }
+            }
+
+            .contact-info {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+
+                .contact-label {
+                    font-size: 0.75rem;
+                    color: $text-secondary;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    font-weight: 600;
+                    margin-bottom: 2px;
+                }
+
+                .contact-value {
+                    font-size: 0.95rem;
+                    font-weight: 600;
+                    color: $text-primary;
+                }
+            }
+        }
+    }
+}

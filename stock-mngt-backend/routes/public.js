@@ -703,4 +703,117 @@ router.get('/allServices', async (req, res) => {
     }
 });
 
+/**
+ * @route   GET /api/public/platform-stats
+ * @desc    Get platform statistics for the About page
+ * @access  Public
+ */
+router.get('/platform-stats', async (req, res) => {
+    try {
+        // Count active stores
+        const storesCount = await Store.count({
+            where: { isVisibleToPublic: true, active: true }
+        });
+
+        // Count available products
+        const productsCount = await Product.count({
+            where: {
+                toDisplay: true,
+                isVisible: true,
+                quantity: { [Op.gt]: 0 }
+            }
+        });
+
+        // Count parent categories only (no parentCategoryId)
+        const categoriesCount = await Category.count({
+            where: { parentCategoryId: null }
+        });
+
+        res.json({
+            stores: storesCount,
+            products: productsCount,
+            categories: categoriesCount
+        });
+    } catch (err) {
+        console.error('Error fetching platform stats:', err);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+/**
+ * @route   POST /api/public/contact
+ * @desc    Handle contact form submission
+ * @access  Public
+ */
+router.post('/contact', async (req, res) => {
+    try {
+        const { name, email, subject, message } = req.body;
+
+        // Validate required fields
+        if (!name || !email || !subject || !message) {
+            return res.status(400).json({
+                success: false,
+                message: 'Tous les champs sont obligatoires'
+            });
+        }
+
+        // Send email notification to admin
+        const sendMail = require('../mailService');
+        const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_FROM_ADDRESS;
+
+        const subjectLabels = {
+            'general': 'Question générale',
+            'support': 'Support technique',
+            'partnership': 'Partenariat',
+            'complaint': 'Réclamation',
+            'other': 'Autre'
+        };
+
+        const emailHtml = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background: linear-gradient(135deg, #4f46e5, #4338ca); padding: 30px; text-align: center;">
+                    <h1 style="color: white; margin: 0;">Nouveau message de contact</h1>
+                </div>
+                <div style="padding: 30px; background: #f8fafc;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-weight: bold; width: 120px;">Nom:</td>
+                            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0;">${name}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Email:</td>
+                            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0;"><a href="mailto:${email}">${email}</a></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0; font-weight: bold;">Sujet:</td>
+                            <td style="padding: 10px 0; border-bottom: 1px solid #e2e8f0;">${subjectLabels[subject] || subject}</td>
+                        </tr>
+                    </table>
+                    <div style="margin-top: 20px;">
+                        <h3 style="color: #1e293b; margin-bottom: 10px;">Message:</h3>
+                        <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <p style="margin: 0; white-space: pre-wrap; color: #64748b;">${message}</p>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding: 20px; text-align: center; color: #64748b; font-size: 12px;">
+                    Ce message a été envoyé depuis le formulaire de contact de Storiom
+                </div>
+            </div>
+        `;
+
+        await sendMail(
+            adminEmail,
+            `[Contact Storiom] ${subjectLabels[subject] || subject} - ${name}`,
+            emailHtml,
+            { replyTo: { email: email, name: name } }
+        );
+
+        res.json({ success: true, message: 'Message envoyé avec succès' });
+    } catch (err) {
+        console.error('Error sending contact message:', err);
+        res.status(500).json({ success: false, message: 'Erreur lors de l\'envoi du message' });
+    }
+});
+
 module.exports = router;

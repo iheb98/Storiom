@@ -1,0 +1,95 @@
+<div class="shipping-page">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-icon">
+                <fa-icon [icon]="faTruck"></fa-icon>
+            </div>
+            <h1>Livraison</h1>
+            <p>Découvrez nos options de livraison rapide et fiable partout en Tunisie</p>
+        </div>
+    </section>
+
+    <!-- Delivery Options -->
+    <section class="options-section">
+        <div class="container">
+            <h2>Options de Livraison</h2>
+            <div class="options-grid">
+                <div class="option-card" *ngFor="let option of deliveryOptions">
+                    <div class="option-icon">
+                        <fa-icon [icon]="option.icon"></fa-icon>
+                    </div>
+                    <h3>{{ option.name }}</h3>
+                    <div class="option-details">
+                        <span class="time">
+                            <fa-icon [icon]="faClock"></fa-icon>
+                            {{ option.time }}
+                        </span>
+                        <span class="price">{{ option.price }}</span>
+                    </div>
+                    <p>{{ option.description }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tracking Steps -->
+    <section class="steps-section">
+        <div class="container">
+            <h2>Suivi de Commande</h2>
+            <p class="section-subtitle">Suivez votre colis en temps réel à chaque étape</p>
+
+            <div class="steps-timeline">
+                <div class="step" *ngFor="let step of steps">
+                    <div class="step-number">{{ step.number }}</div>
+                    <div class="step-content">
+                        <h4>{{ step.title }}</h4>
+                        <p>{{ step.description }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Delivery Zones -->
+    <section class="zones-section">
+        <div class="container">
+            <h2>Délais par Région</h2>
+            <div class="zones-table">
+                <div class="table-header">
+                    <span>Région</span>
+                    <span>Standard</span>
+                    <span>Express</span>
+                </div>
+                <div class="table-row" *ngFor="let zone of zones">
+                    <span class="region-name">{{ zone.region }}</span>
+                    <span class="time">{{ zone.standard }}</span>
+                    <span class="time express">{{ zone.express }}</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Section -->
+    <section class="info-section">
+        <div class="container">
+            <div class="info-grid">
+                <div class="info-card">
+                    <fa-icon [icon]="faBox"></fa-icon>
+                    <h3>Emballage Soigné</h3>
+                    <p>Tous les produits sont emballés avec soin pour garantir leur protection pendant le transport.</p>
+                </div>
+                <div class="info-card">
+                    <fa-icon [icon]="faCheckCircle"></fa-icon>
+                    <h3>Livraison Garantie</h3>
+                    <p>En cas de problème avec votre livraison, notre équipe est là pour vous aider.</p>
+                </div>
+                <div class="info-card">
+                    <fa-icon [icon]="faQuestionCircle"></fa-icon>
+                    <h3>Une Question ?</h3>
+                    <p>Contactez notre service client pour toute question concernant votre livraison.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

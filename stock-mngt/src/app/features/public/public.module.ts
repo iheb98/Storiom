@@ -44,6 +44,11 @@ import { StoreServicesComponent } from './pages/store-services/store-services.co
 import { MyServiceRequestsComponent } from './pages/my-service-requests/my-service-requests.component';
 import { TrackRequestComponent } from './pages/track-request/track-request.component';
 import { AllServicesComponent } from './pages/all-services/all-services.component';
+import { AboutComponent } from './pages/about/about.component';
+import { ContactComponent } from './pages/contact/contact.component';
+import { PrivacyComponent } from './pages/privacy/privacy.component';
+import { ShippingComponent } from './pages/shipping/shipping.component';
+import { FaqComponent } from './pages/faq/faq.component';
 
 @NgModule({
   declarations: [
@@ -69,7 +74,12 @@ import { AllServicesComponent } from './pages/all-services/all-services.componen
     StoreServicesComponent,
     MyServiceRequestsComponent,
     TrackRequestComponent,
-    AllServicesComponent
+    AllServicesComponent,
+    AboutComponent,
+    ContactComponent,
+    PrivacyComponent,
+    ShippingComponent,
+    FaqComponent
   ],
   imports: [
     CommonModule,

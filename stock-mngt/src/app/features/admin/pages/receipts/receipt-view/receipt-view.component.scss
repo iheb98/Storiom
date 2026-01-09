@@ -17,6 +17,12 @@ $radius-md: 12px;
     justify-content: center;
     align-items: flex-start;
     position: relative;
+    max-width: 100vw;
+    overflow-x: hidden;
+
+    @media (max-width: 576px) {
+        padding: 0;
+    }
 
     @media print {
         padding: 0;
@@ -49,6 +55,10 @@ $radius-md: 12px;
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
     margin-bottom: 30px;
+
+    @media (max-width: 576px) {
+        height: 150px;
+    }
 }
 
 .skeleton-info {
@@ -77,6 +87,10 @@ $radius-md: 12px;
     background: linear-gradient(90deg, #e8ecef 25%, #f5f7fa 50%, #e8ecef 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
+
+    @media (max-width: 576px) {
+        width: 100%;
+    }
 }
 
 @keyframes shimmer {
@@ -111,6 +125,11 @@ $radius-md: 12px;
     overflow: hidden;
     animation: fadeInUp 0.4s ease-out;
 
+    @media (max-width: 576px) {
+        border-radius: 0;
+        box-shadow: none;
+    }
+
     @media print {
         box-shadow: none;
         max-width: 100%;
@@ -143,18 +162,10 @@ $radius-md: 12px;
         display: none !important;
     }
 
-    @media (max-width: 480px) {
-        flex-wrap: wrap;
+    @media (max-width: 576px) {
+        padding: 0.75rem 1rem;
         gap: 0.5rem;
-
-        .btn-action {
-            font-size: 0.75rem;
-            padding: 0.4rem 0.75rem;
-
-            fa-icon {
-                display: none;
-            }
-        }
+        justify-content: space-between;
     }
 
     .btn-action {
@@ -168,6 +179,25 @@ $radius-md: 12px;
         transition: all 0.2s;
         cursor: pointer;
         border: 1px solid transparent;
+
+        @media (max-width: 576px) {
+            font-size: 0.8rem;
+            padding: 0.5rem 0.75rem;
+            gap: 0.35rem;
+
+            fa-icon {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.6rem;
+
+            fa-icon {
+                display: none;
+            }
+        }
 
         &.btn-back {
             color: #475569;
@@ -208,8 +238,12 @@ $radius-md: 12px;
         padding: 0;
     }
 
+    @media (max-width: 768px) {
+        padding: 25px;
+    }
+
     @media (max-width: 576px) {
-        padding: 20px;
+        padding: 15px;
     }
 }
 
@@ -222,10 +256,17 @@ $radius-md: 12px;
     border-bottom: 2px solid #f1f1f1;
     padding-bottom: 2rem;
 
+    @media (max-width: 768px) {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+    }
+
     @media (max-width: 576px) {
         flex-direction: column;
         align-items: flex-start;
         gap: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
     }
 
     .store-info {
@@ -234,6 +275,10 @@ $radius-md: 12px;
             font-weight: 700;
             color: #2c3e50;
             margin: 0;
+
+            @media (max-width: 576px) {
+                font-size: 1.4rem;
+            }
         }
 
         .store-logo {
@@ -255,6 +300,10 @@ $radius-md: 12px;
             font-weight: 800;
             color: $primary;
             margin: 0 0 10px;
+
+            @media (max-width: 576px) {
+                font-size: 1.5rem;
+            }
         }
 
         .invoice-number-block {
@@ -265,12 +314,20 @@ $radius-md: 12px;
                 font-size: 0.85rem;
                 font-weight: 600;
                 display: block;
+
+                @media (max-width: 576px) {
+                    font-size: 0.75rem;
+                }
             }
 
             .value {
                 font-size: 1.1rem;
                 font-weight: 600;
                 color: #1e293b;
+
+                @media (max-width: 576px) {
+                    font-size: 1rem;
+                }
             }
         }
     }
@@ -298,6 +355,11 @@ $radius-md: 12px;
             text-transform: uppercase;
             margin: 0 0 10px;
             letter-spacing: 0.5px;
+
+            @media (max-width: 576px) {
+                font-size: 0.7rem;
+                margin-bottom: 8px;
+            }
         }
 
         .info-content {
@@ -306,6 +368,10 @@ $radius-md: 12px;
                 font-size: 1.1rem;
                 color: #1e293b;
                 margin-bottom: 5px;
+
+                @media (max-width: 576px) {
+                    font-size: 1rem;
+                }
             }
 
             .contact-line {
@@ -313,6 +379,10 @@ $radius-md: 12px;
                 color: #64748b;
                 margin-bottom: 3px;
                 line-height: 1.5;
+
+                @media (max-width: 576px) {
+                    font-size: 0.85rem;
+                }
 
                 .contact-label {
                     font-weight: 500;
@@ -334,11 +404,21 @@ $radius-md: 12px;
 .items-table-container {
     margin-bottom: 2rem;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    @media (max-width: 576px) {
+        margin: 0 -15px 1.5rem;
+        padding: 0 15px;
+    }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 600px;
+        min-width: 500px;
+
+        @media (max-width: 576px) {
+            min-width: 450px;
+        }
 
         thead {
             tr {
@@ -353,6 +433,12 @@ $radius-md: 12px;
                     text-transform: uppercase;
                     letter-spacing: 0.5px;
                     border-bottom: 2px solid #e2e8f0;
+                    white-space: nowrap;
+
+                    @media (max-width: 576px) {
+                        padding: 10px 12px;
+                        font-size: 0.7rem;
+                    }
                 }
             }
         }
@@ -370,6 +456,11 @@ $radius-md: 12px;
                     font-size: 0.95rem;
                     color: #475569;
                     vertical-align: middle;
+
+                    @media (max-width: 576px) {
+                        padding: 12px;
+                        font-size: 0.85rem;
+                    }
 
                     &:first-child {
                         font-weight: 500;
@@ -393,8 +484,8 @@ $radius-md: 12px;
     page-break-inside: avoid;
 
     @media (max-width: 576px) {
-        justify-content: flex-start;
-        margin-top: 1.5rem;
+        justify-content: stretch;
+        margin-top: 1rem;
     }
 
     .totals-box {
@@ -403,6 +494,12 @@ $radius-md: 12px;
         border-radius: 8px;
         padding: 20px;
 
+        @media (max-width: 576px) {
+            width: 100%;
+            min-width: unset;
+            padding: 15px;
+        }
+
         .total-row {
             display: flex;
             justify-content: space-between;
@@ -410,6 +507,11 @@ $radius-md: 12px;
             font-size: 0.95rem;
             color: #64748b;
             border-bottom: 1px dashed #e2e8f0;
+
+            @media (max-width: 576px) {
+                font-size: 0.9rem;
+                padding: 8px 0;
+            }
 
             &:last-child {
                 border-bottom: none;
@@ -423,6 +525,11 @@ $radius-md: 12px;
                 margin-top: 5px;
                 border-top: 2px solid #3f51b5;
                 border-bottom: none;
+
+                @media (max-width: 576px) {
+                    font-size: 1rem;
+                    padding-top: 12px;
+                }
 
                 .currency {
                     color: $primary;
@@ -439,6 +546,12 @@ $radius-md: 12px;
     text-align: center;
     color: #94a3b8;
     font-size: 0.85rem;
+
+    @media (max-width: 576px) {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        font-size: 0.8rem;
+    }
 
     .thank-you {
         font-weight: 500;

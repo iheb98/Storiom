@@ -1,16 +1,16 @@
-// Receipt Body Styles - Transfer from receipt-view.scss
+// Receipt Invoice Component - PDF Export Styles
+// This component is only used for PDF generation, so NO media queries
+// to ensure consistent output regardless of device viewport
+
+:host {
+    display: block;
+    width: 800px;
+    background-color: white;
+}
 
 .receipt-body {
     padding: 40px;
-    background-color: white; // Ensure white background
-
-    @media print {
-        padding: 0;
-    }
-
-    @media (max-width: 576px) {
-        padding: 20px;
-    }
+    background-color: white;
 }
 
 // Header
@@ -21,14 +21,6 @@
     margin-bottom: 3rem;
     border-bottom: 2px solid #f1f1f1;
     padding-bottom: 2rem;
-
-    @media (max-width: 576px) {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-        padding-bottom: 1.5rem;
-    }
 
     .store-info {
         .store-name {
@@ -47,15 +39,10 @@
     .invoice-details {
         text-align: right;
 
-        @media (max-width: 576px) {
-            text-align: left;
-            width: 100%;
-        }
-
         .invoice-title {
             font-size: 2rem;
             font-weight: 800;
-            color: #e2e8f0; // Subtle text color for visual hierarchy
+            color: #e2e8f0;
             text-transform: uppercase;
             margin: 0;
             line-height: 1;
@@ -87,12 +74,6 @@
     gap: 4rem;
     margin-bottom: 3rem;
 
-    @media (max-width: 768px) {
-        flex-direction: column;
-        gap: 2rem;
-        margin-bottom: 2rem;
-    }
-
     .info-block {
         flex: 1;
 
@@ -118,11 +99,11 @@
             }
 
             .contact-line {
-                margin-bottom: 0.25rem; // Add slight spacing between lines
+                margin-bottom: 0.25rem;
 
                 .contact-label {
                     margin-right: 0.5rem;
-                    font-weight: 500; // Match previous look if needed
+                    font-weight: 500;
                 }
 
                 .contact-value {
@@ -139,12 +120,10 @@
 // Table
 .items-table-container {
     margin-bottom: 2rem;
-    overflow-x: auto; // Allow horizontal scroll on mobile
 
     table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 600px; // Force table to keep structure, scroll if needed
 
         thead {
             th {
@@ -187,17 +166,13 @@
     }
 }
 
-// Totals
+// Totals - Prevent page break inside
 .totals-section {
     display: flex;
     justify-content: flex-end;
     margin-top: 2rem;
     page-break-inside: avoid;
-
-    @media (max-width: 576px) {
-        justify-content: flex-start; // Align left on small screens
-        margin-top: 1.5rem;
-    }
+    break-inside: avoid;
 
     .totals-box {
         width: 300px;
@@ -206,17 +181,13 @@
         padding: 1rem;
         background-color: #f8fafc;
 
-        @media (max-width: 576px) {
-            width: 100%; // Full width on mobile
-        }
-
         .total-row {
             display: flex;
             justify-content: space-between;
             padding: 0.5rem 0;
             color: #64748b;
             font-size: 0.95rem;
-            white-space: nowrap; // Prevent wrapping for "TVA (19%)" etc.
+            white-space: nowrap;
             border-bottom: 1px dashed #e2e8f0;
 
             &:last-child {
@@ -233,14 +204,14 @@
                 font-size: 1.25rem;
 
                 .currency {
-                    color: #0d6efd; // Brand color accent
+                    color: #0d6efd;
                 }
             }
         }
     }
 }
 
-// Footer
+// Footer - Prevent page break inside
 .footer-section {
     margin-top: 4rem;
     padding-top: 2rem;
@@ -248,32 +219,12 @@
     text-align: center;
     color: #94a3b8;
     font-size: 0.85rem;
+    page-break-inside: avoid;
+    break-inside: avoid;
 
     .thank-you {
         font-weight: 500;
         margin-bottom: 0.5rem;
         color: #475569;
-    }
-}
-
-// Print Specific Overrides
-@media print {
-    @page {
-        margin: 0;
-        size: auto;
-    }
-
-    body {
-        margin: 0;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    .header-section,
-    .info-section,
-    .items-table-container,
-    .totals-section,
-    .footer-section {
-        page-break-inside: avoid;
     }
 }

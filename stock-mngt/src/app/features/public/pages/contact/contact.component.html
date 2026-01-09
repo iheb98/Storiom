@@ -1,0 +1,112 @@
+<div class="contact-page">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Contactez-nous</h1>
+            <p>Une question ? N'hésitez pas à nous contacter. Notre équipe est là pour vous aider.</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="contact-section">
+        <div class="container">
+            <div class="contact-grid">
+                <!-- Contact Form -->
+                <div class="contact-form-wrapper">
+                    <h2>Envoyez-nous un message</h2>
+
+                    <div class="success-message" *ngIf="isSubmitted">
+                        <fa-icon [icon]="faCheckCircle"></fa-icon>
+                        <span>Votre message a été envoyé avec succès !</span>
+                    </div>
+
+                    <div class="error-message" *ngIf="errorMessage">
+                        <fa-icon [icon]="faExclamationCircle"></fa-icon>
+                        <span>{{ errorMessage }}</span>
+                    </div>
+
+                    <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" *ngIf="!isSubmitted">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Nom complet *</label>
+                                <input type="text" id="name" formControlName="name" placeholder="Votre nom">
+                                <span class="error"
+                                    *ngIf="contactForm.get('name')?.invalid && contactForm.get('name')?.touched">
+                                    Veuillez entrer votre nom
+                                </span>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email *</label>
+                                <input type="email" id="email" formControlName="email" placeholder="votre@email.com">
+                                <span class="error"
+                                    *ngIf="contactForm.get('email')?.invalid && contactForm.get('email')?.touched">
+                                    Veuillez entrer un email valide
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject">Sujet *</label>
+                            <select id="subject" formControlName="subject">
+                                <option value="">Sélectionnez un sujet</option>
+                                <option value="general">Question générale</option>
+                                <option value="support">Support technique</option>
+                                <option value="partnership">Partenariat</option>
+                                <option value="complaint">Réclamation</option>
+                                <option value="other">Autre</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Message *</label>
+                            <textarea id="message" formControlName="message" rows="5"
+                                placeholder="Votre message..."></textarea>
+                            <span class="error"
+                                *ngIf="contactForm.get('message')?.invalid && contactForm.get('message')?.touched">
+                                Minimum 10 caractères
+                            </span>
+                        </div>
+
+                        <button type="submit" class="btn-submit" [disabled]="contactForm.invalid || isSubmitting">
+                            <fa-icon [icon]="faPaperPlane" *ngIf="!isSubmitting"></fa-icon>
+                            <span *ngIf="!isSubmitting">Envoyer le message</span>
+                            <span *ngIf="isSubmitting">Envoi en cours...</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="contact-info-wrapper">
+                    <h2>Informations de contact</h2>
+
+                    <div class="info-cards">
+                        <div class="info-card" *ngFor="let info of contactInfo">
+                            <div class="info-icon">
+                                <fa-icon [icon]="info.icon"></fa-icon>
+                            </div>
+                            <div class="info-content">
+                                <span class="info-label">{{ info.label }}</span>
+                                <span class="info-value">{{ info.value }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--<div class="social-section">
+                        <h3>Suivez-nous</h3>
+                        <div class="social-links">
+                            <a href="#" class="social-link facebook">
+                                <fa-icon [icon]="faFacebook"></fa-icon>
+                            </a>
+                            <a href="#" class="social-link instagram">
+                                <fa-icon [icon]="faInstagram"></fa-icon>
+                            </a>
+                            <a href="#" class="social-link twitter">
+                                <fa-icon [icon]="faTwitter"></fa-icon>
+                            </a>
+                        </div>
+                    </div>-->
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

@@ -49,11 +49,15 @@
                     <h5>De :</h5>
                     <div class="info-content">
                         <strong>{{store?.name}}</strong>
-                        <div *ngIf="store?.address" class="contact-line">
-                            {{store?.address?.street}}, {{store?.address?.city}}
+                        <div *ngIf="store?.address?.street || store?.address?.city" class="contact-line">
+                            {{store?.address?.street}}<ng-container
+                                *ngIf="store?.address?.street && store?.address?.city">,
+                            </ng-container>{{store?.address?.city}}
                         </div>
-                        <div *ngIf="store?.address" class="contact-line">
-                            {{store?.address?.state}} {{store?.address?.postalCode}}
+                        <div *ngIf="store?.address?.state || store?.address?.postalCode" class="contact-line">
+                            {{store?.address?.state}}<ng-container
+                                *ngIf="store?.address?.state && store?.address?.postalCode">
+                            </ng-container>{{store?.address?.postalCode}}
                         </div>
                         <div *ngIf="store?.address?.country" class="contact-line">
                             {{store?.address?.country}}

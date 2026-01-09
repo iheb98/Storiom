@@ -1,0 +1,272 @@
+// Variables
+$primary: #4f46e5;
+$primary-dark: #4338ca;
+$primary-light: rgba(79, 70, 229, 0.1);
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+$white: #ffffff;
+$background: #f8fafc;
+$border-color: #e2e8f0;
+
+.faq-page {
+    min-height: 100vh;
+    background: $background;
+}
+
+// Hero Section
+.hero-section {
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+    padding: 80px 20px 100px;
+    text-align: center;
+
+    .hero-content {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .hero-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba($white, 0.15);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+
+        fa-icon {
+            font-size: 2.5rem;
+            color: $white;
+        }
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: $white;
+        margin: 0 0 15px;
+
+        @media (max-width: 768px) {
+            font-size: 2rem;
+        }
+    }
+
+    p {
+        font-size: 1.1rem;
+        color: rgba($white, 0.9);
+        margin: 0 0 30px;
+    }
+}
+
+// Search Bar
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: $white;
+    padding: 16px 24px;
+    border-radius: 50px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+
+    fa-icon {
+        font-size: 1.1rem;
+        color: $text-secondary;
+    }
+
+    input {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 1rem;
+        color: $text-primary;
+
+        &::placeholder {
+            color: #94a3b8;
+        }
+    }
+}
+
+// FAQ Section
+.faq-section {
+    padding: 60px 20px 80px;
+    margin-top: -40px;
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+}
+
+// Categories
+.categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 40px;
+
+    button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        background: $white;
+        border: 1px solid $border-color;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        color: $text-secondary;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        fa-icon {
+            font-size: 0.9rem;
+        }
+
+        &:hover {
+            border-color: $primary;
+            color: $primary;
+        }
+
+        &.active {
+            background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+            border-color: transparent;
+            color: $white;
+        }
+    }
+}
+
+// FAQ List
+.faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.faq-item {
+    background: $white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+
+    .faq-question {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 22px 25px;
+        background: none;
+        border: none;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        span {
+            font-size: 1rem;
+            font-weight: 600;
+            color: $text-primary;
+            padding-right: 15px;
+        }
+
+        .arrow {
+            font-size: 0.9rem;
+            color: $text-secondary;
+            transition: transform 0.3s ease;
+        }
+
+        &:hover {
+            background: rgba($primary, 0.02);
+        }
+    }
+
+    .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, padding 0.3s ease;
+
+        p {
+            padding: 0 25px 22px;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: $text-secondary;
+            margin: 0;
+        }
+    }
+
+    &.open {
+        .faq-question {
+            .arrow {
+                transform: rotate(180deg);
+            }
+        }
+
+        .faq-answer {
+            max-height: 500px;
+        }
+    }
+}
+
+// No Results
+.no-results {
+    text-align: center;
+    padding: 60px 20px;
+    background: $white;
+    border-radius: 16px;
+
+    fa-icon {
+        font-size: 3rem;
+        color: $border-color;
+        margin-bottom: 20px;
+    }
+
+    h3 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0 0 10px;
+    }
+
+    p {
+        font-size: 0.95rem;
+        color: $text-secondary;
+        margin: 0;
+    }
+}
+
+// Contact CTA
+.contact-cta {
+    text-align: center;
+    padding: 50px;
+    background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+    border-radius: 20px;
+    margin-top: 50px;
+
+    h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: $white;
+        margin: 0 0 10px;
+    }
+
+    p {
+        font-size: 1rem;
+        color: rgba($white, 0.9);
+        margin: 0 0 25px;
+    }
+
+    .btn-contact {
+        display: inline-block;
+        padding: 14px 35px;
+        background: $white;
+        color: $primary;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+
+        &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+    }
+}

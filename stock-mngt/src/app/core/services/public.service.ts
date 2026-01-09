@@ -74,4 +74,12 @@ export class PublicService {
   getCategoryTree(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/categories/tree`);
   }
+
+  getPlatformStats(): Observable<{ stores: number, products: number, categories: number }> {
+    return this.http.get<{ stores: number, products: number, categories: number }>(`${this.apiUrl}/platform-stats`);
+  }
+
+  sendContactMessage(data: { name: string, email: string, subject: string, message: string }): Observable<{ success: boolean, message: string }> {
+    return this.http.post<{ success: boolean, message: string }>(`${this.apiUrl}/contact`, data);
+  }
 }
