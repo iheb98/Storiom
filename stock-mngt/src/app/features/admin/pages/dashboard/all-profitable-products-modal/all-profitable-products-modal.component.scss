@@ -249,6 +249,24 @@
             }
         }
 
+        &.stock {
+            fa-icon {
+                color: #3b82f6;
+            }
+
+            &.low-stock {
+                background: rgba(239, 68, 68, 0.15);
+
+                fa-icon {
+                    color: #ef4444;
+                }
+
+                .stat-value {
+                    color: #ef4444;
+                }
+            }
+        }
+
         &.margin {
             fa-icon {
                 color: #3b82f6;

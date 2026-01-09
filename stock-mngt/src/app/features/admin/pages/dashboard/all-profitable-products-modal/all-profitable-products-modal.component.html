@@ -49,11 +49,11 @@
                             <span class="stat-label">DT Profit</span>
                         </div>
                     </div>
-                    <div class="stat-item margin">
-                        <fa-icon [icon]="faChartLine"></fa-icon>
+                    <div class="stat-item stock" [class.low-stock]="operation?.product?.quantity < 10">
+                        <fa-icon [icon]="faBox"></fa-icon>
                         <div class="stat-details">
-                            <span class="stat-value">{{ operation?.total_amount }}</span>
-                            <span class="stat-label">Vendus</span>
+                            <span class="stat-value">{{ operation?.product?.quantity }}</span>
+                            <span class="stat-label">En stock</span>
                         </div>
                     </div>
                 </div>
