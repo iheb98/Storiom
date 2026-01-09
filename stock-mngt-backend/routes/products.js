@@ -99,8 +99,8 @@ router.delete('/cart/:productId', utility.authenticate, async (req, res) => {
 });
 
 router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
-    const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, thumbnails, quantity, unit, storeId, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, discount } = req.body
-    Product.create({ name, code, buyingPrice, sellingPrice, discount, currency, color, size, description, images: JSON.stringify(images), thumbnails: JSON.stringify(thumbnails || []), quantity, unit, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id, criticalStockIndicator, toDisplay }).then(createdProduct => {
+    const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, thumbnails, quantity, unit, storeId, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, discount, mainImageIndex } = req.body
+    Product.create({ name, code, buyingPrice, sellingPrice, discount, currency, color, size, description, images: JSON.stringify(images), thumbnails: JSON.stringify(thumbnails || []), quantity, unit, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id, criticalStockIndicator, toDisplay, mainImageIndex: mainImageIndex || 0 }).then(createdProduct => {
         console.log(quantity)
         if (quantity > 0) {
             Operation.create({ receiptId: null, type: "LOADED", productId: createdProduct.id, amount: quantity, price: createdProduct.buyingPrice, date: new Date(), creatorUserId: req.user.id, impactStock: true })
@@ -124,7 +124,7 @@ router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
 })
 
 router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
-    const { id, name, code, color, quantity, unit, images, thumbnails, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, activateCriticalStockIndicator, discount } = req.body
+    const { id, name, code, color, quantity, unit, images, thumbnails, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, activateCriticalStockIndicator, discount, mainImageIndex } = req.body
     Product.findOne(
         {
             where: {
@@ -150,6 +150,7 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
         product.toDisplay = toDisplay
         product.criticalStockIndicator = criticalStockIndicator
         product.activateCriticalStockIndicator = activateCriticalStockIndicator
+        product.mainImageIndex = mainImageIndex !== undefined ? mainImageIndex : product.mainImageIndex
         product.size = size
         product.save().then(
             savedProduct => {

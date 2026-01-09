@@ -1448,3 +1448,179 @@ $radius-lg: 16px;
         }
     }
 }
+
+// ============================================
+// IMAGE SELECTOR MODAL
+// ============================================
+.image-selector-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+
+.image-selector-card {
+    background: $white;
+    border-radius: $radius-lg;
+    max-width: 700px;
+    width: 100%;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: fadeInUp 0.3s ease-out;
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 25px;
+        border-bottom: 1px solid $border-color;
+        background: linear-gradient(135deg, $primary 0%, $primary-dark 100%);
+        color: $white;
+
+        h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: $white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(1.1);
+            }
+        }
+    }
+
+    .modal-body {
+        padding: 25px;
+        overflow-y: auto;
+        max-height: calc(80vh - 80px);
+
+        .modal-hint {
+            margin: 0 0 20px;
+            color: $text-secondary;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .image-option {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: $radius-sm;
+            overflow: hidden;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+
+            &:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            }
+
+            &.selected {
+                border-color: #f59e0b;
+
+                .image-star {
+                    opacity: 1;
+                }
+            }
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .image-star {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: rgba(0, 0, 0, 0.5);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0.6;
+                transition: all 0.2s;
+
+                &.active {
+                    background: #f59e0b;
+                    opacity: 1;
+                }
+            }
+
+            &:hover .image-star {
+                opacity: 1;
+            }
+
+            .image-label {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: linear-gradient(0deg, rgba(0, 0, 0, 0.7), transparent);
+                color: white;
+                font-size: 0.7rem;
+                font-weight: 600;
+                text-align: center;
+                padding: 15px 5px 6px;
+            }
+        }
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Image action button style
+.btn-action.image {
+    background: rgba(124, 58, 237, 0.1);
+    color: #7c3aed;
+
+    &:hover {
+        background: #7c3aed;
+        color: $white;
+    }
+}

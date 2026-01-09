@@ -5,7 +5,7 @@ import {
   faEdit, faTrash, faEye, faArrowUp, faArrowDown, faPlus, faSearch,
   faFilter, faUndo, faTag, faAlignLeft, faTruck, faFolder, faCubes,
   faEyeSlash, faGlobe, faLock, faSearchPlus, faShoppingCart, faTimes, faBox,
-  faBarcode, faCamera
+  faBarcode, faCamera, faImages, faStar
 } from '@fortawesome/free-solid-svg-icons';
 import { BarcodeFormat } from '@zxing/library';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -52,10 +52,15 @@ export class ProductsMngtComponent implements OnInit {
   faBox = faBox;
   faBarcode = faBarcode;
   faCamera = faCamera;
+  faImages = faImages;
+  faStar = faStar;
 
   // Loading States
   isLoading = true;
   isActionLoading = false;
+
+  // Image Selector Modal
+  imageSelectProduct: any = null;
 
   // Filters
   minBuyingPriceFilter: number = null;
@@ -374,6 +379,63 @@ export class ProductsMngtComponent implements OnInit {
       return product?.sellingPrice || 0;
     }
     return product.sellingPrice * (1 - product.discount / 100);
+  }
+
+  // Image Selector Modal Methods
+  openImageSelector(product: any) {
+    this.imageSelectProduct = product;
+  }
+
+  closeImageSelector() {
+    this.imageSelectProduct = null;
+  }
+
+  setProductMainImage(product: any, index: number) {
+    // Update locally first for immediate feedback
+    product.mainImageIndex = index;
+
+    // Then update via API
+    this.productService.updateProduct({
+      id: product.id,
+      mainImageIndex: index,
+      // Include other required fields from product
+      name: product.name,
+      code: product.code,
+      color: product.color,
+      quantity: product.quantity,
+      unit: product.unit,
+      images: product.images,
+      thumbnails: product.thumbnails,
+      sellingPrice: product.sellingPrice,
+      description: product.description,
+      buyingPrice: product.buyingPrice,
+      size: product.size,
+      supplierId: product.supplier?.id,
+      categoryId: product.category?.id,
+      brandId: product.brand?.id,
+      criticalStockIndicator: product.criticalStockIndicator,
+      toDisplay: product.toDisplay,
+      activateCriticalStockIndicator: product.activateCriticalStockIndicator,
+      discount: product.discount
+    }).subscribe(
+      () => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Image principale mise à jour',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      },
+      (error) => {
+        console.error('Failed to update main image:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur lors de la mise à jour',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
+    );
   }
 
   search() {

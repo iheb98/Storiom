@@ -27,6 +27,12 @@ export class PublicService {
     return this.http.get<any>(this.apiUrl + '/publicProduct/' + id);
   }
 
+  getProductRecommendations(productId: number, limit: number = 8): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/products/${productId}/recommendations`, {
+      params: { limit: limit.toString() }
+    });
+  }
+
 
 
   getPublicProducts(query): Observable<any> {

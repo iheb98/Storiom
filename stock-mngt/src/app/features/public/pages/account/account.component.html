@@ -96,6 +96,11 @@
                     <span>Mes Demandes</span>
                     <fa-icon [icon]="faChevronRight" class="arrow"></fa-icon>
                 </button>
+                <button [class.active]="activeTab === 'wishlist'" (click)="switchTab('wishlist')">
+                    <fa-icon [icon]="faHeart"></fa-icon>
+                    <span>Ma Liste d'envies</span>
+                    <fa-icon [icon]="faChevronRight" class="arrow"></fa-icon>
+                </button>
                 <div class="nav-separator"></div>
                 <button class="logout-btn" (click)="logout()">
                     <fa-icon [icon]="faSignOutAlt"></fa-icon>
@@ -113,12 +118,139 @@
 
             <!-- ORDERS TAB -->
             <div class="tab-content" *ngIf="activeTab === 'orders'">
-                <div class="orders-placeholder">
-                    <div class="placeholder-icon">
-                        <fa-icon [icon]="faShoppingBag"></fa-icon>
+                <div class="orders-section">
+                    <div class="section-header">
+                        <h2><fa-icon [icon]="faShoppingBag"></fa-icon> Mes Commandes</h2>
+                        <span class="orders-count" *ngIf="orders.length > 0">
+                            {{ orders.length }} commande(s)
+                        </span>
                     </div>
-                    <h3>Historique des commandes</h3>
-                    <p>Cette fonctionnalité sera bientôt disponible.</p>
+
+                    <!-- Loading -->
+                    <div class="orders-loading" *ngIf="isLoadingOrders">
+                        <div class="skeleton-order" *ngFor="let i of [1,2,3]"></div>
+                    </div>
+
+                    <!-- Orders List -->
+                    <div class="orders-list" *ngIf="!isLoadingOrders && orders.length > 0">
+                        <div class="order-card" *ngFor="let order of orders">
+                            <div class="order-header">
+                                <div class="order-info">
+                                    <span class="order-number">Commande #{{ order.id }}</span>
+                                    <span class="order-date">
+                                        <fa-icon [icon]="faCalendarAlt"></fa-icon>
+                                        {{ order.createdAt | date:'dd/MM/yyyy à HH:mm' }}
+                                    </span>
+                                </div>
+                                <span class="status-badge" [ngClass]="getOrderStatusInfo(order.status).color">
+                                    {{ getOrderStatusInfo(order.status).label }}
+                                </span>
+                            </div>
+
+                            <div class="order-store" *ngIf="order.store">
+                                <fa-icon [icon]="faStore"></fa-icon>
+                                {{ order.store.name }}
+                            </div>
+
+                            <div class="order-items">
+                                <div class="order-item" *ngFor="let item of order.items?.slice(0, 3)">
+                                    <img [src]="getOrderItemImage(item)" [alt]="item.product?.name"
+                                        [class.default-image]="isDefaultOrderImage(item)">
+                                    <div class="item-details">
+                                        <span class="item-name">{{ item.product?.name }}</span>
+                                        <span class="item-qty">x{{ item.quantity }}</span>
+                                    </div>
+                                    <span class="item-price">{{ item.price | number:'1.2-2' }} DT</span>
+                                </div>
+                                <div class="more-items" *ngIf="order.items?.length > 3">
+                                    +{{ order.items.length - 3 }} autre(s) produit(s)
+                                </div>
+                            </div>
+
+                            <div class="order-footer">
+                                <div class="order-total">
+                                    <span class="label">Total</span>
+                                    <span class="value">{{ order.totalAmount | number:'1.2-2' }} DT</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="empty-orders" *ngIf="!isLoadingOrders && orders.length === 0">
+                        <div class="empty-icon">
+                            <fa-icon [icon]="faBoxOpen"></fa-icon>
+                        </div>
+                        <h3>Aucune commande</h3>
+                        <p>Vous n'avez pas encore passé de commande.</p>
+                        <a routerLink="/" class="btn-explore">
+                            Découvrir nos produits
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- WISHLIST TAB -->
+            <div class="tab-content" *ngIf="activeTab === 'wishlist'">
+                <div class="wishlist-section">
+                    <div class="section-header">
+                        <h2><fa-icon [icon]="faHeart"></fa-icon> Ma Liste d'envies</h2>
+                        <span class="wishlist-count" *ngIf="wishlistProducts.length > 0">
+                            {{ wishlistProducts.length }} produit(s)
+                        </span>
+                    </div>
+
+                    <!-- Loading -->
+                    <div class="wishlist-loading" *ngIf="isLoadingWishlist">
+                        <div class="skeleton-product" *ngFor="let i of [1,2,3,4]"></div>
+                    </div>
+
+                    <!-- Products Grid -->
+                    <div class="wishlist-grid" *ngIf="!isLoadingWishlist && wishlistProducts.length > 0">
+                        <div class="wishlist-item" *ngFor="let wishlistItem of wishlistProducts">
+                            <div class="item-image" (click)="viewProduct(wishlistItem?.product.id)">
+                                <img [src]="getProductImage(wishlistItem?.product)" [alt]="wishlistItem?.product.name">
+                                <span class="discount-badge" *ngIf="wishlistItem?.product.discount > 0">-{{
+                                    wishlistItem?.product.discount
+                                    }}%</span>
+                            </div>
+                            <div class="item-info">
+                                <h3 (click)="viewProduct(wishlistItem?.product.id)">{{ wishlistItem?.product.name }}
+                                </h3>
+                                <p class="store-name" *ngIf="wishlistItem?.product.store">
+                                    <fa-icon [icon]="faStore"></fa-icon>
+                                    {{ wishlistItem?.product.store.name }}
+                                </p>
+                                <div class="price-row">
+                                    <span class="original-price" *ngIf="wishlistItem?.product.discount > 0">
+                                        {{ wishlistItem?.product.sellingPrice | number:'1.2-2' }} DT
+                                    </span>
+                                    <span class="price" [class.discounted]="wishlistItem?.product.discount > 0">
+                                        {{ wishlistItem?.product.discount > 0 ? (wishlistItem?.product.sellingPrice * (1
+                                        -
+                                        wishlistItem?.product.discount / 100))
+                                        : wishlistItem?.product.sellingPrice | number:'1.2-2' }} DT
+                                    </span>
+                                </div>
+                            </div>
+                            <button class="remove-btn" (click)="removeFromWishlist(wishlistItem?.product.id)"
+                                title="Retirer">
+                                <fa-icon [icon]="faTrash"></fa-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="empty-wishlist" *ngIf="!isLoadingWishlist && wishlistProducts.length === 0">
+                        <div class="empty-icon">
+                            <fa-icon [icon]="faHeart"></fa-icon>
+                        </div>
+                        <h3>Votre liste est vide</h3>
+                        <p>Ajoutez des produits à votre liste d'envies en cliquant sur le cœur.</p>
+                        <a routerLink="/" class="btn-explore">
+                            Explorer les produits
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -224,6 +356,10 @@
     <button [class.active]="activeTab === 'services'" (click)="switchTab('services')">
         <fa-icon [icon]="faClipboardList"></fa-icon>
         <span>Demandes</span>
+    </button>
+    <button [class.active]="activeTab === 'wishlist'" (click)="switchTab('wishlist')">
+        <fa-icon [icon]="faHeart"></fa-icon>
+        <span>Envies</span>
     </button>
     <button class="logout" (click)="logout()">
         <fa-icon [icon]="faSignOutAlt"></fa-icon>

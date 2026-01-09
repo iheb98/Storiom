@@ -4,9 +4,13 @@ import { Router } from '@angular/router';
 import {
     faUser, faShoppingBag, faSignOutAlt, faCog, faChevronRight,
     faEnvelope, faPhone, faMapMarkerAlt, faCalendarAlt, faEdit,
-    faClipboardList, faClock, faSpinner, faCheckCircle, faTimesCircle, faStore
+    faClipboardList, faClock, faSpinner, faCheckCircle, faTimesCircle, faStore, faHeart, faTrash,
+    faTruck, faBoxOpen, faEye
 } from '@fortawesome/free-solid-svg-icons';
 import { ServiceRequestService } from 'src/app/core/services/service-request.service';
+import { WishlistService } from 'src/app/core/services/wishlist.service';
+import { OrderService } from 'src/app/core/services/order.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'app-account',
@@ -15,13 +19,22 @@ import { ServiceRequestService } from 'src/app/core/services/service-request.ser
 })
 export class AccountComponent implements OnInit {
 
-    activeTab: 'profile' | 'orders' | 'services' = 'profile';
+    activeTab: 'profile' | 'orders' | 'services' | 'wishlist' = 'profile';
     user: any;
     isLoading = true;
+    environment = environment;
 
     // Service Requests
     serviceRequests: any[] = [];
     isLoadingRequests = false;
+
+    // Wishlist
+    wishlistProducts: any[] = [];
+    isLoadingWishlist = false;
+
+    // Orders
+    orders: any[] = [];
+    isLoadingOrders = false;
 
     // Icons
     faUser = faUser;
@@ -40,6 +53,11 @@ export class AccountComponent implements OnInit {
     faCheckCircle = faCheckCircle;
     faTimesCircle = faTimesCircle;
     faStore = faStore;
+    faHeart = faHeart;
+    faTrash = faTrash;
+    faTruck = faTruck;
+    faBoxOpen = faBoxOpen;
+    faEye = faEye;
 
     // Status config
     statuses = [
@@ -52,7 +70,9 @@ export class AccountComponent implements OnInit {
     constructor(
         private authService: AuthService,
         private router: Router,
-        private serviceRequestService: ServiceRequestService
+        private serviceRequestService: ServiceRequestService,
+        private wishlistService: WishlistService,
+        private orderService: OrderService
     ) { }
 
     ngOnInit(): void {
@@ -94,10 +114,14 @@ export class AccountComponent implements OnInit {
         });
     }
 
-    switchTab(tab: 'profile' | 'orders' | 'services') {
+    switchTab(tab: 'profile' | 'orders' | 'services' | 'wishlist') {
         this.activeTab = tab;
         if (tab === 'services') {
             this.loadServiceRequests();
+        } else if (tab === 'wishlist') {
+            this.loadWishlist();
+        } else if (tab === 'orders') {
+            this.loadOrders();
         }
     }
 
@@ -133,6 +157,159 @@ export class AccountComponent implements OnInit {
             year: 'numeric',
             month: 'long'
         });
+    }
+
+    // Orders methods
+    loadOrders() {
+        if (this.orders.length > 0) return; // Already loaded
+        this.isLoadingOrders = true;
+        this.orderService.getMyOrders().subscribe({
+            next: (orders) => {
+                this.orders = orders;
+                this.isLoadingOrders = false;
+            },
+            error: (err) => {
+                console.error(err);
+                this.isLoadingOrders = false;
+            }
+        });
+    }
+
+    getOrderStatusInfo(status: string) {
+        const orderStatuses: any = {
+            'pending': { label: 'En attente', color: 'pending' },
+            'confirmed': { label: 'Confirmée', color: 'confirmed' },
+            'processing': { label: 'En préparation', color: 'processing' },
+            'shipped': { label: 'Expédiée', color: 'shipped' },
+            'delivered': { label: 'Livrée', color: 'delivered' },
+            'cancelled': { label: 'Annulée', color: 'cancelled' }
+        };
+        return orderStatuses[status] || { label: status, color: 'pending' };
+    }
+
+    getOrderItemImage(item: any): string {
+        const product = item?.product;
+        if (!product) return 'assets/default_product.png';
+
+        // Check mainImage first
+        if (product.mainImage) {
+            return this.environment.backend + '/' + product.mainImage;
+        }
+
+        const idx = product?.mainImageIndex || 0;
+        let thumbnails = product?.thumbnails;
+        let images = product?.images;
+
+        // Parse if string
+        if (typeof thumbnails === 'string') {
+            try { thumbnails = JSON.parse(thumbnails); } catch { thumbnails = []; }
+        }
+        if (typeof images === 'string') {
+            try { images = JSON.parse(images); } catch { images = []; }
+        }
+
+        // Ensure they are arrays with content
+        if (Array.isArray(thumbnails) && thumbnails.length > 0 && thumbnails[0]) {
+            const imgIdx = thumbnails.length > idx ? idx : 0;
+            return this.environment.backend + '/' + thumbnails[imgIdx];
+        }
+        if (Array.isArray(images) && images.length > 0 && images[0]) {
+            const imgIdx = images.length > idx ? idx : 0;
+            return this.environment.backend + '/' + images[imgIdx];
+        }
+
+        return 'assets/default_product.png';
+    }
+
+    isDefaultOrderImage(item: any): boolean {
+        const product = item?.product;
+        if (!product) return true;
+        if (product.mainImage) return false;
+
+        let thumbnails = product?.thumbnails;
+        let images = product?.images;
+
+        if (typeof thumbnails === 'string') {
+            try { thumbnails = JSON.parse(thumbnails); } catch { thumbnails = []; }
+        }
+        if (typeof images === 'string') {
+            try { images = JSON.parse(images); } catch { images = []; }
+        }
+
+        const hasThumbnails = Array.isArray(thumbnails) && thumbnails.length > 0 && thumbnails[0];
+        const hasImages = Array.isArray(images) && images.length > 0 && images[0];
+
+        return !hasThumbnails && !hasImages;
+    }
+
+    // Wishlist methods
+    loadWishlist() {
+        this.isLoadingWishlist = true;
+        this.wishlistService.getWishlist().subscribe({
+            next: (products) => {
+                this.wishlistProducts = products;
+                this.isLoadingWishlist = false;
+            },
+            error: (err) => {
+                console.error(err);
+                this.isLoadingWishlist = false;
+            }
+        });
+    }
+
+    removeFromWishlist(productId: number) {
+        this.wishlistService.removeFromWishlist(productId).subscribe({
+            next: () => {
+                this.wishlistProducts = this.wishlistProducts.filter(item => item.product?.id !== productId);
+            },
+            error: (err) => {
+                console.error(err);
+            }
+        });
+    }
+
+    getProductImage(product: any): string {
+        const idx = product?.mainImageIndex || 0;
+
+        // Parse thumbnails if it's a string
+        let thumbnails = product?.thumbnails;
+        if (typeof thumbnails === 'string') {
+            try {
+                thumbnails = JSON.parse(thumbnails);
+            } catch {
+                thumbnails = [];
+            }
+        }
+
+        // Parse images if it's a string
+        let images = product?.images;
+        if (typeof images === 'string') {
+            try {
+                images = JSON.parse(images);
+            } catch {
+                images = [];
+            }
+        }
+
+        // Use mainImageIndex or fallback
+        if (Array.isArray(thumbnails) && thumbnails.length > idx) {
+            return this.environment.backend + '/' + thumbnails[idx];
+        }
+        if (Array.isArray(thumbnails) && thumbnails.length > 0) {
+            return this.environment.backend + '/' + thumbnails[0];
+        }
+        if (Array.isArray(images) && images.length > idx) {
+            return this.environment.backend + '/' + images[idx];
+        }
+        if (Array.isArray(images) && images.length > 0) {
+            return this.environment.backend + '/' + images[0];
+        }
+
+        return 'assets/default_product.png';
+    }
+
+    viewProduct(productId: number) {
+        this.router.navigate(['/publicProduct', productId]);
     }
 }
 

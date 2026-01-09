@@ -95,6 +95,12 @@ module.exports = {
         defaultValue: false,
         field: 'activate_critical_stock_indicator'
       },
+      mainImageIndex: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 0,
+        field: 'main_image_index'
+      },
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE

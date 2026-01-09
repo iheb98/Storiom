@@ -119,25 +119,15 @@ async function notifyDeliveryWorkers(order, user, store, items) {
         // Send email to the assigned delivery worker
         if (assignedWorker.email) {
             try {
-                // Use nodemailer directly for CC support
-                const nodemailer = require('nodemailer');
-                const transporter = nodemailer.createTransport({
-                    host: 'smtp.hostinger.com',
-                    port: 465,
-                    secure: true,
-                    auth: {
-                        user: 'noreply@storiom.com',
-                        pass: 'Storiom-9897'
-                    }
-                });
+                // Build CC recipients for Brevo API format
+                const ccRecipients = ccList.map(email => ({ email }));
 
-                await transporter.sendMail({
-                    from: 'noreply@storiom.com',
-                    to: assignedWorker.email,
-                    cc: ccList.join(', '),
-                    subject: `🚚 Nouvelle commande #${order.id} - ${userAddress.state}`,
-                    html: emailHtml
-                });
+                await sendMail(
+                    assignedWorker.email,
+                    `🚚 Nouvelle commande #${order.id} - ${userAddress.state}`,
+                    emailHtml,
+                    ccRecipients.length > 0 ? { cc: ccRecipients } : {}
+                );
 
                 console.log(`Email sent to delivery worker: ${assignedWorker.firstName} ${assignedWorker.lastName} (${assignedWorker.email})`);
             } catch (emailErr) {

@@ -464,9 +464,11 @@ export class OrdersMngtComponent implements OnInit {
             }
         }
 
-        // Return first image or default
+        // Return image at mainImageIndex or default
+        const idx = product?.mainImageIndex || 0;
         if (Array.isArray(images) && images.length > 0) {
-            return this.backend_URL + '/' + images[0];
+            const imageIdx = images.length > idx ? idx : 0;
+            return this.backend_URL + '/' + images[imageIdx];
         }
 
         return 'assets/default_product.png';

@@ -253,8 +253,16 @@
                         <div class="section-body">
                             <div class="images-grid" *ngIf="images?.length > 0 || selectedFiles.length > 0">
                                 <!-- Existing images (already uploaded) -->
-                                <div class="image-preview" *ngFor="let item of images">
+                                <div class="image-preview" *ngFor="let item of images; let i = index"
+                                    [class.main-image]="mainImageIndex === i">
                                     <img [src]="environment.backend + '/' + item" alt="Product image">
+                                    <div class="main-badge" *ngIf="mainImageIndex === i">
+                                        <fa-icon [icon]="faStar"></fa-icon> Principal
+                                    </div>
+                                    <button type="button" class="set-main-image" (click)="setMainImage(i)"
+                                        [class.active]="mainImageIndex === i" title="Définir comme image principale">
+                                        <fa-icon [icon]="mainImageIndex === i ? faStar : faStarOutline"></fa-icon>
+                                    </button>
                                     <button type="button" class="delete-image" (click)="deleteImage(item)">
                                         <fa-icon [icon]="faTimes"></fa-icon>
                                     </button>

@@ -188,9 +188,16 @@
 
                 <!-- Product Image -->
                 <div class="product-image"
-                    (click)="openImage(item?.images?.length > 0 ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png')">
-                    <img [src]="(item?.thumbnails?.length > 0 ? environment.backend + '/' + item?.thumbnails[0] : (item?.images?.length > 0 ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png'))"
-                        alt="{{ item?.name }}"
+                    (click)="openImage(item?.images?.length > (item?.mainImageIndex || 0) ? environment.backend + '/' + item?.images[item?.mainImageIndex || 0] : (item?.images?.length > 0 ? environment.backend + '/' + item?.images[0] : 'assets/default_product.png'))">
+                    <img [src]="item?.thumbnails?.length > (item?.mainImageIndex || 0) 
+                        ? environment.backend + '/' + item?.thumbnails[item?.mainImageIndex || 0] 
+                        : (item?.thumbnails?.length > 0 
+                            ? environment.backend + '/' + item?.thumbnails[0] 
+                            : (item?.images?.length > (item?.mainImageIndex || 0) 
+                                ? environment.backend + '/' + item?.images[item?.mainImageIndex || 0] 
+                                : (item?.images?.length > 0 
+                                    ? environment.backend + '/' + item?.images[0] 
+                                    : 'assets/default_product.png')))" alt="{{ item?.name }}"
                         [class.default-image]="!item?.images?.length && !item?.thumbnails?.length">
                     <div class="image-overlay">
                         <fa-icon [icon]="faSearchPlus"></fa-icon>

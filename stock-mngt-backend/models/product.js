@@ -101,6 +101,12 @@ module.exports = (sequelize, DataTypes) => {
     discount: {
       type: DataTypes.FLOAT
     },
+    mainImageIndex: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: 0,
+      field: 'main_image_index'
+    },
     activateCriticalStockIndicator: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

@@ -219,6 +219,8 @@ export class ProductAnalyticsComponent implements OnInit {
     }
 
     getProductImage(product: any): string {
+        const idx = product?.mainImageIndex || 0;
+
         if (product?.thumbnails) {
             // Handle thumbnails as string (JSON) or array
             let thumbnails = product.thumbnails;
@@ -230,7 +232,8 @@ export class ProductAnalyticsComponent implements OnInit {
                 }
             }
             if (Array.isArray(thumbnails) && thumbnails.length > 0) {
-                return this.backend_URL + '/' + thumbnails[0];
+                const imageIdx = thumbnails.length > idx ? idx : 0;
+                return this.backend_URL + '/' + thumbnails[imageIdx];
             }
         }
         return 'assets/default_product.png';

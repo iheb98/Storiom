@@ -107,8 +107,11 @@ export class CartComponent implements OnInit {
       }
     }
 
+    // Use mainImageIndex or default to 0
+    const idx = product?.mainImageIndex || 0;
     if (Array.isArray(images) && images.length > 0) {
-      return this.environment.backend + '/' + images[0];
+      const imageIdx = images.length > idx ? idx : 0;
+      return this.environment.backend + '/' + images[imageIdx];
     }
 
     return 'assets/default_product.png';

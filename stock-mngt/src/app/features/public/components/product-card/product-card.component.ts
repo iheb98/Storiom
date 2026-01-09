@@ -104,6 +104,28 @@ export class ProductCardComponent implements OnInit {
     return this.product.sellingPrice * (1 - this.product.discount / 100);
   }
 
+  getMainImageUrl(): string {
+    const idx = this.product?.mainImageIndex || 0;
+
+    // Try thumbnails first
+    if (this.product?.thumbnails?.length > idx) {
+      return this.environment.backend + '/' + this.product.thumbnails[idx];
+    }
+    if (this.product?.thumbnails?.length > 0) {
+      return this.environment.backend + '/' + this.product.thumbnails[0];
+    }
+
+    // Fall back to images
+    if (this.product?.images?.length > idx) {
+      return this.environment.backend + '/' + this.product.images[idx];
+    }
+    if (this.product?.images?.length > 0) {
+      return this.environment.backend + '/' + this.product.images[0];
+    }
+
+    return 'assets/default_product.png';
+  }
+
   goToStore(event: Event) {
     event.stopPropagation();
     console.log("test")

@@ -1,4 +1,23 @@
-<div class="product-page" *ngIf="product">
+<!-- Product Not Found State -->
+<div class="product-not-found" *ngIf="!isLoading && productNotFound">
+    <div class="not-found-content">
+        <div class="not-found-icon">
+            <i class="fa fa-search"></i>
+        </div>
+        <h2>Produit introuvable</h2>
+        <p>Ce produit n'existe pas ou a été supprimé.</p>
+        <div class="not-found-actions">
+            <a routerLink="/" class="btn-primary">
+                <i class="fa fa-home"></i> Retour à l'accueil
+            </a>
+            <button (click)="goBack()" class="btn-secondary">
+                <i class="fa fa-arrow-left"></i> Page précédente
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="product-page" *ngIf="!isLoading && product">
 
     <!-- Breadcrumb -->
     <nav class="breadcrumb-nav">
@@ -180,10 +199,60 @@
             </div>
         </div>
     </div>
+
+    <!-- Recommendations Section -->
+    <div class="recommendations-section" *ngIf="recommendations.length > 0 || isLoadingRecommendations">
+        <div class="section-header">
+            <h2><fa-icon [icon]="faStar"></fa-icon> Produits similaires</h2>
+            <p class="section-subtitle">Découvrez d'autres produits qui pourraient vous intéresser</p>
+        </div>
+
+        <!-- Loading Skeleton -->
+        <div class="recommendations-grid skeleton-grid" *ngIf="isLoadingRecommendations">
+            <div class="recommendation-skeleton" *ngFor="let i of [1,2,3,4]"></div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="recommendations-grid" *ngIf="!isLoadingRecommendations && recommendations.length > 0">
+            <div *ngFor="let rec of recommendations" class="recommendation-card" (click)="viewRecommendation(rec.id)">
+                <div class="rec-image-wrapper">
+                    <img [src]="getRecommendationImage(rec)" [alt]="rec.name"
+                        [class.default-image]="isDefaultRecImage(rec)">
+                    <span class="rec-discount" *ngIf="rec.discount > 0">-{{ rec.discount }}%</span>
+                </div>
+                <div class="rec-info">
+                    <span class="rec-store" *ngIf="rec.store?.name">
+                        <fa-icon [icon]="faStore"></fa-icon> {{ rec.store.name }}
+                    </span>
+                    <h4 class="rec-name">{{ rec.name }}</h4>
+                    <div class="rec-rating">
+                        <div class="stars">
+                            <fa-icon [icon]="faStar" *ngFor="let s of [1,2,3,4,5]"
+                                [class.filled]="s <= getRecAverageRating(rec)"></fa-icon>
+                        </div>
+                        <span class="rating-count">({{ rec.reviews?.length || 0 }} avis)</span>
+                    </div>
+                    <div class="rec-price">
+                        <span class="original" *ngIf="rec.discount > 0">{{ rec.sellingPrice | number:'1.2-2' }}
+                            DT</span>
+                        <span class="current" [class.discounted]="rec.discount > 0">
+                            {{ rec.discount > 0 ? (rec.sellingPrice * (1 - rec.discount / 100)) : rec.sellingPrice |
+                            number:'1.2-2' }} DT
+                        </span>
+                    </div>
+                    <button class="rec-add-to-cart" (click)="addRecommendationToCart(rec, $event)"
+                        [disabled]="rec.quantity <= 0">
+                        <fa-icon [icon]="faShoppingCart"></fa-icon>
+                        {{ rec.quantity > 0 ? 'Ajouter' : 'Rupture' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Loading Skeleton -->
-<div class="loading-skeleton" *ngIf="!product">
+<div class="loading-skeleton" *ngIf="isLoading">
     <!-- Breadcrumb Skeleton -->
     <div class="skeleton-breadcrumb">
         <div class="skeleton-text short"></div>

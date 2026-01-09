@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Product, Category, Store, Supplier, Review, User, Address } = require('../models');
+const { Product, Category, Store, Supplier, Review, User, Address, ProductStats } = require('../models');
 const { Op, Sequelize, where } = require('sequelize');
 const utility = require('../utility');
 
@@ -468,6 +468,139 @@ router.get('/publicProduct/:id', (req, res, next) => {
             message: err.toString()
         })
     })
+});
+
+/**
+ * @route   GET /api/public/products/:id/recommendations
+ * @desc    Get recommended products (same category, store, or popular)
+ * @access  Public
+ */
+router.get('/products/:id/recommendations', async (req, res) => {
+    const productId = parseInt(req.params.id);
+    const limit = parseInt(req.query.limit) || 8;
+
+    try {
+        // First, get the current product to know its category and store
+        const currentProduct = await Product.findByPk(productId, {
+            attributes: ['id', 'categoryId', 'storeId']
+        });
+
+        if (!currentProduct) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        // Build conditions for recommendations
+        const recommendations = [];
+
+        // 1. Same category products (prioritize)
+        if (currentProduct.categoryId) {
+            const sameCategoryProducts = await Product.findAll({
+                where: {
+                    categoryId: currentProduct.categoryId,
+                    id: { [Op.ne]: productId },
+                    toDisplay: true,
+                    isVisible: true,
+                    quantity: { [Op.gt]: 0 }
+                },
+                include: [
+                    {
+                        model: Store,
+                        as: 'store',
+                        attributes: ['name', 'id'],
+                        where: { isVisibleToPublic: true, active: true },
+                        required: true
+                    },
+                    {
+                        model: ProductStats,
+                        as: 'stats',
+                        attributes: ['viewCount', 'orderCount', 'popularityScore'],
+                        required: false
+                    },
+                    { model: Review, as: 'reviews', attributes: ['rating'] }
+                ],
+                order: [[Sequelize.literal('COALESCE("stats"."popularity_score", 0)'), 'DESC']],
+                limit: limit,
+                subQuery: false
+            });
+            recommendations.push(...sameCategoryProducts);
+        }
+
+        // 2. If we need more, get popular products from the same store
+        if (recommendations.length < limit && currentProduct.storeId) {
+            const existingIds = recommendations.map(p => p.id);
+            existingIds.push(productId);
+
+            const sameStoreProducts = await Product.findAll({
+                where: {
+                    storeId: currentProduct.storeId,
+                    id: { [Op.notIn]: existingIds },
+                    toDisplay: true,
+                    isVisible: true,
+                    quantity: { [Op.gt]: 0 }
+                },
+                include: [
+                    {
+                        model: Store,
+                        as: 'store',
+                        attributes: ['name', 'id'],
+                        where: { isVisibleToPublic: true, active: true },
+                        required: true
+                    },
+                    {
+                        model: ProductStats,
+                        as: 'stats',
+                        attributes: ['viewCount', 'orderCount', 'popularityScore'],
+                        required: false
+                    },
+                    { model: Review, as: 'reviews', attributes: ['rating'] }
+                ],
+                order: [[Sequelize.literal('COALESCE("stats"."popularity_score", 0)'), 'DESC']],
+                limit: limit - recommendations.length,
+                subQuery: false
+            });
+            recommendations.push(...sameStoreProducts);
+        }
+
+        // 3. If still need more, get globally popular products
+        if (recommendations.length < limit) {
+            const existingIds = recommendations.map(p => p.id);
+            existingIds.push(productId);
+
+            const popularProducts = await Product.findAll({
+                where: {
+                    id: { [Op.notIn]: existingIds },
+                    toDisplay: true,
+                    isVisible: true,
+                    quantity: { [Op.gt]: 0 }
+                },
+                include: [
+                    {
+                        model: Store,
+                        as: 'store',
+                        attributes: ['name', 'id'],
+                        where: { isVisibleToPublic: true, active: true },
+                        required: true
+                    },
+                    {
+                        model: ProductStats,
+                        as: 'stats',
+                        attributes: ['viewCount', 'orderCount', 'popularityScore'],
+                        required: false
+                    },
+                    { model: Review, as: 'reviews', attributes: ['rating'] }
+                ],
+                order: [[Sequelize.literal('COALESCE("stats"."popularity_score", 0)'), 'DESC']],
+                limit: limit - recommendations.length,
+                subQuery: false
+            });
+            recommendations.push(...popularProducts);
+        }
+
+        res.json(recommendations.slice(0, limit));
+    } catch (err) {
+        console.error('Error fetching recommendations:', err);
+        res.status(500).json({ message: 'Server Error' });
+    }
 });
 
 router.post('/reviews', utility.authenticate, async (req, res) => {

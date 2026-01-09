@@ -4,8 +4,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   faArrowLeft, faEdit, faTimes, faChartLine, faCubes, faExclamationTriangle,
   faEye, faInfoCircle, faTag, faFolder, faTruck, faCoins, faArrowDown,
-  faArrowUp, faAlignLeft, faImages, faCloudUploadAlt, faPlus, faSave, faBox, faBarcode, faCamera, faPercent
+  faArrowUp, faAlignLeft, faImages, faCloudUploadAlt, faPlus, faSave, faBox, faBarcode, faCamera, faPercent, faStar
 } from '@fortawesome/free-solid-svg-icons';
+import { faStar as faStarOutline } from '@fortawesome/free-regular-svg-icons';
 import { BarcodeFormat } from '@zxing/library';
 import { EMPTY, forkJoin } from 'rxjs';
 import { expand, map } from 'rxjs/operators';
@@ -53,6 +54,8 @@ export class ProductAddComponent implements OnInit {
   faBarcode = faBarcode;
   faCamera = faCamera;
   faPercent = faPercent;
+  faStar = faStar;
+  faStarOutline = faStarOutline;
 
   // Barcode Scanner
   scannerActive = false;
@@ -87,6 +90,7 @@ export class ProductAddComponent implements OnInit {
   images: string[] = [];
   thumbnails: string[] = [];
   compressedImages: any[] = [];
+  mainImageIndex: number = 0;
   data: any;
   selectedCategory = '';
   selectedFiles: { file: File, preview: string }[] = [];
@@ -214,6 +218,8 @@ export class ProductAddComponent implements OnInit {
         this.form.get('criticalStockIndicator').setValue(response?.criticalStockIndicator);
         this.form.get('activateCriticalStockIndicator').setValue(response?.activateCriticalStockIndicator || false);
         this.form.get('code').setValue(response?.code);
+        this.form.get('mainImageIndex').setValue(response?.mainImageIndex || 0);
+        this.mainImageIndex = response?.mainImageIndex || 0;
         this.images = response?.images || [];
         this.thumbnails = response?.thumbnails || [];
         this.isLoading = false;
@@ -251,6 +257,7 @@ export class ProductAddComponent implements OnInit {
       sellingPrice: [null],
       discount: [0],
       toDisplay: [defaultVisibility],
+      mainImageIndex: [0],
       images: [null],
       date: [(new Date()).toISOString().substring(0, 16)]
     });
@@ -648,6 +655,17 @@ export class ProductAddComponent implements OnInit {
         this.thumbnails.splice(index, 1);
       }
 
+      // Adjust mainImageIndex when an image is deleted
+      if (index < this.mainImageIndex) {
+        // Deleted image was before main image, shift index down
+        this.mainImageIndex--;
+        this.form.get('mainImageIndex').setValue(this.mainImageIndex);
+      } else if (index === this.mainImageIndex) {
+        // Deleted image was the main image, reset to first image
+        this.mainImageIndex = 0;
+        this.form.get('mainImageIndex').setValue(0);
+      }
+
       // Queue for deletion when user clicks Update (only in edit mode)
       if (this.edit) {
         this.pendingDeletions.push({ image: item, thumbnail: thumbnailToDelete });
@@ -718,6 +736,12 @@ export class ProductAddComponent implements OnInit {
 
   removeSelectedFile(index: number) {
     this.selectedFiles.splice(index, 1);
+  }
+
+  // Set the main display image
+  setMainImage(index: number) {
+    this.mainImageIndex = index;
+    this.form.get('mainImageIndex').setValue(index);
   }
 
   uploadImages(FilesToUpload: File[], images: string[]) {

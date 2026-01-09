@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { environment } from 'src/environments/environment';
@@ -34,6 +34,12 @@ export class PublicViewProductComponent implements OnInit {
   quantity: number = 1;
   lightboxOpen: boolean = false;
   isInWishlist = false;
+  isLoading = true;
+  productNotFound = false;
+
+  // Recommendations
+  recommendations: any[] = [];
+  isLoadingRecommendations = false;
 
   // Icons
   faChevronRight = faChevronRight;
@@ -67,7 +73,8 @@ export class PublicViewProductComponent implements OnInit {
     private cartService: CartService,
     private authService: AuthService,
     private toastService: ToastService,
-    private location: Location
+    private location: Location,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -81,9 +88,19 @@ export class PublicViewProductComponent implements OnInit {
   }
 
   loadProduct(id: string) {
-    //
+    this.isLoading = true;
+    this.productNotFound = false;
     this.publicService.getPublicProduct(id).subscribe(res => {
-      //
+      console.log('Product response:', res); // Debug log
+      // Check if product is null, undefined, or empty object
+      if (res === null || res === undefined || (typeof res === 'object' && !res.id)) {
+        console.log('Product not found - setting productNotFound=true, isLoading=false');
+        this.productNotFound = true;
+        this.isLoading = false;
+        this.cdr.detectChanges(); // Force Angular to update the view
+        console.log('After setting: isLoading=', this.isLoading, 'productNotFound=', this.productNotFound);
+        return;
+      }
       this.product = res;
       this.calculateAverageRating();
 
@@ -104,8 +121,11 @@ export class PublicViewProductComponent implements OnInit {
           this.product.images = JSON.parse(this.product.images);
         }
         if (this.product.images.length > 0) {
-          this.selectedImage = environment.backend + '/' + this.product.images[0];
-          this.selectedImageIndex = 0;
+          // Use mainImageIndex or default to 0
+          const idx = this.product.mainImageIndex || 0;
+          const imageIdx = this.product.images.length > idx ? idx : 0;
+          this.selectedImage = environment.backend + '/' + this.product.images[imageIdx];
+          this.selectedImageIndex = imageIdx;
           this.isDefaultImage = false;
         } else {
           this.selectedImage = 'assets/default_product.png';
@@ -115,9 +135,94 @@ export class PublicViewProductComponent implements OnInit {
         this.selectedImage = 'assets/default_product.png';
         this.isDefaultImage = true;
       }
+      this.isLoading = false;
+
+      // Load recommendations
+      this.loadRecommendations(parseInt(id));
     }, () => {
-      //
+      this.productNotFound = true;
+      this.isLoading = false;
     });
+  }
+
+  loadRecommendations(productId: number) {
+    this.isLoadingRecommendations = true;
+    this.publicService.getProductRecommendations(productId, 4).subscribe({
+      next: (products) => {
+        this.recommendations = products;
+        this.isLoadingRecommendations = false;
+      },
+      error: () => {
+        this.recommendations = [];
+        this.isLoadingRecommendations = false;
+      }
+    });
+  }
+
+  getRecommendationImage(product: any): string {
+    if (!product) return 'assets/default_product.png';
+
+    if (product.mainImage) {
+      return this.environment.backend + '/' + product.mainImage;
+    }
+
+    const idx = product?.mainImageIndex || 0;
+    let thumbnails = product?.thumbnails;
+    let images = product?.images;
+
+    if (typeof thumbnails === 'string') {
+      try { thumbnails = JSON.parse(thumbnails); } catch { thumbnails = []; }
+    }
+    if (typeof images === 'string') {
+      try { images = JSON.parse(images); } catch { images = []; }
+    }
+
+    if (Array.isArray(thumbnails) && thumbnails.length > 0 && thumbnails[0]) {
+      const imgIdx = thumbnails.length > idx ? idx : 0;
+      return this.environment.backend + '/' + thumbnails[imgIdx];
+    }
+    if (Array.isArray(images) && images.length > 0 && images[0]) {
+      const imgIdx = images.length > idx ? idx : 0;
+      return this.environment.backend + '/' + images[imgIdx];
+    }
+
+    return 'assets/default_product.png';
+  }
+
+  getRecAverageRating(rec: any): number {
+    if (!rec.reviews || rec.reviews.length === 0) return 0;
+    const total = rec.reviews.reduce((acc: number, r: any) => acc + Number(r.rating), 0);
+    return total / rec.reviews.length;
+  }
+
+  isDefaultRecImage(product: any): boolean {
+    if (!product) return true;
+    if (product.mainImage) return false;
+
+    let thumbnails = product?.thumbnails;
+    let images = product?.images;
+
+    if (typeof thumbnails === 'string') {
+      try { thumbnails = JSON.parse(thumbnails); } catch { thumbnails = []; }
+    }
+    if (typeof images === 'string') {
+      try { images = JSON.parse(images); } catch { images = []; }
+    }
+
+    const hasThumbnails = Array.isArray(thumbnails) && thumbnails.length > 0 && thumbnails[0];
+    const hasImages = Array.isArray(images) && images.length > 0 && images[0];
+
+    return !hasThumbnails && !hasImages;
+  }
+
+  viewRecommendation(productId: number) {
+    this.router.navigate(['/publicProduct', productId]);
+  }
+
+  addRecommendationToCart(rec: any, event: Event) {
+    event.stopPropagation(); // Prevent card click navigation
+    this.cartService.addToCart(rec, 1);
+    this.toastService.showSuccess(`${rec.name} ajouté au panier`);
   }
 
   calculateAverageRating() {
