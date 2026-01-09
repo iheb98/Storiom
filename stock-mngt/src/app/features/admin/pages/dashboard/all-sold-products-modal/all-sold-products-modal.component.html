@@ -26,7 +26,7 @@
         <!-- Products Grid -->
         <div class="products-grid" *ngIf="!isLoading && displayedProducts.length > 0">
             <div class="product-card" *ngFor="let operation of displayedProducts; let i = index"
-                [class.top-three]="getGlobalRank(i) <= 3">
+                [class.top-three]="getGlobalRank(i) <= 3" (click)="goToProduct(operation?.product?.id)">
 
                 <!-- Rank Badge -->
                 <div class="rank-badge" [ngClass]="getRankClass(getGlobalRank(i))">

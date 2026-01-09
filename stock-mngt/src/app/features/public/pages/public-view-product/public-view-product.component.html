@@ -44,6 +44,11 @@
                 <span class="discount-badge" *ngIf="product?.discount > 0">
                     -{{ product?.discount }}%
                 </span>
+                <span class="condition-badge" *ngIf="product?.condition && product?.condition !== 'NEW'"
+                    [class.used]="product?.condition === 'USED'"
+                    [class.used-good]="product?.condition === 'USED_GOOD_CONDITION'">
+                    {{ product?.condition === 'USED' ? 'Occasion' : 'Occasion - Bon état' }}
+                </span>
             </div>
             <div class="thumbnails" *ngIf="product?.images?.length > 1">
                 <button class="thumb" *ngFor="let img of product.images; let i = index"

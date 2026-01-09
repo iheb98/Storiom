@@ -113,6 +113,12 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: false,
       field: 'activate_critical_stock_indicator'
     },
+    condition: {
+      type: DataTypes.ENUM('NEW', 'USED', 'USED_GOOD_CONDITION'),
+      allowNull: false,
+      defaultValue: 'NEW',
+      field: 'condition'
+    },
   }, {
     sequelize,
     tableName: 'products',

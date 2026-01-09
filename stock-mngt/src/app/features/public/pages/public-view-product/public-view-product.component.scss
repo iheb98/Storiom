@@ -406,6 +406,26 @@ $radius-lg: 16px;
     font-size: 0.85rem;
     font-weight: 600;
   }
+
+  .condition-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    color: $white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+
+    &.used {
+      background: linear-gradient(135deg, #78909c 0%, #546e7a 100%);
+    }
+
+    &.used-good {
+      background: linear-gradient(135deg, #0288d1 0%, #01579b 100%);
+    }
+  }
 }
 
 .thumbnails {

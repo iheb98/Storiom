@@ -10,7 +10,8 @@
 
         <!-- Products List -->
         <div class="products-list" *ngIf="operations?.length > 0">
-            <div class="product-item" *ngFor="let operation of operations; let i = index">
+            <div class="product-item" *ngFor="let operation of operations; let i = index"
+                (click)="goToProduct(operation?.product?.id)">
                 <div class="product-rank" [class.gold]="i === 0" [class.silver]="i === 1" [class.bronze]="i === 2">
                     <span>{{ i + 1 }}</span>
                 </div>

@@ -4,11 +4,12 @@ import { faChartBar } from '@fortawesome/free-regular-svg-icons';
 import {
   faEdit, faFile, faTimes, faArrowDown, faArrowUp, faCoins, faExclamationTriangle,
   faImages, faSearchPlus, faImage, faArrowLeft, faCube, faTag, faAlignLeft,
-  faCalendarAlt, faClock, faBox, faPercent
+  faCalendarAlt, faClock, faBox, faPercent, faEye, faShoppingCart, faHeart, faTrophy, faChartLine, faCheckCircle
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { StatService } from 'src/app/core/services/stat.service';
+import { AnalyticsService } from 'src/app/core/services/analytics.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 
@@ -37,6 +38,12 @@ export class ProductViewComponent implements OnInit {
   faTimes = faTimes;
   faBox = faBox;
   faPercent = faPercent;
+  faEye = faEye;
+  faShoppingCart = faShoppingCart;
+  faHeart = faHeart;
+  faTrophy = faTrophy;
+  faChartLine = faChartLine;
+  faCheckCircle = faCheckCircle;
   textIcon = faFile;
   chartIcon = faChartBar;
 
@@ -69,11 +76,23 @@ export class ProductViewComponent implements OnInit {
   product: any;
   selectedImage: string | null = null;
 
+  // Marketplace Analytics
+  isAnalyticsLoading = false;
+  productStats: any = null;
+  viewCount = 0;
+  orderCount = 0;
+  cartAddCount = 0;
+  wishlistCount = 0;
+  quantitySold = 0;
+  conversionRate = 0;
+  popularityScore = 0;
+
   hoursLabels = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
 
   constructor(
     private productService: ProductService,
     private statService: StatService,
+    private analyticsService: AnalyticsService,
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
@@ -154,6 +173,7 @@ export class ProductViewComponent implements OnInit {
         this.product = response;
         this.isLoading = false;
         this.getOperationStats();
+        this.loadProductAnalytics();
       },
       error => {
         this.isLoading = false;
@@ -327,5 +347,49 @@ export class ProductViewComponent implements OnInit {
       return this.product?.sellingPrice || 0;
     }
     return this.product.sellingPrice * (1 - this.product.discount / 100);
+  }
+
+  loadProductAnalytics() {
+    if (!this.id) return;
+
+    this.isAnalyticsLoading = true;
+    this.analyticsService.getProductStats(parseInt(this.id)).subscribe(
+      (response: any) => {
+        this.productStats = response;
+        this.viewCount = response?.viewCount || 0;
+        this.orderCount = response?.orderCount || 0;
+        this.cartAddCount = response?.cartAddCount || 0;
+        this.wishlistCount = response?.wishlistCount || 0;
+        this.quantitySold = response?.totalQuantitySold || 0;
+        this.popularityScore = response?.popularityScore || 0;
+
+        // Calculate conversion rate (orders / views * 100)
+        this.conversionRate = this.viewCount > 0
+          ? parseFloat(((this.orderCount / this.viewCount) * 100).toFixed(2))
+          : 0;
+
+        this.isAnalyticsLoading = false;
+      },
+      error => {
+        console.error('Error loading product analytics:', error);
+        this.isAnalyticsLoading = false;
+      }
+    );
+  }
+
+  getPerformanceLevel(score: number): string {
+    if (score >= 50) return 'excellent';
+    if (score >= 20) return 'good';
+    if (score >= 5) return 'average';
+    return 'low';
+  }
+
+  getConditionLabel(condition: string): string {
+    switch (condition) {
+      case 'NEW': return 'Neuf';
+      case 'USED': return 'Occasion';
+      case 'USED_GOOD_CONDITION': return 'Occasion en bon état';
+      default: return 'Non spécifié';
+    }
   }
 }

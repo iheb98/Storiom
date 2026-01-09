@@ -6,6 +6,12 @@
     <!-- Out of Stock Badge -->
     <span class="out-of-stock-badge" *ngIf="product?.quantity <= 0">Rupture de stock</span>
 
+    <!-- Condition Badge (for non-new products) -->
+    <span class="condition-badge" *ngIf="product?.condition && product?.condition !== 'NEW'"
+      [class.used]="product?.condition === 'USED'" [class.used-good]="product?.condition === 'USED_GOOD_CONDITION'">
+      {{ product?.condition === 'USED' ? 'Occasion' : 'Occasion - Bon état' }}
+    </span>
+
     <img [src]="getMainImageUrl()" [alt]="product.name" loading="lazy"
       [class.default-image]="!product?.images?.length && !product?.thumbnails?.length">
 

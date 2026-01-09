@@ -101,6 +101,12 @@ module.exports = {
         defaultValue: 0,
         field: 'main_image_index'
       },
+      condition: {
+        type: DataTypes.ENUM('NEW', 'USED', 'USED_GOOD_CONDITION'),
+        allowNull: false,
+        defaultValue: 'NEW',
+        field: 'condition'
+      },
       updatedAt: {
         allowNull: false,
         type: DataTypes.DATE

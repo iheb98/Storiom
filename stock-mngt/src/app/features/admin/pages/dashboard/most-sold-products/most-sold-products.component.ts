@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { faFire, faBox, faFireAlt, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StatService } from 'src/app/core/services/stat.service';
@@ -27,7 +28,8 @@ export class MostSoldProductsComponent implements OnInit {
   constructor(
     private statService: StatService,
     private authService: AuthService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -55,5 +57,11 @@ export class MostSoldProductsComponent implements OnInit {
       maxHeight: '90vh',
       panelClass: 'dark-modal'
     });
+  }
+
+  goToProduct(productId: number) {
+    if (productId) {
+      this.router.navigate(['/admin/products/view/' + productId]);
+    }
   }
 }

@@ -130,6 +130,17 @@
                                 </ng-select>
                             </div>
 
+                            <div class="form-group">
+                                <label for="condition"><fa-icon [icon]="faCheckCircle"></fa-icon> État du
+                                    produit</label>
+                                <ng-select formControlName="condition" id="condition"
+                                    placeholder="Sélectionner l'état...">
+                                    <ng-option value="NEW">Neuf</ng-option>
+                                    <ng-option value="USED">Occasion</ng-option>
+                                    <ng-option value="USED_GOOD_CONDITION">Occasion en bon état</ng-option>
+                                </ng-select>
+                            </div>
+
                             <div class="settings-grid">
                                 <div class="toggle-setting">
                                     <div class="toggle-info">
@@ -294,7 +305,7 @@
 
             <!-- Submit Button -->
             <div class="form-actions">
-                <button type="button" class="btn-cancel" (click)="navigateTo('/products')">Annuler</button>
+                <button type="button" class="btn-cancel" (click)="navigateTo('/admin/products')">Annuler</button>
                 <button type="submit" class="btn-submit" [disabled]="isSubmitting">
                     <fa-icon [icon]="productId ? faSave : faPlus"></fa-icon>
                     {{ productId ? 'Enregistrer les modifications' : 'Ajouter le produit' }}

@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { faFire, faBox, faTimes, faChevronLeft, faChevronRight, faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StatService } from 'src/app/core/services/stat.service';
@@ -33,6 +34,7 @@ export class AllSoldProductsModalComponent implements OnInit {
     constructor(
         private statService: StatService,
         private authService: AuthService,
+        private router: Router,
         public dialogRef: MatDialogRef<AllSoldProductsModalComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any
     ) { }
@@ -91,5 +93,12 @@ export class AllSoldProductsModalComponent implements OnInit {
 
     close() {
         this.dialogRef.close();
+    }
+
+    goToProduct(productId: number) {
+        if (productId) {
+            this.dialogRef.close();
+            this.router.navigate(['/admin/products/view/' + productId]);
+        }
     }
 }

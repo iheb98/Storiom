@@ -104,6 +104,30 @@
   text-transform: uppercase;
 }
 
+.condition-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: white;
+  font-size: 0.7rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  z-index: 2;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+
+  &.used {
+    background: linear-gradient(135deg, #78909c 0%, #546e7a 100%);
+    box-shadow: 0 2px 8px rgba(84, 110, 122, 0.3);
+  }
+
+  &.used-good {
+    background: linear-gradient(135deg, #0288d1 0%, #01579b 100%);
+    box-shadow: 0 2px 8px rgba(2, 136, 209, 0.3);
+  }
+}
+
 .overlay-utils {
   position: absolute;
   top: 10px;

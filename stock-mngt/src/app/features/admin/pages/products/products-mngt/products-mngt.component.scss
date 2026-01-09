@@ -1084,6 +1084,29 @@ $radius-lg: 16px;
         z-index: 2;
         box-shadow: 0 2px 6px rgba(198, 40, 40, 0.3);
     }
+
+    .condition-badge {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        color: white;
+        font-size: 0.65rem;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+        z-index: 2;
+        text-transform: uppercase;
+
+        &.used {
+            background: linear-gradient(135deg, #78909c 0%, #546e7a 100%);
+            box-shadow: 0 2px 6px rgba(84, 110, 122, 0.3);
+        }
+
+        &.used-good {
+            background: linear-gradient(135deg, #0288d1 0%, #01579b 100%);
+            box-shadow: 0 2px 6px rgba(2, 136, 209, 0.3);
+        }
+    }
 }
 
 .product-info {

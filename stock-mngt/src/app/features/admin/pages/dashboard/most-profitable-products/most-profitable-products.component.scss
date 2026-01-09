@@ -100,6 +100,7 @@ $radius-md: 12px;
     border-radius: $radius-md;
     border: 1px solid $border-color;
     transition: all 0.2s ease;
+    cursor: pointer;
 
     &:hover {
         border-color: $primary;

@@ -203,6 +203,11 @@
                         <fa-icon [icon]="faSearchPlus"></fa-icon>
                     </div>
                     <span class="discount-badge" *ngIf="item?.discount > 0">-{{ item?.discount }}%</span>
+                    <span class="condition-badge" *ngIf="item?.condition && item?.condition !== 'NEW'"
+                        [class.used]="item?.condition === 'USED'"
+                        [class.used-good]="item?.condition === 'USED_GOOD_CONDITION'">
+                        {{ item?.condition === 'USED' ? 'Occasion' : 'Bon état' }}
+                    </span>
                 </div>
 
                 <!-- Product Info -->

@@ -472,6 +472,23 @@ $radius-lg: 16px;
             background: $danger-light;
             color: $danger;
         }
+
+        &.condition {
+            &.new {
+                background: $success-light;
+                color: $success;
+            }
+
+            &.used {
+                background: rgba(156, 163, 175, 0.15);
+                color: #6b7280;
+            }
+
+            &.used-good {
+                background: $info-light;
+                color: $info;
+            }
+        }
     }
 
     .info-content {
@@ -831,6 +848,210 @@ $radius-lg: 16px;
 
         &:hover {
             background: rgba(255, 255, 255, 0.2);
+        }
+    }
+}
+
+// ============================================
+// MARKETPLACE ANALYTICS SECTION
+// ============================================
+.marketplace-analytics-section {
+    background: $white;
+    border-radius: $radius-lg;
+    padding: 25px;
+    box-shadow: $shadow-sm;
+    border: 1px solid $border-color;
+    margin-bottom: 30px;
+
+    .section-header {
+        margin-bottom: 20px;
+
+        h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: $text-primary;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            fa-icon {
+                color: $primary;
+            }
+        }
+    }
+}
+
+.analytics-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 40px 20px;
+    color: $text-secondary;
+
+    .spinner {
+        width: 24px;
+        height: 24px;
+        border: 3px solid $border-color;
+        border-top-color: $primary;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+
+    @media (max-width: 1200px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: 768px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 480px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.analytics-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-radius: $radius-md;
+    background: $background;
+    border: 1px solid $border-color;
+    transition: all 0.3s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-sm;
+    }
+
+    .card-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        fa-icon {
+            font-size: 1.2rem;
+            color: $white;
+        }
+    }
+
+    .card-content {
+        display: flex;
+        flex-direction: column;
+
+        .card-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: $text-primary;
+            line-height: 1.2;
+        }
+
+        .card-label {
+            font-size: 0.75rem;
+            color: $text-secondary;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    }
+
+    // Card variants
+    &.views {
+        .card-icon {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+    }
+
+    &.orders {
+        .card-icon {
+            background: linear-gradient(135deg, $success 0%, darken($success, 10%) 100%);
+        }
+    }
+
+    &.cart {
+        .card-icon {
+            background: linear-gradient(135deg, $warning 0%, darken($warning, 10%) 100%);
+        }
+    }
+
+    &.wishlist {
+        .card-icon {
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+        }
+    }
+
+    &.conversion {
+        .card-icon {
+            background: linear-gradient(135deg, $purple 0%, darken($purple, 10%) 100%);
+        }
+    }
+
+    &.sold {
+        .card-icon {
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+        }
+    }
+}
+
+.popularity-score-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid $border-color;
+
+    .score-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+
+        .score-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: $text-secondary;
+        }
+
+        .score-badge {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: $white;
+
+            &.excellent {
+                background: linear-gradient(135deg, $success 0%, darken($success, 10%) 100%);
+                box-shadow: 0 4px 15px rgba($success, 0.4);
+            }
+
+            &.good {
+                background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+                box-shadow: 0 4px 15px rgba(#3b82f6, 0.4);
+            }
+
+            &.average {
+                background: linear-gradient(135deg, $warning 0%, darken($warning, 10%) 100%);
+                box-shadow: 0 4px 15px rgba($warning, 0.4);
+            }
+
+            &.low {
+                background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+                box-shadow: 0 4px 15px rgba(#9ca3af, 0.3);
+            }
         }
     }
 }

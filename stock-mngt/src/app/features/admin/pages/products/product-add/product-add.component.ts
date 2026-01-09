@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   faArrowLeft, faEdit, faTimes, faChartLine, faCubes, faExclamationTriangle,
   faEye, faInfoCircle, faTag, faFolder, faTruck, faCoins, faArrowDown,
-  faArrowUp, faAlignLeft, faImages, faCloudUploadAlt, faPlus, faSave, faBox, faBarcode, faCamera, faPercent, faStar
+  faArrowUp, faAlignLeft, faImages, faCloudUploadAlt, faPlus, faSave, faBox, faBarcode, faCamera, faPercent, faStar, faCheckCircle
 } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarOutline } from '@fortawesome/free-regular-svg-icons';
 import { BarcodeFormat } from '@zxing/library';
@@ -56,6 +56,7 @@ export class ProductAddComponent implements OnInit {
   faPercent = faPercent;
   faStar = faStar;
   faStarOutline = faStarOutline;
+  faCheckCircle = faCheckCircle;
 
   // Barcode Scanner
   scannerActive = false;
@@ -219,6 +220,7 @@ export class ProductAddComponent implements OnInit {
         this.form.get('activateCriticalStockIndicator').setValue(response?.activateCriticalStockIndicator || false);
         this.form.get('code').setValue(response?.code);
         this.form.get('mainImageIndex').setValue(response?.mainImageIndex || 0);
+        this.form.get('condition').setValue(response?.condition || 'NEW');
         this.mainImageIndex = response?.mainImageIndex || 0;
         this.images = response?.images || [];
         this.thumbnails = response?.thumbnails || [];
@@ -259,6 +261,7 @@ export class ProductAddComponent implements OnInit {
       toDisplay: [defaultVisibility],
       mainImageIndex: [0],
       images: [null],
+      condition: ['NEW'],
       date: [(new Date()).toISOString().substring(0, 16)]
     });
   }
@@ -370,7 +373,7 @@ export class ProductAddComponent implements OnInit {
               timer: 1500
             });
             this.ngZone.run(() => {
-              this.router.navigateByUrl('/products', { replaceUrl: true });
+              this.router.navigateByUrl('/admin/products', { replaceUrl: true });
             });
           },
           error => {
@@ -416,7 +419,7 @@ export class ProductAddComponent implements OnInit {
               timer: 1500
             });
             this.ngZone.run(() => {
-              this.router.navigateByUrl('/products', { replaceUrl: true });
+              this.router.navigateByUrl('/admin/products', { replaceUrl: true });
             });
           },
           error => {
@@ -508,7 +511,7 @@ export class ProductAddComponent implements OnInit {
                 timer: 1500
               });
               this.ngZone.run(() => {
-                this.router.navigateByUrl('/products', { replaceUrl: true });
+                this.router.navigateByUrl('/admin/products', { replaceUrl: true });
               });
             },
             error => {
@@ -567,7 +570,7 @@ export class ProductAddComponent implements OnInit {
                 timer: 1500
               });
               this.ngZone.run(() => {
-                this.router.navigateByUrl('/products', { replaceUrl: true });
+                this.router.navigateByUrl('/admin/products', { replaceUrl: true });
               });
             },
             error => {
