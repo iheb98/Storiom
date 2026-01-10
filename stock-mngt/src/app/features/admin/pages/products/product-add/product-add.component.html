@@ -26,11 +26,11 @@
 
         <!-- Navigation -->
         <div class="page-navigation">
-            <a class="nav-link" (click)="navigateTo('/products')">
+            <a class="nav-link" (click)="navigateTo('/admin/products')">
                 <fa-icon [icon]="faArrowLeft"></fa-icon>
                 <span>Retour aux produits</span>
             </a>
-            <a class="nav-link" *ngIf="productId" (click)="navigateTo('/products/view/' + product?.id)">
+            <a class="nav-link" *ngIf="productId" (click)="navigateTo('/admin/products/view/' + product?.id)">
                 <fa-icon [icon]="faEye"></fa-icon>
                 <span>Consulter</span>
             </a>
