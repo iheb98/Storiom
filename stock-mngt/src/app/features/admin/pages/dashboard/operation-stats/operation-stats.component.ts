@@ -178,17 +178,17 @@ export class OperationStatsComponent implements OnInit, OnChanges {
     for (let i = 1; i <= 12; i++) {
       this.soldOperationsData.push(0);
       this.loadedOperationsData.push(0);
-      months.push(i + 1);
+      months.push(i);
     }
     this.operationsLabels = months;
     if (this.operations) {
       for (let operation of this.operations) {
         if (operation.type == "SOLD") {
-          this.soldOperationsData[new Date(operation.date).getMonth() - 1] +=
+          this.soldOperationsData[new Date(operation.date).getMonth()] +=
             (operation?.price && operation?.amount) ?
               operation?.price * operation?.amount : 0;
         } else if (operation.type == "LOADED") {
-          this.loadedOperationsData[new Date(operation.date).getMonth() - 1] +=
+          this.loadedOperationsData[new Date(operation.date).getMonth()] +=
             (operation?.price && operation?.amount) ?
               operation?.price * operation?.amount : 0;
         }
