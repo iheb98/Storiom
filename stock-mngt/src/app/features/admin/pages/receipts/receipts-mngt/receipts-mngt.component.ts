@@ -276,7 +276,7 @@ export class ReceiptsMngtComponent implements OnInit {
           const footerText = `${storeName} | Tél: ${storePhone} | ${storeEmail}`;
 
           const options = {
-            margin: [10, 10, 20, 10], // top, left, bottom, right - extra bottom margin for footer
+            margin: 0,
             filename: this.printingReceipt?.code + '.pdf',
             image: { type: 'png', quality: 0.98 },
             html2canvas: { scale: 2, windowWidth: 1200 },
@@ -318,7 +318,7 @@ export class ReceiptsMngtComponent implements OnInit {
           this.printingReceipt = null;
           Swal.fire('Erreur', 'Erreur lors de la préparation du PDF.', 'error');
         }
-      }, 500);
+      }, 100);
     }, error => {
       console.error("Receipt Fetch Error:", error);
       Swal.fire('Erreur', 'Impossible de charger la facture.', 'error');
