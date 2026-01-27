@@ -52,7 +52,11 @@ export class ReceiptViewComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    window.scrollTo(0, 0);
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }, 0);
     this.receiptId = this.route.snapshot.paramMap.get('id');
     this.loadData();
   }

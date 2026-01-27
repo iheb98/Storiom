@@ -69,7 +69,11 @@ export class PublicProductsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    window.scrollTo(0, 0);
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }, 0);
     this.loadCategories();
     this.governorates = getAllGovernorates();
 
@@ -227,7 +231,11 @@ export class PublicProductsComponent implements OnInit {
 
     this.currentPage = 0;
     this.router.navigate([], { queryParams });
-    window.scrollTo(0, 0);
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }, 0);
   }
 
   resetFilters() {
@@ -260,6 +268,11 @@ export class PublicProductsComponent implements OnInit {
   toggleMobileFilters() {
     this.mobileFiltersOpen = !this.mobileFiltersOpen;
     document.body.style.overflow = this.mobileFiltersOpen ? 'hidden' : '';
+  }
+
+  closeMobileFilters() {
+    this.mobileFiltersOpen = false;
+    document.body.style.overflow = '';
   }
 
   hasActiveFilters(): boolean {
@@ -302,7 +315,7 @@ export class PublicProductsComponent implements OnInit {
   selectCategory(categoryId: number) {
     this.filters.category = categoryId;
     this.applyFilters();
-    this.mobileFiltersOpen = false;
+    this.closeMobileFilters();
   }
 
   hasSubCategories(category: any): boolean {

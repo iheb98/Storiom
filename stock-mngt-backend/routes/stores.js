@@ -6,11 +6,11 @@ const checkSubscription = require('../checkSubscription');
 
 router.post('/create', utility.authenticate, async (req, res) => {
     try {
-        const { name, logo, images, description, country, street, city, state, postalCode, phone, email, site, userId, isVisibleToPublic, isSupportingDeliveries } = req.body;
+        const { name, logo, images, description, country, street, city, state, postalCode, phone, email, site, userId, isVisibleToPublic, isSupportingDeliveries, taxId } = req.body;
 
         const createdStore = await Store.create({
             name, logo, images: JSON.stringify(images), active: true, phone, email, site,
-            description, userId, creatorUserId: req.user.id, isVisibleToPublic, isSupportingDeliveries
+            description, userId, creatorUserId: req.user.id, isVisibleToPublic, isSupportingDeliveries, taxId
         });
 
         await Address.create({ storeId: createdStore.id, country, street, city, state, postalCode });
@@ -34,7 +34,7 @@ router.post('/create', utility.authenticate, async (req, res) => {
 })
 
 router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
-    const { name, logo, images, description, country, street, city, state, postalCode, phone, email, site, isVisibleToPublic, isSupportingDeliveries } = req.body
+    const { name, logo, images, description, country, street, city, state, postalCode, phone, email, site, isVisibleToPublic, isSupportingDeliveries, taxId } = req.body
     Store.findOne({
         where: {
             id: req.body.id
@@ -46,6 +46,7 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
         store.phone = phone
         store.email = email
         store.site = site
+        store.taxId = taxId
         store.logo = logo ? logo : store.logo
         store.isVisibleToPublic = isVisibleToPublic
         store.isSupportingDeliveries = isSupportingDeliveries

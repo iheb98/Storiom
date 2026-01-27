@@ -105,7 +105,7 @@
                 <div class="store-card" *ngFor="let store of featuredStores" [routerLink]="['/stores', store.id]">
                     <div class="store-logo">
                         <img [src]="store.logo ? environment.backend + '/' + store.logo : 'assets/default_store.png'"
-                            [alt]="store.name">
+                            [alt]="store.name" [class.default-image]="!store.logo">
                     </div>
                     <div class="store-info">
                         <h3>{{ store.name }}</h3>

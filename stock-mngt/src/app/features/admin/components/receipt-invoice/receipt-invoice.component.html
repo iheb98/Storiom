@@ -45,6 +45,9 @@
                 <div *ngIf="store?.site" class="contact-line">
                     <span class="contact-label">Web :</span> <span class="contact-value">{{store?.site}}</span>
                 </div>
+                <div *ngIf="store?.taxId" class="contact-line">
+                    <span class="contact-label">MF :</span> <span class="contact-value">{{store?.taxId}}</span>
+                </div>
             </div>
         </div>
         <div class="info-block to">

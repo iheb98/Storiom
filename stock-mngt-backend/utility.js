@@ -91,7 +91,7 @@ const fromTo = (from, to) => {
 
 function generateAccessToken(user) {
     delete user.iat
-    let jwttoken = jwt.sign(user, process.env.SECRET, { expiresIn: '10s' })
+    let jwttoken = jwt.sign(user, process.env.SECRET, { expiresIn: '1h' })
     return jwttoken
 }
 

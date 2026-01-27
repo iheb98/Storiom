@@ -123,7 +123,11 @@ export class ProductsMngtComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    window.scrollTo(0, 0);
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }, 0);
     this.route.queryParams.subscribe(params => {
       this.isCriticalFilter = params['filter'] === 'critical';
       this.loadInitialData();
@@ -499,6 +503,60 @@ export class ProductsMngtComponent implements OnInit {
       return;
     }
 
+    // If trying to display products, check for products without images
+    if (toDisplay) {
+      let productsWithoutImages: any[] = [];
+      let validProductIds: number[] = [];
+
+      if (updateAll) {
+        // Check all products on current page (API will handle all products)
+        productsWithoutImages = this.products.filter(p => !p.images || p.images.length === 0);
+        validProductIds = this.products.filter(p => p.images && p.images.length > 0).map(p => p.id);
+      } else {
+        // Check only selected products
+        const selectedProducts = this.products.filter(p => this.selectedIds.includes(p.id));
+        productsWithoutImages = selectedProducts.filter(p => !p.images || p.images.length === 0);
+        validProductIds = selectedProducts.filter(p => p.images && p.images.length > 0).map(p => p.id);
+      }
+
+      if (productsWithoutImages.length > 0) {
+        const productNames = productsWithoutImages.slice(0, 5).map(p => p.name).join(', ');
+        const moreText = productsWithoutImages.length > 5 ? ` et ${productsWithoutImages.length - 5} autre(s)` : '';
+
+        if (validProductIds.length === 0) {
+          // All selected products have no images
+          Swal.fire({
+            icon: 'error',
+            title: 'Aucune image disponible',
+            html: `<p>Les produits suivants n'ont pas d'images et ne peuvent pas être affichés sur le marketplace :</p>
+                   <p><strong>${productNames}${moreText}</strong></p>
+                   <p>Veuillez ajouter au moins une image à chaque produit avant de l'afficher.</p>`,
+            confirmButtonText: 'Compris'
+          });
+          return;
+        }
+
+        // Some products have images, some don't - ask user what to do
+        Swal.fire({
+          icon: 'warning',
+          title: 'Certains produits sans images',
+          html: `<p>${productsWithoutImages.length} produit(s) n'ont pas d'images et seront ignorés :</p>
+                 <p><strong>${productNames}${moreText}</strong></p>
+                 <p>Voulez-vous continuer avec les ${validProductIds.length} produit(s) valide(s) ?</p>`,
+          showCancelButton: true,
+          confirmButtonText: 'Continuer',
+          cancelButtonText: 'Annuler',
+          confirmButtonColor: '#28a745'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Proceed with only valid products
+            this.executeDisplayUpdate(validProductIds, true, false);
+          }
+        });
+        return;
+      }
+    }
+
     const action = toDisplay ? 'afficher' : 'masquer';
     const scope = updateAll ? 'TOUS les produits' : `${this.selectedIds.length} produit(s) sélectionné(s)`;
 
@@ -512,35 +570,39 @@ export class ProductsMngtComponent implements OnInit {
       confirmButtonColor: toDisplay ? '#28a745' : '#dc3545'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.isActionLoading = true;
-        this.productService.bulkUpdateVisibility({
-          ids: this.selectedIds,
-          toDisplay: toDisplay,
-          updateAll: updateAll,
-          storeId: this.authService.getConnectedUser()?.store
-        }).subscribe(
-          response => {
-            this.isActionLoading = false;
-            Swal.fire({
-              icon: 'success',
-              title: response.message || 'Mise à jour réussie!',
-              showConfirmButton: false,
-              timer: 1500
-            });
-            this.selectedIds = [];
-            this.getProducts(this.currentPage, this.currentSize);
-          },
-          error => {
-            this.isActionLoading = false;
-            Swal.fire({
-              icon: 'error',
-              title: 'Erreur',
-              text: error?.error?.message || 'Une erreur est survenue'
-            });
-          }
-        );
+        this.executeDisplayUpdate(this.selectedIds, toDisplay, updateAll);
       }
     });
+  }
+
+  private executeDisplayUpdate(ids: number[], toDisplay: boolean, updateAll: boolean) {
+    this.isActionLoading = true;
+    this.productService.bulkUpdateVisibility({
+      ids: ids,
+      toDisplay: toDisplay,
+      updateAll: updateAll,
+      storeId: this.authService.getConnectedUser()?.store
+    }).subscribe(
+      response => {
+        this.isActionLoading = false;
+        Swal.fire({
+          icon: 'success',
+          title: response.message || 'Mise à jour réussie!',
+          showConfirmButton: false,
+          timer: 1500
+        });
+        this.selectedIds = [];
+        this.getProducts(this.currentPage, this.currentSize);
+      },
+      error => {
+        this.isActionLoading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur',
+          text: error?.error?.message || 'Une erreur est survenue'
+        });
+      }
+    );
   }
 
   // Barcode Scanner Methods

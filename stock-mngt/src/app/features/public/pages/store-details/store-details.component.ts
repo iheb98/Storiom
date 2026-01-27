@@ -79,7 +79,11 @@ export class StoreDetailsComponent implements OnInit, AfterViewChecked {
     ) { }
 
     ngOnInit(): void {
-        window.scrollTo(0, 0);
+        setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'auto' });
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }, 0);
         this.route.paramMap.subscribe(params => {
             this.storeId = params.get('id');
             if (this.storeId) {
@@ -169,7 +173,11 @@ export class StoreDetailsComponent implements OnInit, AfterViewChecked {
 
     applyFilters() {
         this.pageIndex = 0;
-        window.scrollTo(0, 0);
+        setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'auto' });
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }, 0);
         this.loadProducts();
     }
 

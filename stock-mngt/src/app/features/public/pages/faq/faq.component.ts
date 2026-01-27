@@ -120,7 +120,11 @@ export class FaqComponent implements OnInit {
     constructor() { }
 
     ngOnInit(): void {
-        window.scrollTo(0, 0);
+        setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'auto' });
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }, 0);
     }
 
     toggleQuestion(id: number) {

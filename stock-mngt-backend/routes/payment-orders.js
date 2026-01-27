@@ -22,7 +22,7 @@ const STORAGE_PLANS = {
 };
 
 // Admin email for notifications
-const ADMIN_EMAIL = 'ihebferjnai0100@gmail.com';
+const ADMIN_EMAIL = 'ihebferjani0100@gmail.com';
 
 // Bank transfer instructions
 const BANK_INSTRUCTIONS = {

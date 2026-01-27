@@ -22,7 +22,7 @@
         <aside class="filters-sidebar" [class.open]="mobileFiltersOpen">
             <div class="sidebar-header">
                 <h2><i class="fa fa-sliders-h"></i> Filtres</h2>
-                <button class="close-filters" (click)="toggleMobileFilters()">
+                <button class="close-filters" (click)="closeMobileFilters()">
                     <i class="fa fa-times"></i>
                 </button>
             </div>
@@ -176,7 +176,7 @@
 
             <!-- Filter Actions -->
             <div class="filter-actions">
-                <button class="btn-apply" (click)="applyFilters(); mobileFiltersOpen = false">
+                <button class="btn-apply" (click)="applyFilters(); closeMobileFilters()">
                     <i class="fa fa-check"></i> Appliquer
                 </button>
                 <button class="btn-reset" (click)="resetFilters()">
@@ -186,7 +186,7 @@
         </aside>
 
         <!-- Mobile Overlay -->
-        <div class="mobile-overlay" *ngIf="mobileFiltersOpen" (click)="toggleMobileFilters()"></div>
+        <div class="mobile-overlay" *ngIf="mobileFiltersOpen" (click)="closeMobileFilters()"></div>
 
         <!-- Products Area -->
         <div class="products-area">

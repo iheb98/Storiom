@@ -69,7 +69,11 @@ export class OrdersMngtComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        window.scrollTo(0, 0);
+        setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'auto' });
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }, 0);
         this.isLoading = true;
         const user = this.authService.getConnectedUser();
 

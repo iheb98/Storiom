@@ -103,8 +103,8 @@
                 </span>-->
             </div>
 
-            <!-- Quantity & Add to Cart -->
-            <div class="purchase-section">
+            <!-- Quantity & Add to Cart (only show if store supports deliveries) -->
+            <div class="purchase-section" *ngIf="product?.store?.isSupportingDeliveries !== false">
                 <div class="quantity-selector">
                     <button class="qty-btn minus" (click)="decreaseQuantity()" [disabled]="quantity <= 1">
                         <fa-icon [icon]="faMinus"></fa-icon>
@@ -245,8 +245,8 @@
                             number:'1.2-2' }} DT
                         </span>
                     </div>
-                    <button class="rec-add-to-cart" (click)="addRecommendationToCart(rec, $event)"
-                        [disabled]="rec.quantity <= 0">
+                    <button class="rec-add-to-cart" *ngIf="rec.store?.isSupportingDeliveries !== false"
+                        (click)="addRecommendationToCart(rec, $event)" [disabled]="rec.quantity <= 0">
                         <fa-icon [icon]="faShoppingCart"></fa-icon>
                         {{ rec.quantity > 0 ? 'Ajouter' : 'Rupture' }}
                     </button>
@@ -316,8 +316,8 @@
     </div>
 </div>
 
-<!-- Mobile Sticky Bar -->
-<div class="mobile-sticky-bar" *ngIf="product">
+<!-- Mobile Sticky Bar (only show if store supports deliveries) -->
+<div class="mobile-sticky-bar" *ngIf="product && product?.store?.isSupportingDeliveries !== false">
     <div class="sticky-price">{{ product?.sellingPrice | number:'1.2-2' }} TND</div>
     <button class="sticky-cart-btn" (click)="addToCart(product)" [disabled]="product?.quantity <= 0">
         <fa-icon [icon]="faShoppingCart"></fa-icon>

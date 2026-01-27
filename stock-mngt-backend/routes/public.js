@@ -506,7 +506,7 @@ router.get('/products/:id/recommendations', async (req, res) => {
                     {
                         model: Store,
                         as: 'store',
-                        attributes: ['name', 'id'],
+                        attributes: ['name', 'id', 'isSupportingDeliveries'],
                         where: { isVisibleToPublic: true, active: true },
                         required: true
                     },

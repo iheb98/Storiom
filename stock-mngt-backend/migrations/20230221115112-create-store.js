@@ -41,6 +41,11 @@ module.exports = {
       type: {
         type: DataTypes.STRING
       },
+      taxId: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        field: 'tax_id'
+      },
       selectedCategories: {
         type: DataTypes.STRING
       },

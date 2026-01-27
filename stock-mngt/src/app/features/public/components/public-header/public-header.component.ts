@@ -86,10 +86,21 @@ export class PublicHeaderComponent implements OnInit {
 
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
+    // Prevent body scroll when menu is open
+    if (this.isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }
+
+  closeMenu() {
+    this.isMenuOpen = false;
+    document.body.style.overflow = '';
   }
 
   goToSellerSpace() {
-    this.isMenuOpen = false;
+    this.closeMenu();
     if (this.authService.isLoggedIn()) {
       const user = this.authService.getConnectedUser();
       if (user?.store) {

@@ -1,5 +1,7 @@
+<!-- Full-screen overlay for closing menu -->
+<div class="overlay" *ngIf="isMenuOpen" (click)="closeMenu()"></div>
+
 <nav class="navbar">
-    <div class="overlay" *ngIf="isMenuOpen" (click)="isMenuOpen = false"></div>
     <div class="container">
         <div class="navbar-brand">
             <a routerLink="/">Storiom</a>
@@ -20,18 +22,18 @@
         </div>
 
         <div class="navbar-links" [class.open]="isMenuOpen">
-            <a routerLink="/publicProducts" routerLinkActive="active" (click)="isMenuOpen = false">Produits</a>
-            <a routerLink="/services" routerLinkActive="active" (click)="isMenuOpen = false">Services</a>
-            <a routerLink="/stores" routerLinkActive="active" (click)="isMenuOpen = false">Boutiques</a>
+            <a routerLink="/publicProducts" routerLinkActive="active" (click)="closeMenu()">Produits</a>
+            <a routerLink="/services" routerLinkActive="active" (click)="closeMenu()">Services</a>
+            <a routerLink="/stores" routerLinkActive="active" (click)="closeMenu()">Boutiques</a>
             <a (click)="goToSellerSpace()" class="seller-link" [class.active]="isSellerActive()">Espace Vendeur</a>
 
             <div class="icon-links">
-                <a (click)="goToCart(); isMenuOpen = false" class="nav-icon" title="Panier">
+                <a (click)="goToCart(); closeMenu()" class="nav-icon" title="Panier">
                     <fa-icon [icon]="cartIcon"></fa-icon>
                     <span class="link-text">Panier</span>
                     <!-- <span class="badge">2</span> -->
                 </a>
-                <a (click)="goToProfile(); isMenuOpen = false" class="nav-icon" title="Compte">
+                <a (click)="goToProfile(); closeMenu()" class="nav-icon" title="Compte">
                     <fa-icon [icon]="userIcon"></fa-icon>
                     <span class="link-text">Compte</span>
                 </a>

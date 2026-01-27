@@ -77,13 +77,22 @@
                         </div>
                     </div>
 
-                    <!-- Website -->
-                    <div class="form-group">
-                        <label for="site">
-                            <fa-icon [icon]="faGlobe"></fa-icon>
-                            Site web
-                        </label>
-                        <input type="url" id="site" formControlName="site" placeholder="https://www.maboutique.tn">
+                    <!-- Website & Tax ID Row -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="site">
+                                <fa-icon [icon]="faGlobe"></fa-icon>
+                                Site web
+                            </label>
+                            <input type="url" id="site" formControlName="site" placeholder="https://www.maboutique.tn">
+                        </div>
+                        <div class="form-group">
+                            <label for="taxId">
+                                <fa-icon [icon]="faStore"></fa-icon>
+                                Numéro fiscal
+                            </label>
+                            <input type="text" id="taxId" formControlName="taxId" placeholder="1234567A/B/C/000">
+                        </div>
                     </div>
 
                     <!-- Location Row -->

@@ -1,13 +1,12 @@
 import { HTTP_INTERCEPTORS, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { HttpInterceptor, HttpHandler, HttpRequest } from '@angular/common/http';
+import { Router } from '@angular/router';
 
-
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, filter, switchMap, take } from 'rxjs/operators';
+import { BehaviorSubject, Observable, throwError, timer } from 'rxjs';
+import { catchError, filter, switchMap, take, timeout } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 
-// const TOKEN_HEADER_KEY = 'Authorization';  // for Spring Boot back-end
 const TOKEN_HEADER_KEY = 'x-access-token';    // for Node.js Express back-end
 
 @Injectable()
@@ -15,7 +14,13 @@ export class RequestInterceptor implements HttpInterceptor {
   private isRefreshing = false;
   private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-  constructor(private authService: AuthService,) { }
+  // Timeout for refresh token request (15 seconds)
+  private readonly REFRESH_TIMEOUT = 15000;
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<Object>> {
     let authReq = req;
@@ -25,58 +30,89 @@ export class RequestInterceptor implements HttpInterceptor {
     }
 
     return next.handle(authReq).pipe(catchError(error => {
-      console.log("tes")
-      //
-      if (error instanceof HttpErrorResponse && !authReq.url.includes('login') && error.status === 403) {
-        return this.handle401Error(authReq, next);
+      // Only handle 403 errors (token expired) for non-auth endpoints
+      if (error instanceof HttpErrorResponse &&
+        !authReq.url.includes('authenticate') &&
+        !authReq.url.includes('/token') &&
+        error.status === 403) {
+        return this.handle403Error(authReq, next);
       }
 
       return throwError(error);
     }));
   }
 
-  private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
-    console.log("1")
+  private handle403Error(request: HttpRequest<any>, next: HttpHandler) {
     if (!this.isRefreshing) {
-      console.log("2")
-
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
 
-      const token = localStorage.getItem('refreshToken');
+      const refreshToken = localStorage.getItem('refreshToken');
 
-      if (token)
-        return this.authService.refreshToken().pipe(
-          switchMap((token: any) => {
-            this.isRefreshing = false;
-            console.log("3")
+      // If no refresh token exists, logout immediately
+      if (!refreshToken) {
+        this.handleLogout();
+        return throwError(() => new Error('No refresh token available'));
+      }
 
-            localStorage.setItem('accessToken', token.accessToken);
-            this.refreshTokenSubject.next(token.accessToken);
+      return this.authService.refreshToken().pipe(
+        // Add timeout to prevent hanging forever
+        timeout(this.REFRESH_TIMEOUT),
+        switchMap((response: any) => {
+          this.isRefreshing = false;
 
-            return next.handle(this.addTokenHeader(request, token.accessToken));
-          }),
-          catchError((err) => {
-            this.isRefreshing = false;
-            console.log("tee")
-            //this.tokenService.signOut();
-            return throwError(err);
-          })
-        );
+          if (response && response.accessToken) {
+            localStorage.setItem('accessToken', response.accessToken);
+            this.refreshTokenSubject.next(response.accessToken);
+            return next.handle(this.addTokenHeader(request, response.accessToken));
+          } else {
+            // Invalid response from refresh endpoint
+            this.handleLogout();
+            return throwError(() => new Error('Invalid refresh response'));
+          }
+        }),
+        catchError((err) => {
+          this.isRefreshing = false;
+          this.refreshTokenSubject.next(null);
+
+          // If refresh fails, logout the user
+          this.handleLogout();
+          return throwError(() => err);
+        })
+      );
     }
 
+    // If already refreshing, wait for the new token with a timeout
     return this.refreshTokenSubject.pipe(
+      // Filter out null (waiting state) and wait for actual token
       filter(token => token !== null),
       take(1),
-      switchMap((token) => next.handle(this.addTokenHeader(request, token)))
+      // Add timeout to prevent infinite wait
+      timeout(this.REFRESH_TIMEOUT),
+      switchMap((token) => next.handle(this.addTokenHeader(request, token))),
+      catchError((err) => {
+        // If waiting times out, reset state and try to proceed
+        this.isRefreshing = false;
+        this.refreshTokenSubject.next(null);
+        return throwError(() => err);
+      })
     );
   }
 
-  private addTokenHeader(request: HttpRequest<any>, token: string) {
-    /* for Spring Boot back-end */
-    // return request.clone({ headers: request.headers.set(TOKEN_HEADER_KEY, 'Bearer ' + token) });
+  private handleLogout() {
+    // Clear all tokens
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
 
-    /* for Node.js Express back-end */
+    // Reset state
+    this.isRefreshing = false;
+    this.refreshTokenSubject.next(null);
+
+    // Redirect to login
+    this.router.navigate(['/login']);
+  }
+
+  private addTokenHeader(request: HttpRequest<any>, token: string) {
     return request.clone({ headers: request.headers.set('Authorization', 'Bearer ' + token) });
   }
 }

@@ -5,7 +5,7 @@ import {
   faCheckCircle, faTimesCircle, faEye, faEyeSlash, faPhoneAlt, faPhone,
   faEnvelope, faGlobe, faMapMarkerAlt, faRoad, faCity, faMap,
   faBolt, faPlus, faExternalLinkAlt, faStore, faChevronDown, faChevronUp,
-  faDatabase, faCloud
+  faDatabase, faCloud, faCrown
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 
@@ -56,6 +56,7 @@ export class StoreViewComponent implements OnInit, AfterViewChecked {
   chevronUpIcon = faChevronUp;
   databaseIcon = faDatabase;
   cloudIcon = faCloud;
+  crownIcon = faCrown;
 
   selectedImage: string | null = null;
 
@@ -80,6 +81,11 @@ export class StoreViewComponent implements OnInit, AfterViewChecked {
   storagePurchases: any[] = [];
   isStorageDetailsExpanded = false;
 
+  // Subscription Tracking
+  subscription: any = null;
+  subscriptionDaysLeft = 0;
+  isSubscriptionActive = false;
+
   // Loading States
   isLoading = true;
   isDescriptionExpanded = false;
@@ -96,7 +102,11 @@ export class StoreViewComponent implements OnInit, AfterViewChecked {
   ) { }
 
   ngOnInit(): void {
-    window.scrollTo(0, 0);
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }, 0);
     this.loadData();
   }
 
@@ -147,6 +157,9 @@ export class StoreViewComponent implements OnInit, AfterViewChecked {
 
         // Load storage purchases (async, not blocking)
         this.loadStoragePurchases(storeId);
+
+        // Load subscription data
+        this.loadSubscription();
 
         this.isLoading = false;
       },
@@ -214,5 +227,35 @@ export class StoreViewComponent implements OnInit, AfterViewChecked {
     const diffTime = expiry.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays > 0 ? diffDays : 0;
+  }
+
+  // Load subscription details
+  loadSubscription() {
+    const userId = this.authService.getConnectedUser()?.id;
+    if (!userId) return;
+
+    this.authService.getSubscriptionDetails(userId).subscribe(
+      (response: any) => {
+        if (response.success && response.subscription) {
+          const sub = response.subscription;
+          const now = new Date();
+          const expDate = new Date(sub.expirationDate);
+
+          // Calculate days remaining
+          const msPerDay = 24 * 60 * 60 * 1000;
+          this.subscriptionDaysLeft = Math.max(0, Math.ceil((expDate.getTime() - now.getTime()) / msPerDay));
+          this.isSubscriptionActive = this.subscriptionDaysLeft > 0;
+          this.subscription = sub;
+        } else {
+          this.subscriptionDaysLeft = 0;
+          this.isSubscriptionActive = false;
+        }
+      },
+      error => {
+        console.error('Error loading subscription:', error);
+        this.subscriptionDaysLeft = 0;
+        this.isSubscriptionActive = false;
+      }
+    );
   }
 }

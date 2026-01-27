@@ -28,6 +28,11 @@ module.exports = (sequelize, DataTypes) => {
     images: DataTypes.STRING,
     phone: DataTypes.STRING,
     email: DataTypes.STRING,
+    taxId: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      field: 'tax_id'
+    },
 
     site: DataTypes.STRING,
     active: {

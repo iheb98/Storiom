@@ -102,102 +102,28 @@
             </div>
         </div>
 
-        <!-- Storage Usage Card -->
-        <div class="storage-card">
-            <div class="storage-header">
-                <div class="storage-icon">
-                    <fa-icon [icon]="cloudIcon"></fa-icon>
+        <!-- Subscription Card -->
+        <div class="subscription-card">
+            <div class="subscription-header">
+                <div class="subscription-icon" [class.active]="isSubscriptionActive"
+                    [class.expired]="!isSubscriptionActive">
+                    <fa-icon [icon]="crownIcon"></fa-icon>
                 </div>
-                <div class="storage-title">
-                    <h3>Stockage Images</h3>
-                    <span class="storage-subtitle">Espace utilisé pour les images produits</span>
-                </div>
-                <button class="storage-purchase-btn" (click)="purchaseStorage()" [disabled]="isPurchasing">
-                    <fa-icon [icon]="plusIcon"></fa-icon>
-                    <span *ngIf="!isPurchasing">Acheter 50 GB</span>
-                    <span *ngIf="isPurchasing">Achat en cours...</span>
-                </button>
-            </div>
-            <div class="storage-body">
-                <div class="storage-progress-container">
-                    <div class="storage-progress-bar" [style.width.%]="storagePercentage"
-                        [class.warning]="storagePercentage >= 70 && storagePercentage < 90"
-                        [class.danger]="storagePercentage >= 90">
-                    </div>
-                </div>
-                <div class="storage-stats">
-                    <div class="storage-used">
-                        <span class="storage-value">{{ formatStorage(storageUsedMB) }}</span>
-                        <span class="storage-unit">utilisés</span>
-                    </div>
-                    <div class="storage-divider"></div>
-                    <div class="storage-limit">
-                        <span class="storage-value">{{ formatStorage(totalLimitMB) }}</span>
-                        <span class="storage-unit">total</span>
-                    </div>
-                    <div class="storage-divider"></div>
-                    <div class="storage-percentage">
-                        <span class="storage-value"
-                            [class.warning-text]="storagePercentage >= 70 && storagePercentage < 90"
-                            [class.danger-text]="storagePercentage >= 90">
-                            {{ storagePercentage | number:'1.1-1' }}%
+                <div class="subscription-info">
+                    <h3>Abonnement</h3>
+                    <div class="subscription-stats">
+                        <span class="stat-item" *ngIf="isSubscriptionActive">
+                            <strong class="days-count">{{ subscriptionDaysLeft }}</strong> jours restants
                         </span>
-                        <span class="storage-unit">utilisé</span>
+                        <span class="stat-item expired" *ngIf="!isSubscriptionActive">
+                            Abonnement expiré
+                        </span>
                     </div>
                 </div>
-                <div class="storage-purchased" *ngIf="purchasedStorageGB !== '0.00'">
-                    <span class="purchased-label">Stockage acheté:</span>
-                    <span class="purchased-value">{{ purchasedStorageGB }} GB</span>
-                </div>
-                <!--<div class="storage-expiry" *ngIf="purchasedStorageExpiresAt && purchasedStorageGB !== '0.00'">
-                    <span class="expiry-label" [class.expired]="isStorageExpired"
-                        [class.expiring-soon]="!isStorageExpired && getStorageExpiryDays() <= 7">
-                        <ng-container *ngIf="isStorageExpired">
-                            ⚠️ Stockage expiré
-                        </ng-container>
-                        <ng-container *ngIf="!isStorageExpired">
-                            📅 Expire le {{ purchasedStorageExpiresAt | date:'dd/MM/yyyy' }}
-                            <span class="days-remaining">({{ getStorageExpiryDays() }} jours restants)</span>
-                        </ng-container>
-                    </span>
-                </div>-->
-
-                <!-- Collapsible Storage Purchases Details -->
-                <div class="storage-details-toggle" *ngIf="storagePurchases.length > 0"
-                    (click)="isStorageDetailsExpanded = !isStorageDetailsExpanded">
-                    <span>{{ isStorageDetailsExpanded ? 'Masquer' : 'Voir' }} les détails ({{ storagePurchases.length }}
-                        achat{{ storagePurchases.length > 1 ? 's' : '' }})</span>
-                    <fa-icon [icon]="isStorageDetailsExpanded ? chevronUpIcon : chevronDownIcon"></fa-icon>
-                </div>
-
-                <div class="storage-purchases-list" *ngIf="isStorageDetailsExpanded && storagePurchases.length > 0">
-                    <div class="purchase-item" *ngFor="let purchase of storagePurchases"
-                        [class.active]="purchase.isActive" [class.expired]="!purchase.isActive">
-                        <div class="purchase-header">
-                            <span class="purchase-size">{{ purchase.sizeGB }} GB</span>
-                            <span class="purchase-status" [class.active]="purchase.isActive"
-                                [class.expired]="!purchase.isActive">
-                                {{ purchase.isActive ? 'Actif' : 'Expiré' }}
-                            </span>
-                        </div>
-                        <div class="purchase-details">
-                            <div class="purchase-dates">
-                                <span class="date-item">
-                                    📅 Acheté: {{ purchase.purchasedAt | date:'dd/MM/yyyy' }}
-                                </span>
-                                <span class="date-item"
-                                    [class.expiring-soon]="purchase.isActive && purchase.daysRemaining <= 7">
-                                    ⏰ Expire: {{ purchase.expiresAt | date:'dd/MM/yyyy' }}
-                                    <span *ngIf="purchase.isActive" class="days-badge">{{ purchase.daysRemaining
-                                        }}j</span>
-                                </span>
-                            </div>
-                            <div class="purchase-amount">
-                                {{ purchase.amount }} {{ purchase.currency }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <button class="subscription-btn" routerLink="/admin/subscription">
+                    <fa-icon [icon]="plusIcon"></fa-icon>
+                    <span>{{ isSubscriptionActive ? 'Gérer' : 'Renouveler' }}</span>
+                </button>
             </div>
         </div>
 

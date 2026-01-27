@@ -188,6 +188,31 @@ router.put('/bulk-visibility', utility.authenticate, checkSubscription, async (r
             whereClause.id = { [Op.in]: ids };
         }
 
+        // If trying to display products, exclude those without images
+        if (toDisplay) {
+            // First, find products that have no images
+            const productsWithoutImages = await Product.findAll({
+                where: {
+                    ...whereClause,
+                    [Op.or]: [
+                        { images: null },
+                        { images: '[]' },
+                        { images: '' }
+                    ]
+                },
+                attributes: ['id', 'name']
+            });
+
+            if (productsWithoutImages.length > 0) {
+                // Add condition to exclude products without images
+                whereClause[Op.and] = [
+                    { images: { [Op.ne]: null } },
+                    { images: { [Op.ne]: '[]' } },
+                    { images: { [Op.ne]: '' } }
+                ];
+            }
+        }
+
         const [affectedCount] = await Product.update(
             { toDisplay: toDisplay },
             { where: whereClause }

@@ -738,6 +738,23 @@ $radius-lg: 16px;
   }
 }
 
+.no-delivery-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 20px;
+  background: $danger-light;
+  border: 1px solid rgba($danger, 0.2);
+  border-radius: $radius-sm;
+  color: $danger;
+  font-size: 0.95rem;
+  font-weight: 500;
+
+  fa-icon {
+    font-size: 1.1rem;
+  }
+}
+
 // ============================================
 // SELLER CARD
 // ============================================

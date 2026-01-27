@@ -69,7 +69,8 @@
       <button class="action-btn details-btn" (click)="$event.stopPropagation(); viewDetails()">
         Détails
       </button>
-      <button class="action-btn cart-btn" (click)="addToCart($event)" [disabled]="product?.quantity <= 0"
+      <button class="action-btn cart-btn" *ngIf="product?.store?.isSupportingDeliveries !== false" 
+        (click)="addToCart($event)" [disabled]="product?.quantity <= 0"
         [class.disabled]="product?.quantity <= 0">
         <i class="fa fa-shopping-cart"></i> {{ product?.quantity <= 0 ? 'Rupture' : 'Ajouter' }} </button>
     </div>
