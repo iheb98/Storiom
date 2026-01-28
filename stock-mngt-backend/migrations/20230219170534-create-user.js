@@ -106,6 +106,11 @@ module.exports = {
           }
         }
       },
+      referredBy: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        field: 'referred_by'
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

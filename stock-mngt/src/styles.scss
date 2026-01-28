@@ -135,8 +135,6 @@ body {
     height: 100%;
 }
 
-.page-title {}
-
 .page-content {
     position: relative;
     height: 100%;
@@ -288,12 +286,12 @@ table {
     margin: 20px 0;
 }
 
-.product-card {
+/*.product-card {
     border: 1px solid #ddd;
     padding: 15px;
     margin: 10px;
     text-align: center;
-}
+}*/
 
 .product-card img {
     width: 100%;
@@ -315,12 +313,95 @@ table {
 .dark-modal {
     .mat-dialog-container {
         background: transparent;
-        padding: 0;
+        padding: 0 !important;
         border-radius: 16px;
         overflow: hidden;
     }
 
     .modal-container {
         max-width: 100%;
+    }
+}
+
+// ============================================
+// GLOBAL MATERIAL DIALOG STYLES
+// ============================================
+// Remove default padding from Material Dialog (legacy)
+.mat-dialog-container {
+    padding: 0 !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+}
+
+// Remove default padding from Material Dialog (v15+ MDC)
+.mat-mdc-dialog-container {
+    --mdc-dialog-container-shape: 16px;
+
+    .mdc-dialog__surface {
+        padding: 0 !important;
+        border-radius: 16px !important;
+        overflow: hidden !important;
+    }
+
+    .mdc-dialog__content {
+        padding: 0 !important;
+        max-height: none !important;
+    }
+
+    .mat-mdc-dialog-surface {
+        padding: 0 !important;
+    }
+}
+
+// Sell product dialog - specific panel class
+.sell-product-dialog,
+.fullscreen-dialog {
+    // Remove margin from the overlay pane
+    margin: 0 !important;
+
+    .mat-mdc-dialog-container {
+        padding: 0 !important;
+
+        .mdc-dialog__surface,
+        .mat-mdc-dialog-surface {
+            padding: 0 !important;
+            border-radius: 16px !important;
+            overflow: hidden !important;
+        }
+
+        .mdc-dialog__content {
+            padding: 0 !important;
+            max-height: none !important;
+        }
+    }
+}
+
+// Mobile responsive dialogs
+@media (max-width: 600px) {
+
+    .sell-product-dialog,
+    .fullscreen-dialog {
+        max-width: 100vw !important;
+        width: 100vw !important;
+        max-height: 100vh !important;
+        height: 100vh !important;
+        margin: 0 !important;
+
+        .mat-mdc-dialog-container {
+            padding: 0 !important;
+
+            .mdc-dialog__surface,
+            .mat-mdc-dialog-surface {
+                border-radius: 0 !important;
+                max-height: 100vh !important;
+                height: 100vh !important;
+                padding: 0 !important;
+            }
+
+            .mdc-dialog__content {
+                padding: 0 !important;
+                max-height: 100vh !important;
+            }
+        }
     }
 }

@@ -42,7 +42,7 @@ function emailWrapper(content) {
                       <span style="font-size: 28px; font-weight: 700; color: #ffffff; letter-spacing: -1px;">S</span>
                     </div>-->
                     <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">Storiom</h1>
-                    <p style="margin: 8px 0 0; font-size: 14px; color: rgba(255, 255, 255, 0.8);">Gestion de Stock Intelligente</p>
+                    <p style="margin: 8px 0 0; font-size: 14px; color: rgba(255, 255, 255, 0.8);">Marketplace et Gestion de Stock Intelligente</p>
                   </td>
                 </tr>
               </table>

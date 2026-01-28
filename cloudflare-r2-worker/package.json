@@ -1,0 +1,22 @@
+{
+    "name": "storiom-r2-worker",
+    "version": "1.0.0",
+    "description": "Cloudflare Worker to serve Storiom R2 bucket content",
+    "main": "src/index.js",
+    "scripts": {
+        "dev": "wrangler dev",
+        "deploy": "wrangler deploy",
+        "tail": "wrangler tail"
+    },
+    "keywords": [
+        "cloudflare",
+        "worker",
+        "r2",
+        "cdn"
+    ],
+    "author": "Storiom",
+    "license": "MIT",
+    "devDependencies": {
+        "wrangler": "^3.0.0"
+    }
+}

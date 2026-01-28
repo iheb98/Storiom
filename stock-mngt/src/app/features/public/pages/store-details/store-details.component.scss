@@ -611,6 +611,121 @@ ng-select {
         }
     }
 
+    // Category Tree Styles
+    .category-tree {
+        max-height: 350px;
+        overflow-y: auto;
+
+        &::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: $border-color;
+            border-radius: 4px;
+        }
+    }
+
+    .category-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        border-radius: $radius-sm;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-bottom: 2px;
+
+        &:hover {
+            background: rgba($primary, 0.1);
+        }
+
+        &.active {
+            background: $primary;
+            color: $white;
+
+            .category-name {
+                font-weight: 600;
+            }
+
+            .expand-icon i {
+                color: $white;
+            }
+        }
+
+        &.root-category {
+            font-weight: 500;
+            border-bottom: 1px solid $border-color;
+            margin-bottom: 8px;
+            padding-bottom: 12px;
+            border-radius: 0;
+        }
+
+        .expand-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 6px;
+            flex-shrink: 0;
+
+            i {
+                font-size: 0.7rem;
+                color: $text-secondary;
+                transition: transform 0.2s, color 0.2s;
+            }
+
+            &:hover i {
+                color: $primary;
+            }
+        }
+
+        .category-name {
+            flex: 1;
+            font-size: 0.9rem;
+            color: inherit;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        // Indentation levels
+        &.level-0 {
+            padding-left: 8px;
+        }
+
+        &.level-1 {
+            padding-left: 28px;
+            font-size: 0.88rem;
+        }
+
+        &.level-2 {
+            padding-left: 48px;
+            font-size: 0.85rem;
+        }
+
+        &.level-3 {
+            padding-left: 68px;
+            font-size: 0.82rem;
+        }
+    }
+
+    .subcategory-container {
+        animation: slideDown 0.2s ease;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .price-inputs {
         display: flex;
         align-items: flex-end;

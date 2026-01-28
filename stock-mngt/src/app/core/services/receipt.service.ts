@@ -42,6 +42,10 @@ export class ReceiptService {
     return this.http.get<any>(this.baseUrl + id);
   }
 
+  getNextReceiptCode(storeId): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'next-code/' + storeId);
+  }
+
 
 
 

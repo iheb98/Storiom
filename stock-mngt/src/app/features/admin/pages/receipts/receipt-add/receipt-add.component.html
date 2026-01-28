@@ -49,8 +49,12 @@
                             </span>
                         </div>
 
-                        <!-- Date & TVA -->
-                        <div class="form-row">
+                        <!-- Date, Code & TVA -->
+                        <div class="form-row three-cols">
+                            <div class="form-group">
+                                <label for="code"><i class="fa fa-hashtag"></i> Code facture</label>
+                                <input type="text" id="code" formControlName="code" placeholder="F0000001">
+                            </div>
                             <div class="form-group">
                                 <label for="date"><i class="fa fa-calendar"></i> Date</label>
                                 <input type="datetime-local" id="date" formControlName="date">

@@ -599,11 +599,13 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 max-width: 70%;
                 max-height: 70%;
                 object-fit: contain;
-            }
 
-            .logo-placeholder {
-                font-size: 2rem;
-                color: $accent-purple;
+                // Default logo with lower opacity
+                &.default-logo {
+                    opacity: 0.4;
+                    max-width: 80%;
+                    max-height: 80%;
+                }
             }
         }
     }

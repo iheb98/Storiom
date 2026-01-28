@@ -90,6 +90,16 @@
                         </div>
                     </div>
 
+                    <!-- Referred By Input -->
+                    <div class="form-group">
+                        <label for="referredBy">Référé par (optionnel)</label>
+                        <div class="input-wrapper" [class.readonly]="referralFromUrl">
+                            <fa-icon [icon]="faUser" class="input-icon"></fa-icon>
+                            <input type="text" id="referredBy" formControlName="referredBy"
+                                placeholder="Nom ou téléphone de la personne" [readonly]="referralFromUrl">
+                        </div>
+                    </div>
+
                     <!-- Address Section (Collapsible) -->
                     <div class="address-toggle" (click)="showAddressSection = !showAddressSection">
                         <span class="toggle-label">

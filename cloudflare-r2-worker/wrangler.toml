@@ -1,0 +1,13 @@
+name = "storiom-r2-worker"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+# R2 bucket binding
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "storiom-images"
+
+# Custom domain route
+routes = [
+  { pattern = "cdn.storiom.com/*", zone_name = "storiom.com" }
+]

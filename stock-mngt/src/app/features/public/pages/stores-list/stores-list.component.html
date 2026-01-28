@@ -135,9 +135,8 @@
                     <div class="logo-container">
                         <img *ngIf="store.logo" [src]="environment.backend + '/' + store.logo"
                             [alt]="store.name + ' logo'" class="store-logo">
-                        <div *ngIf="!store.logo" class="logo-placeholder">
-                            <i class="fa fa-store"></i>
-                        </div>
+                        <img *ngIf="!store.logo" src="assets/default_store.png" [alt]="store.name + ' logo'"
+                            class="store-logo default-logo">
                     </div>
                 </div>
 

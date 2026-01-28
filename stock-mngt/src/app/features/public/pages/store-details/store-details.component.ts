@@ -30,12 +30,16 @@ export class StoreDetailsComponent implements OnInit, AfterViewChecked {
 
     // Filters
     categories: any[] = [];
+    flatCategories: any[] = [];
     selectedCategory: number = null;
     minPrice: number = null;
     maxPrice: number = null;
     searchText: string = '';
-    sortBy: string = 'createdAtDesc';
+    sortBy: string = null;
     minRating: number = null;
+
+    // Category tree expansion
+    expandedCategories: Set<number> = new Set();
 
     // Pagination
     totalProducts = 0;
@@ -118,7 +122,8 @@ export class StoreDetailsComponent implements OnInit, AfterViewChecked {
 
     loadCategories() {
         this.publicService.getCategoryTree().subscribe(res => {
-            this.categories = this.flattenCategories(res);
+            this.categories = res;
+            this.flatCategories = this.flattenCategories(res);
         });
     }
 
@@ -131,6 +136,35 @@ export class StoreDetailsComponent implements OnInit, AfterViewChecked {
             }
         }
         return result;
+    }
+
+    // Category Tree Methods
+    toggleCategoryExpand(categoryId: number, event: Event) {
+        event.stopPropagation();
+        if (this.expandedCategories.has(categoryId)) {
+            this.expandedCategories.delete(categoryId);
+        } else {
+            this.expandedCategories.add(categoryId);
+        }
+    }
+
+    isCategoryExpanded(categoryId: number): boolean {
+        return this.expandedCategories.has(categoryId);
+    }
+
+    selectCategory(categoryId: number) {
+        this.selectedCategory = categoryId;
+        this.applyFilters();
+        this.closeMobileFilters();
+    }
+
+    hasSubCategories(category: any): boolean {
+        return category.subCategories && category.subCategories.length > 0;
+    }
+
+    closeMobileFilters() {
+        this.mobileFiltersOpen = false;
+        document.body.style.overflow = '';
     }
 
     loadProducts() {
@@ -216,7 +250,7 @@ export class StoreDetailsComponent implements OnInit, AfterViewChecked {
     }
 
     getCategoryName(categoryId: number): string {
-        const cat = this.categories.find(c => c.id === categoryId);
+        const cat = this.flatCategories.find(c => c.id === categoryId);
         return cat ? cat.name.trim() : '';
     }
 

@@ -37,7 +37,7 @@
 </div>
 
 <!-- Account Content -->
-<div class="account-container" *ngIf="!isLoading && user">
+<div class="account-container" *ngIf="!isLoading">
     <!-- Page Header -->
     <div class="account-header">
         <div class="header-content">
@@ -344,7 +344,7 @@
 </div>
 
 <!-- Mobile Bottom Navigation -->
-<div class="mobile-tabs" *ngIf="!isLoading && user">
+<div class="mobile-tabs">
     <button [class.active]="activeTab === 'profile'" (click)="switchTab('profile')">
         <fa-icon [icon]="faUser"></fa-icon>
         <span>Profil</span>

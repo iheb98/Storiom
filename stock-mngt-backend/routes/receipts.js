@@ -5,6 +5,26 @@ const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 const { Op } = require('sequelize');
 
+// Get next receipt code for a store
+router.get('/next-code/:storeId', utility.authenticate, checkSubscription, async (req, res) => {
+    const storeId = req.params.storeId;
+    try {
+        const countReceipts = await Receipt.count({
+            where: {
+                store_id: storeId,
+                creatorUserId: req.user.id
+            }
+        });
+        const nextCode = codeFormater(countReceipts + 1);
+        res.json({ code: nextCode, count: countReceipts + 1 });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.toString()
+        });
+    }
+});
+
 router.post('/create', utility.authenticate, checkSubscription, async (req, res) => {
     const { code, tva, type, name, date, userId, storeId, supplierId, operations, impactStock } = req.body
     let total = 0;
@@ -18,7 +38,7 @@ router.post('/create', utility.authenticate, checkSubscription, async (req, res)
         }
     }).then(countReceipts => {
         Receipt.create({
-            code: codeFormater(countReceipts + 1),
+            code: code || codeFormater(countReceipts + 1),
             total,
             tva,
             type,

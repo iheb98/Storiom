@@ -77,6 +77,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     creatorUserId: {
       type: DataTypes.INTEGER
+    },
+    verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      field: 'verified'
     }
   }, {
     sequelize,

@@ -57,6 +57,21 @@ export class ReceiptAddComponent implements OnInit {
     }, 0);
     this.getSuppliers();
     this.initForm();
+    this.loadNextReceiptCode();
+  }
+
+  loadNextReceiptCode() {
+    const storeId = this.authService.getConnectedUser()?.store;
+    if (storeId) {
+      this.receiptService.getNextReceiptCode(storeId).subscribe(
+        response => {
+          this.form.patchValue({ code: response.code });
+        },
+        error => {
+          console.error('Error loading next receipt code:', error);
+        }
+      );
+    }
   }
 
 
@@ -97,6 +112,7 @@ export class ReceiptAddComponent implements OnInit {
   initForm() {
     let currentDate = new Date();
     this.form = this.formBuilder.group({
+      code: [''],
       type: [null, Validators.required],
       supplierId: [null],
       name: [null],
@@ -131,6 +147,7 @@ export class ReceiptAddComponent implements OnInit {
 
             let form = this.form.getRawValue();
             let newReceipt = {
+              code: form.code,
               type: form.type,
               name: form.name,
               supplierId: form.supplierId,
@@ -156,6 +173,7 @@ export class ReceiptAddComponent implements OnInit {
 
         let form = this.form.getRawValue();
         let newReceipt = {
+          code: form.code,
           type: form.type,
           name: form.name,
           supplierId: form.supplierId,
@@ -180,6 +198,7 @@ export class ReceiptAddComponent implements OnInit {
 
         let form = this.form.getRawValue();
         let newReceipt = {
+          code: form.code,
           type: form.type,
           name: form.name,
           supplierId: form.supplierId,

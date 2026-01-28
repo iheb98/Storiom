@@ -262,6 +262,21 @@
         &:focus-within .input-icon {
             color: #667eea;
         }
+
+        // Readonly state (e.g., when referral comes from URL)
+        &.readonly {
+            background: #f5f5f5;
+            border-color: #ddd;
+
+            input {
+                cursor: not-allowed;
+                color: #666;
+            }
+
+            .input-icon {
+                color: #999;
+            }
+        }
     }
 
     .simple-input {

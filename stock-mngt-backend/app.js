@@ -69,6 +69,17 @@ app.use(cors({
 app.use(express.static('.'));
 app.use(bodyparser.json({ limit: '50mb' }));
 
+// Set UTF-8 charset for all JSON responses (fixes French character encoding on VPS/Nginx)
+app.use((req, res, next) => {
+  res.charset = 'utf-8';
+  const originalJson = res.json.bind(res);
+  res.json = function (data) {
+    res.set('Content-Type', 'application/json; charset=utf-8');
+    return originalJson(data);
+  };
+  next();
+});
+
 
 app.post('/api/uploadFile', upload.single('file'), (req, res) => {
   res.json({
@@ -159,11 +170,13 @@ app.post('/api/sendMail', async (req, res) => {
 
 app.get('/api/confirm', async (req, res) => {
   const { token } = req.query;
+  const utility = require('./utility');
 
   const user = await User.findOne({
     where: {
       confirmationToken: token
-    }
+    },
+    include: ['store', 'subscription']
   });
 
   if (!user) {
@@ -179,7 +192,30 @@ app.get('/api/confirm', async (req, res) => {
     user.confirmationToken = null;
     user.tokenExpiresAt = null;
     await user.save();
-    return res.send({ message: "Votre compte a été confirmé avec succès. Vous pouvez maintenant vous connecter." });
+
+    // Generate tokens for auto-login
+    const accessToken = utility.generateAccessToken({
+      id: user.id,
+      role: user.role,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      store: user.store ? user.store.id : null,
+      subscription: user.subscription
+    });
+    const refreshToken = await utility.generateRefreshToken({
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      store: user.store ? user.store.id : null,
+      subscription: user.subscription
+    });
+
+    return res.send({
+      message: "Votre compte a été confirmé avec succès !",
+      success: true,
+      accessToken,
+      refreshToken
+    });
   }
 
   const newToken = crypto.randomBytes(32).toString('hex');

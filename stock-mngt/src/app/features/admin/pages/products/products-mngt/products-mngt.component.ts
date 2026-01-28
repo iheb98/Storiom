@@ -261,6 +261,7 @@ export class ProductsMngtComponent implements OnInit {
 
   sell(product: any) {
     const dialogRef = this.dialog.open(SellProductComponent, {
+      panelClass: 'sell-product-dialog',
       data: {
         product,
         operationType: "SOLD"
@@ -276,6 +277,7 @@ export class ProductsMngtComponent implements OnInit {
 
   load(product: any) {
     const dialogRef = this.dialog.open(SellProductComponent, {
+      panelClass: 'sell-product-dialog',
       data: {
         product,
         operationType: "LOADED"

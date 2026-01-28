@@ -17,7 +17,8 @@ router.post('/register', async (req, res) => {
     const {
         firstName, lastName, email, password, phone, country,
         street, city, state, postalCode, language, entryDate,
-        salary, functionInStore, worksInStore, superiorId, role
+        salary, functionInStore, worksInStore, superiorId, role,
+        referredBy
     } = req.body;
 
     try {
@@ -37,6 +38,7 @@ router.post('/register', async (req, res) => {
             password: hashedPassword,
             entryDate, salary, functionInStore, worksInStore,
             superiorId, role: "Owner",
+            referredBy,
             confirmationToken,
             tokenExpiresAt,
             isConfirmed: false,
@@ -62,6 +64,7 @@ router.post('/register', async (req, res) => {
         });
 
     } catch (err) {
+        console.log(err);
         res.status(500).json({
             success: false,
             message: err.toString()
@@ -83,7 +86,7 @@ router.post('/authenticate', async (req, res, next) => {
         }
 
         if (!user || !user.isConfirmed) {
-            return res.status(500).json({ message: 'Merci de confirmer votre compte. Un mail contenant le lien de vérification a été envoyé' });
+            return res.status(500).json({ message: 'Merci de confirmer votre compte. Un mail contenant le lien de vérification a été envoyé', isConfirmed: false });
         }
 
         comparePassword(password, user.password, async (err, isMatch) => {
@@ -103,6 +106,7 @@ router.post('/authenticate', async (req, res, next) => {
             }
         })
     } catch (err) {
+        console.log(err);
         res.json({ error: err })
     }
 });

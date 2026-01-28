@@ -33,7 +33,7 @@ export class ContactComponent implements OnInit {
 
     contactInfo = [
         { icon: this.faEnvelope, label: 'Email', value: 'contact@storiom.com' },
-        { icon: this.faPhone, label: 'Téléphone', value: '+216 XX XXX XXX' },
+        { icon: this.faPhone, label: 'Téléphone', value: '+216 93 432 553' },
     ];
 
     constructor(

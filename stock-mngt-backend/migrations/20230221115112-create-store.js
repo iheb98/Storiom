@@ -72,6 +72,11 @@ module.exports = {
         defaultValue: 53687091200, // 50 GB default (50 * 1024 * 1024 * 1024)
         field: 'storage_limit_bytes'
       },
+      verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        field: 'verified'
+      },
       createdAt: {
         allowNull: false,
         type: DataTypes.DATE

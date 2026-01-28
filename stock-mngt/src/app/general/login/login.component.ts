@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { UserSettingsService } from 'src/app/core/services/user-settings.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 import Swal from 'sweetalert2';
 
@@ -21,7 +23,8 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private formBuilder: FormBuilder,
     private authService: AuthService,
-    private userSettingsService: UserSettingsService
+    private userSettingsService: UserSettingsService,
+    private http: HttpClient
   ) { }
 
   ngOnInit(): void {
@@ -94,13 +97,67 @@ export class LoginComponent implements OnInit {
         },
           error => {
             this.isLoading = false;
-            Swal.fire({
-              icon: 'error',
-              title: error.error.message || 'Une erreur est survenue ! Merci de réessayer plus tard',
-              showConfirmButton: false,
-              timer: 3000
-            })
+
+            // Check if account is not confirmed
+            if (error.error?.isConfirmed === false) {
+              Swal.fire({
+                icon: 'warning',
+                title: 'Compte non confirmé',
+                text: error.error.message || 'Merci de confirmer votre compte.',
+                showCancelButton: true,
+                confirmButtonText: 'Renvoyer l\'email',
+                cancelButtonText: 'Fermer',
+                confirmButtonColor: '#3f51b5',
+                cancelButtonColor: '#6c757d'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  this.resendConfirmationEmail();
+                }
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: error.error.message || 'Une erreur est survenue ! Merci de réessayer plus tard',
+                showConfirmButton: false,
+                timer: 3000
+              });
+            }
           })
     }
   }
+
+  resendConfirmationEmail() {
+    const email = this.form.get('email').value;
+
+    Swal.fire({
+      title: 'Envoi en cours...',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    this.http.get(`${environment.apiUrl}/resendConfirmationMail`, {
+      params: { email },
+      responseType: 'text'
+    }).subscribe({
+      next: (response) => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Email envoyé !',
+          text: 'Un nouveau lien de confirmation vous a été envoyé par e-mail.',
+          confirmButtonColor: '#3f51b5'
+        });
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur',
+          text: err.error || 'Impossible d\'envoyer l\'email. Veuillez réessayer.',
+          confirmButtonColor: '#3f51b5'
+        });
+      }
+    });
+  }
 }
+

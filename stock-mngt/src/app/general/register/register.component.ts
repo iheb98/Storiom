@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TermsComponent } from 'src/app/pages/terms/terms.component';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { getAllGovernorates, getCitiesForGovernorate, getAllCities } from 'src/app/shared/data/tunisia-locations';
@@ -55,6 +55,7 @@ export class RegisterComponent implements OnInit {
   confirmPasswordError: boolean;
   showAddressSection = false;
   isLoading = false;
+  referralFromUrl = false;
 
   // Autocomplete for address
   governorateSearchText = '';
@@ -68,6 +69,7 @@ export class RegisterComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private dialog: MatDialog
@@ -81,6 +83,13 @@ export class RegisterComponent implements OnInit {
     }, 0);
     this.initForm();
     this.initLocationData();
+
+    // Pre-fill referredBy from query param
+    const refParam = this.route.snapshot.queryParamMap.get('ref');
+    if (refParam) {
+      this.form.patchValue({ referredBy: refParam });
+      this.referralFromUrl = true;
+    }
   }
 
   initForm() {
@@ -96,7 +105,8 @@ export class RegisterComponent implements OnInit {
       state: [''],
       city: [''],
       street: [''],
-      postalCode: ['']
+      postalCode: [''],
+      referredBy: ['']
     })
   }
 

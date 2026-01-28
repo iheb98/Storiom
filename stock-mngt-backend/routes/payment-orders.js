@@ -333,15 +333,15 @@ router.post('/admin/:id/validate', utility.authenticate, async (req, res) => {
                 });
             }
 
-            // Send confirmation email to user
+            // Send confirmation email to user with the final combined expiration date
             const userEmailHtml = `
         <h2>Votre abonnement a été activé !</h2>
         <p>Bonjour ${order.user.firstName},</p>
         <p>Votre paiement pour la commande <strong>#${order.orderNumber}</strong> a été reçu et validé.</p>
         <p><strong>Détails de l'abonnement:</strong></p>
         <ul>
-          <li>Plan: ${order.subscriptionPlan}</li>
-          <li>Valide jusqu'au: ${expirationDate.toLocaleDateString('fr-FR')}</li>
+          <li>Plan ajouté: ${order.subscriptionPlan}</li>
+          <li>Durée totale valide jusqu'au: ${new Date(subscription.expirationDate).toLocaleDateString('fr-FR')}</li>
         </ul>
         <p>Merci pour votre confiance !</p>
         <p>L'équipe Storiom</p>

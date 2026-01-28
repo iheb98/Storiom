@@ -114,6 +114,11 @@ module.exports = (sequelize, DataTypes) => {
           defaultScreen: 'none'
         }
       }
+    },
+    referredBy: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      field: 'referred_by'
     }
 
   }, {
