@@ -286,49 +286,79 @@ export class ProductAddComponent implements OnInit {
       return;
     }
 
+    // Check if toDisplay is true but no images are provided
+    const toDisplay = this.form.get('toDisplay')?.value;
+    const hasImages = originalFiles.length > 0 || (this.images?.length || 0) > 0;
+
+    if (toDisplay && !hasImages) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Image requise',
+        html: 'Pour qu\'un produit soit visible au public, il doit avoir au moins une image.<br><br>Que souhaitez-vous faire ?',
+        showCancelButton: true,
+        confirmButtonText: 'Créer sans afficher',
+        cancelButtonText: 'Annuler et ajouter une image',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#6c757d',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Set toDisplay to false and proceed
+          this.form.patchValue({ toDisplay: false });
+          this.proceedWithCreate(originalFiles);
+        }
+        // If cancelled, user will add an image
+      });
+      return;
+    }
+
     if (this.form.valid) {
-      this.isSubmitting = true;
+      this.proceedWithCreate(originalFiles);
+    }
+  }
 
-      if (originalFiles.length > 0) {
-        const timestamp = new Date().getTime();
-        const userId = this.authService.getConnectedUser().id;
+  private proceedWithCreate(originalFiles: File[]) {
+    this.isSubmitting = true;
 
-        // Generate filenames for originals (keep extension)
-        const originalNames = originalFiles.map((file, index) => {
-          const ext = file.name.substring(file.name.lastIndexOf('.'));
-          return `${userId}-${timestamp}${index + 1}${ext}`;
-        });
+    if (originalFiles.length > 0) {
+      const timestamp = new Date().getTime();
+      const userId = this.authService.getConnectedUser().id;
 
-        // Generate filenames for WebP thumbnails
-        const thumbnailNames = originalFiles.map((file, index) =>
-          `${userId}-${timestamp}${index + 1}-thumb.webp`
-        );
+      // Generate filenames for originals (keep extension)
+      const originalNames = originalFiles.map((file, index) => {
+        const ext = file.name.substring(file.name.lastIndexOf('.'));
+        return `${userId}-${timestamp}${index + 1}${ext}`;
+      });
 
-        // Create WebP thumbnails
-        const compressionObservables = originalFiles.map(file =>
-          this.compressor.compress(file, 800, 0.8)
-        );
+      // Generate filenames for WebP thumbnails
+      const thumbnailNames = originalFiles.map((file, index) =>
+        `${userId}-${timestamp}${index + 1}-thumb.webp`
+      );
 
-        forkJoin(compressionObservables).subscribe({
-          next: (thumbnailFiles: File[]) => {
-            // Upload both originals and thumbnails
-            this.uploadDualImages(originalFiles, originalNames, thumbnailFiles, thumbnailNames);
-          },
-          error: (err) => {
-            this.isSubmitting = false;
-            console.error('Compression error:', err);
-            Swal.fire({
-              icon: 'error',
-              title: 'Erreur lors de la création des miniatures',
-              showConfirmButton: false,
-              timer: 1500
-            });
-          }
-        });
-      } else {
-        // No images to upload
-        this.uploadAndSaveProduct([], [], [], []);
-      }
+      // Create WebP thumbnails
+      const compressionObservables = originalFiles.map(file =>
+        this.compressor.compress(file, 800, 0.8)
+      );
+
+      forkJoin(compressionObservables).subscribe({
+        next: (thumbnailFiles: File[]) => {
+          // Upload both originals and thumbnails
+          this.uploadDualImages(originalFiles, originalNames, thumbnailFiles, thumbnailNames);
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          console.error('Compression error:', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur lors de la création des miniatures',
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }
+      });
+    } else {
+      // No images to upload
+      this.uploadAndSaveProduct([], [], [], []);
     }
   }
 
@@ -459,76 +489,106 @@ export class ProductAddComponent implements OnInit {
       return;
     }
 
+    // Check if toDisplay is true but no images are provided
+    const toDisplay = this.form.get('toDisplay')?.value;
+    const hasImages = originalFiles.length > 0 || (this.images?.length || 0) > 0;
+
+    if (toDisplay && !hasImages) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Image requise',
+        html: 'Pour qu\'un produit soit visible au public, il doit avoir au moins une image.<br><br>Que souhaitez-vous faire ?',
+        showCancelButton: true,
+        confirmButtonText: 'Modifier sans afficher',
+        cancelButtonText: 'Annuler et ajouter une image',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#6c757d',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Set toDisplay to false and proceed
+          this.form.patchValue({ toDisplay: false });
+          this.proceedWithUpdate(originalFiles);
+        }
+        // If cancelled, user will add an image
+      });
+      return;
+    }
+
     if (this.form.valid) {
-      this.isSubmitting = true;
+      this.proceedWithUpdate(originalFiles);
+    }
+  }
 
-      if (originalFiles.length > 0) {
-        const timestamp = new Date().getTime();
-        const userId = this.authService.getConnectedUser().id;
+  private proceedWithUpdate(originalFiles: File[]) {
+    this.isSubmitting = true;
 
-        // Generate filenames for originals (keep extension)
-        const originalNames = originalFiles.map((file, index) => {
-          const ext = file.name.substring(file.name.lastIndexOf('.'));
-          return `${userId}-${timestamp}${index + 1}${ext}`;
-        });
+    if (originalFiles.length > 0) {
+      const timestamp = new Date().getTime();
+      const userId = this.authService.getConnectedUser().id;
 
-        // Generate filenames for WebP thumbnails
-        const thumbnailNames = originalFiles.map((file, index) =>
-          `${userId}-${timestamp}${index + 1}-thumb.webp`
-        );
+      // Generate filenames for originals (keep extension)
+      const originalNames = originalFiles.map((file, index) => {
+        const ext = file.name.substring(file.name.lastIndexOf('.'));
+        return `${userId}-${timestamp}${index + 1}${ext}`;
+      });
 
-        // Create WebP thumbnails
-        const compressionObservables = originalFiles.map(file =>
-          this.compressor.compress(file, 800, 0.8)
-        );
+      // Generate filenames for WebP thumbnails
+      const thumbnailNames = originalFiles.map((file, index) =>
+        `${userId}-${timestamp}${index + 1}-thumb.webp`
+      );
 
-        forkJoin(compressionObservables).subscribe({
-          next: (thumbnailFiles: File[]) => {
-            this.uploadDualImagesForUpdate(originalFiles, originalNames, thumbnailFiles, thumbnailNames);
-          },
-          error: (err) => {
+      // Create WebP thumbnails
+      const compressionObservables = originalFiles.map(file =>
+        this.compressor.compress(file, 800, 0.8)
+      );
+
+      forkJoin(compressionObservables).subscribe({
+        next: (thumbnailFiles: File[]) => {
+          this.uploadDualImagesForUpdate(originalFiles, originalNames, thumbnailFiles, thumbnailNames);
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          console.error('Compression error:', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur lors de la création des miniatures',
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }
+      });
+    } else {
+      // No new images, just update the product
+      this.form.get('images').setValue(this.images);
+      this.form.addControl('thumbnails', this.formBuilder.control(this.thumbnails));
+      this.productService.updateProduct({ ...this.form.getRawValue(), storeId: this.user?.store, id: this.product?.id })
+        .subscribe(
+          response => {
+            // Process queued image deletions
+            this.processPendingDeletions();
+
             this.isSubmitting = false;
-            console.error('Compression error:', err);
+            Swal.fire({
+              icon: 'success',
+              title: 'Produit modifié !',
+              showConfirmButton: false,
+              timer: 1500
+            });
+            this.ngZone.run(() => {
+              this.router.navigateByUrl('/admin/products', { replaceUrl: true });
+            });
+          },
+          error => {
+            this.isSubmitting = false;
             Swal.fire({
               icon: 'error',
-              title: 'Erreur lors de la création des miniatures',
+              title: 'Une erreur est survenue ! Merci de réessayer plus tard',
               showConfirmButton: false,
               timer: 1500
             });
           }
-        });
-      } else {
-        // No new images, just update the product
-        this.form.get('images').setValue(this.images);
-        this.form.addControl('thumbnails', this.formBuilder.control(this.thumbnails));
-        this.productService.updateProduct({ ...this.form.getRawValue(), storeId: this.user?.store, id: this.product?.id })
-          .subscribe(
-            response => {
-              // Process queued image deletions
-              this.processPendingDeletions();
-
-              this.isSubmitting = false;
-              Swal.fire({
-                icon: 'success',
-                title: 'Produit modifié !',
-                showConfirmButton: false,
-                timer: 1500
-              });
-              this.ngZone.run(() => {
-                this.router.navigateByUrl('/admin/products', { replaceUrl: true });
-              });
-            },
-            error => {
-              this.isSubmitting = false;
-              Swal.fire({
-                icon: 'error',
-                title: 'Une erreur est survenue ! Merci de réessayer plus tard',
-                showConfirmButton: false,
-                timer: 1500
-              });
-            }
-          );
-      }
+        );
     }
   }
 

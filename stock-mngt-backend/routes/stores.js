@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Store, Brand, Expense, Address, Subscription, StoragePurchase } = require('../models');
+const { Store, Brand, Expense, Address, Subscription, StoragePurchase, User } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 
@@ -24,7 +24,12 @@ router.post('/create', utility.authenticate, async (req, res) => {
             });
         }
 
-        res.json({ store: createdStore });
+        User.findOne({ where: { id: req.user.id } }).then(user => {
+            user.role = 'Owner'
+            user.save().then(savedUser => {
+                res.json({ store: createdStore });
+            })
+        })
     } catch (err) {
         res.status(500).json({
             success: false,

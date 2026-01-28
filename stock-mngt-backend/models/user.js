@@ -43,8 +43,8 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 'FR'
     },
     role: {
-      type: DataTypes.ENUM('Owner', 'Admin', 'Worker'),
-      defaultValue: 'Owner'
+      type: DataTypes.ENUM('SuperAdmin', 'Owner', 'Admin', 'Worker', 'Customer'),
+      defaultValue: 'Customer'
     },
     functionInStore: {
       type: DataTypes.STRING,
