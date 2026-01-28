@@ -4,7 +4,12 @@ import { filter } from 'rxjs/operators';
 import { faChartBar } from '@fortawesome/free-regular-svg-icons';
 import {
   faPowerOff, faHome, faStore, faUser, faCodeBranch, faHandHoldingUsd,
-  faCoins, faShuttleVan, faBox, faReceipt, faImage, faFile, faWindowRestore, faInfoCircle, faShoppingCart, faCog, faTruck, faWrench, faClipboardList
+  faCoins, faShuttleVan, faBox, faReceipt, faImage, faFile, faWindowRestore, faInfoCircle, faShoppingCart, faCog, faTruck, faWrench, faClipboardList,
+  faTruckLoading,
+  faBookmark,
+  faTags,
+  faLayerGroup,
+  faChartLine
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../../../../core/services/auth.service';
 import { StoreService } from '../../../../core/services/store.service';
@@ -260,10 +265,10 @@ export class AdminLayoutComponent implements OnInit {
       { label: 'Statistiques', icon: this.statsIcon, link: 'admin/dashboard' },
       { label: 'Commandes', icon: faShoppingCart, link: 'admin/orders' },
       { label: 'Produits', icon: faBox, link: 'admin/products' },
-      { label: 'Analytique', icon: this.statsIcon, link: 'admin/analytics' },
-      { label: 'Catégories', icon: this.categoryIcon, link: 'admin/categories' },
-      { label: 'Marques', icon: faImage, link: 'admin/brands' },
-      { label: 'Fournisseurs', icon: faShuttleVan, link: 'admin/suppliers' },
+      { label: 'Analytique', icon: faChartLine, link: 'admin/analytics' },
+      { label: 'Catégories', icon: faLayerGroup, link: 'admin/categories' },
+      { label: 'Marques', icon: faTags, link: 'admin/brands' },
+      { label: 'Fournisseurs', icon: faTruckLoading, link: 'admin/suppliers' },
       { label: 'Livreurs', icon: faTruck, link: 'admin/delivery-workers' },
       { label: 'Services', icon: faWrench, link: 'admin/services' },
       { label: 'Demandes', icon: faClipboardList, link: 'admin/service-requests' },

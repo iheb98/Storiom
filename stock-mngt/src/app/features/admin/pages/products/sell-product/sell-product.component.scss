@@ -29,8 +29,8 @@ $radius-lg: 16px;
 
     @media (max-width: 600px) {
         min-width: 100%;
-        max-height: 100vh;
-        height: 100%;
+        max-height: 500px; // Fixed height to avoid keyboard resize issues
+        height: auto;
     }
 }
 
@@ -41,14 +41,14 @@ $radius-lg: 16px;
     display: flex;
     align-items: center;
     gap: 15px;
-    padding: 20px 25px;
+    padding: 16px 20px;
     border-radius: $radius-lg $radius-lg 0 0;
     position: relative;
     flex-shrink: 0;
 
     @media (max-width: 600px) {
-        border-radius: 0;
-        padding: 16px 20px;
+        border-radius: 16px 16px 0 0;
+        padding: 12px 16px;
     }
 
     &.sell {
@@ -136,13 +136,15 @@ $radius-lg: 16px;
 // DIALOG BODY
 // ============================================
 .dialog-body {
-    padding: 25px;
+    padding: 20px;
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 
     @media (max-width: 600px) {
-        padding: 16px;
+        padding: 12px 16px;
+        max-height: 350px; // Fixed height to avoid keyboard resize issues
+        overflow-y: auto;
     }
 }
 
@@ -447,16 +449,16 @@ $radius-lg: 16px;
 .dialog-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
-    padding: 20px 25px;
+    gap: 10px;
+    padding: 16px 20px;
     background: $background;
     border-radius: 0 0 $radius-lg $radius-lg;
     flex-shrink: 0;
 
     @media (max-width: 600px) {
-        padding: 16px;
-        border-radius: 0;
-        gap: 10px;
+        padding: 12px 16px;
+        border-radius: 0 0 16px 16px;
+        gap: 8px;
     }
 
     .btn-cancel {
