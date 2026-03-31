@@ -1,5 +1,5 @@
 {
-  "name": "stock-mngt-backend",
+  "name": "storiom-backend",
   "version": "1.0.0",
   "description": "Stock management application's backend",
   "main": "app.js",

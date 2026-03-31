@@ -9,11 +9,11 @@ const express = require('express');
 const app = express();
 app.use(requireHTTPS);
 
-app.use(express.static(`./dist/stock-mngt`));
+app.use(express.static(`./dist/storiom-frontend`));
 
-app.get(`/*`, function(req, res) {
-    res.sendFile(`index.html`, {root: 'dist/stock-mngt/'}
-  );
-  });
+app.get(`/*`, function (req, res) {
+    res.sendFile(`index.html`, { root: 'dist/storiom-frontend/' }
+    );
+});
 
-  app.listen(process.env.PORT || 8080);
+app.listen(process.env.PORT || 8080);

@@ -42,7 +42,7 @@ const storage = multer.diskStorage(
 require('dotenv/config');
 
 // **************************************** CORS ****************************************
-var allowedDomains = ['http://localhost:4200', 'http://145.223.103.252', 'https://storiom.com', 'https://www.storiom.com'];
+var allowedDomains = ['*', 'http://localhost:4200', 'http://145.223.103.252', 'https://storiom.com', 'https://www.storiom.com', 'http://192.168.0.194:4200'];
 
 /*
 var corsOptions = {
@@ -311,7 +311,7 @@ app.use('/', (req, res) => {
   res.json({ message: "Welcome to the stock management application's backend!" });
 })
 
-app.listen(port, '0.0.0.0', async () => {
+app.listen(port, async () => {
   try {
     await sequelize.authenticate()
     console.log('Connected To Database')

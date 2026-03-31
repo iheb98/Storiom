@@ -259,7 +259,7 @@
         <!-- Pagination -->
         <div class="pagination-wrapper" *ngIf="!isLoading && products?.length > 0">
             <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="24"
-                [showFirstLastButtons]="true" [pageSizeOptions]="[24, 48, 100, 200]" [pageIndex]="0">
+                [showFirstLastButtons]="true" [pageSizeOptions]="[24, 48, 100, 200]" [pageIndex]="currentPage">
             </mat-paginator>
         </div>
     </div>

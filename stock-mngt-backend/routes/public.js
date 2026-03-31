@@ -16,7 +16,8 @@ router.get('/products/random', async (req, res) => {
         const products = await Product.findAll({
             where: {
                 toDisplay: true, // Only show products marked for display
-                quantity: { [Op.gt]: 0 } // Only show products that are in stock
+                isVisible: true, // Only show visible products
+                //quantity: { [Op.gt]: 0 } // Only show products that are in stock
             },
             order: Sequelize.literal('RANDOM()'), // This works for PostgreSQL and SQLite
             limit: limit,

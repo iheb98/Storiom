@@ -328,34 +328,52 @@
         </div>
     </div>
 
-    <!-- Support Contact Section -->
-    <div class="support-section" *ngIf="!isLoading">
-        <div class="support-card">
-            <div class="support-header">
-                <fa-icon [icon]="faInfoCircle"></fa-icon>
-                <h3>Besoin d'aide ?</h3>
+    <!-- Floating Contact Widget -->
+    <div class="floating-contact-widget" [class.expanded]="contactWidgetExpanded">
+        <!-- Toggle Button -->
+        <button class="contact-toggle" (click)="contactWidgetExpanded = !contactWidgetExpanded"
+            [class.active]="contactWidgetExpanded">
+            <fa-icon [icon]="contactWidgetExpanded ? faTimes : faHeadset"></fa-icon>
+            <span class="toggle-label" *ngIf="!contactWidgetExpanded">Besoin d'aide ?</span>
+        </button>
+
+        <!-- Expanded Contact Panel -->
+        <div class="contact-panel" *ngIf="contactWidgetExpanded">
+            <div class="panel-header">
+                <fa-icon [icon]="faHeadset"></fa-icon>
+                <div class="header-text">
+                    <h4>Besoin d'aide ?</h4>
+                    <p>Notre équipe est là pour vous</p>
+                </div>
             </div>
-            <p>Notre équipe est disponible pour répondre à vos questions concernant les abonnements et le paiement.</p>
-            <div class="support-contacts">
-                <a href="mailto:support@storiom.com" class="contact-item">
-                    <div class="contact-icon email">
+
+            <div class="panel-body">
+                <a href="mailto:support@storiom.com" class="contact-option email">
+                    <div class="option-icon">
                         <fa-icon [icon]="faEnvelope"></fa-icon>
                     </div>
-                    <div class="contact-info">
-                        <span class="contact-label">Email</span>
-                        <span class="contact-value">support@storiom.com</span>
+                    <div class="option-content">
+                        <span class="option-label">Email</span>
+                        <span class="option-value">support@storiom.com</span>
                     </div>
+                    <fa-icon [icon]="faChevronRight" class="option-arrow"></fa-icon>
                 </a>
-                <a href="tel:+21612345678" class="contact-item">
-                    <div class="contact-icon phone">
+
+                <a href="tel:+21693432553" class="contact-option phone">
+                    <div class="option-icon">
                         <fa-icon [icon]="faPhone"></fa-icon>
                     </div>
-                    <div class="contact-info">
-                        <span class="contact-label">Téléphone</span>
-                        <span class="contact-value">+216 93 432 553</span>
+                    <div class="option-content">
+                        <span class="option-label">Téléphone</span>
+                        <span class="option-value">+216 93 432 553</span>
                     </div>
+                    <fa-icon [icon]="faChevronRight" class="option-arrow"></fa-icon>
                 </a>
             </div>
+
+            <!--<div class="panel-footer">
+                <span>Disponible du Lundi au Vendredi</span>
+            </div>-->
         </div>
     </div>
 </div>

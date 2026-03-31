@@ -231,8 +231,9 @@
                             </div>
 
                             <div class="form-row">
-                                <div class="form-group" *ngIf="!productId">
-                                    <label for="quantity"><fa-icon [icon]="faCubes"></fa-icon> Quantité initiale</label>
+                                <div class="form-group">
+                                    <label for="quantity"><fa-icon [icon]="faCubes"></fa-icon> Quantité <span
+                                            *ngIf="!productId">initiale</span></label>
                                     <input type="number" id="quantity" formControlName="quantity" placeholder="0">
                                 </div>
 

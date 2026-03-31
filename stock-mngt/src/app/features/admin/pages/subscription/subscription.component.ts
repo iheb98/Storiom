@@ -3,7 +3,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import {
     faCreditCard, faCheck, faSpinner, faClock, faTimes,
     faReceipt, faBuilding, faCopy, faCheckCircle, faExclamationTriangle,
-    faArrowLeft, faInfoCircle, faStar, faRocket, faGem, faEnvelope, faPhone
+    faArrowLeft, faInfoCircle, faStar, faRocket, faGem, faEnvelope, faPhone,
+    faHeadset, faChevronRight
 } from '@fortawesome/free-solid-svg-icons';
 import { PaymentOrderService, PaymentOrder, PricingInfo, BankInstructions } from 'src/app/core/services/payment-order.service';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -43,6 +44,11 @@ export class SubscriptionComponent implements OnInit {
     faGem = faGem;
     faEnvelope = faEnvelope;
     faPhone = faPhone;
+    faHeadset = faHeadset;
+    faChevronRight = faChevronRight;
+
+    // Contact widget state
+    contactWidgetExpanded = false;
 
     // State
     isLoading = true;
@@ -219,8 +225,32 @@ export class SubscriptionComponent implements OnInit {
     }
 
     selectPlan(plan: SubscriptionPlan) {
-        this.selectedPlan = plan;
-        this.createOrder();
+        Swal.fire({
+            title: 'Confirmer votre choix',
+            html: `
+                <div style="text-align: center; padding: 10px 0;">
+                    <div style="font-size: 2.5rem; font-weight: 800; color: #2c3e50; margin-bottom: 8px;">
+                        ${plan.price} <span style="font-size: 1rem; color: #6c757d;">TND</span>
+                    </div>
+                    <div style="font-size: 1.1rem; color: #6c757d; margin-bottom: 16px;">
+                        Abonnement ${plan.duration}
+                    </div>
+                    ${plan.discount ? `<div style="display: inline-block; background: rgba(76, 175, 80, 0.1); color: #4caf50; padding: 6px 16px; border-radius: 20px; font-weight: 600;">Économisez ${plan.discount}</div>` : ''}
+                </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Confirmer',
+            cancelButtonText: 'Annuler',
+            confirmButtonColor: '#3f51b5',
+            cancelButtonColor: '#6c757d',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.selectedPlan = plan;
+                this.createOrder();
+            }
+        });
     }
 
     createOrder() {

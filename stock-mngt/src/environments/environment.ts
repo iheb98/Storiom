@@ -4,10 +4,10 @@
 
 export const environment = {
   production: false,
-  BASE_PATH : 'http://localhost:3000/api',
-  apiUrl : 'http://localhost:3000/api',
-  couleurs : ['Blanc','Noir','Rouge','Bleu'],
-  backend:'https://pub-0ec6d9eaef734feb88e4c649e89bf0d5.r2.dev'
+  BASE_PATH: 'http://localhost:3000/api',
+  apiUrl: 'http://localhost:3000/api',
+  couleurs: ['Blanc', 'Noir', 'Rouge', 'Bleu'],
+  backend: 'https://storiom-r2-worker.storiom.workers.dev'
 };
 
 /*

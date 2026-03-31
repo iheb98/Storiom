@@ -215,7 +215,8 @@ router.get('/recommendations/:userId', async (req, res) => {
 
         // Find products in preferred categories that user hasn't interacted with
         const whereClause = {
-            id: { [Op.notIn]: interactedProductIds }
+            id: { [Op.notIn]: interactedProductIds },
+            isVisible: true
         };
         if (storeId) {
             whereClause.storeId = storeId;
@@ -272,6 +273,7 @@ router.get('/similar/:productId', async (req, res) => {
             const similarByCategory = await Product.findAll({
                 where: {
                     id: { [Op.ne]: productId },
+                    isVisible: true,
                     categoryId: product.categoryId
                 },
                 include: [{
@@ -306,7 +308,7 @@ router.get('/similar/:productId', async (req, res) => {
         const productIds = similarProducts.map(sp => sp.productId);
 
         const products = await Product.findAll({
-            where: { id: { [Op.in]: productIds } },
+            where: { id: { [Op.in]: productIds }, isVisible: true },
             include: [{
                 model: ProductStats,
                 as: 'stats',
@@ -331,7 +333,7 @@ router.get('/store/:storeId', utility.authenticate, async (req, res) => {
 
         // Get all products for this store
         const products = await Product.findAll({
-            where: { storeId },
+            where: { storeId, isVisible: true },
             attributes: ['id']
         });
 
@@ -400,7 +402,7 @@ function calculatePopularityScore(stats) {
 
 // Helper function to get popular products
 async function getPopularProducts(limit, storeId) {
-    const whereClause = storeId ? { storeId } : {};
+    const whereClause = storeId ? { storeId, isVisible: true } : { isVisible: true };
 
     return Product.findAll({
         where: whereClause,
