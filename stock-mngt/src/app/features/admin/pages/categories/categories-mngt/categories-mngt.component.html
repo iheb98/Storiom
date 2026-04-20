@@ -24,8 +24,8 @@
             </div>
         </header>
 
-        <!-- Mode Toolbar (Admin Only) -->
-        <div class="mode-toolbar" *ngIf="connectedUserRole == 'Admin'">
+        <!-- Mode Toolbar -->
+        <div class="mode-toolbar" *ngIf="canAddCategory()">
             <div class="mode-buttons">
                 <button class="mode-btn" [class.active]="mode == 'SELECT'" (click)="mode = 'SELECT'">
                     <fa-icon [icon]="faMousePointer"></fa-icon>
@@ -92,7 +92,17 @@
             <div class="categories-grid">
                 <div class="category-card" *ngFor="let item of categories"
                     [class.selected]="item?.id == selectedCategory?.id" [class.delete-mode]="mode == 'DELETE'"
-                    [class.edit-mode]="mode == 'EDIT'" (click)="selectCategory(item)">
+                    [class.edit-mode]="mode == 'EDIT'"
+                    [class.static-category]="isStaticCategory(item)"
+                    [class.hidden-category]="!isCategoryVisible(item.id)"
+                    (click)="selectCategory(item)">
+
+                    <!-- Type Badge -->
+                    <div class="category-badge" [class.static]="isStaticCategory(item)" [class.custom]="!isStaticCategory(item)">
+                        <fa-icon [icon]="isStaticCategory(item) ? faGlobe : faStore"></fa-icon>
+                        <span>{{ isStaticCategory(item) ? 'Globale' : 'Personnalisée' }}</span>
+                    </div>
+
                     <div class="category-icon">
                         <fa-icon [icon]="faFolder"></fa-icon>
                     </div>
@@ -100,15 +110,29 @@
                     <span class="sub-count" *ngIf="item?.subCategories?.length">
                         {{ item?.subCategories?.length }} sous-cat.
                     </span>
-                    <div class="card-action" *ngIf="mode == 'DELETE'">
+
+                    <!-- Visibility Toggle -->
+                    <button class="visibility-btn" *ngIf="mode == 'SELECT' && isStaticCategory(item)"
+                        [class.visible]="isCategoryVisible(item.id)"
+                        [class.hidden]="!isCategoryVisible(item.id)"
+                        (click)="toggleVisibility(item, $event)"
+                        [title]="isCategoryVisible(item.id) ? 'Visible dans la boutique — Cliquez pour masquer' : 'Masquée dans la boutique — Cliquez pour afficher'">
+                        <fa-icon [icon]="isCategoryVisible(item.id) ? faEye : faEyeSlash"></fa-icon>
+                    </button>
+
+                    <div class="card-action" *ngIf="mode == 'DELETE' && canEditCategory(item)">
                         <fa-icon [icon]="faTrash"></fa-icon>
                     </div>
-                    <div class="card-action edit" *ngIf="mode == 'EDIT'">
+                    <div class="card-action edit" *ngIf="mode == 'EDIT' && canEditCategory(item)">
                         <fa-icon [icon]="faPen"></fa-icon>
+                    </div>
+                    <!-- Lock icon for non-editable static categories -->
+                    <div class="card-action locked" *ngIf="(mode == 'DELETE' || mode == 'EDIT') && !canEditCategory(item)">
+                        <fa-icon [icon]="faGlobe"></fa-icon>
                     </div>
                 </div>
 
-                <div class="category-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'"
+                <div class="category-card add-card" *ngIf="mode == 'SELECT' && canAddCategory()"
                     (click)="addCategory()">
                     <div class="add-icon">
                         <fa-icon [icon]="faPlus"></fa-icon>
@@ -135,15 +159,15 @@
                     <span class="sub-count" *ngIf="item?.subCategories?.length">
                         {{ item?.subCategories?.length }} sous-cat.
                     </span>
-                    <div class="card-action" *ngIf="mode == 'DELETE'">
+                    <div class="card-action" *ngIf="mode == 'DELETE' && canEditCategory(item)">
                         <fa-icon [icon]="faTrash"></fa-icon>
                     </div>
-                    <div class="card-action edit" *ngIf="mode == 'EDIT'">
+                    <div class="card-action edit" *ngIf="mode == 'EDIT' && canEditCategory(item)">
                         <fa-icon [icon]="faPen"></fa-icon>
                     </div>
                 </div>
 
-                <div class="category-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'"
+                <div class="category-card add-card" *ngIf="mode == 'SELECT' && canAddCategory()"
                     (click)="addSubCategory(selectedCategory)">
                     <div class="add-icon">
                         <fa-icon [icon]="faPlus"></fa-icon>
@@ -170,15 +194,15 @@
                     <span class="sub-count" *ngIf="item?.subCategories?.length">
                         {{ item?.subCategories?.length }} sous-cat.
                     </span>
-                    <div class="card-action" *ngIf="mode == 'DELETE'">
+                    <div class="card-action" *ngIf="mode == 'DELETE' && canEditCategory(item)">
                         <fa-icon [icon]="faTrash"></fa-icon>
                     </div>
-                    <div class="card-action edit" *ngIf="mode == 'EDIT'">
+                    <div class="card-action edit" *ngIf="mode == 'EDIT' && canEditCategory(item)">
                         <fa-icon [icon]="faPen"></fa-icon>
                     </div>
                 </div>
 
-                <div class="category-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'"
+                <div class="category-card add-card" *ngIf="mode == 'SELECT' && canAddCategory()"
                     (click)="addSubCategory(selectedSubCategory1)">
                     <div class="add-icon">
                         <fa-icon [icon]="faPlus"></fa-icon>
@@ -205,15 +229,15 @@
                     <span class="sub-count" *ngIf="item?.subCategories?.length">
                         {{ item?.subCategories?.length }} sous-cat.
                     </span>
-                    <div class="card-action" *ngIf="mode == 'DELETE'">
+                    <div class="card-action" *ngIf="mode == 'DELETE' && canEditCategory(item)">
                         <fa-icon [icon]="faTrash"></fa-icon>
                     </div>
-                    <div class="card-action edit" *ngIf="mode == 'EDIT'">
+                    <div class="card-action edit" *ngIf="mode == 'EDIT' && canEditCategory(item)">
                         <fa-icon [icon]="faPen"></fa-icon>
                     </div>
                 </div>
 
-                <div class="category-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'"
+                <div class="category-card add-card" *ngIf="mode == 'SELECT' && canAddCategory()"
                     (click)="addSubCategory(selectedSubCategory2)">
                     <div class="add-icon">
                         <fa-icon [icon]="faPlus"></fa-icon>
@@ -237,15 +261,15 @@
                         <fa-icon [icon]="faFolder"></fa-icon>
                     </div>
                     <span class="category-name">{{ item?.name }}</span>
-                    <div class="card-action" *ngIf="mode == 'DELETE'">
+                    <div class="card-action" *ngIf="mode == 'DELETE' && canEditCategory(item)">
                         <fa-icon [icon]="faTrash"></fa-icon>
                     </div>
-                    <div class="card-action edit" *ngIf="mode == 'EDIT'">
+                    <div class="card-action edit" *ngIf="mode == 'EDIT' && canEditCategory(item)">
                         <fa-icon [icon]="faPen"></fa-icon>
                     </div>
                 </div>
 
-                <div class="category-card add-card" *ngIf="mode == 'SELECT' && connectedUserRole=='Admin'"
+                <div class="category-card add-card" *ngIf="mode == 'SELECT' && canAddCategory()"
                     (click)="addSubCategory(selectedSubCategory3)">
                     <div class="add-icon">
                         <fa-icon [icon]="faPlus"></fa-icon>
@@ -260,7 +284,7 @@
             <fa-icon [icon]="faFolderOpen"></fa-icon>
             <h3>Aucune catégorie disponible</h3>
             <p>Commencez par créer votre première catégorie</p>
-            <button class="btn-add" (click)="addCategory()" *ngIf="connectedUserRole == 'Admin'">
+            <button class="btn-add" (click)="addCategory()" *ngIf="canAddCategory()">
                 <fa-icon [icon]="faPlus"></fa-icon> Créer une catégorie
             </button>
         </div>

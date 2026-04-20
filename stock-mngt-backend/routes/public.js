@@ -1,8 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { Product, Category, Store, Supplier, Review, User, Address, ProductStats } = require('../models');
+const { Product, Category, Store, Supplier, Review, User, Address, ProductStats, Brand } = require('../models');
 const { Op, Sequelize, where } = require('sequelize');
 const utility = require('../utility');
+
+// Helper: determine if request is in store context (custom domain or preview)
+function isStoreContext(req) {
+    return !!(req.resolvedStore || req.query.storeContext === 'true');
+}
 
 /**
  * @route   GET /api/public/products/random
@@ -15,7 +20,7 @@ router.get('/products/random', async (req, res) => {
     try {
         const products = await Product.findAll({
             where: {
-                toDisplay: true, // Only show products marked for display
+                ...(isStoreContext(req) ? { toDisplayStore: true } : { toDisplay: true }),
                 isVisible: true, // Only show visible products
                 //quantity: { [Op.gt]: 0 } // Only show products that are in stock
             },
@@ -44,34 +49,65 @@ router.get('/products/random', async (req, res) => {
 
 /**
  * @route   GET /api/public/categories/tree
- * @desc    Get all static categories and their sub-categories as a tree
+ * @desc    Get categories as a tree. If storeId is passed, returns store-visible categories.
  * @access  Public
  */
 router.get('/categories/tree', async (req, res) => {
     try {
-        const categories = await Category.findAll({
-            where: {
-                // We fetch top-level categories that are static (shared across stores)
-                parentCategoryId: null,
-                static: true
-            },
-            include: [ // A recursive include to fetch the entire category tree
-                {
+        const storeId = req.query.storeId || (req.resolvedStore ? req.resolvedStore.id : null);
+
+        const subCategoryInclude = {
+            model: Category,
+            as: 'subCategories',
+            include: {
+                model: Category,
+                as: 'subCategories',
+                include: {
                     model: Category,
                     as: 'subCategories',
-                    include: {
-                        model: Category,
-                        as: 'subCategories',
-                        include: {
-                            model: Category,
-                            as: 'subCategories',
-                            include: { model: Category, as: 'subCategories' }
-                        }
-                    }
+                    include: { model: Category, as: 'subCategories' }
                 }
-            ]
-        });
-        res.json(categories);
+            }
+        };
+
+        if (storeId) {
+            // Store context: get visible static categories + store's custom categories
+            const { StoreCategoryVisibility } = require('../models');
+
+            // Get visibility overrides for this store
+            const visibilityRecords = await StoreCategoryVisibility.findAll({
+                where: { storeId },
+                attributes: ['categoryId', 'visible']
+            });
+            const visibilityMap = {};
+            visibilityRecords.forEach(r => { visibilityMap[r.categoryId] = r.visible; });
+
+            // Get static categories (global)
+            const staticCategories = await Category.findAll({
+                where: { parentCategoryId: null, static: true },
+                include: [subCategoryInclude]
+            });
+
+            // Get store's custom categories (non-static, belonging to this store)
+            const customCategories = await Category.findAll({
+                where: { storeId, parentCategoryId: null, static: { [Op.not]: true } },
+                include: [subCategoryInclude]
+            });
+
+            // Filter static categories: only include if visible (default: visible if no override)
+            const visibleStaticCategories = staticCategories.filter(cat => {
+                return visibilityMap[cat.id] !== false; // visible unless explicitly set to false
+            });
+
+            res.json([...visibleStaticCategories, ...customCategories]);
+        } else {
+            // Marketplace: only static categories
+            const categories = await Category.findAll({
+                where: { parentCategoryId: null, static: true },
+                include: [subCategoryInclude]
+            });
+            res.json(categories);
+        }
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server Error' });
@@ -89,7 +125,7 @@ router.get('/products/search', async (req, res) => {
     try {
         const products = await Product.findAll({
             where: {
-                toDisplay: true,
+                ...(isStoreContext(req) ? { toDisplayStore: true } : { toDisplay: true }),
                 [Op.or]: [
                     { name: { [Op.iLike]: `%${query}%` } },
                     { description: { [Op.iLike]: `%${query}%` } }
@@ -163,6 +199,10 @@ function extractAndRemoveCategoryId(query) {
 
 router.get('/allStores/products', async (req, res) => {
     try {
+        // If on a custom domain, auto-scope to that store
+        if (req.resolvedStore) {
+            req.query.query = (req.query.query || '') + (req.query.query ? ',' : '') + `storeId = '${req.resolvedStore.id}'`;
+        }
         // -------------------------------
         // 0. Pagination
         // -------------------------------
@@ -204,7 +244,7 @@ router.get('/allStores/products', async (req, res) => {
         // -------------------------------
         let whereClause = {
             isVisible: true,
-            toDisplay: true,
+            ...(isStoreContext(req) ? { toDisplayStore: true } : { toDisplay: true }),
             ...utility.buildQuery(rawQuery)
         };
 
@@ -225,6 +265,29 @@ router.get('/allStores/products', async (req, res) => {
                 ...whereClause,
                 name: { [Op.iLike]: `%${searchable}%` }
             };
+        }
+
+        // -------------------------------
+        // 6b. Price range filter
+        // -------------------------------
+        if (req.query.minPrice) {
+            whereClause.sellingPrice = {
+                ...(whereClause.sellingPrice || {}),
+                [Op.gte]: parseFloat(req.query.minPrice)
+            };
+        }
+        if (req.query.maxPrice) {
+            whereClause.sellingPrice = {
+                ...(whereClause.sellingPrice || {}),
+                [Op.lte]: parseFloat(req.query.maxPrice)
+            };
+        }
+
+        // -------------------------------
+        // 6c. Brand filter
+        // -------------------------------
+        if (req.query.brandId) {
+            whereClause.brandId = parseInt(req.query.brandId);
         }
 
         // -------------------------------
@@ -249,6 +312,7 @@ router.get('/allStores/products', async (req, res) => {
                 include: [
                     { model: Supplier, as: 'supplier', required: false },
                     { model: Category, as: 'category', required: false },
+                    { model: Brand, as: 'brand', required: false },
                     {
                         model: Store,
                         as: 'store',
@@ -314,6 +378,33 @@ router.get('/allStores/products', async (req, res) => {
     }
 });
 
+/**
+ * @route   GET /api/public/brands/store/:storeId
+ * @desc    Get all brands used by products in a given store
+ * @access  Public
+ */
+router.get('/brands/store/:storeId', async (req, res) => {
+    try {
+        const storeId = req.params.storeId;
+        const products = await Product.findAll({
+            where: { storeId, isVisible: true, brandId: { [Op.not]: null } },
+            attributes: ['brandId'],
+            group: ['brandId'],
+            raw: true
+        });
+        const brandIds = products.map(p => p.brandId).filter(Boolean);
+        if (brandIds.length === 0) return res.json([]);
+
+        const brands = await Brand.findAll({
+            where: { id: { [Op.in]: brandIds } },
+            order: [['name', 'ASC']]
+        });
+        res.json(brands);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
 
 
 
@@ -334,7 +425,7 @@ router.get('/allStores/products/count', async (req, res) => {
         // -------------------------------
         let whereClause = {
             isVisible: true,
-            toDisplay: true,
+            ...(isStoreContext(req) ? { toDisplayStore: true } : { toDisplay: true }),
             ...utility.buildQuery(rawQuery)
         };
 
@@ -354,6 +445,22 @@ router.get('/allStores/products/count', async (req, res) => {
             whereClause = {
                 ...whereClause,
                 name: { [Op.iLike]: `%${searchable}%` }
+            };
+        }
+
+        // -------------------------------
+        // 4b. Price range filter
+        // -------------------------------
+        if (req.query.minPrice) {
+            whereClause.sellingPrice = {
+                ...(whereClause.sellingPrice || {}),
+                [Op.gte]: parseFloat(req.query.minPrice)
+            };
+        }
+        if (req.query.maxPrice) {
+            whereClause.sellingPrice = {
+                ...(whereClause.sellingPrice || {}),
+                [Op.lte]: parseFloat(req.query.maxPrice)
             };
         }
 
@@ -404,11 +511,14 @@ router.get('/allStores/products/count', async (req, res) => {
 
 
 router.get('/allStores', (req, res, next) => {
+    // If on a custom domain, return only that store
+    const whereClause = { active: true, isVisibleToPublic: true };
+    if (req.resolvedStore) {
+        whereClause.id = req.resolvedStore.id;
+    }
+
     Store.findAll({
-        where: {
-            active: true,
-            isVisibleToPublic: true
-        },
+        where: whereClause,
         include: ['address']
     }).then(stores => {
         res.json(stores)
@@ -448,7 +558,7 @@ router.get('/publicProduct/:id', (req, res, next) => {
         where: {
             id,
             isVisible: true,
-            toDisplay: true
+            ...(isStoreContext(req) ? { toDisplayStore: true } : { toDisplay: true })
         }, include: ['brand', 'category', 'supplier', 'store', {
             model: Review,
             as: 'reviews',
@@ -814,6 +924,56 @@ router.post('/contact', async (req, res) => {
     } catch (err) {
         console.error('Error sending contact message:', err);
         res.status(500).json({ success: false, message: 'Erreur lors de l\'envoi du message' });
+    }
+});
+
+/**
+ * @route   GET /api/public/resolve-domain
+ * @desc    Resolve a custom domain to a store (used by frontend on init)
+ * @access  Public
+ */
+router.get('/resolve-domain', async (req, res) => {
+    try {
+        const host = req.query.host || req.headers.host || '';
+        const hostname = host.split(':')[0];
+
+        const { isPlatformDomain } = require('../domainResolver');
+        if (isPlatformDomain(hostname)) {
+            return res.json({ isDomainStore: false, store: null });
+        }
+
+        const store = await Store.findOne({
+            where: {
+                customDomain: hostname,
+                domainVerified: true,
+                active: true
+            },
+            include: ['address']
+        });
+
+        if (store) {
+            return res.json({
+                isDomainStore: true,
+                store: {
+                    id: store.id,
+                    name: store.name,
+                    description: store.description,
+                    logo: store.logo,
+                    images: store.images ? JSON.parse(store.images) : [],
+                    phone: store.phone,
+                    email: store.email,
+                    site: store.site,
+                    theme: store.theme,
+                    address: store.address,
+                    isSupportingDeliveries: store.isSupportingDeliveries
+                }
+            });
+        }
+
+        return res.json({ isDomainStore: false, store: null });
+    } catch (err) {
+        console.error('Error resolving domain:', err);
+        res.status(500).json({ isDomainStore: false, store: null, error: 'Resolution failed' });
     }
 });
 

@@ -1,0 +1,28 @@
+<div class="store-auth-page">
+  <div class="auth-card">
+    <div class="auth-header" *ngIf="isLoading">
+      <div style="padding: 40px 0; text-align: center;">
+        <div class="confirm-spinner"></div>
+        <p style="margin-top: 16px; color: #7f8c8d;">Confirmation en cours...</p>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && success" style="padding: 40px; text-align: center;">
+      <fa-icon [icon]="faCheckCircle" style="font-size: 3rem; color: #16a34a;"></fa-icon>
+      <h2 style="margin: 16px 0 8px; color: #1a1a2e;">Compte confirmé !</h2>
+      <p style="color: #7f8c8d; margin-bottom: 24px;">Votre compte a été confirmé avec succès. Redirection en cours...</p>
+      <a [routerLink]="[basePath]" class="submit-btn" style="display: inline-flex; text-decoration: none; width: auto; padding: 12px 24px;">
+        Accéder à la boutique <fa-icon [icon]="faArrowRight"></fa-icon>
+      </a>
+    </div>
+
+    <div *ngIf="!isLoading && !success" style="padding: 40px; text-align: center;">
+      <fa-icon [icon]="faTimesCircle" style="font-size: 3rem; color: #dc2626;"></fa-icon>
+      <h2 style="margin: 16px 0 8px; color: #1a1a2e;">Erreur de confirmation</h2>
+      <p style="color: #7f8c8d;">{{ errorMessage }}</p>
+      <a [routerLink]="[basePath, 'login']" class="submit-btn" style="display: inline-flex; text-decoration: none; width: auto; padding: 12px 24px; margin-top: 16px;">
+        Retour à la connexion
+      </a>
+    </div>
+  </div>
+</div>

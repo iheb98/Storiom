@@ -1,0 +1,191 @@
+<div class="store-landing" *ngIf="store" [class.dark-mode]="themeConfig.mode === 'dark'">
+
+  <!-- ═══ ANNOUNCEMENT BAR ═══ -->
+  <div class="announcement-bar animate-in" *ngIf="themeConfig.announcement?.enabled && themeConfig.announcement?.text"
+    [style.background]="themeConfig.announcement.bgColor">
+    <a *ngIf="themeConfig.announcement.link" [href]="themeConfig.announcement.link" class="announcement-link">
+      {{ themeConfig.announcement.text }}
+    </a>
+    <span *ngIf="!themeConfig.announcement.link">{{ themeConfig.announcement.text }}</span>
+  </div>
+
+  <!-- ═══ HERO SECTION ═══ -->
+  <section class="hero-section" *ngIf="themeConfig.sections?.hero !== false"
+    [ngStyle]="themeConfig.hero?.style === 'gradient' ? getHeroBackground() : {}">
+
+    <!-- Image Carousel -->
+    <div class="hero-carousel" *ngIf="themeConfig.hero?.style !== 'gradient' && getHeroImages().length > 0">
+      <img *ngFor="let img of getHeroImages(); let i = index" class="hero-slide-img"
+        [class.active]="i === currentHeroSlide" [src]="environment.backend + '/' + img" alt="Banner">
+      <!-- Carousel Indicators -->
+      <div class="hero-indicators" *ngIf="getHeroImages().length > 1">
+        <button *ngFor="let img of getHeroImages(); let i = index" class="hero-indicator"
+          [class.active]="i === currentHeroSlide" (click)="currentHeroSlide = i">
+        </button>
+      </div>
+    </div>
+
+    <!-- Fallback: no images -->
+    <div class="hero-carousel hero-fallback"
+      *ngIf="themeConfig.hero?.style !== 'gradient' && getHeroImages().length === 0"></div>
+
+    <!-- Hero Content (below image) -->
+    <div class="hero-content" [style.background]="themeConfig.primaryColor || '#4f46e5'">
+      <h1 class="hero-title animate-in delay-1" [style.font-family]="themeConfig.fontFamily">
+        {{ getHeroTitle() }}
+      </h1>
+      <p class="hero-subtitle animate-in delay-2" *ngIf="getHeroSubtitle()" [innerHTML]="getHeroSubtitle()"></p>
+      <div class="hero-actions animate-in delay-3">
+        <button class="btn-hero-primary" (click)="browseProducts()">
+          <i class="fa fa-shopping-bag"></i>
+          {{ getHeroCta() }}
+        </button>
+        <!--<a *ngIf="store.phone" [href]="'tel:' + store.phone" class="btn-hero-outline">
+          <i class="fa fa-phone"></i>
+          Nous contacter
+        </a>-->
+      </div>
+      <div class="hero-badges animate-in delay-4">
+        <!--<span class="badge" *ngIf="store.isSupportingDeliveries">
+          <i class="fa fa-truck"></i> Livraison disponible
+        </span>-->
+        <span class="badge" *ngIf="store.address?.city">
+          <i class="fa fa-map-marker"></i> {{ store.address.city }}, {{ store.address.state }}
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ USP FEATURES BAR ═══ -->
+  <section class="usps-section"
+    *ngIf="themeConfig.sections?.usps !== false && themeConfig.usps?.enabled && themeConfig.usps?.items?.length > 0">
+    <div class="section-container">
+      <div class="usps-grid">
+        <div class="usp-card animate-in" *ngFor="let usp of themeConfig.usps.items; let i = index"
+          [style.animation-delay]="(i * 0.08) + 's'">
+          <div class="usp-icon-wrap" [style.background]="themeConfig.primaryColor + '12'"
+            [style.color]="themeConfig.primaryColor">
+            <i class="fa" [ngClass]="getUspIcon(usp.icon)"></i>
+          </div>
+          <h4 class="usp-title">{{ usp.title }}</h4>
+          <p class="usp-subtitle" *ngIf="usp.subtitle">{{ usp.subtitle }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FEATURED PRODUCTS ═══ -->
+  <section class="featured-section" *ngIf="themeConfig.sections?.products !== false">
+    <div class="section-container">
+      <div class="section-header animate-in">
+        <h2 [style.font-family]="themeConfig.fontFamily">Produits en vedette</h2>
+        <button class="view-all-btn" (click)="browseProducts()" [style.color]="themeConfig.primaryColor">
+          Voir tout <i class="fa fa-arrow-right"></i>
+        </button>
+      </div>
+
+      <div class="products-grid" *ngIf="!isLoading">
+        <app-store-product-card *ngFor="let product of featuredProducts; let i = index" [product]="product"
+          [basePath]="basePath" class="animate-in" [style.animation-delay]="(i * 0.05) + 's'">
+        </app-store-product-card>
+      </div>
+
+      <!-- Loading skeleton -->
+      <div class="products-grid" *ngIf="isLoading">
+        <div class="product-card skeleton" *ngFor="let i of [1,2,3,4,5,6,7,8]">
+          <div class="skeleton-image"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-price"></div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="!isLoading && featuredProducts.length === 0">
+        <i class="fa fa-archive"></i>
+        <p>Aucun produit disponible pour le moment</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ ABOUT SECTION ═══ -->
+  <section class="about-section animate-in"
+    *ngIf="themeConfig.sections?.about !== false && themeConfig.about?.enabled && themeConfig.about?.content">
+    <div class="section-container">
+      <div class="about-grid" [class.has-image]="themeConfig.about.image">
+        <div class="about-content">
+          <h2 [style.font-family]="themeConfig.fontFamily">{{ themeConfig.about.title || 'Notre histoire' }}</h2>
+          <p>{{ themeConfig.about.content }}</p>
+        </div>
+        <div class="about-image" *ngIf="themeConfig.about.image">
+          <img [src]="environment.backend + '/' + themeConfig.about.image" alt="About">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CATEGORIES ═══ -->
+  <section class="categories-section" *ngIf="themeConfig.sections?.categories !== false && categories.length > 0">
+    <div class="section-container">
+      <div class="section-header animate-in">
+        <h2 [style.font-family]="themeConfig.fontFamily">Nos catégories</h2>
+      </div>
+      <div class="categories-grid">
+        <div class="category-card animate-in" *ngFor="let cat of categories; let i = index"
+          [style.animation-delay]="(i * 0.05) + 's'" (click)="browseCategory(cat.id)">
+          <div class="category-icon" [style.background]="themeConfig.primaryColor + '15'"
+            [style.color]="themeConfig.primaryColor">
+            <i class="fa fa-tag"></i>
+          </div>
+          <span class="category-name">{{ cat.name }}</span>
+          <span class="category-arrow">
+            <i class="fa fa-chevron-right"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ STORE INFO ═══ -->
+  <section class="info-section" *ngIf="themeConfig.sections?.info !== false">
+    <div class="section-container">
+      <div class="info-grid">
+        <div class="info-card animate-in" *ngIf="store.phone">
+          <i class="fa fa-phone" [style.color]="themeConfig.primaryColor"></i>
+          <h3>Téléphone</h3>
+          <a [href]="'tel:' + store.phone">{{ store.phone }}</a>
+        </div>
+        <div class="info-card animate-in" *ngIf="store.email">
+          <i class="fa fa-envelope" [style.color]="themeConfig.primaryColor"></i>
+          <h3>Email</h3>
+          <a [href]="'mailto:' + store.email">{{ store.email }}</a>
+        </div>
+        <div class="info-card animate-in" *ngIf="store.address?.city">
+          <i class="fa fa-map-marker" [style.color]="themeConfig.primaryColor"></i>
+          <h3>Adresse</h3>
+          <p>{{ store.address.street }}, {{ store.address.city }} {{ store.address.postalCode }}</p>
+        </div>
+        <div class="info-card animate-in" *ngIf="store.site">
+          <i class="fa fa-globe" [style.color]="themeConfig.primaryColor"></i>
+          <h3>Site web</h3>
+          <a [href]="store.site" target="_blank">{{ store.site }}</a>
+        </div>
+      </div>
+
+      <!-- Social Links -->
+      <div class="social-links animate-in" *ngIf="hasSocial()">
+        <a *ngIf="themeConfig.social.facebook" [href]="themeConfig.social.facebook" target="_blank"
+          class="social-link facebook">
+          <i class="fa fa-facebook"></i>
+        </a>
+        <a *ngIf="themeConfig.social.instagram" [href]="themeConfig.social.instagram" target="_blank"
+          class="social-link instagram">
+          <i class="fa fa-instagram"></i>
+        </a>
+        <a *ngIf="themeConfig.social.tiktok" [href]="themeConfig.social.tiktok" target="_blank"
+          class="social-link tiktok">
+          <i class="fa fa-music"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</div>

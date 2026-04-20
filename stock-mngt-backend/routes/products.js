@@ -99,8 +99,8 @@ router.delete('/cart/:productId', utility.authenticate, async (req, res) => {
 });
 
 router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
-    const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, thumbnails, quantity, unit, storeId, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, discount, mainImageIndex, condition } = req.body
-    Product.create({ name, code, buyingPrice, sellingPrice, discount, currency, color, size, description, images: JSON.stringify(images), thumbnails: JSON.stringify(thumbnails || []), quantity, unit, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id, criticalStockIndicator, toDisplay, mainImageIndex: mainImageIndex || 0, condition: condition || 'NEW' }).then(createdProduct => {
+    const { name, code, buyingPrice, sellingPrice, currency, color, size, description, images, thumbnails, quantity, unit, storeId, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, toDisplayStore, discount, mainImageIndex, condition } = req.body
+    Product.create({ name, code, buyingPrice, sellingPrice, discount, currency, color, size, description, images: JSON.stringify(images), thumbnails: JSON.stringify(thumbnails || []), quantity, unit, storeId, supplierId, categoryId, brandId, creatorUserId: req.user.id, criticalStockIndicator, toDisplay, toDisplayStore, mainImageIndex: mainImageIndex || 0, condition: condition || 'NEW' }).then(createdProduct => {
         console.log(quantity)
         if (quantity > 0) {
             Operation.create({ receiptId: null, type: "LOADED", productId: createdProduct.id, amount: quantity, price: createdProduct.buyingPrice, date: new Date(), creatorUserId: req.user.id, impactStock: true })
@@ -124,7 +124,7 @@ router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
 })
 
 router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
-    const { id, name, code, color, quantity, unit, images, thumbnails, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, activateCriticalStockIndicator, discount, mainImageIndex, condition } = req.body
+    const { id, name, code, color, quantity, unit, images, thumbnails, sellingPrice, description, buyingPrice, size, supplierId, categoryId, brandId, criticalStockIndicator, toDisplay, toDisplayStore, activateCriticalStockIndicator, discount, mainImageIndex, condition } = req.body
     Product.findOne(
         {
             where: {
@@ -148,6 +148,7 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
         product.buyingPrice = buyingPrice
         product.discount = discount
         product.toDisplay = toDisplay
+        product.toDisplayStore = toDisplayStore
         product.criticalStockIndicator = criticalStockIndicator
         product.activateCriticalStockIndicator = activateCriticalStockIndicator
         product.mainImageIndex = mainImageIndex !== undefined ? mainImageIndex : product.mainImageIndex
@@ -215,6 +216,68 @@ router.put('/bulk-visibility', utility.authenticate, checkSubscription, async (r
 
         const [affectedCount] = await Product.update(
             { toDisplay: toDisplay },
+            { where: whereClause }
+        );
+
+        res.json({
+            success: true,
+            message: `${affectedCount} produit(s) mis à jour`,
+            affectedCount
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: err.toString() });
+    }
+});
+
+// Bulk update toDisplayStore for selected products or all products
+router.put('/bulk-store-visibility', utility.authenticate, checkSubscription, async (req, res) => {
+    try {
+        const { ids, toDisplayStore, updateAll, storeId } = req.body;
+        const userId = req.user.id;
+
+        let whereClause = {
+            creatorUserId: userId,
+            isVisible: true
+        };
+
+        if (storeId) {
+            whereClause.store_id = storeId;
+        }
+
+        if (!updateAll) {
+            if (!ids || ids.length === 0) {
+                return res.status(400).json({ success: false, message: "Aucun produit sélectionné" });
+            }
+            whereClause.id = { [Op.in]: ids };
+        }
+
+        // If trying to display products, exclude those without images
+        if (toDisplayStore) {
+            const productsWithoutImages = await Product.findAll({
+                where: {
+                    ...whereClause,
+                    [Op.or]: [
+                        { images: null },
+                        { images: '[]' },
+                        { images: '' }
+                    ]
+                },
+                attributes: ['id', 'name']
+            });
+
+            if (productsWithoutImages.length > 0) {
+                whereClause[Op.and] = [
+                    { images: { [Op.ne]: null } },
+                    { images: { [Op.ne]: '[]' } },
+                    { images: { [Op.ne]: '' } }
+                ];
+            }
+        }
+
+        const [affectedCount] = await Product.update(
+            { toDisplayStore: toDisplayStore },
             { where: whereClause }
         );
 

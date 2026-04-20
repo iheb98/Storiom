@@ -97,6 +97,16 @@
                             <fa-icon [icon]="faUser"></fa-icon>
                             {{ order.user.firstName }} {{ order.user.lastName }}
                         </span>
+                        <span class="order-client" *ngIf="!order.user && order.storeCustomer">
+                            <fa-icon [icon]="faUser"></fa-icon>
+                            {{ order.storeCustomer.firstName }} {{ order.storeCustomer.lastName }}
+                            <span class="online-badge">🌐 En ligne</span>
+                        </span>
+                        <span class="order-client" *ngIf="!order.user && !order.storeCustomer && order.customerName">
+                            <fa-icon [icon]="faUser"></fa-icon>
+                            {{ order.customerName }}
+                            <span class="online-badge">🌐 En ligne</span>
+                        </span>
                         <span class="order-date">
                             <fa-icon [icon]="faCalendar"></fa-icon>
                             {{ order.createdAt | date:'dd MMM yyyy, HH:mm' }}
@@ -121,6 +131,7 @@
                     <!-- Customer Section -->
                     <div class="details-section customer-section">
                         <h4><fa-icon [icon]="faUser"></fa-icon> Client</h4>
+                        <!-- Platform user -->
                         <div class="customer-card" *ngIf="order.user">
                             <div class="customer-avatar">
                                 {{ order.user.firstName?.charAt(0) }}{{ order.user.lastName?.charAt(0) }}
@@ -132,6 +143,33 @@
                                 </span>
                                 <span class="customer-contact" *ngIf="order.user.phone">
                                     <fa-icon [icon]="faPhone"></fa-icon> {{ order.user.phone }}
+                                </span>
+                            </div>
+                        </div>
+                        <!-- Store customer -->
+                        <div class="customer-card" *ngIf="!order.user && order.storeCustomer">
+                            <div class="customer-avatar online">
+                                {{ order.storeCustomer.firstName?.charAt(0) }}{{ order.storeCustomer.lastName?.charAt(0) }}
+                            </div>
+                            <div class="customer-info">
+                                <span class="customer-name">
+                                    {{ order.storeCustomer.firstName }} {{ order.storeCustomer.lastName }}
+                                    <span class="online-badge">🌐 En ligne</span>
+                                </span>
+                                <span class="customer-contact">
+                                    <fa-icon [icon]="faEnvelope"></fa-icon> {{ order.storeCustomer.email }}
+                                </span>
+                                <span class="customer-contact" *ngIf="order.storeCustomer.phone">
+                                    <fa-icon [icon]="faPhone"></fa-icon> {{ order.storeCustomer.phone }}
+                                </span>
+                                <span class="customer-contact" *ngIf="order.customerPhone">
+                                    <fa-icon [icon]="faPhone"></fa-icon> {{ order.customerPhone }}
+                                </span>
+                                <span class="customer-contact" *ngIf="order.customerAddress">
+                                    <i class="fa fa-map-marker"></i> {{ order.customerAddress }}
+                                </span>
+                                <span class="customer-contact" *ngIf="order.notes">
+                                    <i class="fa fa-sticky-note"></i> {{ order.notes }}
                                 </span>
                             </div>
                         </div>

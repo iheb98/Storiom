@@ -9,15 +9,15 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate({ Category, Store }) {
+    static associate({ Category, Store, StoreCategoryVisibility }) {
       // define association here
       this.hasMany(Category, { foreignKey: 'parent_categorie_id', as: 'subCategories' })
       this.belongsTo(Category, { foreignKey: 'parent_categorie_id', as: 'parentCategory' })
-      //this.belongsTo(Category, { foreignKey: 'parent_categorie_id', as: 'parentCategory' })
-      //this.belongsTo(Store, { foreignKey: 'store_id', as: 'store' })
+      this.belongsTo(Store, { foreignKey: 'store_id', as: 'store' })
+      this.hasMany(StoreCategoryVisibility, { foreignKey: 'category_id', as: 'visibility' })
     }
     toJSON() {
-      return { ...this.get(), storeId: undefined, store_id: undefined, parentCategoryId: undefined, parent_categorie_id: undefined, creatorUserId: undefined, createdAt: undefined, updatedAt: undefined }
+      return { ...this.get(), store_id: undefined, parentCategoryId: undefined, parent_categorie_id: undefined, creatorUserId: undefined, createdAt: undefined, updatedAt: undefined }
     }
   }
   Category.init({

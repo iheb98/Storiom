@@ -1,0 +1,744 @@
+<div class="customizer">
+
+  <!-- Top Bar -->
+  <div class="customizer-topbar">
+    <div class="topbar-left">
+      <i class="fa fa-paint-brush topbar-icon"></i>
+      <div>
+        <h1>Personnalisation</h1>
+        <p>Configurez l'apparence de votre boutique</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn-save-topbar" (click)="saveTheme()" [disabled]="isSavingTheme">
+        <fa-icon [icon]="isSavingTheme ? faSpinner : faSave" [spin]="isSavingTheme"></fa-icon>
+        {{ isSavingTheme ? 'Sauvegarde...' : 'Sauvegarder' }}
+      </button>
+      <a class="btn-preview" [href]="'/preview-store/' + storeId" target="_blank" *ngIf="storeId">
+        <fa-icon [icon]="faExternalLinkAlt"></fa-icon> Prévisualiser
+      </a>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="customizer-layout" *ngIf="!isLoading">
+
+    <!-- ═══ SIDEBAR (Desktop) ═══ -->
+    <aside class="customizer-sidebar desktop-sidebar">
+      <nav class="sidebar-nav">
+        <div class="sidebar-group" *ngFor="let group of sidebarGroups">
+          <div class="group-label" *ngIf="group.label">{{ group.label }}</div>
+          <button *ngFor="let item of group.items"
+                  class="sidebar-item"
+                  [class.active]="activeSection === item.key"
+                  (click)="setActiveSection(item.key)">
+            <i class="fa fa-{{item.icon}} sidebar-icon"></i>
+            <span>{{ item.label }}</span>
+          </button>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- ═══ MOBILE SECTION PICKER ═══ -->
+    <div class="mobile-section-picker">
+      <div class="section-select-wrap">
+        <i class="fa fa-bars select-icon"></i>
+        <select [(ngModel)]="activeSection" class="section-select">
+          <ng-container *ngFor="let group of sidebarGroups">
+            <optgroup [label]="group.label" *ngIf="group.label">
+              <option *ngFor="let item of group.items" [value]="item.key">{{ item.label }}</option>
+            </optgroup>
+            <ng-container *ngIf="!group.label">
+              <option *ngFor="let item of group.items" [value]="item.key">{{ item.label }}</option>
+            </ng-container>
+          </ng-container>
+        </select>
+        <i class="fa fa-chevron-down select-arrow"></i>
+      </div>
+      <button class="btn-save-mobile" (click)="saveTheme()" [disabled]="isSavingTheme">
+        <fa-icon [icon]="isSavingTheme ? faSpinner : faSave" [spin]="isSavingTheme"></fa-icon>
+      </button>
+    </div>
+
+    <!-- ═══ CONTENT PANEL ═══ -->
+    <main class="customizer-content">
+
+      <!-- ─── DOMAIN ─── -->
+      <div class="panel" *ngIf="activeSection === 'domain'">
+        <div class="panel-header">
+          <i class="fa fa-globe panel-icon"></i>
+          <div>
+            <h2>Domaine personnalisé</h2>
+            <p>Connectez votre propre nom de domaine</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label>Nom de domaine</label>
+            <div class="domain-input-group">
+              <span class="input-prefix">https://</span>
+              <input type="text" [(ngModel)]="customDomain" placeholder="monmagasin.com" [disabled]="isSaving" class="domain-input">
+            </div>
+          </div>
+          <button class="btn btn-primary" (click)="saveDomain()" [disabled]="isSaving || !customDomain.trim()">
+            <fa-icon [icon]="isSaving ? faSpinner : faSave" [spin]="isSaving"></fa-icon>
+            {{ isSaving ? 'Sauvegarde...' : 'Sauvegarder' }}
+          </button>
+
+          <div class="domain-status" *ngIf="hasDomain">
+            <div class="status-badge" [ngClass]="domainVerified ? 'verified' : 'pending'">
+              <fa-icon [icon]="domainVerified ? faCheckCircle : faClock"></fa-icon>
+              {{ domainVerified ? 'Vérifié & actif' : 'En attente de vérification' }}
+            </div>
+            <div class="action-buttons">
+              <button class="btn btn-outline" (click)="verifyDomain()" [disabled]="isVerifying" *ngIf="!domainVerified">
+                <fa-icon [icon]="isVerifying ? faSpinner : faSync" [spin]="isVerifying"></fa-icon>
+                {{ isVerifying ? 'Vérification...' : 'Vérifier le DNS' }}
+              </button>
+              <button class="btn btn-outline btn-danger" (click)="removeDomain()" [disabled]="isRemoving">
+                <fa-icon [icon]="isRemoving ? faSpinner : faTrash" [spin]="isRemoving"></fa-icon>
+                Supprimer
+              </button>
+            </div>
+          </div>
+
+          <div class="dns-help" *ngIf="hasDomain && !domainVerified">
+            <div class="info-box">
+              <fa-icon [icon]="faInfoCircle"></fa-icon>
+              <div>
+                <p><strong>Configuration DNS requise</strong></p>
+                <p>Ajoutez un enregistrement CNAME pointant vers <code>{{ verificationDetails || 'app.storiom.com' }}</code></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── COLORS ─── -->
+      <div class="panel" *ngIf="activeSection === 'colors'">
+        <div class="panel-header">
+          <i class="fa fa-tint panel-icon"></i>
+          <div>
+            <h2>Couleurs & Thème</h2>
+            <p>Définissez l'identité visuelle de votre boutique</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="color-grid">
+            <div class="form-group">
+              <label>Couleur principale</label>
+              <div class="color-picker-row">
+                <input type="color" [(ngModel)]="theme.primaryColor" class="color-input">
+                <input type="text" [(ngModel)]="theme.primaryColor" class="color-text">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Couleur d'accent</label>
+              <div class="color-picker-row">
+                <input type="color" [(ngModel)]="theme.accentColor" class="color-input">
+                <input type="text" [(ngModel)]="theme.accentColor" class="color-text">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Mode d'affichage</label>
+            <div class="mode-selector">
+              <button [class.active]="theme.mode === 'light'" (click)="theme.mode = 'light'">
+                <fa-icon [icon]="faSun"></fa-icon> Clair
+              </button>
+              <button [class.active]="theme.mode === 'dark'" (click)="theme.mode = 'dark'">
+                <fa-icon [icon]="faMoon"></fa-icon> Sombre
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── TYPOGRAPHY ─── -->
+      <div class="panel" *ngIf="activeSection === 'typography'">
+        <div class="panel-header">
+          <i class="fa fa-font panel-icon"></i>
+          <div>
+            <h2>Typographie</h2>
+            <p>Choisissez la police de votre boutique</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="font-grid">
+            <button *ngFor="let font of fonts"
+                    class="font-option"
+                    [class.active]="theme.fontFamily === font"
+                    [style.font-family]="font"
+                    (click)="theme.fontFamily = font">
+              <span class="font-preview">Aa</span>
+              <span class="font-name">{{ font }}</span>
+              <fa-icon [icon]="faCheck" class="font-check" *ngIf="theme.fontFamily === font"></fa-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── HERO ─── -->
+      <div class="panel" *ngIf="activeSection === 'hero'">
+        <div class="panel-header">
+          <i class="fa fa-image panel-icon"></i>
+          <div>
+            <h2>Hero / Bannière</h2>
+            <p>Personnalisez l'en-tête visuel de votre page d'accueil</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label>Style de bannière</label>
+            <div class="style-selector">
+              <button *ngFor="let style of heroStyles"
+                      [class.active]="theme.hero.style === style.value"
+                      (click)="theme.hero.style = style.value">
+                {{ style.label }}
+              </button>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Titre</label>
+              <input type="text" [(ngModel)]="theme.hero.title" placeholder="Bienvenue chez nous">
+            </div>
+            <div class="form-group">
+              <label>Sous-titre</label>
+              <input type="text" [(ngModel)]="theme.hero.subtitle" placeholder="Découvrez notre collection">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Texte du bouton</label>
+              <input type="text" [(ngModel)]="theme.hero.ctaText" placeholder="Voir les produits">
+            </div>
+            <div class="form-group">
+              <label>Opacité overlay</label>
+              <input type="range" min="0" max="1" step="0.05" [(ngModel)]="theme.hero.overlayOpacity">
+              <span class="range-value">{{ theme.hero.overlayOpacity }}</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Images de la bannière</label>
+            <div class="hero-images-grid">
+              <div class="hero-thumb" *ngFor="let img of theme.hero.images; let i = index">
+                <img [src]="backend + '/' + img" alt="Hero image">
+                <button class="remove-img-btn" (click)="removeHeroImage(i)"><fa-icon [icon]="faTimes"></fa-icon></button>
+              </div>
+              <label class="add-image-btn">
+                <input type="file" accept="image/*" multiple (change)="onHeroImagesSelected($event)" hidden>
+                <fa-icon [icon]="faCloudUploadAlt"></fa-icon>
+                <span>Ajouter</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group" *ngIf="theme.hero.images?.length > 1">
+            <label>Vitesse du défilement (secondes)</label>
+            <input type="number" [(ngModel)]="theme.hero.autoScrollSpeed" min="2" max="15">
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── PRODUCTS PAGE ─── -->
+      <div class="panel" *ngIf="activeSection === 'products'">
+        <div class="panel-header">
+          <i class="fa fa-th-large panel-icon"></i>
+          <div>
+            <h2>Page Produits</h2>
+            <p>Configurez la mise en page de votre catalogue</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label>Colonnes dans la grille</label>
+            <div class="option-selector">
+              <button *ngFor="let cols of [2, 3, 4, 5]"
+                      [class.active]="theme.productsPage.gridColumns === cols"
+                      (click)="theme.productsPage.gridColumns = cols">
+                {{ cols }} colonnes
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Tri par défaut</label>
+            <select [(ngModel)]="theme.productsPage.defaultSort">
+              <option value="">Aucun</option>
+              <option value="price_asc">Prix croissant</option>
+              <option value="price_desc">Prix décroissant</option>
+              <option value="newest">Plus récents</option>
+              <option value="name_asc">Nom A-Z</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Produits par page</label>
+            <select [(ngModel)]="theme.productsPage.productsPerPage">
+              <option [ngValue]="12">12</option>
+              <option [ngValue]="24">24</option>
+              <option [ngValue]="36">36</option>
+              <option [ngValue]="48">48</option>
+            </select>
+          </div>
+          <div class="toggle-row">
+            <label>Afficher les filtres</label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="theme.productsPage.showFilters">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label>Dégradé dans l'en-tête</label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="theme.productsPage.headerGradient">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── CART ─── -->
+      <div class="panel" *ngIf="activeSection === 'cart'">
+        <div class="panel-header">
+          <i class="fa fa-shopping-cart panel-icon"></i>
+          <div>
+            <h2>Panier</h2>
+            <p>Configurez l'apparence du panier</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label>Texte du bouton de commande</label>
+            <input type="text" [(ngModel)]="theme.cartPage.checkoutText" placeholder="Commander">
+          </div>
+          <div class="toggle-row">
+            <label>Afficher « Continuer les achats »</label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="theme.cartPage.showContinueShopping">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label>Afficher « Livraison gratuite »</label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="theme.cartPage.showFreeShipping">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── HEADER ─── -->
+      <div class="panel" *ngIf="activeSection === 'header'">
+        <div class="panel-header">
+          <i class="fa fa-window-maximize panel-icon"></i>
+          <div>
+            <h2>En-tête</h2>
+            <p>Personnalisez la barre de navigation</p>
+          </div>
+        </div>
+        <div class="panel-body">
+
+          <!-- Template Selector -->
+          <div class="form-group">
+            <label>Choisir un modèle</label>
+            <div class="header-templates-grid">
+              <div class="header-tpl-card"
+                   *ngFor="let tpl of headerTemplates"
+                   [class.active]="theme.header.template === tpl.id"
+                   (click)="applyHeaderTemplate(tpl)">
+                <div class="tpl-preview"
+                     [style.background]="tpl.preview.bg === 'primary' ? (theme.primaryColor || '#4f46e5') : tpl.preview.bg">
+                  <div class="tpl-logo" [style.background]="tpl.preview.accent"></div>
+                  <div class="tpl-nav">
+                    <span [style.background]="tpl.preview.text + '60'"></span>
+                    <span [style.background]="tpl.preview.text + '40'"></span>
+                    <span [style.background]="tpl.preview.text + '40'"></span>
+                  </div>
+                  <div class="tpl-search" [style.border-color]="tpl.preview.text + '25'">
+                    <span [style.background]="tpl.preview.text + '30'"></span>
+                  </div>
+                </div>
+                <div class="tpl-info">
+                  <span class="tpl-name">{{ tpl.name }}</span>
+                  <span class="tpl-desc">{{ tpl.desc }}</span>
+                </div>
+                <div class="tpl-check" *ngIf="theme.header.template === tpl.id">
+                  <fa-icon [icon]="faCheck"></fa-icon>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="template-divider">
+            <span>Personnalisation avancée</span>
+          </div>
+
+          <div class="color-grid">
+            <div class="form-group">
+              <label>Arrière-plan</label>
+              <div class="color-picker-row">
+                <input type="color" [(ngModel)]="theme.header.bgColor" class="color-input">
+                <input type="text" [(ngModel)]="theme.header.bgColor" class="color-text">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Couleur du texte</label>
+              <div class="color-picker-row">
+                <input type="color" [(ngModel)]="theme.header.textColor" class="color-input">
+                <input type="text" [(ngModel)]="theme.header.textColor" class="color-text">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Position du logo</label>
+            <div class="option-selector">
+              <button [class.active]="theme.header.logoPosition === 'left'" (click)="theme.header.logoPosition = 'left'">Gauche</button>
+              <button [class.active]="theme.header.logoPosition === 'center'" (click)="theme.header.logoPosition = 'center'">Centre</button>
+            </div>
+          </div>
+          <div class="toggle-row">
+            <label>En-tête sticky</label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="theme.header.sticky">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label>Afficher la recherche</label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="theme.header.showSearch">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="template-divider">
+            <span>Icônes de navigation</span>
+          </div>
+
+          <div class="nav-icons-editor">
+            <div class="nav-icon-slot" *ngFor="let slot of ['home', 'products', 'cart']">
+              <label class="nav-icon-label">{{ navIconOptions[slot].label }}</label>
+              <div class="nav-icon-right">
+                <div class="nav-icon-choices">
+                  <button *ngFor="let opt of navIconOptions[slot].icons"
+                          class="icon-choice-btn"
+                          [class.active]="theme.header.icons[slot] === opt.value"
+                          (click)="theme.header.icons[slot] = opt.value"
+                          [title]="opt.label">
+                    <i class="fa fa-{{ opt.value }}"></i>
+                  </button>
+                </div>
+                <div class="custom-icon-input">
+                  <i class="fa fa-{{ theme.header.icons[slot] || 'question' }} custom-icon-preview"></i>
+                  <input type="text" [(ngModel)]="theme.header.icons[slot]"
+                         placeholder="ex: shopping-cart">
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ─── FOOTER ─── -->
+      <div class="panel" *ngIf="activeSection === 'footer'">
+        <div class="panel-header">
+          <i class="fa fa-columns panel-icon"></i>
+          <div>
+            <h2>Pied de page</h2>
+            <p>Personnalisez le bas de votre boutique</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="color-grid">
+            <div class="form-group">
+              <label>Arrière-plan</label>
+              <div class="color-picker-row">
+                <input type="color" [(ngModel)]="theme.footer.bgColor" class="color-input">
+                <input type="text" [(ngModel)]="theme.footer.bgColor" class="color-text">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Couleur du texte</label>
+              <div class="color-picker-row">
+                <input type="color" [(ngModel)]="theme.footer.textColor" class="color-input">
+                <input type="text" [(ngModel)]="theme.footer.textColor" class="color-text">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Texte de description</label>
+            <textarea [(ngModel)]="theme.footer.text" rows="3" placeholder="Décrivez votre boutique..."></textarea>
+          </div>
+          <div class="toggle-row">
+            <label>Section Contact</label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="theme.footer.showContact">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label>Section Réseaux sociaux</label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="theme.footer.showSocial">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label>Section Liens rapides</label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="theme.footer.showQuickLinks">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="quick-links-panel" *ngIf="theme.footer.showQuickLinks">
+            <label>Liens rapides (max 6)</label>
+            <div class="quick-link-row" *ngFor="let link of theme.footer.quickLinks; let i = index">
+              <input type="text" [(ngModel)]="link.label" placeholder="Label">
+              <input type="text" [(ngModel)]="link.url" placeholder="https://...">
+              <button class="btn-icon danger" (click)="removeQuickLink(i)"><fa-icon [icon]="faTimes"></fa-icon></button>
+            </div>
+            <button class="btn btn-sm" (click)="addQuickLink()" *ngIf="theme.footer.quickLinks.length < 6">
+              <fa-icon [icon]="faPlus"></fa-icon> Ajouter un lien
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── PRODUCT CARD ─── -->
+      <div class="panel" *ngIf="activeSection === 'productCard'">
+        <div class="panel-header">
+          <i class="fa fa-id-card panel-icon"></i>
+          <div>
+            <h2>Carte produit</h2>
+            <p>Personnalisez l'apparence des fiches produit</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label>Ratio de l'image</label>
+            <div class="option-selector">
+              <button [class.active]="theme.productCard.imageRatio === 'square'" (click)="theme.productCard.imageRatio = 'square'">Carré</button>
+              <button [class.active]="theme.productCard.imageRatio === 'portrait'" (click)="theme.productCard.imageRatio = 'portrait'">Portrait</button>
+              <button [class.active]="theme.productCard.imageRatio === 'landscape'" (click)="theme.productCard.imageRatio = 'landscape'">Paysage</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Effet au survol</label>
+            <div class="option-selector">
+              <button [class.active]="theme.productCard.hoverEffect === 'lift'" (click)="theme.productCard.hoverEffect = 'lift'">Élévation</button>
+              <button [class.active]="theme.productCard.hoverEffect === 'zoom'" (click)="theme.productCard.hoverEffect = 'zoom'">Zoom</button>
+              <button [class.active]="theme.productCard.hoverEffect === 'none'" (click)="theme.productCard.hoverEffect = 'none'">Aucun</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Arrondi des coins ({{ theme.productCard.borderRadius }}px)</label>
+            <input type="range" min="0" max="24" step="2" [(ngModel)]="theme.productCard.borderRadius">
+          </div>
+          <div class="toggle-row">
+            <label>Bouton « Ajouter au panier »</label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="theme.productCard.showCartButton">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <label>Badge de réduction</label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="theme.productCard.showDiscountBadge">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── ANNOUNCEMENT ─── -->
+      <div class="panel" *ngIf="activeSection === 'announcement'">
+        <div class="panel-header">
+          <i class="fa fa-bullhorn panel-icon"></i>
+          <div>
+            <h2>Barre d'annonce</h2>
+            <p>Affichez un message promotionnel</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="toggle-row">
+            <label>Activer la barre d'annonce</label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="theme.announcement.enabled">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div *ngIf="theme.announcement.enabled">
+            <div class="form-group">
+              <label>Texte</label>
+              <input type="text" [(ngModel)]="theme.announcement.text" placeholder="🎉 Livraison offerte dès 50 DT !">
+            </div>
+            <div class="form-group">
+              <label>Couleur de fond</label>
+              <div class="color-picker-row">
+                <input type="color" [(ngModel)]="theme.announcement.bgColor" class="color-input">
+                <input type="text" [(ngModel)]="theme.announcement.bgColor" class="color-text">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Lien (optionnel)</label>
+              <input type="text" [(ngModel)]="theme.announcement.link" placeholder="https://...">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── USPS ─── -->
+      <div class="panel" *ngIf="activeSection === 'usps'">
+        <div class="panel-header">
+          <i class="fa fa-check-circle panel-icon"></i>
+          <div>
+            <h2>Avantages</h2>
+            <p>Mettez en avant vos atouts</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="toggle-row">
+            <label>Activer les avantages</label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="theme.usps.enabled">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div *ngIf="theme.usps.enabled" class="usp-items-list">
+            <div class="usp-edit-card" *ngFor="let usp of theme.usps.items; let i = index">
+              <div class="usp-edit-header">
+                <div class="usp-edit-number">{{ i + 1 }}</div>
+                <span class="usp-edit-label">Avantage {{ i + 1 }}</span>
+              </div>
+              <div class="usp-edit-fields">
+                <div class="form-group">
+                  <label>Icône</label>
+                  <div class="usp-icon-picker">
+                    <div class="usp-icon-preview" [style.background]="(theme.primaryColor || '#4f46e5') + '12'"
+                         [style.color]="theme.primaryColor || '#4f46e5'">
+                      <i class="fa" [ngClass]="'fa-' + (usp.icon || 'star')"></i>
+                    </div>
+                    <select [(ngModel)]="usp.icon">
+                      <option *ngFor="let ico of uspIcons" [value]="ico.value">{{ ico.label }}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Titre</label>
+                  <input type="text" [(ngModel)]="usp.title" placeholder="Ex: Livraison gratuite">
+                </div>
+                <div class="form-group">
+                  <label>Description</label>
+                  <input type="text" [(ngModel)]="usp.subtitle" placeholder="Ex: Dès 50 DT d'achat">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── ABOUT ─── -->
+      <div class="panel" *ngIf="activeSection === 'about'">
+        <div class="panel-header">
+          <i class="fa fa-info-circle panel-icon"></i>
+          <div>
+            <h2>À propos</h2>
+            <p>Racontez votre histoire</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="toggle-row">
+            <label>Activer la section À propos</label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="theme.about.enabled">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div *ngIf="theme.about.enabled">
+            <div class="form-group">
+              <label>Titre</label>
+              <input type="text" [(ngModel)]="theme.about.title" placeholder="Notre histoire">
+            </div>
+            <div class="form-group">
+              <label>Contenu</label>
+              <textarea [(ngModel)]="theme.about.content" rows="5" placeholder="Racontez votre histoire..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Image</label>
+              <label class="upload-area">
+                <input type="file" accept="image/*" (change)="uploadAboutImage($event)" hidden>
+                <img *ngIf="theme.about.image" [src]="backend + '/' + theme.about.image" class="about-preview">
+                <div *ngIf="!theme.about.image" class="upload-placeholder">
+                  <fa-icon [icon]="faCloudUploadAlt"></fa-icon>
+                  <span>Cliquez pour ajouter une image</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── SOCIAL ─── -->
+      <div class="panel" *ngIf="activeSection === 'social'">
+        <div class="panel-header">
+          <i class="fa fa-share-alt panel-icon"></i>
+          <div>
+            <h2>Réseaux sociaux</h2>
+            <p>Ajoutez vos liens sociaux</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label><fa-icon [icon]="faFacebook"></fa-icon> Facebook</label>
+            <input type="text" [(ngModel)]="theme.social.facebook" placeholder="https://facebook.com/...">
+          </div>
+          <div class="form-group">
+            <label><fa-icon [icon]="faInstagram"></fa-icon> Instagram</label>
+            <input type="text" [(ngModel)]="theme.social.instagram" placeholder="https://instagram.com/...">
+          </div>
+          <div class="form-group">
+            <label><fa-icon [icon]="faTiktok"></fa-icon> TikTok</label>
+            <input type="text" [(ngModel)]="theme.social.tiktok" placeholder="https://tiktok.com/@...">
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── VISIBILITY ─── -->
+      <div class="panel" *ngIf="activeSection === 'visibility'">
+        <div class="panel-header">
+          <i class="fa fa-eye panel-icon"></i>
+          <div>
+            <h2>Visibilité des sections</h2>
+            <p>Choisissez les sections à afficher sur votre boutique</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="toggle-row" *ngFor="let section of [
+            { key: 'hero', label: 'Bannière Hero' },
+            { key: 'products', label: 'Produits en vedette' },
+            { key: 'categories', label: 'Catégories' },
+            { key: 'usps', label: 'Avantages' },
+            { key: 'about', label: 'Section À propos' },
+            { key: 'info', label: 'Informations' },
+            { key: 'footer', label: 'Pied de page' }
+          ]">
+            <label>{{ section.label }}</label>
+            <label class="switch">
+              <input type="checkbox" [(ngModel)]="theme.sections[section.key]">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>

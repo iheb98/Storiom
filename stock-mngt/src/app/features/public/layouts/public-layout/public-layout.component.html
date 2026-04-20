@@ -1,9 +1,42 @@
 <div class="public-layout">
-  <app-public-header></app-public-header>
+  <!-- Marketplace mode: show full Storiom header + footer -->
+  <ng-container *ngIf="!isCustomDomain">
+    <app-public-header></app-public-header>
+  </ng-container>
+
+  <!-- Custom domain mode: show simple store header -->
+  <ng-container *ngIf="isCustomDomain">
+    <header class="store-domain-header">
+      <div class="store-header-inner">
+        <a routerLink="/" class="store-header-brand">
+          <img *ngIf="domainStore?.logo" [src]="domainStore.logo" [alt]="domainStore.name" class="store-header-logo">
+          <span class="store-header-name">{{ domainStore?.name }}</span>
+        </a>
+        <nav class="store-header-nav">
+          <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Accueil</a>
+          <a routerLink="/publicProducts" routerLinkActive="active">Produits</a>
+          <a routerLink="/cart" routerLinkActive="active">
+            <i class="fas fa-shopping-cart"></i> Panier
+          </a>
+        </nav>
+      </div>
+    </header>
+  </ng-container>
 
   <div class="main-content">
     <router-outlet></router-outlet>
   </div>
 
-  <app-public-footer></app-public-footer>
+  <!-- Marketplace mode: full footer -->
+  <ng-container *ngIf="!isCustomDomain">
+    <app-public-footer></app-public-footer>
+  </ng-container>
+
+  <!-- Custom domain mode: simple footer -->
+  <footer class="store-domain-footer" *ngIf="isCustomDomain">
+    <div class="store-footer-inner">
+      <p>&copy; {{ currentYear }} {{ domainStore?.name }}. Propulsé par <a href="https://storiom.com" target="_blank">Storiom</a></p>
+    </div>
+  </footer>
 </div>
+

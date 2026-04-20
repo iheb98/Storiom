@@ -1,0 +1,213 @@
+<div class="store-profile-page">
+  <!-- ═══ HEADER ═══ -->
+  <div class="profile-hero">
+    <div class="hero-inner">
+      <div class="avatar-wrap">
+        <div class="avatar">
+          {{ customer?.firstName?.charAt(0) || 'C' }}{{ customer?.lastName?.charAt(0) || '' }}
+        </div>
+      </div>
+      <div class="hero-info">
+        <h1>{{ customer?.firstName }} {{ customer?.lastName }}</h1>
+        <p class="hero-email"><fa-icon [icon]="faEnvelope"></fa-icon> {{ customer?.email }}</p>
+      </div>
+      <button class="logout-btn" (click)="logout()">
+        <fa-icon [icon]="faSignOut"></fa-icon>
+        <span>Déconnexion</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ TABS ═══ -->
+  <div class="tabs-bar">
+    <div class="tabs-inner">
+      <button class="tab" [class.active]="activeTab === 'profile'" (click)="switchTab('profile')">
+        <fa-icon [icon]="faUser"></fa-icon> Mon Profil
+      </button>
+      <button class="tab" [class.active]="activeTab === 'orders'" (click)="switchTab('orders')">
+        <fa-icon [icon]="faShoppingBag"></fa-icon> Mes Commandes
+        <span class="tab-badge" *ngIf="orders.length > 0">{{ orders.length }}</span>
+      </button>
+      <button class="tab" [class.active]="activeTab === 'security'" (click)="switchTab('security')">
+        <fa-icon [icon]="faLock"></fa-icon> Sécurité
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ CONTENT ═══ -->
+  <div class="profile-content">
+
+    <!-- ─── Profile Tab ─── -->
+    <div class="tab-panel" *ngIf="activeTab === 'profile'">
+      <div class="card">
+        <div class="card-header">
+          <h2>Informations personnelles</h2>
+          <button class="edit-btn" *ngIf="!isEditing" (click)="startEdit()">
+            <fa-icon [icon]="faEdit"></fa-icon> Modifier
+          </button>
+        </div>
+
+        <!-- Success message -->
+        <div class="success-msg" *ngIf="saveMessage">
+          <fa-icon [icon]="faCheck"></fa-icon> {{ saveMessage }}
+        </div>
+
+        <!-- View mode -->
+        <div class="info-grid" *ngIf="!isEditing">
+          <div class="info-item">
+            <label>Prénom</label>
+            <span>{{ customer?.firstName || '—' }}</span>
+          </div>
+          <div class="info-item">
+            <label>Nom</label>
+            <span>{{ customer?.lastName || '—' }}</span>
+          </div>
+          <div class="info-item">
+            <label>Email</label>
+            <span>{{ customer?.email || '—' }}</span>
+          </div>
+          <div class="info-item">
+            <label>Téléphone</label>
+            <span>{{ customer?.phone || '—' }}</span>
+          </div>
+          <div class="info-item full-width">
+            <label>Adresse</label>
+            <span>{{ customer?.address || '—' }}</span>
+          </div>
+        </div>
+
+        <!-- Edit mode -->
+        <div class="edit-form" *ngIf="isEditing">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Prénom</label>
+              <input type="text" [(ngModel)]="editForm.firstName" placeholder="Votre prénom">
+            </div>
+            <div class="form-group">
+              <label>Nom</label>
+              <input type="text" [(ngModel)]="editForm.lastName" placeholder="Votre nom">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Téléphone</label>
+            <input type="text" [(ngModel)]="editForm.phone" placeholder="Numéro de téléphone">
+          </div>
+          <div class="form-group full-width">
+            <label>Adresse</label>
+            <textarea [(ngModel)]="editForm.address" placeholder="Votre adresse de livraison" rows="3"></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn-save" (click)="saveProfile()" [disabled]="saving">
+              <fa-icon [icon]="faSave"></fa-icon> {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
+            </button>
+            <button class="btn-cancel" (click)="cancelEdit()">
+              <fa-icon [icon]="faTimes"></fa-icon> Annuler
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Orders Tab ─── -->
+    <div class="tab-panel" *ngIf="activeTab === 'orders'">
+      <!-- Loading -->
+      <div class="loading-state" *ngIf="loadingOrders">
+        <div class="spinner"></div>
+        <p>Chargement de vos commandes...</p>
+      </div>
+
+      <!-- Empty -->
+      <div class="empty-state" *ngIf="!loadingOrders && orders.length === 0">
+        <div class="empty-icon"><fa-icon [icon]="faShoppingBag"></fa-icon></div>
+        <h3>Aucune commande</h3>
+        <p>Vous n'avez pas encore passé de commande.</p>
+        <a [routerLink]="[basePath, 'products']" class="btn-browse">
+          Découvrir nos produits <fa-icon [icon]="faChevronRight"></fa-icon>
+        </a>
+      </div>
+
+      <!-- Orders list -->
+      <div class="orders-list" *ngIf="!loadingOrders && orders.length > 0">
+        <div class="order-card" *ngFor="let order of orders">
+          <div class="order-header">
+            <div class="order-meta">
+              <span class="order-id">#{{ order.id }}</span>
+              <span class="order-date">
+                <fa-icon [icon]="faCalendar"></fa-icon>
+                {{ order.createdAt | date:'dd/MM/yyyy à HH:mm' }}
+              </span>
+            </div>
+            <span class="order-status" [ngClass]="getStatusClass(order.status)">
+              {{ getStatusLabel(order.status) }}
+            </span>
+          </div>
+
+          <div class="order-items">
+            <div class="order-item" *ngFor="let item of order.items">
+              <div class="item-image">
+                <img *ngIf="getProductImage(item.product)" [src]="getProductImage(item.product)" [alt]="item.product?.name">
+                <div class="item-placeholder" *ngIf="!getProductImage(item.product)">
+                  <fa-icon [icon]="faBox"></fa-icon>
+                </div>
+              </div>
+              <div class="item-info">
+                <span class="item-name">{{ item.product?.name || 'Produit' }}</span>
+                <span class="item-qty">Qté: {{ item.quantity }}</span>
+              </div>
+              <span class="item-price">{{ item.price | number:'1.2-2' }} DT</span>
+            </div>
+          </div>
+
+          <div class="order-footer">
+            <div class="order-details" *ngIf="order.customerAddress">
+              <fa-icon [icon]="faMapMarkerAlt"></fa-icon>
+              <span>{{ order.customerAddress }}</span>
+            </div>
+            <div class="order-total">
+              Total: <strong>{{ getOrderTotal(order) | number:'1.2-2' }} DT</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Security Tab ─── -->
+    <div class="tab-panel" *ngIf="activeTab === 'security'">
+      <div class="card">
+        <div class="card-header">
+          <h2>Changer le mot de passe</h2>
+        </div>
+
+        <div class="success-msg" *ngIf="passwordMessage">
+          <fa-icon [icon]="faCheck"></fa-icon> {{ passwordMessage }}
+        </div>
+        <div class="error-msg" *ngIf="passwordError">
+          {{ passwordError }}
+        </div>
+
+        <div class="edit-form">
+          <div class="form-group">
+            <label>Mot de passe actuel</label>
+            <input type="password" [(ngModel)]="passwordForm.currentPassword" placeholder="••••••••">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nouveau mot de passe</label>
+              <input type="password" [(ngModel)]="passwordForm.newPassword" placeholder="••••••••">
+            </div>
+            <div class="form-group">
+              <label>Confirmer le mot de passe</label>
+              <input type="password" [(ngModel)]="passwordForm.confirmPassword" placeholder="••••••••">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-save" (click)="changePassword()" [disabled]="changingPassword">
+              <fa-icon [icon]="faLock"></fa-icon> {{ changingPassword ? 'Modification...' : 'Modifier le mot de passe' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

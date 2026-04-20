@@ -4,15 +4,10 @@ const {
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Review extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate({ User, Product }) {
-      // define association here
+    static associate({ User, Product, StoreCustomer }) {
       this.belongsTo(User, { foreignKey: 'userId', as: 'user' })
       this.belongsTo(Product, { foreignKey: 'productId', as: 'product' })
+      this.belongsTo(StoreCustomer, { foreignKey: 'storeCustomerId', as: 'storeCustomer' })
     }
     toJSON() {
       return { ...this.get(), userId: undefined, productId: undefined, user_id: undefined, product_id: undefined }
@@ -27,7 +22,13 @@ module.exports = (sequelize, DataTypes) => {
     },
     userId: {
       type: DataTypes.INTEGER,
-      field: 'user_id'
+      field: 'user_id',
+      allowNull: true
+    },
+    storeCustomerId: {
+      type: DataTypes.INTEGER,
+      field: 'store_customer_id',
+      allowNull: true
     },
     productId: {
       type: DataTypes.INTEGER,

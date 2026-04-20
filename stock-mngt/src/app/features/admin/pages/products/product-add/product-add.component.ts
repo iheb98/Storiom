@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   faArrowLeft, faEdit, faTimes, faChartLine, faCubes, faExclamationTriangle,
   faEye, faInfoCircle, faTag, faFolder, faTruck, faCoins, faArrowDown,
-  faArrowUp, faAlignLeft, faImages, faCloudUploadAlt, faPlus, faSave, faBox, faBarcode, faCamera, faPercent, faStar, faCheckCircle
+  faArrowUp, faAlignLeft, faImages, faCloudUploadAlt, faPlus, faSave, faBox, faBarcode, faCamera, faPercent, faStar, faCheckCircle, faStore
 } from '@fortawesome/free-solid-svg-icons';
 import { faStar as faStarOutline } from '@fortawesome/free-regular-svg-icons';
 import { BarcodeFormat } from '@zxing/library';
@@ -57,6 +57,7 @@ export class ProductAddComponent implements OnInit {
   faStar = faStar;
   faStarOutline = faStarOutline;
   faCheckCircle = faCheckCircle;
+  faStore = faStore;
 
   // Barcode Scanner
   scannerActive = false;
@@ -220,6 +221,7 @@ export class ProductAddComponent implements OnInit {
         this.form.get('supplierId').setValue(response?.supplier?.id);
         this.form.get('size').setValue(response?.size);
         this.form.get('toDisplay').setValue(response?.toDisplay);
+        this.form.get('toDisplayStore').setValue(response?.toDisplayStore);
         this.form.get('criticalStockIndicator').setValue(response?.criticalStockIndicator);
         this.form.get('activateCriticalStockIndicator').setValue(response?.activateCriticalStockIndicator || false);
         this.form.get('code').setValue(response?.code);
@@ -263,6 +265,7 @@ export class ProductAddComponent implements OnInit {
       sellingPrice: [null],
       discount: [0],
       toDisplay: [defaultVisibility],
+      toDisplayStore: [false],
       mainImageIndex: [0],
       images: [null],
       condition: ['NEW'],

@@ -41,6 +41,7 @@ import { SubscriptionComponent } from './pages/subscription/subscription.compone
 import { PaymentOrdersAdminComponent } from '../superadmin/pages/payment-orders-admin/payment-orders-admin.component';
 import { RoleGuard } from 'src/app/core/services/role.guard';
 import { ProductAnalyticsComponent } from './pages/product-analytics/product-analytics.component';
+import { DomainSettingsComponent } from './pages/settings/domain-settings/domain-settings.component';
 
 const routes: Routes = [
   {
@@ -130,6 +131,7 @@ const routes: Routes = [
 
       // ------------ Settings ------------
       { path: 'settings', component: UserSettingsComponent },
+      { path: 'domain-settings', component: DomainSettingsComponent },
     ],
   },
 ];

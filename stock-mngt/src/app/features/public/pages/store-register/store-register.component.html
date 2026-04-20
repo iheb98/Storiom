@@ -1,0 +1,82 @@
+<div class="store-auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1>Créer un compte</h1>
+      <p>Rejoignez {{ storeName }}</p>
+    </div>
+
+    <div class="auth-error" *ngIf="errorMessage">
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <div class="auth-success" *ngIf="successMessage">
+      <span>{{ successMessage }}</span>
+    </div>
+
+    <form (ngSubmit)="register()" class="auth-form" *ngIf="!successMessage">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">
+            <fa-icon [icon]="faUser"></fa-icon> Prénom *
+          </label>
+          <input type="text" id="firstName" [(ngModel)]="firstName" name="firstName"
+                 placeholder="Prénom" autocomplete="given-name">
+        </div>
+        <div class="form-group">
+          <label for="lastName">
+            <fa-icon [icon]="faUser"></fa-icon> Nom *
+          </label>
+          <input type="text" id="lastName" [(ngModel)]="lastName" name="lastName"
+                 placeholder="Nom" autocomplete="family-name">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">
+          <fa-icon [icon]="faEnvelope"></fa-icon> Email *
+        </label>
+        <input type="email" id="email" [(ngModel)]="email" name="email"
+               placeholder="votre@email.com" autocomplete="email">
+      </div>
+
+      <div class="form-group">
+        <label for="phone">
+          <fa-icon [icon]="faPhone"></fa-icon> Téléphone
+        </label>
+        <input type="tel" id="phone" [(ngModel)]="phone" name="phone"
+               placeholder="(Optionnel)" autocomplete="tel">
+      </div>
+
+      <div class="form-group">
+        <label for="password">
+          <fa-icon [icon]="faLock"></fa-icon> Mot de passe *
+        </label>
+        <div class="password-input">
+          <input [type]="showPassword ? 'text' : 'password'" id="password"
+                 [(ngModel)]="password" name="password"
+                 placeholder="Au moins 6 caractères" autocomplete="new-password">
+          <button type="button" class="toggle-pw" (click)="showPassword = !showPassword">
+            <fa-icon [icon]="showPassword ? faEyeSlash : faEye"></fa-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">
+          <fa-icon [icon]="faLock"></fa-icon> Confirmer le mot de passe *
+        </label>
+        <input type="password" id="confirmPassword" [(ngModel)]="confirmPassword"
+               name="confirmPassword" placeholder="••••••••" autocomplete="new-password">
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Créer mon compte <fa-icon [icon]="faArrowRight"></fa-icon></span>
+        <span *ngIf="isLoading">Inscription...</span>
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Déjà un compte ? <a [routerLink]="[basePath, 'login']">Se connecter</a></p>
+    </div>
+  </div>
+</div>

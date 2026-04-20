@@ -61,38 +61,86 @@
 
         <!-- Bulk Actions Bar -->
         <div class="bulk-actions-bar" *ngIf="products?.length > 0">
-            <div class="bulk-left">
-                <label class="select-all-checkbox">
-                    <input type="checkbox" [checked]="isAllSelected"
-                        (change)="toggleSelectAll($any($event.target).checked)">
-                    <span>Tout sélectionner</span>
-                </label>
-                <span class="selection-count" *ngIf="selectedIds.length > 0">
-                    {{ selectedIds.length }} produit(s) sélectionné(s)
-                </span>
-            </div>
-            <div class="bulk-right">
-                <button class="btn-bulk show" (click)="bulkUpdateDisplay(true)" [disabled]="selectedIds.length === 0"
-                    title="Afficher les produits sélectionnés">
+            <div class="bulk-header" (click)="bulkActionsCollapsed = !bulkActionsCollapsed">
+                <div class="bulk-header-left">
+                    <label class="select-all-checkbox" (click)="$event.stopPropagation()">
+                        <input type="checkbox" [checked]="isAllSelected"
+                            (change)="toggleSelectAll($any($event.target).checked)">
+                        <span>Tout sélectionner</span>
+                    </label>
+                    <span class="selection-count" *ngIf="selectedIds.length > 0">
+                        {{ selectedIds.length }} sélectionné(s)
+                    </span>
+                </div>
+                <button class="bulk-toggle-btn" [class.expanded]="!bulkActionsCollapsed">
                     <fa-icon [icon]="faEye"></fa-icon>
-                    <span>Afficher</span>
+                    <span>Actions de visibilité</span>
+                    <fa-icon [icon]="faChevronDown" class="chevron"></fa-icon>
                 </button>
-                <button class="btn-bulk hide" (click)="bulkUpdateDisplay(false)" [disabled]="selectedIds.length === 0"
-                    title="Masquer les produits sélectionnés">
-                    <fa-icon [icon]="faEyeSlash"></fa-icon>
-                    <span>Masquer</span>
-                </button>
-                <div class="bulk-divider"></div>
-                <button class="btn-bulk show-all" (click)="bulkUpdateDisplay(true, true)"
-                    title="Afficher tous les produits">
-                    <fa-icon [icon]="faGlobe"></fa-icon>
-                    <span>Tout afficher</span>
-                </button>
-                <button class="btn-bulk hide-all" (click)="bulkUpdateDisplay(false, true)"
-                    title="Masquer tous les produits">
-                    <fa-icon [icon]="faLock"></fa-icon>
-                    <span>Tout masquer</span>
-                </button>
+            </div>
+
+            <div class="bulk-body" [class.collapsed]="bulkActionsCollapsed">
+                <div class="bulk-sections">
+                    <!-- Marketplace Section -->
+                    <div class="bulk-section marketplace">
+                        <div class="section-label">
+                            <fa-icon [icon]="faGlobe"></fa-icon>
+                            <span>Marketplace</span>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn-bulk show" (click)="bulkUpdateDisplay(true)" [disabled]="selectedIds.length === 0"
+                                title="Afficher les sélectionnés">
+                                <fa-icon [icon]="faEye"></fa-icon>
+                                <span>Afficher</span>
+                            </button>
+                            <button class="btn-bulk hide" (click)="bulkUpdateDisplay(false)" [disabled]="selectedIds.length === 0"
+                                title="Masquer les sélectionnés">
+                                <fa-icon [icon]="faEyeSlash"></fa-icon>
+                                <span>Masquer</span>
+                            </button>
+                            <button class="btn-bulk show-all" (click)="bulkUpdateDisplay(true, true)"
+                                title="Afficher tous">
+                                <fa-icon [icon]="faGlobe"></fa-icon>
+                                <span>Tout afficher</span>
+                            </button>
+                            <button class="btn-bulk hide-all" (click)="bulkUpdateDisplay(false, true)"
+                                title="Tout masquer">
+                                <fa-icon [icon]="faLock"></fa-icon>
+                                <span>Tout masquer</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Store Section -->
+                    <div class="bulk-section store">
+                        <div class="section-label">
+                            <fa-icon [icon]="faStore"></fa-icon>
+                            <span>Boutique en ligne</span>
+                        </div>
+                        <div class="section-actions">
+                            <button class="btn-bulk store-show" (click)="bulkUpdateStoreDisplay(true)" [disabled]="selectedIds.length === 0"
+                                title="Afficher les sélectionnés">
+                                <fa-icon [icon]="faEye"></fa-icon>
+                                <span>Afficher</span>
+                            </button>
+                            <button class="btn-bulk store-hide" (click)="bulkUpdateStoreDisplay(false)" [disabled]="selectedIds.length === 0"
+                                title="Masquer les sélectionnés">
+                                <fa-icon [icon]="faEyeSlash"></fa-icon>
+                                <span>Masquer</span>
+                            </button>
+                            <button class="btn-bulk store-show-all" (click)="bulkUpdateStoreDisplay(true, true)"
+                                title="Afficher tous">
+                                <fa-icon [icon]="faStore"></fa-icon>
+                                <span>Tout afficher</span>
+                            </button>
+                            <button class="btn-bulk store-hide-all" (click)="bulkUpdateStoreDisplay(false, true)"
+                                title="Tout masquer">
+                                <fa-icon [icon]="faStore"></fa-icon>
+                                <span>Tout masquer</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -181,8 +229,13 @@
                         [class.warning]="item?.quantity > 5 && item?.quantity <= 10" [class.good]="item?.quantity > 10">
                         {{ item?.quantity }} en stock
                     </span>
-                    <span class="visibility-badge" [class.visible]="item?.toDisplay" [class.hidden]="!item?.toDisplay">
+                    <span class="visibility-badge" [class.visible]="item?.toDisplay" [class.hidden]="!item?.toDisplay"
+                        title="Marketplace">
                         <fa-icon [icon]="item?.toDisplay ? faEye : faEyeSlash"></fa-icon>
+                    </span>
+                    <span class="visibility-badge store" [class.visible]="item?.toDisplayStore" [class.hidden]="!item?.toDisplayStore"
+                        title="Boutique en ligne">
+                        <fa-icon [icon]="faStore"></fa-icon>
                     </span>
                 </div>
 

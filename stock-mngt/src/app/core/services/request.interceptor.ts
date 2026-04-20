@@ -30,12 +30,19 @@ export class RequestInterceptor implements HttpInterceptor {
     }
 
     return next.handle(authReq).pipe(catchError(error => {
-      // Only handle 403 errors (token expired) for non-auth endpoints
-      if (error instanceof HttpErrorResponse &&
-        !authReq.url.includes('authenticate') &&
-        !authReq.url.includes('/token') &&
-        error.status === 403) {
-        return this.handle403Error(authReq, next);
+      if (error instanceof HttpErrorResponse) {
+        // 402 = subscription expired — don't logout, redirect to subscription page
+        if (error.status === 402 && error.error?.subscriptionExpired) {
+          this.router.navigate(['/admin/subscription']);
+          return throwError(error);
+        }
+
+        // Only handle 403 errors (token expired) for non-auth endpoints
+        if (!authReq.url.includes('authenticate') &&
+          !authReq.url.includes('/token') &&
+          error.status === 403) {
+          return this.handle403Error(authReq, next);
+        }
       }
 
       return throwError(error);

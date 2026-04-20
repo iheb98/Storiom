@@ -121,7 +121,7 @@ export class StoreDetailsComponent implements OnInit, AfterViewChecked {
     }
 
     loadCategories() {
-        this.publicService.getCategoryTree().subscribe(res => {
+        this.publicService.getCategoryTree(this.storeId).subscribe(res => {
             this.categories = res;
             this.flatCategories = this.flattenCategories(res);
         });
@@ -260,15 +260,8 @@ export class StoreDetailsComponent implements OnInit, AfterViewChecked {
         // Track cart_add event
         this.trackEvent(product, 'cart_add');
 
-        if (this.authService.isLoggedIn()) {
-            this.productService.addToCart(product.id, 1).subscribe({
-                next: () => this.toastService.showSuccess('Produit ajouté au panier'),
-                error: () => this.toastService.showError('Erreur lors de l\'ajout au panier')
-            });
-        } else {
-            this.cartService.addToCart(product, 1);
-            this.toastService.showSuccess('Produit ajouté au panier (Local)');
-        }
+        this.cartService.addToCart(product, 1);
+        this.toastService.showSuccess('Produit ajouté au panier');
     }
 
     // Track analytics events

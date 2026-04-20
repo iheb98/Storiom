@@ -39,8 +39,9 @@ const checkSubscription = async (req, res, next) => {
         }
 
         if (isExpired) {
-            return res.status(403).json({
+            return res.status(402).json({
                 success: false,
+                subscriptionExpired: true,
                 message: 'Abonnement expiré. Veuillez renouveler votre abonnement pour continuer.'
             });
         }

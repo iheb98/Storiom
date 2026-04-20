@@ -257,16 +257,13 @@ router.get('/my-orders', utility.authenticate, async (req, res) => {
 router.get('/store/:storeId', utility.authenticate, async (req, res) => {
     try {
         const storeId = req.params.storeId;
-
-        // Ensure user has access to this store (Add your checkSubscription/permission logic here if needed)
-        // For now preventing random access:
-        // const store = await Store.findByPk(storeId);
-        // if (store.userId !== req.user.id) return res.status(403).json({message: "Unauthorized"});
+        const { StoreCustomer } = require('../models');
 
         const orders = await Order.findAll({
             where: { storeId },
             include: [
                 { model: User, as: 'user', attributes: ['id', 'firstName', 'lastName', 'email', 'phone'] },
+                { model: StoreCustomer, as: 'storeCustomer', attributes: ['id', 'firstName', 'lastName', 'email', 'phone'] },
                 {
                     model: OrderItem,
                     as: 'items',

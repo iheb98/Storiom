@@ -49,6 +49,18 @@ import { ContactComponent } from './pages/contact/contact.component';
 import { PrivacyComponent } from './pages/privacy/privacy.component';
 import { ShippingComponent } from './pages/shipping/shipping.component';
 import { FaqComponent } from './pages/faq/faq.component';
+import { StoreLandingComponent } from './pages/store-landing/store-landing.component';
+import { StoreLayoutComponent } from './layouts/store-layout/store-layout.component';
+import { StoreProductsComponent } from './pages/store-products/store-products.component';
+import { StoreCartComponent } from './pages/store-cart/store-cart.component';
+import { StoreProductCardComponent } from './components/store-product-card/store-product-card.component';
+import { StoreViewProductComponent } from './pages/store-view-product/store-view-product.component';
+import { StoreLoginComponent } from './pages/store-login/store-login.component';
+import { StoreRegisterComponent } from './pages/store-register/store-register.component';
+import { StoreForgotPasswordComponent } from './pages/store-forgot-password/store-forgot-password.component';
+import { StoreResetPasswordComponent } from './pages/store-reset-password/store-reset-password.component';
+import { StoreConfirmComponent } from './pages/store-confirm/store-confirm.component';
+import { StoreProfileComponent } from './pages/store-profile/store-profile.component';
 
 @NgModule({
   declarations: [
@@ -58,6 +70,11 @@ import { FaqComponent } from './pages/faq/faq.component';
     PublicFooterComponent,
     ProductCardComponent,
     PublicLayoutComponent,
+    StoreLayoutComponent,
+    StoreProductsComponent,
+    StoreCartComponent,
+    StoreProductCardComponent,
+    StoreViewProductComponent,
     PublicProductsComponent,
     PublicViewProductComponent,
     CartComponent,
@@ -79,7 +96,14 @@ import { FaqComponent } from './pages/faq/faq.component';
     ContactComponent,
     PrivacyComponent,
     ShippingComponent,
-    FaqComponent
+    FaqComponent,
+    StoreLandingComponent,
+    StoreLoginComponent,
+    StoreRegisterComponent,
+    StoreForgotPasswordComponent,
+    StoreResetPasswordComponent,
+    StoreConfirmComponent,
+    StoreProfileComponent
   ],
   imports: [
     CommonModule,

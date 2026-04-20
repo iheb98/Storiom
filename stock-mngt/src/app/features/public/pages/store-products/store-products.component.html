@@ -1,0 +1,195 @@
+<div class="store-products-page">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-inner">
+      <h1>Nos Produits</h1>
+      <p class="product-count" *ngIf="!isLoading">{{ count }} produit{{ count > 1 ? 's' : '' }} trouvé{{ count > 1 ? 's' : '' }}</p>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="toolbar-inner">
+      <!-- Mobile sidebar toggle -->
+      <button class="sidebar-toggle" (click)="toggleSidebar()">
+        <fa-icon [icon]="faBars"></fa-icon>
+        <span>Filtres</span>
+      </button>
+
+      <!-- Search -->
+      <div class="toolbar-search">
+        <fa-icon [icon]="faSearch" class="search-icon"></fa-icon>
+        <input type="text" [(ngModel)]="searchQuery"
+               placeholder="Rechercher un produit..."
+               (keyup.enter)="applyFilters()">
+        <button class="clear-btn" *ngIf="searchQuery" (click)="searchQuery=''; applyFilters()">
+          <fa-icon [icon]="faTimes"></fa-icon>
+        </button>
+      </div>
+
+      <!-- Sort -->
+      <select [(ngModel)]="sortBy" (change)="applyFilters()" class="toolbar-select">
+        <option value="">Trier par</option>
+        <option value="price_asc">Prix croissant</option>
+        <option value="price_desc">Prix décroissant</option>
+        <option value="newest">Plus récents</option>
+        <option value="name_asc">Nom A-Z</option>
+      </select>
+
+      <!-- Clear -->
+      <button class="toolbar-btn clear" *ngIf="searchQuery || selectedCategory || sortBy || minPrice || maxPrice || selectedBrand" (click)="clearFilters()">
+        <fa-icon [icon]="faTimes"></fa-icon> Réinitialiser
+      </button>
+    </div>
+  </div>
+
+  <!-- Main layout: Sidebar + Products -->
+  <div class="products-layout">
+
+    <!-- ═══ CATEGORY SIDEBAR ═══ -->
+    <aside class="category-sidebar" [class.open]="sidebarOpen">
+      <div class="sidebar-header">
+        <h3><fa-icon [icon]="faFilter"></fa-icon> Catégories</h3>
+        <button class="sidebar-close" (click)="sidebarOpen = false">
+          <fa-icon [icon]="faTimes"></fa-icon>
+        </button>
+      </div>
+
+      <!-- All categories -->
+      <button class="cat-item cat-all"
+              [class.active]="!selectedCategory"
+              (click)="selectCategory(null)">
+        <span>Toutes les catégories</span>
+        <span class="cat-count">{{ count }}</span>
+      </button>
+
+      <!-- Category tree -->
+      <div class="cat-tree">
+        <ng-container *ngFor="let cat of categoryTree">
+          <ng-container *ngTemplateOutlet="categoryNode; context: { $implicit: cat, level: 0 }"></ng-container>
+        </ng-container>
+      </div>
+
+      <!-- Price Range Filter -->
+      <div class="sidebar-section">
+        <h3><i class="fa fa-tag"></i> Fourchette de prix</h3>
+        <div class="price-range-inputs">
+          <div class="price-field">
+            <label>Min</label>
+            <input type="number" [(ngModel)]="minPrice"
+                   placeholder="0" min="0"
+                   (keyup.enter)="applyFilters()">
+          </div>
+          <span class="price-separator">—</span>
+          <div class="price-field">
+            <label>Max</label>
+            <input type="number" [(ngModel)]="maxPrice"
+                   placeholder="∞" min="0"
+                   (keyup.enter)="applyFilters()">
+          </div>
+        </div>
+        <button class="price-apply-btn" (click)="applyFilters()">
+          <i class="fa fa-check"></i> Appliquer
+        </button>
+      </div>
+
+      <!-- Brand Filter -->
+      <div class="sidebar-section" *ngIf="brands.length > 0">
+        <h3><i class="fa fa-bookmark"></i> Marque</h3>
+        <div class="brand-list">
+          <button class="brand-item"
+                  [class.active]="!selectedBrand"
+                  (click)="selectedBrand = null; applyFilters()">
+            Toutes les marques
+          </button>
+          <button class="brand-item"
+                  *ngFor="let brand of brands"
+                  [class.active]="selectedBrand === brand.id"
+                  (click)="selectedBrand = brand.id; applyFilters()">
+            {{ brand.name }}
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Mobile overlay -->
+    <div class="sidebar-overlay" [class.open]="sidebarOpen" (click)="sidebarOpen = false"></div>
+
+    <!-- ═══ PRODUCTS AREA ═══ -->
+    <div class="products-main">
+      <!-- Active filters -->
+      <div class="active-filters" *ngIf="selectedCategory || minPrice || maxPrice || selectedBrand">
+        <span class="filter-chip" *ngIf="selectedCategory">
+          {{ getCategoryName(selectedCategory) }}
+          <button (click)="selectCategory(null)"><fa-icon [icon]="faTimes"></fa-icon></button>
+        </span>
+        <span class="filter-chip" *ngIf="minPrice || maxPrice">
+          Prix: {{ minPrice || 0 }} — {{ maxPrice || '∞' }} DT
+          <button (click)="minPrice = null; maxPrice = null; applyFilters()"><fa-icon [icon]="faTimes"></fa-icon></button>
+        </span>
+        <span class="filter-chip" *ngIf="selectedBrand">
+          Marque: {{ getBrandName(selectedBrand) }}
+          <button (click)="selectedBrand = null; applyFilters()"><fa-icon [icon]="faTimes"></fa-icon></button>
+        </span>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading-state" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p>Chargement des produits...</p>
+      </div>
+
+      <!-- Empty -->
+      <div class="empty-state" *ngIf="!isLoading && products.length === 0">
+        <i class="fa fa-search empty-icon"></i>
+        <h3>Aucun produit trouvé</h3>
+        <p>Essayez de modifier vos filtres ou votre recherche</p>
+        <button class="btn-primary" (click)="clearFilters()">Voir tous les produits</button>
+      </div>
+
+      <!-- Grid -->
+      <div class="products-grid" *ngIf="!isLoading && products.length > 0">
+        <app-store-product-card
+          *ngFor="let product of products"
+          [product]="product"
+          [basePath]="basePath">
+        </app-store-product-card>
+      </div>
+
+      <!-- Pagination -->
+      <mat-paginator *ngIf="count > currentSize"
+                     [length]="count"
+                     [pageSize]="currentSize"
+                     [pageSizeOptions]="[12, 24, 48]"
+                     (page)="handlePageEvent($event)">
+      </mat-paginator>
+    </div>
+  </div>
+</div>
+
+<!-- Recursive category tree template -->
+<ng-template #categoryNode let-cat let-level="level">
+  <div class="cat-node" [style.padding-left.px]="level * 16">
+    <button class="cat-item"
+            [class.active]="selectedCategory === cat.id"
+            (click)="selectCategory(cat.id)">
+      <!-- Expand toggle -->
+      <span class="cat-toggle"
+            *ngIf="cat.subCategories?.length > 0"
+            (click)="toggleCategory(cat.id); $event.stopPropagation()">
+        <fa-icon [icon]="isCategoryExpanded(cat.id) ? faChevronDown : faChevronRight"></fa-icon>
+      </span>
+      <span class="cat-toggle placeholder" *ngIf="!cat.subCategories?.length"></span>
+      <span class="cat-name">{{ cat.name }}</span>
+    </button>
+
+    <!-- Children -->
+    <div class="cat-children" *ngIf="cat.subCategories?.length > 0 && isCategoryExpanded(cat.id)"
+         [@.disabled]="true">
+      <ng-container *ngFor="let child of cat.subCategories">
+        <ng-container *ngTemplateOutlet="categoryNode; context: { $implicit: child, level: level + 1 }"></ng-container>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>

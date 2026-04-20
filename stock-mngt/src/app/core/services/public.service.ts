@@ -23,8 +23,8 @@ export class PublicService {
     return this.http.post(`${this.apiUrl}/reviews`, reviewData);
   }
 
-  getPublicProduct(id): Observable<any> {
-    return this.http.get<any>(this.apiUrl + '/publicProduct/' + id);
+  getPublicProduct(id, params?: any): Observable<any> {
+    return this.http.get<any>(this.apiUrl + '/publicProduct/' + id, { params });
   }
 
   getProductRecommendations(productId: number, limit: number = 8): Observable<any[]> {
@@ -69,10 +69,15 @@ export class PublicService {
 
 
   /**
-   * Fetches the category tree for the sidebar.
+   * Fetches the category tree. If storeId is passed, returns store-visible categories.
    */
-  getCategoryTree(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/categories/tree`);
+  getCategoryTree(storeId?: number | string): Observable<any[]> {
+    const params = storeId ? { storeId: storeId.toString() } : {};
+    return this.http.get<any[]>(`${this.apiUrl}/categories/tree`, { params });
+  }
+
+  getStoreBrands(storeId: number | string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/brands/store/${storeId}`);
   }
 
   getPlatformStats(): Observable<{ stores: number, products: number, categories: number }> {

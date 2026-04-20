@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddCategoryComponent } from '../add-category/add-category.component';
 import {
   faMousePointer, faTrash, faFolderOpen, faFolder, faHome, faChevronRight,
-  faPlus, faPen, faEdit, faLayerGroup
+  faPlus, faPen, faEdit, faLayerGroup, faGlobe, faStore, faEye, faEyeSlash
 } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 
@@ -27,6 +27,10 @@ export class CategoriesMngtComponent implements OnInit {
   faPlus = faPlus;
   faPen = faPen;
   faLayerGroup = faLayerGroup;
+  faGlobe = faGlobe;
+  faStore = faStore;
+  faEye = faEye;
+  faEyeSlash = faEyeSlash;
 
   // State
   mode: 'SELECT' | 'EDIT' | 'DELETE' = 'SELECT';
@@ -34,6 +38,7 @@ export class CategoriesMngtComponent implements OnInit {
   isActionLoading = false;
 
   categories: any[] = [];
+  visibilityMap: { [categoryId: number]: boolean } = {};
 
   selectedCategory: any = null;
   selectedSubCategory1: any = null;
@@ -59,6 +64,7 @@ export class CategoriesMngtComponent implements OnInit {
     this.storeId = this.authService.getConnectedUser()?.store;
     this.connectedUserRole = this.authService.getConnectedUser()?.role;
     this.getCategories();
+    this.loadVisibility();
   }
 
   getCategories() {
@@ -78,6 +84,58 @@ export class CategoriesMngtComponent implements OnInit {
         });
       }
     );
+  }
+
+  loadVisibility() {
+    this.categoryService.getStoreVisibility(this.storeId).subscribe(
+      (map: any) => {
+        this.visibilityMap = map;
+      },
+      () => { }
+    );
+  }
+
+  // Check if a category is visible for this store (default: true)
+  isCategoryVisible(categoryId: number): boolean {
+    return this.visibilityMap[categoryId] !== false;
+  }
+
+  toggleVisibility(category: any, event: Event) {
+    event.stopPropagation();
+    const currentlyVisible = this.isCategoryVisible(category.id);
+    const newVisible = !currentlyVisible;
+
+    this.visibilityMap[category.id] = newVisible;
+
+    this.categoryService.toggleCategoryVisibility(this.storeId, category.id, newVisible).subscribe(
+      () => { },
+      () => {
+        // Revert on error
+        this.visibilityMap[category.id] = currentlyVisible;
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur lors du changement de visibilité',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      }
+    );
+  }
+
+  // Check if a category is static (global) or custom (store-specific)
+  isStaticCategory(category: any): boolean {
+    return category?.static === true;
+  }
+
+  // Check if current user can edit/delete a category
+  canEditCategory(category: any): boolean {
+    if (this.connectedUserRole === 'Admin' || this.connectedUserRole === 'SuperAdmin') return true;
+    if (this.connectedUserRole === 'Owner' && !this.isStaticCategory(category)) return true;
+    return false;
+  }
+
+  canAddCategory(): boolean {
+    return this.connectedUserRole === 'Admin' || this.connectedUserRole === 'SuperAdmin' || this.connectedUserRole === 'Owner';
   }
 
   addCategory() {
@@ -126,7 +184,8 @@ export class CategoriesMngtComponent implements OnInit {
           name: result.name,
           image: result.image,
           icon: result.icon,
-          parentCategoryId: parentCategory.id
+          parentCategoryId: parentCategory.id,
+          storeId: this.storeId
         }).subscribe(
           response => {
             parentCategory.subCategories.push({ ...response, subCategories: [] });
@@ -161,8 +220,16 @@ export class CategoriesMngtComponent implements OnInit {
       this.selectedSubCategory3 = null;
       this.selectedSubCategory4 = null;
     } else if (this.mode == 'DELETE') {
+      if (!this.canEditCategory(category)) {
+        Swal.fire({ icon: 'warning', title: 'Vous ne pouvez pas supprimer une catégorie globale', showConfirmButton: false, timer: 1500 });
+        return;
+      }
       this.deleteCategory(category);
     } else if (this.mode == 'EDIT') {
+      if (!this.canEditCategory(category)) {
+        Swal.fire({ icon: 'warning', title: 'Vous ne pouvez pas modifier une catégorie globale', showConfirmButton: false, timer: 1500 });
+        return;
+      }
       this.updateCategory(category);
     }
   }
@@ -174,8 +241,10 @@ export class CategoriesMngtComponent implements OnInit {
       this.selectedSubCategory3 = null;
       this.selectedSubCategory4 = null;
     } else if (this.mode == 'DELETE') {
+      if (!this.canEditCategory(category)) { Swal.fire({ icon: 'warning', title: 'Vous ne pouvez pas supprimer une catégorie globale', showConfirmButton: false, timer: 1500 }); return; }
       this.deleteCategory(category);
     } else if (this.mode == 'EDIT') {
+      if (!this.canEditCategory(category)) { Swal.fire({ icon: 'warning', title: 'Vous ne pouvez pas modifier une catégorie globale', showConfirmButton: false, timer: 1500 }); return; }
       this.updateCategory(category);
     }
   }
@@ -186,8 +255,10 @@ export class CategoriesMngtComponent implements OnInit {
       this.selectedSubCategory3 = null;
       this.selectedSubCategory4 = null;
     } else if (this.mode == 'DELETE') {
+      if (!this.canEditCategory(category)) { Swal.fire({ icon: 'warning', title: 'Vous ne pouvez pas supprimer une catégorie globale', showConfirmButton: false, timer: 1500 }); return; }
       this.deleteCategory(category);
     } else if (this.mode == 'EDIT') {
+      if (!this.canEditCategory(category)) { Swal.fire({ icon: 'warning', title: 'Vous ne pouvez pas modifier une catégorie globale', showConfirmButton: false, timer: 1500 }); return; }
       this.updateCategory(category);
     }
   }
@@ -197,8 +268,10 @@ export class CategoriesMngtComponent implements OnInit {
       this.selectedSubCategory3 = category;
       this.selectedSubCategory4 = null;
     } else if (this.mode == 'DELETE') {
+      if (!this.canEditCategory(category)) { Swal.fire({ icon: 'warning', title: 'Vous ne pouvez pas supprimer une catégorie globale', showConfirmButton: false, timer: 1500 }); return; }
       this.deleteCategory(category);
     } else if (this.mode == 'EDIT') {
+      if (!this.canEditCategory(category)) { Swal.fire({ icon: 'warning', title: 'Vous ne pouvez pas modifier une catégorie globale', showConfirmButton: false, timer: 1500 }); return; }
       this.updateCategory(category);
     }
   }
@@ -207,8 +280,10 @@ export class CategoriesMngtComponent implements OnInit {
     if (this.mode == 'SELECT') {
       this.selectedSubCategory4 = category;
     } else if (this.mode == 'DELETE') {
+      if (!this.canEditCategory(category)) { Swal.fire({ icon: 'warning', title: 'Vous ne pouvez pas supprimer une catégorie globale', showConfirmButton: false, timer: 1500 }); return; }
       this.deleteCategory(category);
     } else if (this.mode == 'EDIT') {
+      if (!this.canEditCategory(category)) { Swal.fire({ icon: 'warning', title: 'Vous ne pouvez pas modifier une catégorie globale', showConfirmButton: false, timer: 1500 }); return; }
       this.updateCategory(category);
     }
   }

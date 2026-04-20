@@ -707,8 +707,94 @@ $radius-lg: 16px;
         background: $blue;
     }
 
+    &.locked {
+        background: $text-secondary;
+        opacity: 0.6;
+    }
+
     .category-card:hover & {
         opacity: 1;
+    }
+}
+
+// Category Type Badge
+.category-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    pointer-events: none;
+
+    fa-icon {
+        font-size: 0.55rem;
+    }
+
+    &.static {
+        background: rgba(63, 81, 181, 0.1);
+        color: $blue;
+    }
+
+    &.custom {
+        background: rgba(46, 125, 50, 0.1);
+        color: $success;
+    }
+}
+
+// Visibility Toggle Button
+.visibility-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 2;
+
+    fa-icon {
+        font-size: 0.7rem;
+    }
+
+    &.visible {
+        background: rgba($success, 0.1);
+        color: $success;
+
+        &:hover {
+            background: rgba($success, 0.2);
+            transform: scale(1.1);
+        }
+    }
+
+    &.hidden {
+        background: rgba($danger, 0.1);
+        color: $danger;
+
+        &:hover {
+            background: rgba($danger, 0.2);
+            transform: scale(1.1);
+        }
+    }
+}
+
+// Hidden category styling
+.category-card.hidden-category {
+    opacity: 0.5;
+
+    &:hover {
+        opacity: 0.8;
     }
 }
 

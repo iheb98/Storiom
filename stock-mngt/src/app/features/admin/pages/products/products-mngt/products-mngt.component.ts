@@ -5,7 +5,7 @@ import {
   faEdit, faTrash, faEye, faArrowUp, faArrowDown, faPlus, faSearch,
   faFilter, faUndo, faTag, faAlignLeft, faTruck, faFolder, faCubes,
   faEyeSlash, faGlobe, faLock, faSearchPlus, faShoppingCart, faTimes, faBox,
-  faBarcode, faCamera, faImages, faStar
+  faBarcode, faCamera, faImages, faStar, faStore, faChevronDown
 } from '@fortawesome/free-solid-svg-icons';
 import { BarcodeFormat } from '@zxing/library';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -54,6 +54,8 @@ export class ProductsMngtComponent implements OnInit {
   faCamera = faCamera;
   faImages = faImages;
   faStar = faStar;
+  faStore = faStore;
+  faChevronDown = faChevronDown;
 
   // Loading States
   isLoading = true;
@@ -107,6 +109,7 @@ export class ProductsMngtComponent implements OnInit {
 
   // Bulk Selection
   selectedIds: number[] = [];
+  bulkActionsCollapsed = true;
 
   constructor(
     private productService: ProductService,
@@ -421,6 +424,7 @@ export class ProductsMngtComponent implements OnInit {
       brandId: product.brand?.id,
       criticalStockIndicator: product.criticalStockIndicator,
       toDisplay: product.toDisplay,
+      toDisplayStore: product.toDisplayStore,
       activateCriticalStockIndicator: product.activateCriticalStockIndicator,
       discount: product.discount
     }).subscribe(
@@ -582,6 +586,115 @@ export class ProductsMngtComponent implements OnInit {
     this.productService.bulkUpdateVisibility({
       ids: ids,
       toDisplay: toDisplay,
+      updateAll: updateAll,
+      storeId: this.authService.getConnectedUser()?.store
+    }).subscribe(
+      response => {
+        this.isActionLoading = false;
+        Swal.fire({
+          icon: 'success',
+          title: response.message || 'Mise à jour réussie!',
+          showConfirmButton: false,
+          timer: 1500
+        });
+        this.selectedIds = [];
+        this.getProducts(this.currentPage, this.currentSize);
+      },
+      error => {
+        this.isActionLoading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur',
+          text: error?.error?.message || 'Une erreur est survenue'
+        });
+      }
+    );
+  }
+
+  // ========================================
+  // Bulk Store Visibility Actions
+  // ========================================
+  bulkUpdateStoreDisplay(toDisplayStore: boolean, updateAll: boolean = false) {
+    if (!updateAll && this.selectedIds.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Aucun produit sélectionné',
+        text: 'Veuillez sélectionner au moins un produit.'
+      });
+      return;
+    }
+
+    if (toDisplayStore) {
+      let productsWithoutImages: any[] = [];
+      let validProductIds: number[] = [];
+
+      if (updateAll) {
+        productsWithoutImages = this.products.filter(p => !p.images || p.images.length === 0);
+        validProductIds = this.products.filter(p => p.images && p.images.length > 0).map(p => p.id);
+      } else {
+        const selectedProducts = this.products.filter(p => this.selectedIds.includes(p.id));
+        productsWithoutImages = selectedProducts.filter(p => !p.images || p.images.length === 0);
+        validProductIds = selectedProducts.filter(p => p.images && p.images.length > 0).map(p => p.id);
+      }
+
+      if (productsWithoutImages.length > 0) {
+        const productNames = productsWithoutImages.slice(0, 5).map(p => p.name).join(', ');
+        const moreText = productsWithoutImages.length > 5 ? ` et ${productsWithoutImages.length - 5} autre(s)` : '';
+
+        if (validProductIds.length === 0) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Aucune image disponible',
+            html: `<p>Les produits suivants n'ont pas d'images et ne peuvent pas être affichés sur la boutique :</p>
+                   <p><strong>${productNames}${moreText}</strong></p>
+                   <p>Veuillez ajouter au moins une image à chaque produit avant de l'afficher.</p>`,
+            confirmButtonText: 'Compris'
+          });
+          return;
+        }
+
+        Swal.fire({
+          icon: 'warning',
+          title: 'Certains produits sans images',
+          html: `<p>${productsWithoutImages.length} produit(s) n'ont pas d'images et seront ignorés :</p>
+                 <p><strong>${productNames}${moreText}</strong></p>
+                 <p>Voulez-vous continuer avec les ${validProductIds.length} produit(s) valide(s) ?</p>`,
+          showCancelButton: true,
+          confirmButtonText: 'Continuer',
+          cancelButtonText: 'Annuler',
+          confirmButtonColor: '#5c6bc0'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.executeStoreDisplayUpdate(validProductIds, true, false);
+          }
+        });
+        return;
+      }
+    }
+
+    const action = toDisplayStore ? 'afficher' : 'masquer';
+    const scope = updateAll ? 'TOUS les produits' : `${this.selectedIds.length} produit(s) sélectionné(s)`;
+
+    Swal.fire({
+      title: `${toDisplayStore ? 'Afficher' : 'Masquer'} sur la boutique`,
+      text: `Voulez-vous ${action} ${scope} sur la boutique en ligne ?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Oui, confirmer',
+      cancelButtonText: 'Annuler',
+      confirmButtonColor: toDisplayStore ? '#5c6bc0' : '#dc3545'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.executeStoreDisplayUpdate(this.selectedIds, toDisplayStore, updateAll);
+      }
+    });
+  }
+
+  private executeStoreDisplayUpdate(ids: number[], toDisplayStore: boolean, updateAll: boolean) {
+    this.isActionLoading = true;
+    this.productService.bulkUpdateStoreVisibility({
+      ids: ids,
+      toDisplayStore: toDisplayStore,
       updateAll: updateAll,
       storeId: this.authService.getConnectedUser()?.store
     }).subscribe(

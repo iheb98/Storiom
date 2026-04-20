@@ -117,4 +117,8 @@ export class ProductService {
   bulkUpdateVisibility(body: { ids: number[], toDisplay: boolean, updateAll?: boolean, storeId?: number }): Observable<any> {
     return this.http.put<any>(this.baseUrl + 'bulk-visibility', body);
   }
+
+  bulkUpdateStoreVisibility(body: { ids: number[], toDisplayStore: boolean, updateAll?: boolean, storeId?: number }): Observable<any> {
+    return this.http.put<any>(this.baseUrl + 'bulk-store-visibility', body);
+  }
 }

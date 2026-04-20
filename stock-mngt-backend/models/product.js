@@ -119,6 +119,11 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 'NEW',
       field: 'condition'
     },
+    toDisplayStore: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      field: 'to_display_store'
+    },
   }, {
     sequelize,
     tableName: 'products',

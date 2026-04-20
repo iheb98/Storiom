@@ -14,6 +14,7 @@ const { expiredLinkEmail, resendConfirmationEmail } = require('./emailTemplates'
 const multerS3 = require('multer-s3');
 const { DeleteObjectCommand, HeadObjectCommand } = require('@aws-sdk/client-s3');
 const s3 = require('./config/r2');
+const { domainResolver } = require('./domainResolver');
 
 const upload = multer({
   storage: multerS3({
@@ -42,7 +43,7 @@ const storage = multer.diskStorage(
 require('dotenv/config');
 
 // **************************************** CORS ****************************************
-var allowedDomains = ['*', 'http://localhost:4200', 'http://145.223.103.252', 'https://storiom.com', 'https://www.storiom.com', 'http://192.168.0.194:4200'];
+var allowedDomains = ['*', 'http://localhost:4200', 'http://161.97.186.60', 'https://storiom.com', 'https://www.storiom.com', 'http://192.168.0.194:4200'];
 
 /*
 var corsOptions = {
@@ -57,17 +58,31 @@ app.use(cors({
     // bypass the requests with no origin (like curl requests, mobile apps, etc )
     if (!origin) return callback(null, true);
 
-    if (allowedDomains.indexOf(origin) === -1) {
-      var msg = `This site ${origin} does not have an access. Only specific domains are allowed to access it.`;
-      return callback(new Error(msg), false);
+    // Always allow our known domains
+    if (allowedDomains.indexOf(origin) !== -1) {
+      return callback(null, true);
     }
-    return callback(null, true);
+
+    // Allow any custom store domain (they'll be verified by the domain resolver)
+    // Custom domains will have their own origin, so we allow them dynamically
+    const { isPlatformDomain } = require('./domainResolver');
+    const originHost = new URL(origin).hostname;
+    if (!isPlatformDomain(originHost)) {
+      // It's a custom domain — allow it (the domain resolver will validate it)
+      return callback(null, true);
+    }
+
+    var msg = `This site ${origin} does not have an access. Only specific domains are allowed to access it.`;
+    return callback(new Error(msg), false);
   }
 }));
 //**************************************************************************************************************
 
 app.use(express.static('.'));
 app.use(bodyparser.json({ limit: '50mb' }));
+
+// Domain resolver — detect custom store domains from Host header
+app.use(domainResolver);
 
 // Set UTF-8 charset for all JSON responses (fixes French character encoding on VPS/Nginx)
 app.use((req, res, next) => {
@@ -284,6 +299,7 @@ const serviceRequestsRoute = require('./routes/service-requests');
 const paymentOrdersRoute = require('./routes/payment-orders');
 const analyticsRoute = require('./routes/analytics');
 const wishlistRoute = require('./routes/wishlist');
+const storeCustomersRoute = require('./routes/store-customers');
 
 app.use('/api/receipts', receiptsRoute)
 app.use('/api/credits', creditsRoute)
@@ -304,6 +320,7 @@ app.use('/api/service-requests', serviceRequestsRoute)
 app.use('/api/payment-orders', paymentOrdersRoute)
 app.use('/api/analytics', analyticsRoute)
 app.use('/api/wishlist', wishlistRoute)
+app.use('/api/store-customers', storeCustomersRoute)
 
 //require('./config/passport')(passport);
 

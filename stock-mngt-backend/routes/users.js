@@ -90,21 +90,13 @@ router.post('/authenticate', async (req, res, next) => {
             return res.status(500).json({ message: 'Merci de confirmer votre compte. Un mail contenant le lien de vérification a été envoyé', isConfirmed: false });
         }
 
-        comparePassword(password, user.password, async (err, isMatch) => {
-            if (err) res.json(err);
-            if (isMatch) {
-                const token = utility.generateAccessToken({ id: user.id, role: user.role, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null, subscription: user.subscription });
-                const refreshToken = await utility.generateRefreshToken({ id: user.id, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null, subscription: user.subscription })
-                // **************************************** LOCAL STORAGE **********************************
-                res.json({
-                    success: true,
-                    accessToken: token,
-                    refreshToken
-                })
-                //********************************************************
-            } else {
-                return res.json({ success: false, errorType: "PASSWORD_ERROR", error: 'Mot de passe incorrect !' });
-            }
+        const token = utility.generateAccessToken({ id: user.id, role: user.role, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null, subscription: user.subscription });
+        const refreshToken = await utility.generateRefreshToken({ id: user.id, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null, subscription: user.subscription })
+        // **************************************** LOCAL STORAGE **********************************
+        res.json({
+            success: true,
+            accessToken: token,
+            refreshToken
         })
     } catch (err) {
         console.log(err);

@@ -84,6 +84,7 @@ import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { SubscriptionComponent } from './pages/subscription/subscription.component';
 import { PaymentOrdersAdminComponent } from '../superadmin/pages/payment-orders-admin/payment-orders-admin.component';
 import { ProductAnalyticsComponent } from './pages/product-analytics/product-analytics.component';
+import { DomainSettingsComponent } from './pages/settings/domain-settings/domain-settings.component';
 
 @NgModule({
   declarations: [
@@ -145,7 +146,8 @@ import { ProductAnalyticsComponent } from './pages/product-analytics/product-ana
     ServiceRequestsStatsComponent,
     SubscriptionComponent,
     PaymentOrdersAdminComponent,
-    ProductAnalyticsComponent
+    ProductAnalyticsComponent,
+    DomainSettingsComponent
   ],
   imports: [
     CommonModule,

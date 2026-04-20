@@ -1,0 +1,93 @@
+<div class="store-cart-page">
+  <div class="cart-container">
+
+    <!-- Header -->
+    <div class="cart-header">
+      <h1><fa-icon [icon]="faShoppingCart"></fa-icon> Panier</h1>
+      <span class="item-count" *ngIf="cart.length > 0">{{ totalItems }} article{{ totalItems > 1 ? 's' : '' }}</span>
+    </div>
+
+    <!-- Preview Warning -->
+    <div class="preview-notice" *ngIf="isPreviewMode">
+      <i class="fa fa-info-circle"></i>
+      Mode aperçu — Vous pouvez ajouter des produits, mais les commandes ne seront pas traitées.
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="cart-loading" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Chargement du panier...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-cart" *ngIf="!isLoading && cart.length === 0">
+      <fa-icon [icon]="faShoppingBag" class="empty-icon"></fa-icon>
+      <h3>Votre panier est vide</h3>
+      <p>Découvrez nos produits et ajoutez-les à votre panier</p>
+      <button class="btn-primary" (click)="continueShopping()">
+        <fa-icon [icon]="faArrowLeft"></fa-icon> Voir les produits
+      </button>
+    </div>
+
+    <!-- Cart Items -->
+    <div class="cart-content" *ngIf="!isLoading && cart.length > 0">
+      <div class="cart-items">
+        <div class="cart-item" *ngFor="let item of cart">
+          <img [src]="getProductImage(item.product)" [alt]="item.product?.name" class="item-image">
+          <div class="item-details">
+            <h3 class="item-name">{{ item.product?.name }}</h3>
+            <p class="item-price">{{ getDiscountedPrice(item.product) | number:'1.2-2' }} DT</p>
+            <p class="item-original" *ngIf="item.product?.discount > 0">
+              {{ item.product.sellingPrice | number:'1.2-2' }} DT
+            </p>
+          </div>
+          <div class="item-qty">
+            <button class="qty-btn" (click)="decreaseQty(item)" [disabled]="item.quantity <= 1">
+              <fa-icon [icon]="faMinus"></fa-icon>
+            </button>
+            <span class="qty-value">{{ item.quantity }}</span>
+            <button class="qty-btn" (click)="increaseQty(item)">
+              <fa-icon [icon]="faPlus"></fa-icon>
+            </button>
+          </div>
+          <div class="item-total">
+            {{ (item.quantity * getDiscountedPrice(item.product)) | number:'1.2-2' }} DT
+          </div>
+          <button class="remove-btn" (click)="removeItem(item)">
+            <fa-icon [icon]="faTrash"></fa-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="cart-summary">
+        <div class="summary-card">
+          <h3>Récapitulatif</h3>
+          <div class="summary-row">
+            <span>Sous-total ({{ totalItems }} articles)</span>
+            <span>{{ totalPrice | number:'1.2-2' }} DT</span>
+          </div>
+          <div class="summary-row">
+            <span>Livraison</span>
+            <span class="free-shipping">Gratuite</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="summary-row total">
+            <span>Total</span>
+            <span>{{ totalPrice | number:'1.2-2' }} DT</span>
+          </div>
+
+          <button class="checkout-btn" (click)="checkout()" [disabled]="isPreviewMode">
+            <fa-icon [icon]="faLock"></fa-icon>
+            {{ isPreviewMode ? 'Commande indisponible (aperçu)' : 'Commander' }}
+          </button>
+
+          <button class="continue-btn" (click)="continueShopping()">
+            <fa-icon [icon]="faArrowLeft"></fa-icon> Continuer les achats
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

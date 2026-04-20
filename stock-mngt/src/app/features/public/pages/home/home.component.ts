@@ -7,6 +7,7 @@ import {
 import { CategoryService } from 'src/app/core/services/category.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { PublicService } from 'src/app/core/services/public.service';
+import { DomainService } from 'src/app/core/services/domain.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -53,10 +54,17 @@ export class HomeComponent implements OnInit {
     private categoryService: CategoryService,
     private productService: ProductService,
     private publicService: PublicService,
+    private domainService: DomainService,
     private router: Router
   ) { }
 
   ngOnInit(): void {
+    // If on a custom domain, redirect to the store landing page
+    if (this.domainService.isCustomDomain) {
+      this.router.navigate(['/store-home'], { replaceUrl: true });
+      return;
+    }
+
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'auto' });
       document.body.scrollTop = 0;

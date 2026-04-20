@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { NgxMatFileInputModule } from '@angular-material-components/file-input';
@@ -23,6 +23,7 @@ import { StoreAddComponent } from './features/admin/pages/stores/store-add/store
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from './general/login/login.component';
 import { RequestInterceptor } from './core/services/request.interceptor';
+import { DomainService } from './core/services/domain.service';
 import { RegisterComponent } from './general/register/register.component';
 import { CategoriesMngtComponent } from './features/admin/pages/categories/categories-mngt/categories-mngt.component';
 import { StoreViewComponent } from './features/admin/pages/stores/store-view/store-view.component';
@@ -115,11 +116,19 @@ import { PublicModule } from './features/public/public.module';
     AdminModule,
     PublicModule
   ],
-  providers: [{
-    provide: HTTP_INTERCEPTORS,
-    useClass: RequestInterceptor,
-    multi: true
-  }],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RequestInterceptor,
+      multi: true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (domainService: DomainService) => () => domainService.initialize(),
+      deps: [DomainService],
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

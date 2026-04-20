@@ -1,0 +1,24 @@
+<div class="store-card" (click)="viewProduct()" [class.loaded]="imageLoaded">
+  <div class="card-image">
+    <div class="card-skeleton" *ngIf="!imageLoaded"></div>
+    <img [src]="getProductImage()" [alt]="product?.name" loading="lazy"
+         [class.visible]="imageLoaded"
+         (load)="onImageLoad()">
+    <span class="badge-discount" *ngIf="product?.discount > 0">-{{ product.discount }}%</span>
+    <div class="card-overlay" *ngIf="imageLoaded">
+      <button class="overlay-btn cart-btn" (click)="addToCart($event)" title="Ajouter au panier">
+        <fa-icon [icon]="faCartPlus"></fa-icon>
+      </button>
+      <button class="overlay-btn view-btn" (click)="viewProduct()" title="Voir le produit">
+        <fa-icon [icon]="faEye"></fa-icon>
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <h3 class="card-name">{{ product?.name }}</h3>
+    <div class="card-pricing">
+      <span class="price-current">{{ getDiscountedPrice() | number:'1.2-2' }} DT</span>
+      <span class="price-original" *ngIf="product?.discount > 0">{{ product.sellingPrice | number:'1.2-2' }} DT</span>
+    </div>
+  </div>
+</div>

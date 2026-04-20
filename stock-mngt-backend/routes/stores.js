@@ -348,3 +348,201 @@ router.get('/:id/storage-purchases', utility.authenticate, checkSubscription, as
 });
 
 module.exports = router;
+
+// ═══════════════════════════════════════════════════════════
+//  CUSTOM DOMAIN MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * @route   PUT /api/stores/:id/domain
+ * @desc    Set or update the custom domain for a store
+ */
+router.put('/:id/domain', utility.authenticate, checkSubscription, async (req, res) => {
+    try {
+        const id = req.params.id;
+        let { domain } = req.body;
+
+        if (!domain) {
+            return res.status(400).json({ success: false, message: 'Le domaine est requis' });
+        }
+
+        // Normalize: remove protocol, trailing slash, www
+        domain = domain.replace(/^https?:\/\//, '').replace(/\/$/, '').replace(/^www\./, '').toLowerCase().trim();
+
+        // Validate domain format
+        const domainRegex = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/;
+        if (!domainRegex.test(domain)) {
+            return res.status(400).json({ success: false, message: 'Format de domaine invalide' });
+        }
+
+        // Check if domain is already taken by another store
+        const existing = await Store.findOne({ where: { customDomain: domain } });
+        if (existing && existing.id !== parseInt(id)) {
+            return res.status(409).json({ success: false, message: 'Ce domaine est déjà utilisé par un autre magasin' });
+        }
+
+        const store = await Store.findOne({ where: { id } });
+        if (!store) {
+            return res.status(404).json({ success: false, message: 'Magasin introuvable' });
+        }
+
+        // Clear old domain from cache if changing
+        if (store.customDomain && store.customDomain !== domain) {
+            const { clearDomainCache } = require('../domainResolver');
+            clearDomainCache(store.customDomain);
+        }
+
+        store.customDomain = domain;
+        store.domainVerified = false; // Reset verification when domain changes
+        await store.save();
+
+        res.json({
+            success: true,
+            message: 'Domaine mis à jour. Veuillez vérifier la configuration DNS.',
+            domain: store.customDomain,
+            domainVerified: store.domainVerified
+        });
+    } catch (err) {
+        console.error('Error setting domain:', err);
+        res.status(500).json({ success: false, message: err.toString() });
+    }
+});
+
+/**
+ * @route   POST /api/stores/:id/domain/verify
+ * @desc    Verify that the custom domain DNS is pointing to our server
+ */
+router.post('/:id/domain/verify', utility.authenticate, checkSubscription, async (req, res) => {
+    try {
+        const id = req.params.id;
+        const store = await Store.findOne({ where: { id } });
+
+        if (!store) {
+            return res.status(404).json({ success: false, message: 'Magasin introuvable' });
+        }
+
+        if (!store.customDomain) {
+            return res.status(400).json({ success: false, message: 'Aucun domaine configuré' });
+        }
+
+        // DNS verification using Node's dns module
+        const dns = require('dns').promises;
+        let verified = false;
+        let details = '';
+
+        try {
+            // Check CNAME records
+            const cnames = await dns.resolveCname(store.customDomain);
+            if (cnames.some(c => c.includes('storiom.com'))) {
+                verified = true;
+                details = `CNAME trouvé: ${cnames.join(', ')}`;
+            } else {
+                details = `CNAME trouvé mais ne pointe pas vers storiom.com: ${cnames.join(', ')}`;
+            }
+        } catch (cnameErr) {
+            // No CNAME, try A record
+            try {
+                const addresses = await dns.resolve4(store.customDomain);
+                const vpsIp = '161.97.186.60';
+                if (addresses.includes(vpsIp)) {
+                    verified = true;
+                    details = `Enregistrement A trouvé: ${addresses.join(', ')}`;
+                } else {
+                    details = `Enregistrement A trouvé mais ne pointe pas vers notre serveur (${vpsIp}): ${addresses.join(', ')}`;
+                }
+            } catch (aErr) {
+                details = 'Aucun enregistrement DNS trouvé. Veuillez configurer un CNAME vers storiom.com ou un A record vers 161.97.186.60';
+            }
+        }
+
+        if (verified) {
+            store.domainVerified = true;
+            await store.save();
+
+            const { clearDomainCache } = require('../domainResolver');
+            clearDomainCache(store.customDomain);
+        }
+
+        res.json({
+            success: true,
+            verified,
+            domain: store.customDomain,
+            details
+        });
+    } catch (err) {
+        console.error('Error verifying domain:', err);
+        res.status(500).json({ success: false, message: err.toString() });
+    }
+});
+
+/**
+ * @route   DELETE /api/stores/:id/domain
+ * @desc    Remove custom domain from a store
+ */
+router.delete('/:id/domain', utility.authenticate, checkSubscription, async (req, res) => {
+    try {
+        const id = req.params.id;
+        const store = await Store.findOne({ where: { id } });
+
+        if (!store) {
+            return res.status(404).json({ success: false, message: 'Magasin introuvable' });
+        }
+
+        if (store.customDomain) {
+            const { clearDomainCache } = require('../domainResolver');
+            clearDomainCache(store.customDomain);
+        }
+
+        store.customDomain = null;
+        store.domainVerified = false;
+        await store.save();
+
+        res.json({ success: true, message: 'Domaine personnalisé supprimé' });
+    } catch (err) {
+        console.error('Error removing domain:', err);
+        res.status(500).json({ success: false, message: err.toString() });
+    }
+});
+
+/**
+ * @route   PUT /api/stores/:id/theme
+ * @desc    Update the store's theme settings
+ */
+router.put('/:id/theme', utility.authenticate, checkSubscription, async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { theme } = req.body;
+
+        const store = await Store.findOne({ where: { id } });
+        if (!store) {
+            return res.status(404).json({ success: false, message: 'Magasin introuvable' });
+        }
+
+        // Deep merge to preserve nested objects, then force Sequelize to detect the change
+        const currentTheme = store.theme || {};
+        const mergedTheme = {};
+        const allKeys = new Set([...Object.keys(currentTheme), ...Object.keys(theme)]);
+        for (const key of allKeys) {
+            if (theme[key] !== undefined && typeof theme[key] === 'object' && !Array.isArray(theme[key]) && theme[key] !== null
+                && currentTheme[key] && typeof currentTheme[key] === 'object' && !Array.isArray(currentTheme[key])) {
+                mergedTheme[key] = { ...currentTheme[key], ...theme[key] };
+            } else if (theme.hasOwnProperty(key)) {
+                mergedTheme[key] = theme[key];
+            } else {
+                mergedTheme[key] = currentTheme[key];
+            }
+        }
+        store.theme = mergedTheme;
+        store.changed('theme', true);
+        await store.save();
+
+        if (store.customDomain) {
+            const { clearDomainCache } = require('../domainResolver');
+            clearDomainCache(store.customDomain);
+        }
+
+        res.json({ success: true, theme: store.theme });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.toString() });
+    }
+});

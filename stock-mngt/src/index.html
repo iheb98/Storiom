@@ -18,66 +18,32 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      background: #ffffff;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 9999;
     }
 
-    .app-loading img {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 24px;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-
     .app-loading .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255, 255, 255, 0.1);
-      border-top-color: #3f51b5;
+      width: 36px;
+      height: 36px;
+      border: 3px solid #e2e8f0;
+      border-top-color: #94a3b8;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
 
-    .app-loading p {
-      margin-top: 16px;
-      color: rgba(255, 255, 255, 0.7);
-      font-family: 'Roboto', sans-serif;
-      font-size: 14px;
-    }
-
     @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-    @keyframes pulse {
-
-      0%,
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
-
-      50% {
-        opacity: 0.7;
-        transform: scale(0.95);
-      }
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
 
 <body>
   <app-root>
-    <!-- Loading indicator shown while Angular bootstraps -->
     <div class="app-loading">
-      <img src="assets/logo.png" alt="Storiom">
       <div class="spinner"></div>
-      <p>Chargement...</p>
     </div>
   </app-root>
 </body>

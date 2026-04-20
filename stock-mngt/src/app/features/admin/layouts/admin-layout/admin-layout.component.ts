@@ -9,7 +9,8 @@ import {
   faBookmark,
   faTags,
   faLayerGroup,
-  faChartLine
+  faChartLine,
+  faGlobe
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from '../../../../core/services/auth.service';
 import { StoreService } from '../../../../core/services/store.service';
@@ -278,6 +279,7 @@ export class AdminLayoutComponent implements OnInit {
       { label: 'Dépenses', icon: faCoins, link: 'admin/expenses' },
       { label: 'Crédits', icon: faHandHoldingUsd, link: 'admin/credits' },
       { label: 'Rapport', icon: faFile, link: 'admin/reports/generate' },
+      { label: 'Domaine & Thème', icon: faGlobe, link: 'admin/domain-settings' },
       //{ label: 'Paramètres', icon: faCog, link: 'admin/settings' }
     ];
   }

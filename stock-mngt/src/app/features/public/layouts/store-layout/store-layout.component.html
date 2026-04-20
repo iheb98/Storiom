@@ -1,0 +1,260 @@
+<div class="store-layout">
+  <!-- ═══ STORE HEADER ═══ -->
+  <header class="store-header" [class.scrolled]="isScrolled"
+          [class.sticky-header]="themeConfig.header?.sticky !== false"
+          [style.font-family]="themeConfig.fontFamily || 'Inter'">
+    <div class="header-inner">
+
+      <!-- Brand -->
+      <a class="header-brand" [routerLink]="basePath || '/'">
+        <div class="brand-logo-wrap">
+          <img *ngIf="store.logo" [src]="environment.backend + '/' + store.logo"
+               [alt]="store.name" class="header-logo">
+          <span *ngIf="!store.logo" class="brand-initial">{{ store.name?.charAt(0) }}</span>
+        </div>
+        <div class="brand-text">
+          <span class="header-store-name">{{ store.name }}</span>
+          <span class="header-tagline" *ngIf="store.description">Boutique en ligne</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="header-nav">
+        <a [routerLink]="basePath || '/'" routerLinkActive="active"
+           [routerLinkActiveOptions]="{exact: true}">
+          <i class="fa fa-{{ themeConfig.header?.icons?.home || 'home' }}"></i>
+          <span>Accueil</span>
+        </a>
+        <a [routerLink]="[basePath, 'products']" routerLinkActive="active">
+          <i class="fa fa-{{ themeConfig.header?.icons?.products || 'th-large' }}"></i>
+          <span>Produits</span>
+        </a>
+      </nav>
+
+      <!-- Spacer -->
+      <div class="header-spacer"></div>
+
+      <!-- Search (desktop) -->
+      <div class="header-search" *ngIf="themeConfig.header?.showSearch !== false"
+           [class.expanded]="searchFocused">
+        <i class="fa fa-search search-icon"></i>
+        <input type="text" [(ngModel)]="searchQuery"
+               placeholder="Rechercher..."
+               (keyup.enter)="onSearch()"
+               (focus)="searchFocused = true"
+               (blur)="searchFocused = false">
+        <button class="search-btn" (click)="onSearch()">
+          <i class="fa fa-search"></i>
+        </button>
+      </div>
+
+      <!-- Actions -->
+      <div class="header-actions">
+        <!-- Cart -->
+        <a [routerLink]="[basePath, 'cart']" class="header-action-btn cart-btn" routerLinkActive="active">
+          <i class="fa fa-{{ themeConfig.header?.icons?.cart || 'shopping-bag' }}"></i>
+          <span class="cart-badge" *ngIf="cartCount > 0">{{ cartCount }}</span>
+        </a>
+
+        <!-- Account -->
+        <a *ngIf="isCustomerLoggedIn" [routerLink]="[basePath, 'account']" class="header-action-btn" routerLinkActive="active">
+          <i class="fa fa-user"></i>
+        </a>
+        <a *ngIf="!isCustomerLoggedIn" [routerLink]="[basePath, 'login']" class="header-action-btn" routerLinkActive="active">
+          <i class="fa fa-user-o"></i>
+        </a>
+
+        <!-- Phone -->
+        <a *ngIf="store.phone" [href]="'tel:' + store.phone" class="header-action-btn phone-btn hide-mobile">
+          <i class="fa fa-phone"></i>
+        </a>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button class="mobile-menu-btn" (click)="toggleMobileMenu()"
+              [class.is-open]="mobileMenuOpen">
+        <span class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══ MOBILE MENU OVERLAY ═══ -->
+  <div class="mobile-overlay" [class.open]="mobileMenuOpen"
+       (click)="closeMobileMenu()"></div>
+
+  <!-- ═══ MOBILE MENU DRAWER ═══ -->
+  <div class="mobile-drawer" [class.open]="mobileMenuOpen"
+       [style.font-family]="themeConfig.fontFamily || 'Inter'">
+
+    <!-- Drawer Header -->
+    <div class="drawer-header">
+      <a class="drawer-brand" [routerLink]="basePath || '/'" (click)="closeMobileMenu()">
+        <div class="drawer-logo-wrap">
+          <img *ngIf="store.logo" [src]="environment.backend + '/' + store.logo"
+               [alt]="store.name" class="drawer-logo">
+          <span *ngIf="!store.logo" class="brand-initial">{{ store.name?.charAt(0) }}</span>
+        </div>
+        <span>{{ store.name }}</span>
+      </a>
+      <button class="drawer-close" (click)="closeMobileMenu()">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Drawer Search -->
+    <div class="drawer-search" *ngIf="themeConfig.header?.showSearch !== false">
+      <i class="fa fa-search"></i>
+      <input type="text" [(ngModel)]="searchQuery"
+             placeholder="Rechercher des produits..."
+             (keyup.enter)="onSearch(); closeMobileMenu()">
+      <button class="search-btn" (click)="onSearch(); closeMobileMenu()">
+        <i class="fa fa-search"></i>
+      </button>
+    </div>
+
+    <!-- Drawer Navigation -->
+    <nav class="drawer-nav">
+      <a [routerLink]="basePath || '/'" (click)="closeMobileMenu()"
+         routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <div class="nav-icon-wrap">
+          <i class="fa fa-{{ themeConfig.header?.icons?.home || 'home' }}"></i>
+        </div>
+        <span>Accueil</span>
+        <i class="fa fa-chevron-right arrow"></i>
+      </a>
+      <a [routerLink]="[basePath, 'products']" (click)="closeMobileMenu()"
+         routerLinkActive="active">
+        <div class="nav-icon-wrap">
+          <i class="fa fa-{{ themeConfig.header?.icons?.products || 'th-large' }}"></i>
+        </div>
+        <span>Produits</span>
+        <i class="fa fa-chevron-right arrow"></i>
+      </a>
+      <a [routerLink]="[basePath, 'cart']" (click)="closeMobileMenu()"
+         routerLinkActive="active">
+        <div class="nav-icon-wrap">
+          <i class="fa fa-{{ themeConfig.header?.icons?.cart || 'shopping-bag' }}"></i>
+        </div>
+        <span>Panier</span>
+        <span class="drawer-badge" *ngIf="cartCount > 0">{{ cartCount }}</span>
+        <i class="fa fa-chevron-right arrow"></i>
+      </a>
+
+      <!-- Auth links -->
+      <a *ngIf="isCustomerLoggedIn" [routerLink]="[basePath, 'account']" (click)="closeMobileMenu()"
+         routerLinkActive="active">
+        <div class="nav-icon-wrap">
+          <i class="fa fa-user"></i>
+        </div>
+        <span>Mon compte</span>
+        <i class="fa fa-chevron-right arrow"></i>
+      </a>
+      <a *ngIf="isCustomerLoggedIn" (click)="logoutCustomer(); closeMobileMenu()" style="cursor: pointer;">
+        <div class="nav-icon-wrap">
+          <i class="fa fa-sign-out"></i>
+        </div>
+        <span>Déconnexion</span>
+        <i class="fa fa-chevron-right arrow"></i>
+      </a>
+      <a *ngIf="!isCustomerLoggedIn" [routerLink]="[basePath, 'login']" (click)="closeMobileMenu()"
+         routerLinkActive="active">
+        <div class="nav-icon-wrap">
+          <i class="fa fa-sign-in"></i>
+        </div>
+        <span>Se connecter</span>
+        <i class="fa fa-chevron-right arrow"></i>
+      </a>
+    </nav>
+
+    <!-- Drawer Contact -->
+    <div class="drawer-contact" *ngIf="store.phone || store.email">
+      <h5>Contact</h5>
+      <a *ngIf="store.phone" [href]="'tel:' + store.phone" class="contact-item">
+        <i class="fa fa-phone"></i>
+        <span>{{ store.phone }}</span>
+      </a>
+      <a *ngIf="store.email" [href]="'mailto:' + store.email" class="contact-item">
+        <i class="fa fa-envelope"></i>
+        <span>{{ store.email }}</span>
+      </a>
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="drawer-footer" *ngIf="hasSocial()">
+      <div class="drawer-social">
+        <a *ngIf="themeConfig.social?.facebook" [href]="themeConfig.social.facebook" target="_blank"><i class="fa fa-facebook"></i></a>
+        <a *ngIf="themeConfig.social?.instagram" [href]="themeConfig.social.instagram" target="_blank"><i class="fa fa-instagram"></i></a>
+        <a *ngIf="themeConfig.social?.tiktok" [href]="themeConfig.social.tiktok" target="_blank"><i class="fa fa-music"></i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview Banner -->
+  <div class="preview-banner" *ngIf="isPreviewMode">
+    <i class="fa fa-eye"></i>
+    Mode aperçu — Les commandes ne seront pas traitées
+  </div>
+
+  <!-- ═══ PAGE CONTENT ═══ -->
+  <main class="store-main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- ═══ STORE FOOTER ═══ -->
+  <footer class="store-footer" *ngIf="themeConfig.sections?.footer !== false"
+          [style.background]="themeConfig.footer?.bgColor || '#0f172a'"
+          [style.color]="themeConfig.footer?.textColor || '#94a3b8'">
+    <div class="footer-container">
+      <div class="footer-grid">
+
+        <!-- Store Info -->
+        <div class="footer-col footer-brand">
+          <div class="footer-logo-row">
+            <img *ngIf="store.logo" [src]="environment.backend + '/' + store.logo" [alt]="store.name" class="footer-logo">
+            <h3>{{ store.name }}</h3>
+          </div>
+          <p class="footer-desc" *ngIf="themeConfig.footer?.text">{{ themeConfig.footer.text }}</p>
+        </div>
+
+        <!-- Contact -->
+        <div class="footer-col" *ngIf="themeConfig.footer?.showContact !== false && (store.phone || store.email || store.address?.city)">
+          <h4>Contact</h4>
+          <ul class="footer-links">
+            <li *ngIf="store.phone"><i class="fa fa-phone"></i> <a [href]="'tel:' + store.phone">{{ store.phone }}</a></li>
+            <li *ngIf="store.email"><i class="fa fa-envelope"></i> <a [href]="'mailto:' + store.email">{{ store.email }}</a></li>
+            <li *ngIf="store.address?.city"><i class="fa fa-map-marker"></i> <span>{{ store.address.city }}</span></li>
+          </ul>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-col" *ngIf="themeConfig.footer?.showQuickLinks && themeConfig.footer?.quickLinks?.length > 0">
+          <h4>Liens rapides</h4>
+          <ul class="footer-links">
+            <li *ngFor="let link of themeConfig.footer.quickLinks">
+              <a [href]="link.url" target="_blank">{{ link.label }}</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Social -->
+        <div class="footer-col" *ngIf="themeConfig.footer?.showSocial !== false && hasSocial()">
+          <h4>Suivez-nous</h4>
+          <div class="footer-social">
+            <a *ngIf="themeConfig.social?.facebook" [href]="themeConfig.social.facebook" target="_blank"><i class="fa fa-facebook"></i></a>
+            <a *ngIf="themeConfig.social?.instagram" [href]="themeConfig.social.instagram" target="_blank"><i class="fa fa-instagram"></i></a>
+            <a *ngIf="themeConfig.social?.tiktok" [href]="themeConfig.social.tiktok" target="_blank"><i class="fa fa-music"></i></a>
+          </div>
+        </div>
+
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; {{ currentYear }} {{ store.name }}. Tous droits réservés.</p>
+        <p>Propulsé par <a href="https://storiom.com" target="_blank" [style.color]="themeConfig.primaryColor">Storiom</a></p>
+      </div>
+    </div>
+  </footer>
+</div>
