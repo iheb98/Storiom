@@ -47,6 +47,7 @@ export class AdminLayoutComponent implements OnInit {
 
   subscriptionStatus: string | null = null;
   subscriptionDetails: any = null;
+  subscriptionPlan: string = 'STOCK';
   imageLoaded = false;
   avatarLoaded = false;
 
@@ -232,6 +233,8 @@ export class AdminLayoutComponent implements OnInit {
         if (response.success && response.subscription) {
           this.subscriptionDetails = response.subscription;
           this.subscriptionStatus = response.subscription.isExpired ? 'Expired' : 'Active';
+          this.subscriptionPlan = response.subscription.plan || 'STOCK_WEBSITE';
+          this.setMenu(); // Refresh menu based on plan
 
           // Show expired dialog if subscription expired
           if (response.subscription.isExpired) {
@@ -280,7 +283,6 @@ export class AdminLayoutComponent implements OnInit {
       { label: 'Crédits', icon: faHandHoldingUsd, link: 'admin/credits' },
       { label: 'Rapport', icon: faFile, link: 'admin/reports/generate' },
       { label: 'Domaine & Thème', icon: faGlobe, link: 'admin/domain-settings' },
-      //{ label: 'Paramètres', icon: faCog, link: 'admin/settings' }
     ];
   }
 }

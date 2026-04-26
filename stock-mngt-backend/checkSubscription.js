@@ -46,6 +46,9 @@ const checkSubscription = async (req, res, next) => {
             });
         }
 
+        // Attach subscription plan tier to request for downstream middleware
+        req.subscriptionPlan = user.subscription.plan || 'STOCK';
+
         next();
 
     } catch (err) {

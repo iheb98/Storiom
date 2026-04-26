@@ -61,6 +61,7 @@ import { StoreForgotPasswordComponent } from './pages/store-forgot-password/stor
 import { StoreResetPasswordComponent } from './pages/store-reset-password/store-reset-password.component';
 import { StoreConfirmComponent } from './pages/store-confirm/store-confirm.component';
 import { StoreProfileComponent } from './pages/store-profile/store-profile.component';
+import { CartPopupComponent } from './components/cart-popup/cart-popup.component';
 
 @NgModule({
   declarations: [
@@ -103,7 +104,8 @@ import { StoreProfileComponent } from './pages/store-profile/store-profile.compo
     StoreForgotPasswordComponent,
     StoreResetPasswordComponent,
     StoreConfirmComponent,
-    StoreProfileComponent
+    StoreProfileComponent,
+    CartPopupComponent
   ],
   imports: [
     CommonModule,

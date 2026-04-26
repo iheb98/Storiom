@@ -589,6 +589,7 @@ router.get('/publicProduct/:id', (req, res, next) => {
 router.get('/products/:id/recommendations', async (req, res) => {
     const productId = parseInt(req.params.id);
     const limit = parseInt(req.query.limit) || 8;
+    const storeIdFilter = req.query.storeId ? parseInt(req.query.storeId) : null;
 
     try {
         // First, get the current product to know its category and store
@@ -605,14 +606,18 @@ router.get('/products/:id/recommendations', async (req, res) => {
 
         // 1. Same category products (prioritize)
         if (currentProduct.categoryId) {
+            const catWhere = {
+                categoryId: currentProduct.categoryId,
+                id: { [Op.ne]: productId },
+                toDisplay: true,
+                isVisible: true,
+                quantity: { [Op.gt]: 0 }
+            };
+            // If storeId filter provided, scope to that store
+            if (storeIdFilter) catWhere.storeId = storeIdFilter;
+
             const sameCategoryProducts = await Product.findAll({
-                where: {
-                    categoryId: currentProduct.categoryId,
-                    id: { [Op.ne]: productId },
-                    toDisplay: true,
-                    isVisible: true,
-                    quantity: { [Op.gt]: 0 }
-                },
+                where: catWhere,
                 include: [
                     {
                         model: Store,
@@ -637,13 +642,14 @@ router.get('/products/:id/recommendations', async (req, res) => {
         }
 
         // 2. If we need more, get popular products from the same store
-        if (recommendations.length < limit && currentProduct.storeId) {
+        const targetStoreId = storeIdFilter || currentProduct.storeId;
+        if (recommendations.length < limit && targetStoreId) {
             const existingIds = recommendations.map(p => p.id);
             existingIds.push(productId);
 
             const sameStoreProducts = await Product.findAll({
                 where: {
-                    storeId: currentProduct.storeId,
+                    storeId: targetStoreId,
                     id: { [Op.notIn]: existingIds },
                     toDisplay: true,
                     isVisible: true,
@@ -672,8 +678,8 @@ router.get('/products/:id/recommendations', async (req, res) => {
             recommendations.push(...sameStoreProducts);
         }
 
-        // 3. If still need more, get globally popular products
-        if (recommendations.length < limit) {
+        // 3. If still need more and NOT scoped to a specific store, get globally popular products
+        if (recommendations.length < limit && !storeIdFilter) {
             const existingIds = recommendations.map(p => p.id);
             existingIds.push(productId);
 

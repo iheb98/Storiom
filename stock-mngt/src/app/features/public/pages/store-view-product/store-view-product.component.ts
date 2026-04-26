@@ -53,6 +53,9 @@ export class StoreViewProductComponent implements OnInit {
   recommendations: any[] = [];
   isLoadingRecommendations = false;
 
+  // Theme
+  showFreeShipping = true;
+
   // Icons
   faChevronRight = faChevronRight;
   faChevronLeft = faChevronLeft;
@@ -163,6 +166,16 @@ export class StoreViewProductComponent implements OnInit {
 
       // Load recommendations
       this.loadRecommendations(parseInt(id));
+
+      // Load theme config for cart settings
+      const storeId = this.product?.store?.id
+        || this.route.parent?.snapshot.paramMap.get('storeId')
+        || this.domainService.storeId;
+      if (storeId) {
+        this.publicService.getStoreById(storeId).subscribe((store: any) => {
+          this.showFreeShipping = store.theme?.cartPage?.showFreeShipping !== false;
+        });
+      }
     }, () => {
       this.productNotFound = true;
       this.isLoading = false;
@@ -171,7 +184,10 @@ export class StoreViewProductComponent implements OnInit {
 
   loadRecommendations(productId: number) {
     this.isLoadingRecommendations = true;
-    this.publicService.getProductRecommendations(productId, 4).subscribe({
+    const storeId = this.product?.store?.id
+      || this.route.parent?.snapshot.paramMap.get('storeId')
+      || this.domainService.storeId;
+    this.publicService.getProductRecommendations(productId, 4, storeId).subscribe({
       next: (products) => {
         this.recommendations = products;
         this.isLoadingRecommendations = false;
@@ -264,6 +280,9 @@ export class StoreViewProductComponent implements OnInit {
       next: (res) => {
         if (res.success) {
           this.storeReviews = res.reviews;
+          // In store context, use store reviews for rating
+          this.product.averageRating = this.getStoreAverageRating();
+          this.product.storeReviewCount = this.storeReviews.length;
           // Check if current customer already reviewed
           if (this.isCustomerLoggedIn) {
             const customer = this.storeAuth.getCustomer();

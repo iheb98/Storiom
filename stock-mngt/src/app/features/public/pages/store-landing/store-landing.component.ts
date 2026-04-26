@@ -43,7 +43,9 @@ export class StoreLandingComponent implements OnInit, OnDestroy {
       backgroundImage: '',
       images: [],
       overlayOpacity: 0.5,
-      autoScrollSpeed: 5
+      autoScrollSpeed: 5,
+      gradientColor1: '',
+      gradientColor2: ''
     },
     announcement: { enabled: false, text: '', bgColor: '#4f46e5', link: '' },
     usps: {
@@ -185,7 +187,9 @@ export class StoreLandingComponent implements OnInit, OnDestroy {
   getHeroBackground(): any {
     const hero = this.themeConfig.hero;
     if (hero.style === 'gradient') {
-      return { background: `linear-gradient(135deg, ${this.themeConfig.primaryColor}, ${this.themeConfig.accentColor})` };
+      const c1 = hero.gradientColor1 || this.themeConfig.primaryColor;
+      const c2 = hero.gradientColor2 || this.themeConfig.accentColor;
+      return { background: `linear-gradient(135deg, ${c1}, ${c2})` };
     }
     if (hero.backgroundImage) {
       return { 'background-image': `url(${this.environment.backend}/${hero.backgroundImage})` };
@@ -277,7 +281,6 @@ export class StoreLandingComponent implements OnInit, OnDestroy {
   addToCart(product: any, event: Event): void {
     event.stopPropagation();
     this.cartService.addToCart(product, 1);
-    this.toastService.showSuccess('Produit ajouté au panier');
   }
 
   browseCategory(categoryId: number): void {
@@ -293,5 +296,9 @@ export class StoreLandingComponent implements OnInit, OnDestroy {
       }
     }
     return 'assets/placeholder-product.png';
+  }
+
+  formatAddress(...parts: string[]): string {
+    return parts.filter(p => !!p).join(', ');
   }
 }

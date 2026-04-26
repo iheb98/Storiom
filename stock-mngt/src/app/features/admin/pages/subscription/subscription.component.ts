@@ -65,6 +65,7 @@ export class SubscriptionComponent implements OnInit {
         activationDate: string;
         expirationDate: string;
         duration: string;
+        plan: string;
         isExpired: boolean;
         daysRemaining: number;
         percentRemaining: number;
@@ -75,12 +76,42 @@ export class SubscriptionComponent implements OnInit {
     currentView: 'plans' | 'bank-details' | 'orders' = 'plans';
     showStorageSection = false;
 
+    // Tier selection
+    selectedTier: 'STOCK' | 'STOCK_WEBSITE' = 'STOCK';
+    tierFeatures: { [key: string]: string[] } = {
+        STOCK: [
+            'Gestion complète des produits',
+            'Suivi des commandes',
+            'Statistiques & rapports',
+            'Gestion des fournisseurs',
+            'Gestion des dépenses & crédits',
+            'Factures & reçus',
+            'Gestion des travailleurs',
+            'Gestion des catégories & marques'
+        ],
+        STOCK_WEBSITE: [
+            'Tout du plan Gestion de Stock',
+            'Boutique en ligne privée',
+            'Domaine personnalisé',
+            'Personnalisation du thème',
+            'Panier & commandes clients',
+            'Inscription des clients',
+            'Avis & évaluations clients'
+        ]
+    };
+
     // Storage plans
     storagePlans: { [key: number]: { [key: string]: number } } = {};
     storageGBOptions: number[] = [50, 100, 200];
     storageDurationOptions: string[] = ['1M', '3M', '6M', '12M'];
     selectedStorageGB: number = 50;
     selectedStorageDuration: string = '1M';
+
+    // Upgrade state
+    upgradePrice: number = 0;
+    upgradeInfo: any = null;
+    isLoadingUpgrade = false;
+    canUpgrade = false;
 
     // Plans
     plans: SubscriptionPlan[] = [];
@@ -123,7 +154,10 @@ export class SubscriptionComponent implements OnInit {
                 console.error('Error loading pricing:', error);
                 // Initialize with default prices if API fails
                 this.pricing = {
-                    subscription: { '1M': 50, '3M': 140, '6M': 260, '12M': 500 },
+                    subscription: {
+                        STOCK: { '1M': 40, '3M': 110, '6M': 210, '12M': 400 },
+                        STOCK_WEBSITE: { '1M': 60, '3M': 170, '6M': 320, '12M': 600 }
+                    },
                     storage: { pricePerUnit: 10, unitSizeGB: 50 },
                     currency: 'TND'
                 };
@@ -188,40 +222,74 @@ export class SubscriptionComponent implements OnInit {
     initPlans() {
         if (!this.pricing) return;
 
+        const tierPrices = this.pricing.subscription[this.selectedTier];
+        if (!tierPrices) return;
+
+        // Calculate discounts based on monthly rate
+        const monthlyPrice = tierPrices['1M'];
+
         this.plans = [
             {
                 key: '1M',
                 name: '1 Mois',
-                price: this.pricing.subscription['1M'],
+                price: tierPrices['1M'],
                 duration: '1 mois',
                 icon: faStar
             },
             {
                 key: '3M',
                 name: '3 Mois',
-                price: this.pricing.subscription['3M'],
+                price: tierPrices['3M'],
                 duration: '3 mois',
-                discount: '7%',
+                discount: Math.round((1 - tierPrices['3M'] / (monthlyPrice * 3)) * 100) + '%',
                 icon: faRocket
             },
             {
                 key: '6M',
                 name: '6 Mois',
-                price: this.pricing.subscription['6M'],
+                price: tierPrices['6M'],
                 duration: '6 mois',
-                discount: '13%',
+                discount: Math.round((1 - tierPrices['6M'] / (monthlyPrice * 6)) * 100) + '%',
                 popular: true,
                 icon: faGem
             },
             {
                 key: '12M',
                 name: '12 Mois',
-                price: this.pricing.subscription['12M'],
+                price: tierPrices['12M'],
                 duration: '12 mois',
-                discount: '17%',
+                discount: Math.round((1 - tierPrices['12M'] / (monthlyPrice * 12)) * 100) + '%',
                 icon: faCreditCard
             }
         ];
+    }
+
+    selectTier(tier: 'STOCK' | 'STOCK_WEBSITE') {
+        this.selectedTier = tier;
+        this.initPlans();
+
+        // If user has active STOCK and selects STOCK_WEBSITE, load upgrade price
+        if (tier === 'STOCK_WEBSITE' && this.currentSubscription && !this.currentSubscription.isExpired && this.currentSubscription.plan === 'STOCK') {
+            this.isLoadingUpgrade = true;
+            this.paymentOrderService.getUpgradePrice().subscribe(
+                (res: any) => {
+                    if (res.success && !res.alreadyUpgraded && !res.isExpired) {
+                        this.canUpgrade = true;
+                        this.upgradePrice = res.upgradePrice;
+                        this.upgradeInfo = res;
+                    } else {
+                        this.canUpgrade = false;
+                    }
+                    this.isLoadingUpgrade = false;
+                },
+                () => {
+                    this.canUpgrade = false;
+                    this.isLoadingUpgrade = false;
+                }
+            );
+        } else {
+            this.canUpgrade = false;
+        }
     }
 
     selectPlan(plan: SubscriptionPlan) {
@@ -253,6 +321,48 @@ export class SubscriptionComponent implements OnInit {
         });
     }
 
+    createUpgradeOrder() {
+        Swal.fire({
+            title: 'Confirmer la mise à niveau',
+            html: `
+                <div style="text-align: center; padding: 10px 0;">
+                    <div style="font-size: 2.5rem; font-weight: 800; color: #2c3e50; margin-bottom: 8px;">
+                        ${this.upgradePrice} <span style="font-size: 1rem; color: #6c757d;">TND</span>
+                    </div>
+                    <div style="font-size: 1rem; color: #6c757d; margin-bottom: 8px;">
+                        Mise à niveau vers <strong>Stock + Boutique</strong>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #999; margin-bottom: 16px;">
+                        Pour vos ${this.upgradeInfo?.remainingDays} jours restants
+                    </div>
+                </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Confirmer la mise à niveau',
+            cancelButtonText: 'Annuler',
+            confirmButtonColor: '#3f51b5',
+            cancelButtonColor: '#6c757d',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.isCreatingOrder = true;
+                this.paymentOrderService.createUpgradeOrder().subscribe(
+                    (res: any) => {
+                        this.isCreatingOrder = false;
+                        this.currentOrder = res.order;
+                        this.bankInstructions = res.bankInstructions;
+                        this.currentView = 'bank-details';
+                    },
+                    (error: any) => {
+                        this.isCreatingOrder = false;
+                        Swal.fire('Erreur', error.error?.message || 'Une erreur est survenue', 'error');
+                    }
+                );
+            }
+        });
+    }
+
     createOrder() {
         if (!this.selectedPlan) return;
 
@@ -260,7 +370,8 @@ export class SubscriptionComponent implements OnInit {
 
         this.paymentOrderService.createOrder({
             paymentType: 'SUBSCRIPTION',
-            subscriptionPlan: this.selectedPlan.key
+            subscriptionPlan: this.selectedPlan.key,
+            subscriptionTier: this.selectedTier
         }).subscribe(
             res => {
                 this.isCreatingOrder = false;

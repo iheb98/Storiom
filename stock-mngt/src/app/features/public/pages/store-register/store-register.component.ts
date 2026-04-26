@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { StoreAuthService } from 'src/app/core/services/store-auth.service';
 import { DomainService } from 'src/app/core/services/domain.service';
 import {
-  faUser, faEnvelope, faPhone, faLock, faArrowRight, faEye, faEyeSlash
+  faUser, faEnvelope, faPhone, faLock, faArrowRight, faEye, faEyeSlash, faMapMarkerAlt
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -19,11 +19,13 @@ export class StoreRegisterComponent implements OnInit {
   faArrowRight = faArrowRight;
   faEye = faEye;
   faEyeSlash = faEyeSlash;
+  faMapMarker = faMapMarkerAlt;
 
   firstName = '';
   lastName = '';
   email = '';
   phone = '';
+  address = { street: '', city: '', state: '', postalCode: '' };
   password = '';
   confirmPassword = '';
   showPassword = false;
@@ -80,6 +82,7 @@ export class StoreRegisterComponent implements OnInit {
       lastName: this.lastName,
       email: this.email,
       phone: this.phone,
+      address: this.address,
       password: this.password
     }, this.previewStoreId).subscribe({
       next: (res) => {

@@ -104,11 +104,11 @@
           </thead>
           <tbody>
             <tr *ngFor="let product of reportData.products">
-              <td class="product-name">{{ product.productName }}</td>
-              <td class="price buying">{{ product.buyingPrice | number:'1.2-2' }} DT</td>
-              <td class="price selling">{{ product.sellingPrice | number:'1.2-2' }} DT</td>
-              <td class="quantity">{{ product.quantitySold }}</td>
-              <td class="earnings">
+              <td class="product-name" data-label="Produit">{{ product.productName }}</td>
+              <td class="price buying" data-label="Prix Achat">{{ product.buyingPrice | number:'1.2-2' }} DT</td>
+              <td class="price selling" data-label="Prix Vente">{{ product.sellingPrice | number:'1.2-2' }} DT</td>
+              <td class="quantity" data-label="Quantité">{{ product.quantitySold }}</td>
+              <td class="earnings" data-label="Bénéfices">
                 <span class="earnings-badge">+{{ product.earnings | number:'1.2-2' }} DT</span>
               </td>
             </tr>

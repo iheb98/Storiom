@@ -3,6 +3,7 @@ const router = express.Router();
 const { Store, Brand, Expense, Address, Subscription, StoragePurchase, User } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
+const checkPlanTier = require('../checkPlanTier');
 
 router.post('/create', utility.authenticate, async (req, res) => {
     try {
@@ -357,7 +358,7 @@ module.exports = router;
  * @route   PUT /api/stores/:id/domain
  * @desc    Set or update the custom domain for a store
  */
-router.put('/:id/domain', utility.authenticate, checkSubscription, async (req, res) => {
+router.put('/:id/domain', utility.authenticate, checkSubscription, checkPlanTier('STOCK_WEBSITE'), async (req, res) => {
     try {
         const id = req.params.id;
         let { domain } = req.body;
@@ -412,7 +413,7 @@ router.put('/:id/domain', utility.authenticate, checkSubscription, async (req, r
  * @route   POST /api/stores/:id/domain/verify
  * @desc    Verify that the custom domain DNS is pointing to our server
  */
-router.post('/:id/domain/verify', utility.authenticate, checkSubscription, async (req, res) => {
+router.post('/:id/domain/verify', utility.authenticate, checkSubscription, checkPlanTier('STOCK_WEBSITE'), async (req, res) => {
     try {
         const id = req.params.id;
         const store = await Store.findOne({ where: { id } });
@@ -479,7 +480,7 @@ router.post('/:id/domain/verify', utility.authenticate, checkSubscription, async
  * @route   DELETE /api/stores/:id/domain
  * @desc    Remove custom domain from a store
  */
-router.delete('/:id/domain', utility.authenticate, checkSubscription, async (req, res) => {
+router.delete('/:id/domain', utility.authenticate, checkSubscription, checkPlanTier('STOCK_WEBSITE'), async (req, res) => {
     try {
         const id = req.params.id;
         const store = await Store.findOne({ where: { id } });
@@ -508,7 +509,7 @@ router.delete('/:id/domain', utility.authenticate, checkSubscription, async (req
  * @route   PUT /api/stores/:id/theme
  * @desc    Update the store's theme settings
  */
-router.put('/:id/theme', utility.authenticate, checkSubscription, async (req, res) => {
+router.put('/:id/theme', utility.authenticate, checkSubscription, checkPlanTier('STOCK_WEBSITE'), async (req, res) => {
     try {
         const id = req.params.id;
         const { theme } = req.body;

@@ -16,6 +16,10 @@ $sidebar-width: 260px;
   .header-inner { max-width: 1200px; margin: 0 auto; }
   h1 { font-size: 28px; font-weight: 700; margin: 0 0 4px; }
   .product-count { font-size: 14px; opacity: 0.8; margin: 0; }
+
+  &.no-gradient {
+    background: var(--store-primary, #4f46e5);
+  }
 }
 
 // ═══ TOOLBAR ═══
@@ -334,7 +338,7 @@ $sidebar-width: 260px;
 // Products Grid
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(var(--grid-cols, 4), 1fr);
   gap: 20px;
 }
 
@@ -347,7 +351,9 @@ mat-paginator {
 
 // ═══ RESPONSIVE ═══
 @media (max-width: 1024px) {
-  .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .products-grid {
+    grid-template-columns: repeat(var(--grid-cols-mobile, 2), 1fr);
+  }
 }
 
 @media (max-width: 768px) {
@@ -393,7 +399,10 @@ mat-paginator {
 }
 
 @media (max-width: 480px) {
-  .products-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .products-grid {
+    grid-template-columns: repeat(var(--grid-cols-mobile, 2), 1fr);
+    gap: 10px;
+  }
 }
 
 // Price filter in sidebar

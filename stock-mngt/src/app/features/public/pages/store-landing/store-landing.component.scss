@@ -93,6 +93,14 @@ $font: var(--store-font, 'Inter');
   border-radius: 0;
 }
 
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  pointer-events: none;
+  z-index: 2;
+}
+
 .hero-slide-img {
   display: block;
   width: 100%;
@@ -159,21 +167,34 @@ $font: var(--store-font, 'Inter');
 
 
 .hero-gradient {
+  min-height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   .hero-overlay { display: none; }
+  .hero-content {
+    background: transparent !important;
+    padding: 60px 24px;
+  }
 }
 
 .hero-split {
   display: flex;
+  flex-direction: row;
   .hero-content {
     flex: 1;
-    text-align: left;
+    text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     padding: 60px 48px;
+    order: 1;
+  }
+  .hero-split-image {
+    order: 2;
   }
   .hero-overlay { display: none; }
-  background: linear-gradient(135deg, #1e293b, #0f172a) !important;
 }
 
 .hero-split-image {
@@ -181,6 +202,7 @@ $font: var(--store-font, 'Inter');
   position: relative;
   overflow: hidden;
   animation: fadeIn 0.8s ease;
+  min-height: 400px;
 }
 
 .hero-split-carousel {
@@ -775,11 +797,12 @@ $font: var(--store-font, 'Inter');
   .hero-content { padding: 24px 20px; }
   .hero-split {
     flex-direction: column;
-    .hero-content { text-align: center; padding: 28px 20px; }
+    .hero-content { text-align: center; padding: 28px 20px; order: unset; }
+    .hero-split-image { order: unset; }
     .hero-actions { justify-content: center; }
     .hero-badges { justify-content: center; }
   }
-  .hero-split-image { height: 200px; }
+  .hero-split-image { height: 250px; min-height: unset; }
   .hero-indicators { bottom: 14px; }
   .btn-hero-primary, .btn-hero-outline {
     padding: 10px 20px; font-size: 13px;

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { StoreAuthService } from './store-auth.service';
 import { environment } from 'src/environments/environment';
 
@@ -12,6 +12,9 @@ export class CartService {
   private LS_KEY = 'cart';
   private _cartCount = new BehaviorSubject<number>(0);
   cartCount$ = this._cartCount.asObservable();
+
+  private _productAdded = new Subject<any>();
+  productAdded$ = this._productAdded.asObservable();
 
   private storeCartUrl = environment.apiUrl + '/store-customers';
 
@@ -38,6 +41,9 @@ export class CartService {
   addToCart(product: any, quantity: number = 1): void {
     // Always update localStorage immediately for UI
     this.addToLocalCart(product, quantity);
+
+    // Emit event for popup
+    this._productAdded.next(product);
 
     // If logged in, also persist to the backend
     if (this.storeAuth.isLoggedIn()) {

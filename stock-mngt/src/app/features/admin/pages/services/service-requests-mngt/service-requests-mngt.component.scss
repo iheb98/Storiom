@@ -193,20 +193,6 @@ $shadow-xl: 0 20px 40px -10px rgba(0, 0, 0, 0.12);
     background: $white;
     border-radius: $radius-lg;
     box-shadow: $shadow-sm;
-    overflow-x: auto;
-
-    &::-webkit-scrollbar {
-        height: 4px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: $border-color;
-        border-radius: 10px;
-    }
 
     .tab-btn {
         display: flex;
@@ -260,28 +246,28 @@ $shadow-xl: 0 20px 40px -10px rgba(0, 0, 0, 0.12);
     }
 
     @media (max-width: 768px) {
-        padding: 6px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
         gap: 6px;
+        padding: 6px;
 
         .tab-btn {
-            padding: 10px 14px;
+            justify-content: center;
+            padding: 10px 8px;
             font-size: 0.8rem;
-        }
-    }
-
-    @media (max-width: 480px) {
-        padding: 4px;
-        gap: 4px;
-        flex-wrap: nowrap;
-
-        .tab-btn {
-            padding: 8px 10px;
-            font-size: 0.6rem;
-            min-width: 0;
 
             fa-icon {
                 display: none;
             }
+        }
+    }
+
+    @media (max-width: 400px) {
+        grid-template-columns: repeat(2, 1fr);
+
+        .tab-btn {
+            padding: 10px 6px;
+            font-size: 0.75rem;
         }
     }
 }

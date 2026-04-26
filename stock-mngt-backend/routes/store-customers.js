@@ -28,7 +28,7 @@ const authenticateCustomer = (req, res, next) => {
 // REGISTER
 // ========================================
 router.post('/register', async (req, res) => {
-    const { firstName, lastName, email, phone, password, storeId } = req.body;
+    const { firstName, lastName, email, phone, password, storeId, address } = req.body;
 
     if (!email || !password || !storeId) {
         return res.status(400).json({ success: false, message: 'Email, mot de passe et storeId sont requis.' });
@@ -63,6 +63,7 @@ router.post('/register', async (req, res) => {
             phone,
             password: hashedPassword,
             storeId,
+            address: address || null,
             isConfirmed: false,
             confirmationToken,
             tokenExpiresAt
@@ -396,6 +397,8 @@ router.put('/profile', authenticateCustomer, async (req, res) => {
         if (lastName !== undefined) customer.lastName = lastName;
         if (phone !== undefined) customer.phone = phone;
         if (address !== undefined) customer.address = address;
+        // Force Sequelize to detect JSONB changes
+        customer.changed('address', true);
         await customer.save();
 
         res.json({ success: true, customer, message: 'Profil mis à jour.' });
@@ -483,7 +486,7 @@ router.post('/place-order', authenticateCustomer, async (req, res) => {
             totalAmount,
             customerName: customerName || `${customer.firstName} ${customer.lastName}`,
             customerPhone: customerPhone || customer.phone,
-            customerAddress: customerAddress || '',
+            customerAddress: customerAddress || [customer.address?.street, customer.address?.city, customer.address?.state, customer.address?.postalCode].filter(Boolean).join(', ') || '',
             notes: notes || ''
         });
 

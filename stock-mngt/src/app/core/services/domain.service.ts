@@ -85,7 +85,7 @@ export class DomainService {
           this._isCustomDomain.next(true);
           this._currentStore.next(result.store);
           this._storeTheme.next(result.store.theme || null);
-          this.applyStoreTheme(result.store.theme);
+          this.applyStoreTheme(result.store.theme, result.store.name);
         } else {
           this._isCustomDomain.next(false);
           this._currentStore.next(null);
@@ -119,7 +119,7 @@ export class DomainService {
    * Apply the store's theme as CSS custom properties on the document root.
    * Components can use these variables for styling.
    */
-  private applyStoreTheme(theme: StoreTheme | null): void {
+  private applyStoreTheme(theme: any, storeName?: string): void {
     if (!theme) return;
 
     const root = document.documentElement;
@@ -131,6 +131,24 @@ export class DomainService {
       root.classList.add('store-dark-mode');
     } else {
       root.classList.remove('store-dark-mode');
+    }
+
+    // Set tab title immediately (before any component renders)
+    const tabTitle = theme.browserTab?.title || storeName || '';
+    if (tabTitle) {
+      document.title = tabTitle;
+    }
+
+    // Set favicon immediately
+    const favicon = theme.browserTab?.favicon;
+    if (favicon) {
+      let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = environment.backend + '/' + favicon;
     }
   }
 

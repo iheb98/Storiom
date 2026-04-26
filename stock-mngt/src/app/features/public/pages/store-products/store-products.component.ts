@@ -34,6 +34,11 @@ export class StoreProductsComponent implements OnInit {
   count = 0;
   currentPage = 0;
   currentSize = 24;
+  gridColumns = 4;
+  gridColumnsMobile = 2;
+  showFilters = true;
+  headerGradient = true;
+  themeLoaded = false;
 
   // Icons
   faCartPlus = faCartPlus;
@@ -78,7 +83,12 @@ export class StoreProductsComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.searchQuery = params['searchable'] || '';
       this.selectedCategory = params['category'] ? +params['category'] : null;
-      this.sortBy = params['sort'] || '';
+      if (!this.themeLoaded) {
+        // Don't override sortBy from theme default on subsequent navigations
+        this.sortBy = params['sort'] || '';
+      } else {
+        this.sortBy = params['sort'] || this.sortBy;
+      }
       this.minPrice = params['minPrice'] ? +params['minPrice'] : null;
       this.maxPrice = params['maxPrice'] ? +params['maxPrice'] : null;
       this.selectedBrand = params['brand'] ? +params['brand'] : null;
@@ -87,6 +97,7 @@ export class StoreProductsComponent implements OnInit {
 
     this.loadCategories();
     this.loadBrands();
+    this.loadThemeConfig();
   }
 
   loadCategories(): void {
@@ -227,5 +238,24 @@ export class StoreProductsComponent implements OnInit {
     this.currentPage = event.pageIndex;
     this.currentSize = event.pageSize;
     this.loadProducts();
+  }
+
+  loadThemeConfig(): void {
+    if (!this.storeId) return;
+    this.publicService.getStoreById(this.storeId).subscribe((store: any) => {
+      const pp = store.theme?.productsPage;
+      if (pp) {
+        this.gridColumns = pp.gridColumns || 4;
+        this.gridColumnsMobile = pp.gridColumnsMobile || 2;
+        this.currentSize = pp.productsPerPage || 24;
+        this.showFilters = pp.showFilters !== false;
+        this.headerGradient = pp.headerGradient !== false;
+        if (pp.defaultSort && !this.sortBy) {
+          this.sortBy = pp.defaultSort;
+        }
+      }
+      this.themeLoaded = true;
+      this.loadProducts();
+    });
   }
 }

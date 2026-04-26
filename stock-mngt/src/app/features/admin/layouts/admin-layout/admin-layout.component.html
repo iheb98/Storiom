@@ -21,7 +21,7 @@
       [matTooltip]="getSubscriptionTooltip() + ' - Cliquez pour gérer'">
       <i class="fa" [class.fa-check-circle]="subscriptionStatus === 'Active'"
         [class.fa-exclamation-circle]="subscriptionStatus === 'Expired'"></i>
-      <span>{{ subscriptionStatus === 'Active' ? 'Activé' : 'Expiré' }}</span>
+      <span class="plan-name">{{ subscriptionPlan === 'STOCK_WEBSITE' ? 'Stock + Boutique' : 'Gestion de Stock' }}</span>
     </a>
 
     <!-- Navigation -->

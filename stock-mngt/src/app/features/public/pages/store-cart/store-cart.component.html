@@ -67,7 +67,7 @@
             <span>Sous-total ({{ totalItems }} articles)</span>
             <span>{{ totalPrice | number:'1.2-2' }} DT</span>
           </div>
-          <div class="summary-row">
+          <div class="summary-row" *ngIf="showFreeShipping">
             <span>Livraison</span>
             <span class="free-shipping">Gratuite</span>
           </div>
@@ -77,12 +77,12 @@
             <span>{{ totalPrice | number:'1.2-2' }} DT</span>
           </div>
 
-          <button class="checkout-btn" (click)="checkout()" [disabled]="isPreviewMode">
+          <button class="checkout-btn" (click)="checkout()" [disabled]="isPreviewMode || placingOrder">
             <fa-icon [icon]="faLock"></fa-icon>
-            {{ isPreviewMode ? 'Commande indisponible (aperçu)' : 'Commander' }}
+            {{ isPreviewMode ? 'Commande indisponible (aperçu)' : (placingOrder ? 'Commande en cours...' : checkoutText) }}
           </button>
 
-          <button class="continue-btn" (click)="continueShopping()">
+          <button class="continue-btn" (click)="continueShopping()" *ngIf="showContinueShopping">
             <fa-icon [icon]="faArrowLeft"></fa-icon> Continuer les achats
           </button>
         </div>

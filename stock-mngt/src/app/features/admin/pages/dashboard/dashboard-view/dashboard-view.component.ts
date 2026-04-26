@@ -137,7 +137,7 @@ export class DashboardViewComponent implements OnInit {
                         value: response?.criticalStock ?? '--',
                         icon: faArrowDown,
                         class: 'critical-stock',
-                        route: '/products',
+                        route: '/admin/products',
                         queryParams: { filter: 'critical' }
                     },
                     {

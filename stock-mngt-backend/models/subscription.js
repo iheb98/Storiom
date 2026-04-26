@@ -40,6 +40,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       field: 'user_id'
     },
+    plan: {
+      type: DataTypes.ENUM('STOCK', 'STOCK_WEBSITE'),
+      allowNull: false,
+      defaultValue: 'STOCK'
+    },
   }, {
     sequelize,
     tableName: 'subscriptions',

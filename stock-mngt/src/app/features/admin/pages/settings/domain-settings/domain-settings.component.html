@@ -1,5 +1,51 @@
 <div class="customizer">
 
+  <!-- Plan Check Loading -->
+  <div class="loading-container" *ngIf="isCheckingPlan">
+    <div class="spinner"></div>
+    <p>Chargement...</p>
+  </div>
+
+  <!-- Upgrade Prompt (no website plan) -->
+  <div class="upgrade-prompt" *ngIf="!isCheckingPlan && !hasWebsitePlan">
+    <div class="upgrade-card">
+      <div class="upgrade-icon">
+        <fa-icon [icon]="faLock"></fa-icon>
+      </div>
+      <h2>Fonctionnalité Premium</h2>
+      <p class="upgrade-desc">
+        La personnalisation de votre boutique en ligne, le domaine personnalisé et le thème sont disponibles avec le plan <strong>Stock + Boutique</strong>.
+      </p>
+      <div class="upgrade-features">
+        <div class="feature-item">
+          <fa-icon [icon]="faGlobe"></fa-icon>
+          <span>Domaine personnalisé</span>
+        </div>
+        <div class="feature-item">
+          <fa-icon [icon]="faPaintBrush"></fa-icon>
+          <span>Personnalisation du thème</span>
+        </div>
+        <div class="feature-item">
+          <fa-icon [icon]="faStore"></fa-icon>
+          <span>Boutique en ligne privée</span>
+        </div>
+        <div class="feature-item">
+          <fa-icon [icon]="faImage"></fa-icon>
+          <span>Hero & bannières personnalisées</span>
+        </div>
+      </div>
+      <a routerLink="/admin/subscription" class="btn-upgrade">
+        <fa-icon [icon]="faRocket"></fa-icon>
+        Passer au plan Stock + Boutique
+        <fa-icon [icon]="faArrowRight"></fa-icon>
+      </a>
+      <p class="upgrade-hint">À partir de 60 TND/mois</p>
+    </div>
+  </div>
+
+  <!-- Full Page Content (has website plan) -->
+  <ng-container *ngIf="!isCheckingPlan && hasWebsitePlan">
+
   <!-- Top Bar -->
   <div class="customizer-topbar">
     <div class="topbar-left">
@@ -120,6 +166,57 @@
         </div>
       </div>
 
+      <!-- ─── BROWSER TAB ─── -->
+      <div class="panel" *ngIf="activeSection === 'browserTab'">
+        <div class="panel-header">
+          <i class="fa fa-tag panel-icon"></i>
+          <div>
+            <h2>Onglet navigateur</h2>
+            <p>Personnalisez le titre et l'icône de votre onglet</p>
+          </div>
+        </div>
+        <div class="panel-body">
+
+          <!-- Live Tab Preview -->
+          <div class="tab-preview-wrap">
+            <div class="tab-preview">
+              <div class="tab-favicon-preview">
+                <img *ngIf="theme.browserTab?.favicon" [src]="backend + '/' + theme.browserTab.favicon" alt="Favicon">
+                <i *ngIf="!theme.browserTab?.favicon" class="fa fa-globe"></i>
+              </div>
+              <span class="tab-title-preview">{{ theme.browserTab?.title || store?.name || 'Ma boutique' }}</span>
+              <i class="fa fa-times tab-close-icon"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Titre de l'onglet</label>
+            <input type="text" [(ngModel)]="theme.browserTab.title" [placeholder]="store?.name || 'Nom de votre boutique'">
+            <span class="form-hint">Laissez vide pour utiliser le nom de votre boutique</span>
+          </div>
+
+          <div class="form-group">
+            <label>Favicon (icône de l'onglet)</label>
+            <div class="favicon-upload-area">
+              <div class="favicon-current" *ngIf="theme.browserTab?.favicon">
+                <img [src]="backend + '/' + theme.browserTab.favicon" alt="Favicon actuel">
+                <button class="btn-icon danger" (click)="removeFavicon()">
+                  <fa-icon [icon]="faTimes"></fa-icon>
+                </button>
+              </div>
+              <label class="upload-area favicon-dropzone" *ngIf="!theme.browserTab?.favicon">
+                <input type="file" accept="image/png,image/ico,image/x-icon,image/svg+xml,image/jpeg" (change)="uploadFavicon($event)" hidden>
+                <fa-icon [icon]="faCloudUploadAlt" *ngIf="!isUploadingFavicon"></fa-icon>
+                <fa-icon [icon]="faSpinner" [spin]="true" *ngIf="isUploadingFavicon"></fa-icon>
+                <span>{{ isUploadingFavicon ? 'Upload en cours...' : 'Cliquez pour ajouter un favicon' }}</span>
+              </label>
+            </div>
+            <span class="form-hint">Format recommandé : PNG ou ICO, 32×32 ou 64×64 pixels</span>
+          </div>
+
+        </div>
+      </div>
+
       <!-- ─── COLORS ─── -->
       <div class="panel" *ngIf="activeSection === 'colors'">
         <div class="panel-header">
@@ -204,6 +301,30 @@
               </button>
             </div>
           </div>
+          <div class="form-group" *ngIf="theme.hero.style === 'gradient'">
+            <label>Couleurs du dégradé</label>
+            <div class="color-grid">
+              <div class="form-group">
+                <label>Couleur 1</label>
+                <div class="color-picker-row">
+                  <input type="color" [(ngModel)]="theme.hero.gradientColor1" class="color-input"
+                    [value]="theme.hero.gradientColor1 || theme.primaryColor">
+                  <input type="text" [(ngModel)]="theme.hero.gradientColor1" class="color-text"
+                    [placeholder]="theme.primaryColor">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Couleur 2</label>
+                <div class="color-picker-row">
+                  <input type="color" [(ngModel)]="theme.hero.gradientColor2" class="color-input"
+                    [value]="theme.hero.gradientColor2 || theme.accentColor">
+                  <input type="text" [(ngModel)]="theme.hero.gradientColor2" class="color-text"
+                    [placeholder]="theme.accentColor">
+                </div>
+              </div>
+            </div>
+            <span class="form-hint">Laissez vide pour utiliser les couleurs du thème</span>
+          </div>
           <div class="form-row">
             <div class="form-group">
               <label>Titre</label>
@@ -257,12 +378,22 @@
         </div>
         <div class="panel-body">
           <div class="form-group">
-            <label>Colonnes dans la grille</label>
+            <label><i class="fa fa-desktop"></i> Colonnes — Bureau</label>
             <div class="option-selector">
               <button *ngFor="let cols of [2, 3, 4, 5]"
                       [class.active]="theme.productsPage.gridColumns === cols"
                       (click)="theme.productsPage.gridColumns = cols">
                 {{ cols }} colonnes
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="fa fa-mobile"></i> Colonnes — Mobile</label>
+            <div class="option-selector">
+              <button *ngFor="let cols of [1, 2, 3]"
+                      [class.active]="theme.productsPage.gridColumnsMobile === cols"
+                      (click)="theme.productsPage.gridColumnsMobile = cols">
+                {{ cols }} {{ cols === 1 ? 'colonne' : 'colonnes' }}
               </button>
             </div>
           </div>
@@ -741,4 +872,5 @@
 
     </main>
   </div>
+  </ng-container>
 </div>

@@ -4,12 +4,20 @@ const { PaymentOrder, User, Subscription, Store, StoragePurchase } = require('..
 const utility = require('../utility');
 const sendMail = require('../mailService');
 
-// Pricing configuration (in TND)
+// Pricing configuration (in TND) — tiered
 const SUBSCRIPTION_PRICES = {
-    '1M': 50,
-    '3M': 140,   // ~7% discount
-    '6M': 260,   // ~13% discount
-    '12M': 500   // ~17% discount
+    STOCK: {
+        '1M': 40,
+        '3M': 110,   // ~8% discount
+        '6M': 210,   // ~12% discount
+        '12M': 400   // ~17% discount
+    },
+    STOCK_WEBSITE: {
+        '1M': 60,
+        '3M': 170,   // ~6% discount
+        '6M': 320,   // ~11% discount
+        '12M': 600   // ~17% discount
+    }
 };
 
 const STORAGE_PRICE_PER_50GB = 10;
@@ -71,19 +79,96 @@ router.get('/pricing', (req, res) => {
     });
 });
 
+// Get upgrade price for current subscription
+router.get('/upgrade-price', utility.authenticate, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const subscription = await Subscription.findOne({ where: { userId } });
+
+        if (!subscription) {
+            return res.status(404).json({ success: false, message: 'No subscription found' });
+        }
+
+        if (subscription.plan === 'STOCK_WEBSITE') {
+            return res.json({ success: true, alreadyUpgraded: true, upgradePrice: 0 });
+        }
+
+        const now = new Date();
+        const expirationDate = new Date(subscription.expirationDate);
+
+        if (expirationDate <= now) {
+            return res.json({ success: true, isExpired: true, upgradePrice: 0 });
+        }
+
+        // Calculate remaining days
+        const msPerDay = 24 * 60 * 60 * 1000;
+        const remainingDays = Math.ceil((expirationDate.getTime() - now.getTime()) / msPerDay);
+
+        // Calculate total days of original subscription
+        const activationDate = new Date(subscription.activationDate);
+        const totalDays = Math.ceil((expirationDate.getTime() - activationDate.getTime()) / msPerDay);
+
+        // Find the closest matching duration for price difference
+        const duration = subscription.duration || '1M';
+        const stockPrice = SUBSCRIPTION_PRICES.STOCK[duration] || SUBSCRIPTION_PRICES.STOCK['1M'];
+        const websitePrice = SUBSCRIPTION_PRICES.STOCK_WEBSITE[duration] || SUBSCRIPTION_PRICES.STOCK_WEBSITE['1M'];
+        const fullDifference = websitePrice - stockPrice;
+
+        // Prorate based on remaining days
+        const upgradePrice = Math.ceil(fullDifference * (remainingDays / totalDays));
+
+        res.json({
+            success: true,
+            upgradePrice,
+            remainingDays,
+            totalDays,
+            duration,
+            fullDifference,
+            currency: 'TND'
+        });
+    } catch (error) {
+        console.error('Error calculating upgrade price:', error);
+        res.status(500).json({ success: false, message: error.toString() });
+    }
+});
+
 // Create payment order
 router.post('/create', utility.authenticate, async (req, res) => {
     try {
         const { paymentType, subscriptionPlan, storageGB, storageDuration } = req.body;
         const userId = req.user.id;
+        const isUpgrade = req.body.isUpgrade || false;
 
         // Calculate amount
         let amount = 0;
         if (paymentType === 'SUBSCRIPTION') {
-            if (!SUBSCRIPTION_PRICES[subscriptionPlan]) {
-                return res.status(400).json({ success: false, message: 'Invalid subscription plan' });
+            if (isUpgrade) {
+                // Calculate upgrade price server-side for security
+                const subscription = await Subscription.findOne({ where: { userId } });
+                if (!subscription || subscription.plan === 'STOCK_WEBSITE') {
+                    return res.status(400).json({ success: false, message: 'Upgrade not applicable' });
+                }
+                const now = new Date();
+                const expirationDate = new Date(subscription.expirationDate);
+                if (expirationDate <= now) {
+                    return res.status(400).json({ success: false, message: 'Subscription expired, please renew instead' });
+                }
+                const msPerDay = 24 * 60 * 60 * 1000;
+                const remainingDays = Math.ceil((expirationDate.getTime() - now.getTime()) / msPerDay);
+                const activationDate = new Date(subscription.activationDate);
+                const totalDays = Math.ceil((expirationDate.getTime() - activationDate.getTime()) / msPerDay);
+                const duration = subscription.duration || '1M';
+                const stockPrice = SUBSCRIPTION_PRICES.STOCK[duration] || SUBSCRIPTION_PRICES.STOCK['1M'];
+                const websitePrice = SUBSCRIPTION_PRICES.STOCK_WEBSITE[duration] || SUBSCRIPTION_PRICES.STOCK_WEBSITE['1M'];
+                const fullDifference = websitePrice - stockPrice;
+                amount = Math.ceil(fullDifference * (remainingDays / totalDays));
+            } else {
+                const tier = req.body.subscriptionTier || 'STOCK';
+                if (!SUBSCRIPTION_PRICES[tier] || !SUBSCRIPTION_PRICES[tier][subscriptionPlan]) {
+                    return res.status(400).json({ success: false, message: 'Invalid subscription plan or tier' });
+                }
+                amount = SUBSCRIPTION_PRICES[tier][subscriptionPlan];
             }
-            amount = SUBSCRIPTION_PRICES[subscriptionPlan];
         } else if (paymentType === 'STORAGE_EXTENSION') {
             const gb = storageGB || 50;
             const duration = storageDuration || '1M';
@@ -100,7 +185,9 @@ router.post('/create', utility.authenticate, async (req, res) => {
             orderNumber: await generateOrderNumber(userId),
             userId,
             paymentType,
-            subscriptionPlan: paymentType === 'SUBSCRIPTION' ? subscriptionPlan : null,
+            subscriptionPlan: (paymentType === 'SUBSCRIPTION' && !isUpgrade) ? subscriptionPlan : null,
+            subscriptionTier: paymentType === 'SUBSCRIPTION' ? 'STOCK_WEBSITE' : null,
+            isUpgrade,
             storageGB: paymentType === 'STORAGE_EXTENSION' ? (storageGB || 50) : null,
             storageDuration: paymentType === 'STORAGE_EXTENSION' ? (storageDuration || '1M') : null,
             amount,
@@ -292,45 +379,58 @@ router.post('/admin/:id/validate', utility.authenticate, async (req, res) => {
             console.log('Processing subscription order:', {
                 orderId: order.id,
                 userId: order.userId,
-                subscriptionPlan: order.subscriptionPlan
+                subscriptionPlan: order.subscriptionPlan,
+                isUpgrade: order.isUpgrade
             });
 
-            if (!order.subscriptionPlan) {
-                console.error('ERROR: subscriptionPlan is null or undefined for order:', order.id);
-                return res.status(400).json({ success: false, message: 'Plan d\'abonnement invalide' });
-            }
-
-            // Renew subscription
-            let subscription = await Subscription.findOne({ where: { userId: order.userId } });
-
-            const now = new Date();
-            let startDate = now;
-
-            // If subscription exists and not expired, extend from expiration date
-            if (subscription && subscription.expirationDate > now) {
-                startDate = new Date(subscription.expirationDate);
-                console.log('Extending from existing expiration:', subscription.expirationDate);
+            if (order.isUpgrade) {
+                // ===== PLAN UPGRADE: just change plan, keep same expiration =====
+                let subscription = await Subscription.findOne({ where: { userId: order.userId } });
+                if (subscription) {
+                    subscription.plan = 'STOCK_WEBSITE';
+                    await subscription.save();
+                    console.log('Plan upgraded to STOCK_WEBSITE for user:', order.userId);
+                }
             } else {
-                console.log('Starting new subscription from now');
-            }
+                // ===== NORMAL SUBSCRIPTION: extend/create =====
+                if (!order.subscriptionPlan) {
+                    console.error('ERROR: subscriptionPlan is null or undefined for order:', order.id);
+                    return res.status(400).json({ success: false, message: 'Plan d\'abonnement invalide' });
+                }
 
-            const expirationDate = calculateExpirationDate(order.subscriptionPlan, startDate);
-            console.log('New expiration date calculated:', expirationDate);
+                let subscription = await Subscription.findOne({ where: { userId: order.userId } });
 
-            if (subscription) {
-                subscription.duration = order.subscriptionPlan;
-                subscription.paymentDate = now;
-                subscription.activationDate = startDate;
-                subscription.expirationDate = expirationDate;
-                await subscription.save();
-            } else {
-                subscription = await Subscription.create({
-                    userId: order.userId,
-                    duration: order.subscriptionPlan,
-                    paymentDate: now,
-                    activationDate: now,
-                    expirationDate: expirationDate
-                });
+                const now2 = new Date();
+                let startDate = now2;
+
+                // If subscription exists and not expired, extend from expiration date
+                if (subscription && subscription.expirationDate > now2) {
+                    startDate = new Date(subscription.expirationDate);
+                    console.log('Extending from existing expiration:', subscription.expirationDate);
+                } else {
+                    console.log('Starting new subscription from now');
+                }
+
+                const expirationDate = calculateExpirationDate(order.subscriptionPlan, startDate);
+                console.log('New expiration date calculated:', expirationDate);
+
+                if (subscription) {
+                    subscription.duration = order.subscriptionPlan;
+                    subscription.plan = order.subscriptionTier || 'STOCK';
+                    subscription.paymentDate = now2;
+                    subscription.activationDate = startDate;
+                    subscription.expirationDate = expirationDate;
+                    await subscription.save();
+                } else {
+                    subscription = await Subscription.create({
+                        userId: order.userId,
+                        duration: order.subscriptionPlan,
+                        plan: order.subscriptionTier || 'STOCK',
+                        paymentDate: now2,
+                        activationDate: now2,
+                        expirationDate: expirationDate
+                    });
+                }
             }
 
             // Send confirmation email to user with the final combined expiration date

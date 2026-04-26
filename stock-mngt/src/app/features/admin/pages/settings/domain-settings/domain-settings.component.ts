@@ -12,7 +12,8 @@ import {
   faRedo, faStar, faHeart, faGift, faBolt, faLeaf, faGem,
   faChevronDown, faChevronUp, faPlus, faTimes, faEye, faEyeSlash,
   faShareAlt, faQuoteRight, faStore, faToggleOn, faToggleOff,
-  faCloudUploadAlt, faArrowsAlt, faImages
+  faCloudUploadAlt, faArrowsAlt, faImages, faTag,
+  faLock, faRocket, faCrown, faArrowRight
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faFacebook, faInstagram, faTiktok
@@ -69,9 +70,18 @@ export class DomainSettingsComponent implements OnInit {
   faCloudUploadAlt = faCloudUploadAlt;
   faArrowsAlt = faArrowsAlt;
   faImages = faImages;
+  faTag = faTag;
   faFacebook = faFacebook;
   faInstagram = faInstagram;
   faTiktok = faTiktok;
+  faLock = faLock;
+  faRocket = faRocket;
+  faCrown = faCrown;
+  faArrowRight = faArrowRight;
+
+  // Plan gating
+  hasWebsitePlan = false;
+  isCheckingPlan = true;
 
   // Domain
   customDomain = '';
@@ -97,7 +107,9 @@ export class DomainSettingsComponent implements OnInit {
       backgroundImage: '',
       images: [] as string[],
       overlayOpacity: 0.5,
-      autoScrollSpeed: 5
+      autoScrollSpeed: 5,
+      gradientColor1: '',
+      gradientColor2: ''
     },
     announcement: {
       enabled: false,
@@ -148,6 +160,7 @@ export class DomainSettingsComponent implements OnInit {
     },
     productsPage: {
       gridColumns: 4,
+      gridColumnsMobile: 2,
       defaultSort: '',
       showFilters: true,
       productsPerPage: 24,
@@ -173,6 +186,10 @@ export class DomainSettingsComponent implements OnInit {
       about: false,
       info: true,
       footer: true
+    },
+    browserTab: {
+      title: '',
+      favicon: ''
     }
   };
   isSavingTheme = false;
@@ -269,7 +286,8 @@ export class DomainSettingsComponent implements OnInit {
     {
       label: '',
       items: [
-        { key: 'domain', label: 'Domaine', icon: 'globe' }
+        { key: 'domain', label: 'Domaine', icon: 'globe' },
+        { key: 'browserTab', label: 'Onglet navigateur', icon: 'tag' }
       ]
     },
     {
@@ -350,6 +368,7 @@ export class DomainSettingsComponent implements OnInit {
   storeImages: string[] = [];
 
   storeId: number;
+  store: any = null;
 
   constructor(
     private http: HttpClient,
@@ -360,6 +379,23 @@ export class DomainSettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.storeId = this.authService.getConnectedUser()?.store;
+    // Check subscription plan first
+    const userId = this.authService.getConnectedUser()?.id;
+    if (userId) {
+      this.authService.getSubscriptionDetails(userId).subscribe(
+        (response: any) => {
+          if (response.success && response.subscription) {
+            this.hasWebsitePlan = response.subscription.plan === 'STOCK_WEBSITE';
+          }
+          this.isCheckingPlan = false;
+        },
+        () => {
+          this.isCheckingPlan = false;
+        }
+      );
+    } else {
+      this.isCheckingPlan = false;
+    }
     if (this.storeId) {
       this.loadStoreSettings();
     }
@@ -376,6 +412,7 @@ export class DomainSettingsComponent implements OnInit {
         this.customDomain = store.customDomain || '';
         this.domainVerified = store.domainVerified || false;
         this.hasDomain = !!store.customDomain;
+        this.store = store;
 
         // Deep merge theme with defaults
         if (store.theme) {
@@ -627,5 +664,38 @@ export class DomainSettingsComponent implements OnInit {
         this.toastService.showError('Erreur lors de la sauvegarde du thème');
       }
     );
+  }
+  // ── Favicon Upload ──
+  isUploadingFavicon = false;
+
+  uploadFavicon(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    const userId = this.authService.getConnectedUser()?.id || 'favicon';
+    const fileName = `favicon-${userId}-${Date.now()}${file.name.substring(file.name.lastIndexOf('.'))}`;
+    const formData = new FormData();
+    formData.set('file', file, fileName);
+
+    this.isUploadingFavicon = true;
+    this.fileService.uploadFile(formData).subscribe(
+      res => {
+        this.isUploadingFavicon = false;
+        if (!this.theme.browserTab) this.theme.browserTab = { title: '', favicon: '' };
+        this.theme.browserTab.favicon = res.fileUrl.split('/').pop();
+        this.toastService.showSuccess('Favicon ajouté');
+      },
+      () => {
+        this.isUploadingFavicon = false;
+        this.toastService.showError('Erreur lors de l\'upload du favicon');
+      }
+    );
+    input.value = '';
+  }
+
+  removeFavicon(): void {
+    if (this.theme.browserTab) {
+      this.theme.browserTab.favicon = '';
+    }
   }
 }

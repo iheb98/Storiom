@@ -5,13 +5,21 @@ import { tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { DomainService } from './domain.service';
 
+export interface StoreCustomerAddress {
+  street?: string;
+  city?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+}
+
 export interface StoreCustomer {
   id: number;
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
-  address: string;
+  address: StoreCustomerAddress | null;
   storeId: number;
 }
 
@@ -40,7 +48,7 @@ export class StoreAuthService {
     return this.domainService.storeId;
   }
 
-  register(data: { firstName: string; lastName: string; email: string; phone?: string; password: string }, storeIdOverride?: number): Observable<any> {
+  register(data: { firstName: string; lastName: string; email: string; phone?: string; address?: any; password: string }, storeIdOverride?: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, { ...data, storeId: storeIdOverride || this.storeId });
   }
 

@@ -1,0 +1,43 @@
+<div class="cart-popup-overlay" *ngIf="visible" (click)="close()"></div>
+<div class="cart-popup" [class.visible]="visible">
+  <!-- Header -->
+  <div class="popup-header">
+    <div class="popup-success">
+      <span class="success-icon"><fa-icon [icon]="faCheck"></fa-icon></span>
+      <span>Ajouté au panier</span>
+    </div>
+    <button class="popup-close" (click)="close()">
+      <fa-icon [icon]="faTimes"></fa-icon>
+    </button>
+  </div>
+
+  <!-- Product Info -->
+  <div class="popup-product" *ngIf="product">
+    <div class="product-thumb">
+      <img [src]="getProductImage()" [alt]="product?.name">
+    </div>
+    <div class="product-details">
+      <h4>{{ product?.name }}</h4>
+      <div class="product-price">
+        <span class="price-main">{{ getDiscountedPrice() | number:'1.2-2' }} DT</span>
+        <span class="price-old" *ngIf="product?.discount > 0">{{ product.sellingPrice | number:'1.2-2' }} DT</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart Summary -->
+  <div class="popup-summary">
+    <fa-icon [icon]="faCart"></fa-icon>
+    <span>{{ cartCount }} article{{ cartCount > 1 ? 's' : '' }} dans votre panier</span>
+  </div>
+
+  <!-- Actions -->
+  <div class="popup-actions">
+    <button class="btn-continue" (click)="continueShopping()">
+      Continuer mes achats
+    </button>
+    <button class="btn-cart" (click)="goToCart()">
+      Voir le panier <fa-icon [icon]="faArrowRight"></fa-icon>
+    </button>
+  </div>
+</div>

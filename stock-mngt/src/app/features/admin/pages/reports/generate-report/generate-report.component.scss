@@ -332,6 +332,7 @@ $radius-lg: 16px;
 
 .products-table-wrapper {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .products-table {
@@ -342,6 +343,10 @@ $radius-lg: 16px;
   td {
     padding: 16px 20px;
     text-align: left;
+
+    @media (max-width: 768px) {
+      padding: 10px 15px;
+    }
   }
 
   thead {
@@ -353,6 +358,11 @@ $radius-lg: 16px;
       color: $text-secondary;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+      display: none;
     }
   }
 
@@ -367,12 +377,50 @@ $radius-lg: 16px;
       &:hover {
         background: $background;
       }
+
+      @media (max-width: 768px) {
+        display: flex;
+        flex-direction: column;
+        padding: 16px;
+        gap: 8px;
+
+        &:hover {
+          background: transparent;
+        }
+      }
+    }
+
+    td {
+      @media (max-width: 768px) {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0;
+        font-size: 0.9rem;
+
+        &::before {
+          content: attr(data-label);
+          font-weight: 600;
+          color: $text-secondary;
+          font-size: 0.8rem;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
+          margin-right: 10px;
+        }
+      }
     }
   }
 
   .product-name {
     font-weight: 600;
     color: $text-primary;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+      border-bottom: 1px solid $border-color;
+      padding-bottom: 8px !important;
+      margin-bottom: 4px;
+    }
   }
 
   .price {
@@ -404,6 +452,14 @@ $radius-lg: 16px;
     text-align: center;
     color: $text-secondary;
     padding: 40px;
+
+    @media (max-width: 768px) {
+      display: block;
+
+      &::before {
+        display: none;
+      }
+    }
   }
 }
 

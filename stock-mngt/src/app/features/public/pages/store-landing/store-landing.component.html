@@ -11,49 +11,102 @@
 
   <!-- ═══ HERO SECTION ═══ -->
   <section class="hero-section" *ngIf="themeConfig.sections?.hero !== false"
+    [class.hero-gradient]="themeConfig.hero?.style === 'gradient'"
+    [class.hero-split]="themeConfig.hero?.style === 'split'"
     [ngStyle]="themeConfig.hero?.style === 'gradient' ? getHeroBackground() : {}">
 
-    <!-- Image Carousel -->
-    <div class="hero-carousel" *ngIf="themeConfig.hero?.style !== 'gradient' && getHeroImages().length > 0">
-      <img *ngFor="let img of getHeroImages(); let i = index" class="hero-slide-img"
-        [class.active]="i === currentHeroSlide" [src]="environment.backend + '/' + img" alt="Banner">
-      <!-- Carousel Indicators -->
-      <div class="hero-indicators" *ngIf="getHeroImages().length > 1">
-        <button *ngFor="let img of getHeroImages(); let i = index" class="hero-indicator"
-          [class.active]="i === currentHeroSlide" (click)="currentHeroSlide = i">
-        </button>
+    <!-- ── SPLIT LAYOUT ── -->
+    <ng-container *ngIf="themeConfig.hero?.style === 'split'">
+      <div class="hero-split-image" *ngIf="getHeroImages().length > 0">
+        <div class="hero-split-carousel">
+          <img *ngFor="let img of getHeroImages(); let i = index"
+            [class.active]="i === currentHeroSlide" [src]="environment.backend + '/' + img" alt="Banner">
+        </div>
+        <div class="hero-indicators" *ngIf="getHeroImages().length > 1">
+          <button *ngFor="let img of getHeroImages(); let i = index" class="hero-indicator"
+            [class.active]="i === currentHeroSlide" (click)="currentHeroSlide = i">
+          </button>
+        </div>
       </div>
-    </div>
+      <div class="hero-content" [style.background]="themeConfig.primaryColor || '#4f46e5'">
+        <h1 class="hero-title animate-in delay-1" [style.font-family]="themeConfig.fontFamily">
+          {{ getHeroTitle() }}
+        </h1>
+        <p class="hero-subtitle animate-in delay-2" *ngIf="getHeroSubtitle()" [innerHTML]="getHeroSubtitle()"></p>
+        <div class="hero-actions animate-in delay-3">
+          <button class="btn-hero-primary" (click)="browseProducts()">
+            <i class="fa fa-shopping-bag"></i>
+            {{ getHeroCta() }}
+          </button>
+        </div>
+        <div class="hero-badges animate-in delay-4">
+          <span class="badge" *ngIf="store.address?.city">
+            <i class="fa fa-map-marker"></i> {{ formatAddress(store.address.city, store.address.state) }}
+          </span>
+        </div>
+      </div>
+    </ng-container>
 
-    <!-- Fallback: no images -->
-    <div class="hero-carousel hero-fallback"
-      *ngIf="themeConfig.hero?.style !== 'gradient' && getHeroImages().length === 0"></div>
+    <!-- ── GRADIENT LAYOUT ── -->
+    <ng-container *ngIf="themeConfig.hero?.style === 'gradient'">
+      <div class="hero-content">
+        <h1 class="hero-title animate-in delay-1" [style.font-family]="themeConfig.fontFamily">
+          {{ getHeroTitle() }}
+        </h1>
+        <p class="hero-subtitle animate-in delay-2" *ngIf="getHeroSubtitle()" [innerHTML]="getHeroSubtitle()"></p>
+        <div class="hero-actions animate-in delay-3">
+          <button class="btn-hero-primary" (click)="browseProducts()">
+            <i class="fa fa-shopping-bag"></i>
+            {{ getHeroCta() }}
+          </button>
+        </div>
+        <div class="hero-badges animate-in delay-4">
+          <span class="badge" *ngIf="store.address?.city">
+            <i class="fa fa-map-marker"></i> {{ formatAddress(store.address.city, store.address.state) }}
+          </span>
+        </div>
+      </div>
+    </ng-container>
 
-    <!-- Hero Content (below image) -->
-    <div class="hero-content" [style.background]="themeConfig.primaryColor || '#4f46e5'">
-      <h1 class="hero-title animate-in delay-1" [style.font-family]="themeConfig.fontFamily">
-        {{ getHeroTitle() }}
-      </h1>
-      <p class="hero-subtitle animate-in delay-2" *ngIf="getHeroSubtitle()" [innerHTML]="getHeroSubtitle()"></p>
-      <div class="hero-actions animate-in delay-3">
-        <button class="btn-hero-primary" (click)="browseProducts()">
-          <i class="fa fa-shopping-bag"></i>
-          {{ getHeroCta() }}
-        </button>
-        <!--<a *ngIf="store.phone" [href]="'tel:' + store.phone" class="btn-hero-outline">
-          <i class="fa fa-phone"></i>
-          Nous contacter
-        </a>-->
+    <!-- ── FULL IMAGE LAYOUT (default) ── -->
+    <ng-container *ngIf="themeConfig.hero?.style !== 'gradient' && themeConfig.hero?.style !== 'split'">
+      <!-- Image Carousel -->
+      <div class="hero-carousel" *ngIf="getHeroImages().length > 0">
+        <img *ngFor="let img of getHeroImages(); let i = index" class="hero-slide-img"
+          [class.active]="i === currentHeroSlide" [src]="environment.backend + '/' + img" alt="Banner">
+        <!-- Overlay -->
+        <div class="hero-overlay" [style.opacity]="themeConfig.hero.overlayOpacity ?? 0.5"></div>
+        <!-- Carousel Indicators -->
+        <div class="hero-indicators" *ngIf="getHeroImages().length > 1">
+          <button *ngFor="let img of getHeroImages(); let i = index" class="hero-indicator"
+            [class.active]="i === currentHeroSlide" (click)="currentHeroSlide = i">
+          </button>
+        </div>
       </div>
-      <div class="hero-badges animate-in delay-4">
-        <!--<span class="badge" *ngIf="store.isSupportingDeliveries">
-          <i class="fa fa-truck"></i> Livraison disponible
-        </span>-->
-        <span class="badge" *ngIf="store.address?.city">
-          <i class="fa fa-map-marker"></i> {{ store.address.city }}, {{ store.address.state }}
-        </span>
+
+      <!-- Fallback: no images -->
+      <div class="hero-carousel hero-fallback"
+        *ngIf="getHeroImages().length === 0"></div>
+
+      <!-- Hero Content (below image) -->
+      <div class="hero-content" [style.background]="themeConfig.primaryColor || '#4f46e5'">
+        <h1 class="hero-title animate-in delay-1" [style.font-family]="themeConfig.fontFamily">
+          {{ getHeroTitle() }}
+        </h1>
+        <p class="hero-subtitle animate-in delay-2" *ngIf="getHeroSubtitle()" [innerHTML]="getHeroSubtitle()"></p>
+        <div class="hero-actions animate-in delay-3">
+          <button class="btn-hero-primary" (click)="browseProducts()">
+            <i class="fa fa-shopping-bag"></i>
+            {{ getHeroCta() }}
+          </button>
+        </div>
+        <div class="hero-badges animate-in delay-4">
+          <span class="badge" *ngIf="store.address?.city">
+            <i class="fa fa-map-marker"></i> {{ formatAddress(store.address.city, store.address.state) }}
+          </span>
+        </div>
       </div>
-    </div>
+    </ng-container>
   </section>
 
   <!-- ═══ USP FEATURES BAR ═══ -->
@@ -161,7 +214,7 @@
         <div class="info-card animate-in" *ngIf="store.address?.city">
           <i class="fa fa-map-marker" [style.color]="themeConfig.primaryColor"></i>
           <h3>Adresse</h3>
-          <p>{{ store.address.street }}, {{ store.address.city }} {{ store.address.postalCode }}</p>
+          <p>{{ formatAddress(store.address.street, store.address.city, store.address.postalCode) }}</p>
         </div>
         <div class="info-card animate-in" *ngIf="store.site">
           <i class="fa fa-globe" [style.color]="themeConfig.primaryColor"></i>
@@ -182,7 +235,7 @@
         </a>
         <a *ngIf="themeConfig.social.tiktok" [href]="themeConfig.social.tiktok" target="_blank"
           class="social-link tiktok">
-          <i class="fa fa-music"></i>
+          <svg class="tiktok-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" width="16" height="16"><path d="M448 209.9a210.1 210.1 0 01-122.8-39.3v178.8A162.6 162.6 0 11185 188.3v89.9a74.6 74.6 0 1052.2 71.2V0h88a121 121 0 00122.8 121z"/></svg>
         </a>
       </div>
     </div>

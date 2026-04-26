@@ -56,8 +56,9 @@ module.exports = (sequelize, DataTypes) => {
       field: 'reset_password_expires'
     },
     address: {
-      type: DataTypes.TEXT,
-      allowNull: true
+      type: DataTypes.JSONB,
+      allowNull: true,
+      defaultValue: null
     }
   }, {
     sequelize,

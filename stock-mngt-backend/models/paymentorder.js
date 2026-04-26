@@ -38,6 +38,19 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       field: 'subscription_plan'
     },
+    // Subscription tier (STOCK or STOCK_WEBSITE)
+    subscriptionTier: {
+      type: DataTypes.ENUM('STOCK', 'STOCK_WEBSITE'),
+      allowNull: true,
+      field: 'subscription_tier'
+    },
+    // Whether this is a plan upgrade (prorated difference)
+    isUpgrade: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+      field: 'is_upgrade'
+    },
     // Storage amount in GB - for STORAGE_EXTENSION type
     storageGB: {
       type: DataTypes.INTEGER,

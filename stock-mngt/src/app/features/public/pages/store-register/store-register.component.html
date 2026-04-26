@@ -48,6 +48,33 @@
       </div>
 
       <div class="form-group">
+        <label for="street">
+          <fa-icon [icon]="faMapMarker"></fa-icon> Rue
+        </label>
+        <input type="text" id="street" [(ngModel)]="address.street" name="street"
+               placeholder="Rue et numéro (Optionnel)">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="city">Ville</label>
+          <input type="text" id="city" [(ngModel)]="address.city" name="city"
+                 placeholder="Ville">
+        </div>
+        <div class="form-group">
+          <label for="state">Gouvernorat</label>
+          <input type="text" id="state" [(ngModel)]="address.state" name="state"
+                 placeholder="Gouvernorat">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="postalCode">Code postal</label>
+        <input type="text" id="postalCode" [(ngModel)]="address.postalCode" name="postalCode"
+               placeholder="Code postal">
+      </div>
+
+      <div class="form-group">
         <label for="password">
           <fa-icon [icon]="faLock"></fa-icon> Mot de passe *
         </label>

@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { DomainService } from 'src/app/core/services/domain.service';
 import { PublicService } from 'src/app/core/services/public.service';
 import { StoreAuthService } from 'src/app/core/services/store-auth.service';
@@ -37,7 +38,8 @@ export class StoreLayoutComponent implements OnInit, OnDestroy {
     private router: Router,
     private domainService: DomainService,
     private publicService: PublicService,
-    private storeAuth: StoreAuthService
+    private storeAuth: StoreAuthService,
+    private titleService: Title
   ) {}
 
   private routeSub: any;
@@ -49,11 +51,31 @@ export class StoreLayoutComponent implements OnInit, OnDestroy {
 
     if (this.isPreviewMode) {
       this.basePath = `/preview-store/${this.storeId}`;
+      // Set title to a thin space so browser doesn't show the URL
+      this.titleService.setTitle('\u200B');
       this.loadStore(this.storeId);
     } else if (this.domainService.isCustomDomain && this.domainService.currentStore) {
       this.basePath = '/store-home';
       const ds = this.domainService.currentStore;
       this.store = { id: ds.id, name: ds.name, logo: ds.logo };
+
+      // Title/favicon already set by DomainService APP_INITIALIZER,
+      // but apply theme immediately from cached data before the API call
+      if (ds.theme) {
+        const defaultTheme = {
+          primaryColor: '#4f46e5', accentColor: '#f59e0b', fontFamily: 'Inter',
+          footer: { text: '', bgColor: '#0f172a', textColor: '#94a3b8', showContact: true, showSocial: true, showQuickLinks: true, quickLinks: [] },
+          header: { bgColor: '#ffffff', textColor: '#0f172a', sticky: true, showSearch: true, logoPosition: 'left' },
+          productsPage: { gridColumns: 4, defaultSort: '', showFilters: true, productsPerPage: 24, headerGradient: true },
+          cartPage: { checkoutText: 'Commander', showContinueShopping: true, showFreeShipping: true },
+          productCard: { showCartButton: true, showDiscountBadge: true, imageRatio: 'square', borderRadius: 14, hoverEffect: 'lift' },
+          social: { facebook: '', instagram: '', tiktok: '' },
+          sections: { footer: true }
+        };
+        this.themeConfig = this.deepMerge(defaultTheme, ds.theme as any || {});
+        this.applyTheme();
+      }
+
       this.loadStore(ds.id.toString());
     }
 
@@ -117,6 +139,22 @@ export class StoreLayoutComponent implements OnInit, OnDestroy {
     root.style.setProperty('--store-primary', this.themeConfig.primaryColor || '#4f46e5');
     root.style.setProperty('--store-accent', this.themeConfig.accentColor || '#f59e0b');
     root.style.setProperty('--store-font', this.themeConfig.fontFamily || 'Inter');
+
+    // Set tab title
+    const tabTitle = this.themeConfig.browserTab?.title || this.store?.name || 'Boutique';
+    this.titleService.setTitle(tabTitle);
+
+    // Set favicon
+    const favicon = this.themeConfig.browserTab?.favicon;
+    if (favicon) {
+      let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'icon';
+        document.head.appendChild(link);
+      }
+      link.href = environment.backend + '/' + favicon;
+    }
   }
 
   deepMerge(target: any, source: any): any {

@@ -6,6 +6,8 @@ import { environment } from 'src/environments/environment';
 export interface PaymentOrderCreate {
     paymentType: 'SUBSCRIPTION' | 'STORAGE_EXTENSION';
     subscriptionPlan?: '1M' | '3M' | '6M' | '12M';
+    subscriptionTier?: 'STOCK' | 'STOCK_WEBSITE';
+    isUpgrade?: boolean;
     storageGB?: number;
     storageDuration?: '1M' | '3M' | '6M' | '12M';
 }
@@ -23,6 +25,7 @@ export interface PaymentOrder {
     userId: number;
     paymentType: 'SUBSCRIPTION' | 'STORAGE_EXTENSION';
     subscriptionPlan?: '1M' | '3M' | '6M' | '12M';
+    subscriptionTier?: 'STOCK' | 'STOCK_WEBSITE';
     storageGB?: number;
     amount: number;
     currency: string;
@@ -43,7 +46,7 @@ export interface PaymentOrder {
 }
 
 export interface PricingInfo {
-    subscription: { [key: string]: number };
+    subscription: { [tier: string]: { [duration: string]: number } };
     storage: { pricePerUnit: number; unitSizeGB: number };
     storagePlans?: { [key: number]: { [key: string]: number } };
     currency: string;
@@ -65,6 +68,19 @@ export class PaymentOrderService {
     // Create a new payment order
     createOrder(data: PaymentOrderCreate): Observable<{ success: boolean; order: PaymentOrder; bankInstructions: BankInstructions }> {
         return this.http.post<any>(this.baseUrl + 'create', data);
+    }
+
+    // Get upgrade price
+    getUpgradePrice(): Observable<any> {
+        return this.http.get<any>(this.baseUrl + 'upgrade-price');
+    }
+
+    // Create upgrade order
+    createUpgradeOrder(): Observable<{ success: boolean; order: PaymentOrder; bankInstructions: BankInstructions }> {
+        return this.http.post<any>(this.baseUrl + 'create', {
+            paymentType: 'SUBSCRIPTION',
+            isUpgrade: true
+        });
     }
 
     // Get user's orders

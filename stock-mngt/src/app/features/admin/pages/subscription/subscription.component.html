@@ -37,7 +37,10 @@
                 </div>
                 <div class="status-info">
                     <h3>{{ currentSubscription.isExpired ? 'Abonnement expiré' : 'Abonnement actif' }}</h3>
-                    <p>{{ currentSubscription.duration === 'TRIAL' ? 'Période d\'essai' : '' }}</p>
+                    <p>
+                        <span class="plan-tier-label">{{ currentSubscription.plan === 'STOCK_WEBSITE' ? 'Stock + Boutique' : 'Gestion de Stock' }}</span>
+                        <span *ngIf="currentSubscription.duration === 'TRIAL'"> — Période d'essai</span>
+                    </p>
                 </div>
                 <div class="expiration-badge" [class.expired]="currentSubscription.isExpired">
                     <span class="label">{{ currentSubscription.isExpired ? 'Expiré le' : 'Expire le' }}</span>
@@ -70,46 +73,140 @@
 
         <div class="section-intro">
             <h2>{{ currentSubscription?.isExpired ? 'Renouvelez votre abonnement' : 'Prolongez votre abonnement' }}</h2>
-            <p>Sélectionnez la durée qui vous convient le mieux</p>
+            <p>Choisissez votre plan puis sélectionnez la durée qui vous convient</p>
         </div>
 
-        <div class="plans-grid">
-            <div class="plan-card" *ngFor="let plan of plans" [class.popular]="plan.popular"
-                [class.selected]="selectedPlan?.key === plan.key" (click)="selectPlan(plan)">
-
-                <div class="popular-badge" *ngIf="plan.popular">
-                    <fa-icon [icon]="faStar"></fa-icon>
-                    Populaire
+        <!-- Tier Selector -->
+        <div class="tier-selector">
+            <div class="tier-card" [class.selected]="selectedTier === 'STOCK'" (click)="selectTier('STOCK')">
+                <div class="tier-header">
+                    <div class="tier-icon">
+                        <fa-icon [icon]="faStar"></fa-icon>
+                    </div>
+                    <h3>Gestion de Stock</h3>
+                    <div class="tier-price-label">
+                        À partir de <strong>{{ pricing?.subscription?.STOCK?.['1M'] || 40 }} TND</strong>/mois
+                    </div>
                 </div>
+                <ul class="tier-features">
+                    <li *ngFor="let feature of tierFeatures['STOCK']">
+                        <fa-icon [icon]="faCheck"></fa-icon>
+                        {{ feature }}
+                    </li>
+                </ul>
+                <button class="btn-tier" [class.active]="selectedTier === 'STOCK'">
+                    {{ selectedTier === 'STOCK' ? 'Sélectionné' : 'Choisir ce plan' }}
+                </button>
+            </div>
 
-                <div class="plan-icon">
-                    <fa-icon [icon]="plan.icon"></fa-icon>
+            <div class="tier-card premium" [class.selected]="selectedTier === 'STOCK_WEBSITE'" (click)="selectTier('STOCK_WEBSITE')">
+                <div class="tier-badge">Recommandé</div>
+                <div class="tier-header">
+                    <div class="tier-icon">
+                        <fa-icon [icon]="faGem"></fa-icon>
+                    </div>
+                    <h3>Stock + Boutique</h3>
+                    <div class="tier-price-label">
+                        À partir de <strong>{{ pricing?.subscription?.STOCK_WEBSITE?.['1M'] || 50 }} TND</strong>/mois
+                    </div>
                 </div>
-
-                <h3>{{ plan.name }}</h3>
-
-                <div class="plan-price">
-                    <span class="amount">{{ plan.price }}</span>
-                    <span class="currency">TND</span>
-                </div>
-
-                <div class="plan-duration">{{ plan.duration }}</div>
-
-                <div class="plan-discount" *ngIf="plan.discount">
-                    <fa-icon [icon]="faCheck"></fa-icon>
-                    Économisez {{ plan.discount }}
-                </div>
-
-                <button class="btn-select" [disabled]="isCreatingOrder">
-                    <span *ngIf="!isCreatingOrder || selectedPlan?.key !== plan.key">
-                        Sélectionner
-                    </span>
-                    <span *ngIf="isCreatingOrder && selectedPlan?.key === plan.key">
-                        <fa-icon [icon]="faSpinner" [spin]="true"></fa-icon>
-                    </span>
+                <ul class="tier-features">
+                    <li *ngFor="let feature of tierFeatures['STOCK_WEBSITE']">
+                        <fa-icon [icon]="faCheck"></fa-icon>
+                        {{ feature }}
+                    </li>
+                </ul>
+                <button class="btn-tier" [class.active]="selectedTier === 'STOCK_WEBSITE'">
+                    {{ selectedTier === 'STOCK_WEBSITE' ? 'Sélectionné' : 'Choisir ce plan' }}
                 </button>
             </div>
         </div>
+
+        <!-- Upgrade Card (shown when STOCK user selects STOCK_WEBSITE) -->
+        <div class="upgrade-section" *ngIf="canUpgrade && selectedTier === 'STOCK_WEBSITE'">
+            <div class="upgrade-card-subscription">
+                <div class="upgrade-header">
+                    <fa-icon [icon]="faStar"></fa-icon>
+                    <h3>Mise à niveau disponible</h3>
+                </div>
+                <p class="upgrade-description">
+                    Passez de <strong>Gestion de Stock</strong> à <strong>Stock + Boutique</strong> pour vos
+                    <strong>{{ upgradeInfo?.remainingDays }} jours</strong> restants.
+                </p>
+                <div class="upgrade-price-card">
+                    <div class="upgrade-price-amount">
+                        <span class="amount">{{ upgradePrice }}</span>
+                        <span class="currency">TND</span>
+                    </div>
+                    <div class="upgrade-price-detail">
+                        Différence proratisée pour {{ upgradeInfo?.remainingDays }} jours
+                    </div>
+                </div>
+                <button class="btn-upgrade-action" (click)="createUpgradeOrder()" [disabled]="isCreatingOrder">
+                    <span *ngIf="!isCreatingOrder">
+                        <fa-icon [icon]="faStar"></fa-icon>
+                        Passer à Stock + Boutique
+                    </span>
+                    <span *ngIf="isCreatingOrder">
+                        <fa-icon [icon]="faSpinner" [spin]="true"></fa-icon>
+                    </span>
+                </button>
+                <p class="upgrade-note">
+                    Après la mise à niveau, votre abonnement expirera toujours à la même date.
+                </p>
+            </div>
+        </div>
+
+        <!-- Loading upgrade price -->
+        <div class="loading-container" *ngIf="isLoadingUpgrade" style="padding: 20px;">
+            <fa-icon [icon]="faSpinner" [spin]="true" class="spinner"></fa-icon>
+            <p>Calcul du prix de mise à niveau...</p>
+        </div>
+
+        <!-- Duration Selection (hidden during upgrade) -->
+        <ng-container *ngIf="!canUpgrade || selectedTier !== 'STOCK_WEBSITE'">
+            <div class="duration-intro">
+                <h3>Choisissez votre durée</h3>
+            </div>
+
+            <div class="plans-grid">
+                <div class="plan-card" *ngFor="let plan of plans" [class.popular]="plan.popular"
+                    [class.selected]="selectedPlan?.key === plan.key" (click)="selectPlan(plan)">
+
+                    <div class="popular-badge" *ngIf="plan.popular">
+                        <fa-icon [icon]="faStar"></fa-icon>
+                        Populaire
+                    </div>
+
+                    <div class="plan-icon">
+                        <fa-icon [icon]="plan.icon"></fa-icon>
+                    </div>
+
+                    <h3>{{ plan.name }}</h3>
+
+                    <div class="plan-price">
+                        <span class="amount">{{ plan.price }}</span>
+                        <span class="currency">TND</span>
+                    </div>
+
+                    <div class="plan-duration">{{ plan.duration }}</div>
+
+                    <div class="plan-discount" *ngIf="plan.discount">
+                        <fa-icon [icon]="faCheck"></fa-icon>
+                        Économisez {{ plan.discount }}
+                    </div>
+
+                    <button class="btn-select" [disabled]="isCreatingOrder">
+                        <span *ngIf="!isCreatingOrder || selectedPlan?.key !== plan.key">
+                            Sélectionner
+                        </span>
+                        <span *ngIf="isCreatingOrder && selectedPlan?.key === plan.key">
+                            <fa-icon [icon]="faSpinner" [spin]="true"></fa-icon>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </ng-container>
 
         <!-- Storage Purchase Section -->
         <!--<div class="storage-section" *ngIf="showStorageSection || pricing?.storage">

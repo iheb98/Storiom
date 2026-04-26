@@ -3,10 +3,24 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Storiom</title>
+  <title>&#8203;</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="assets/logo.png">
+  <link rel="icon" type="image/x-icon" href="assets/logo.png" id="app-favicon">
+  <script>
+    (function() {
+      var h = location.hostname;
+      var p = location.pathname;
+      var platforms = ['storiom.com','www.storiom.com','localhost','127.0.0.1','161.97.186.60'];
+      var isStore = p.indexOf('/preview-store/') === 0 || p.indexOf('/store-home') === 0;
+      if (platforms.indexOf(h) !== -1 && !isStore) {
+        document.title = 'Storiom';
+      } else if (platforms.indexOf(h) === -1) {
+        var link = document.getElementById('app-favicon');
+        if (link) link.href = 'data:,';
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">

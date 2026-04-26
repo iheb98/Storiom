@@ -76,7 +76,7 @@
                     </fa-icon>
                 </div>
                 <span class="rating-text">{{ product.averageRating | number:'1.1-1' }}</span>
-                <span class="reviews-count">({{ product.reviews?.length || 0 }} avis)</span>
+                <span class="reviews-count">({{ storeReviews.length || 0 }} avis)</span>
             </div>
 
             <!-- Price -->
@@ -122,7 +122,7 @@
             </div>
 
             <!-- Delivery Info -->
-            <div class="delivery-info" *ngIf="product?.store?.isSupportingDeliveries">
+            <div class="delivery-info" *ngIf="product?.store?.isSupportingDeliveries && showFreeShipping">
                 <div class="info-item">
                     <fa-icon [icon]="faTruck"></fa-icon>
                     <span>Livraison disponible</span>
@@ -253,13 +253,6 @@
                 </div>
                 <div class="rec-info">
                     <h4 class="rec-name">{{ rec.name }}</h4>
-                    <div class="rec-rating">
-                        <div class="stars">
-                            <fa-icon [icon]="faStar" *ngFor="let s of [1,2,3,4,5]"
-                                [class.filled]="s <= getRecAverageRating(rec)"></fa-icon>
-                        </div>
-                        <span class="rating-count">({{ rec.reviews?.length || 0 }} avis)</span>
-                    </div>
                     <div class="rec-price">
                         <span class="original" *ngIf="rec.discount > 0">{{ rec.sellingPrice | number:'1.2-2' }}
                             DT</span>

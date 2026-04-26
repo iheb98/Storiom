@@ -405,7 +405,7 @@ router.get('/subscription/:id', utility.authenticate, async (req, res) => {
             });
         }
 
-        let { activationDate, expirationDate, duration, createdAt } = user.subscription;
+        let { activationDate, expirationDate, duration, createdAt, plan } = user.subscription;
 
         // Calculate expiration date if not set
         let calculatedExpirationDate = expirationDate;
@@ -432,6 +432,7 @@ router.get('/subscription/:id', utility.authenticate, async (req, res) => {
                 activationDate,
                 expirationDate: calculatedExpirationDate,
                 duration,
+                plan: plan || 'STOCK',
                 isExpired,
                 createdAt
             }

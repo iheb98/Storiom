@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { StoreAuthService } from 'src/app/core/services/store-auth.service';
 import { CartService } from 'src/app/core/services/cart.service';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { DomainService } from 'src/app/core/services/domain.service';
+import { PublicService } from 'src/app/core/services/public.service';
 import { environment } from 'src/environments/environment.prod';
 import {
   faShoppingCart, faMinus, faPlus, faTrash, faArrowLeft, faLock, faShoppingBag
@@ -27,6 +29,12 @@ export class StoreCartComponent implements OnInit {
   isLoading = false;
   isPreviewMode = false;
   basePath = '';
+  placingOrder = false;
+
+  // Theme settings
+  checkoutText = 'Commander';
+  showContinueShopping = true;
+  showFreeShipping = true;
 
   // Icons
   faShoppingCart = faShoppingCart;
@@ -42,21 +50,30 @@ export class StoreCartComponent implements OnInit {
     private router: Router,
     private storeAuth: StoreAuthService,
     private cartService: CartService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private domainService: DomainService,
+    private publicService: PublicService
   ) {}
 
   ngOnInit(): void {
     window.scrollTo({ top: 0, behavior: 'auto' });
 
-    const storeId = this.route.parent?.snapshot.paramMap.get('storeId');
-    this.isPreviewMode = !!storeId;
-    this.basePath = storeId ? `/preview-store/${storeId}` : '';
+    if (this.domainService.isCustomDomain) {
+      this.basePath = '/store-home';
+      this.isPreviewMode = false;
+    } else {
+      const storeId = this.route.parent?.snapshot.paramMap.get('storeId');
+      this.isPreviewMode = !!storeId;
+      this.basePath = storeId ? `/preview-store/${storeId}` : '/store-home';
+    }
 
     if (this.storeAuth.isLoggedIn()) {
       this.loadCartFromApi();
     } else {
       this.loadCartFromLocalStorage();
     }
+
+    this.loadThemeConfig();
   }
 
   loadCartFromLocalStorage(): void {
@@ -123,8 +140,6 @@ export class StoreCartComponent implements OnInit {
     this.toastService.showSuccess('Produit retiré du panier');
   }
 
-
-
   calculateTotals(): void {
     this.totalItems = this.cart.reduce((acc, item) => acc + item.quantity, 0);
     this.totalPrice = this.cart.reduce((acc, item) => acc + item.quantity * this.getDiscountedPrice(item.product), 0);
@@ -139,8 +154,64 @@ export class StoreCartComponent implements OnInit {
       this.toastService.showWarning('Commande impossible en mode aperçu');
       return;
     }
-    // Real checkout would go here
-    this.toastService.showWarning('Veuillez vous connecter pour commander.');
-    this.router.navigate(['/login']);
+
+    // If not logged in as store customer, redirect to store login
+    if (!this.storeAuth.isLoggedIn()) {
+      this.toastService.showWarning('Veuillez vous connecter pour commander.');
+      this.router.navigate([this.basePath, 'login']);
+      return;
+    }
+
+    // Build order items
+    const items = this.cart.map(item => ({
+      productId: item.product?.id || item.product?.productId,
+      quantity: item.quantity
+    }));
+
+    if (!items.length) return;
+
+    const customer = this.storeAuth.getCustomer();
+
+    this.placingOrder = true;
+    this.storeAuth.placeOrder({
+      items,
+      customerName: customer ? `${customer.firstName} ${customer.lastName}` : '',
+      customerPhone: customer?.phone || '',
+      customerAddress: customer?.address
+        ? [customer.address.street, customer.address.city, customer.address.state, customer.address.postalCode].filter(v => v).join(', ')
+        : ''
+    }).subscribe({
+      next: (res: any) => {
+        this.placingOrder = false;
+        if (res.success) {
+          this.toastService.showSuccess('Commande passée avec succès !');
+          // Clear cart
+          this.cartService.clearCart();
+          this.cart = [];
+          this.calculateTotals();
+          this.router.navigate([this.basePath, 'account']);
+        } else {
+          this.toastService.showError(res.message || 'Erreur lors de la commande.');
+        }
+      },
+      error: (err: any) => {
+        this.placingOrder = false;
+        this.toastService.showError(err?.error?.message || 'Erreur lors de la commande.');
+      }
+    });
+  }
+
+  loadThemeConfig(): void {
+    const storeId = this.route.parent?.snapshot.paramMap.get('storeId')
+      || this.domainService.storeId?.toString();
+    if (!storeId) return;
+    this.publicService.getStoreById(storeId).subscribe((store: any) => {
+      const cp = store.theme?.cartPage;
+      if (cp) {
+        this.checkoutText = cp.checkoutText || 'Commander';
+        this.showContinueShopping = cp.showContinueShopping !== false;
+        this.showFreeShipping = cp.showFreeShipping !== false;
+      }
+    });
   }
 }

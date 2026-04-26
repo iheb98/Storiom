@@ -1,7 +1,7 @@
 <div class="store-products-page">
 
   <!-- Page Header -->
-  <div class="page-header">
+  <div class="page-header" [class.no-gradient]="!headerGradient">
     <div class="header-inner">
       <h1>Nos Produits</h1>
       <p class="product-count" *ngIf="!isLoading">{{ count }} produit{{ count > 1 ? 's' : '' }} trouvé{{ count > 1 ? 's' : '' }}</p>
@@ -12,7 +12,7 @@
   <div class="toolbar">
     <div class="toolbar-inner">
       <!-- Mobile sidebar toggle -->
-      <button class="sidebar-toggle" (click)="toggleSidebar()">
+      <button class="sidebar-toggle" (click)="toggleSidebar()" *ngIf="showFilters">
         <fa-icon [icon]="faBars"></fa-icon>
         <span>Filtres</span>
       </button>
@@ -48,7 +48,7 @@
   <div class="products-layout">
 
     <!-- ═══ CATEGORY SIDEBAR ═══ -->
-    <aside class="category-sidebar" [class.open]="sidebarOpen">
+    <aside class="category-sidebar" [class.open]="sidebarOpen" *ngIf="showFilters">
       <div class="sidebar-header">
         <h3><fa-icon [icon]="faFilter"></fa-icon> Catégories</h3>
         <button class="sidebar-close" (click)="sidebarOpen = false">
@@ -114,7 +114,7 @@
     </aside>
 
     <!-- Mobile overlay -->
-    <div class="sidebar-overlay" [class.open]="sidebarOpen" (click)="sidebarOpen = false"></div>
+    <div class="sidebar-overlay" [class.open]="sidebarOpen" (click)="sidebarOpen = false" *ngIf="showFilters"></div>
 
     <!-- ═══ PRODUCTS AREA ═══ -->
     <div class="products-main">
@@ -149,7 +149,9 @@
       </div>
 
       <!-- Grid -->
-      <div class="products-grid" *ngIf="!isLoading && products.length > 0">
+      <div class="products-grid" *ngIf="!isLoading && products.length > 0"
+           [style.--grid-cols]="gridColumns"
+           [style.--grid-cols-mobile]="gridColumnsMobile">
         <app-store-product-card
           *ngFor="let product of products"
           [product]="product"
@@ -161,7 +163,7 @@
       <mat-paginator *ngIf="count > currentSize"
                      [length]="count"
                      [pageSize]="currentSize"
-                     [pageSizeOptions]="[12, 24, 48]"
+                     [pageSizeOptions]="[12, 24, 36, 48]"
                      (page)="handlePageEvent($event)">
       </mat-paginator>
     </div>

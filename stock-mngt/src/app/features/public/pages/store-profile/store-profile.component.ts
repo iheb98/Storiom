@@ -31,7 +31,10 @@ export class StoreProfileComponent implements OnInit, OnDestroy {
 
   // Edit state
   isEditing = false;
-  editForm = { firstName: '', lastName: '', phone: '', address: '' };
+  editForm = {
+    firstName: '', lastName: '', phone: '',
+    address: { street: '', city: '', state: '', postalCode: '' }
+  };
   saving = false;
   saveMessage = '';
 
@@ -83,7 +86,12 @@ export class StoreProfileComponent implements OnInit, OnDestroy {
             firstName: c.firstName || '',
             lastName: c.lastName || '',
             phone: c.phone || '',
-            address: c.address || ''
+            address: {
+              street: c.address?.street || '',
+              city: c.address?.city || '',
+              state: c.address?.state || '',
+              postalCode: c.address?.postalCode || ''
+            }
           };
         }
       })
@@ -116,7 +124,12 @@ export class StoreProfileComponent implements OnInit, OnDestroy {
         firstName: this.customer.firstName || '',
         lastName: this.customer.lastName || '',
         phone: this.customer.phone || '',
-        address: this.customer.address || ''
+        address: {
+          street: this.customer.address?.street || '',
+          city: this.customer.address?.city || '',
+          state: this.customer.address?.state || '',
+          postalCode: this.customer.address?.postalCode || ''
+        }
       };
     }
   }

@@ -27,10 +27,10 @@ export class PublicService {
     return this.http.get<any>(this.apiUrl + '/publicProduct/' + id, { params });
   }
 
-  getProductRecommendations(productId: number, limit: number = 8): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/products/${productId}/recommendations`, {
-      params: { limit: limit.toString() }
-    });
+  getProductRecommendations(productId: number, limit: number = 8, storeId?: number | string): Observable<any[]> {
+    const params: any = { limit: limit.toString() };
+    if (storeId) params.storeId = storeId.toString();
+    return this.http.get<any[]>(`${this.apiUrl}/products/${productId}/recommendations`, { params });
   }
 
 
