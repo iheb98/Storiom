@@ -66,6 +66,29 @@
                 </div>
             </div>
 
+            <!-- Queued Next Plan -->
+            <div class="next-plan-section" *ngIf="currentSubscription.nextPlan && !currentSubscription.isExpired">
+                <div class="next-plan-divider">
+                    <span class="divider-label">Plan suivant</span>
+                </div>
+                <div class="next-plan-card">
+                    <div class="next-plan-icon">
+                        <fa-icon [icon]="faClock"></fa-icon>
+                    </div>
+                    <div class="next-plan-info">
+                        <h4>{{ currentSubscription.nextPlan === 'STOCK_WEBSITE' ? 'Stock + Boutique' : 'Gestion de Stock' }}</h4>
+                        <p>
+                            Du {{ currentSubscription.nextActivationDate | date:'dd/MM/yyyy' }}
+                            au {{ currentSubscription.nextExpirationDate | date:'dd/MM/yyyy' }}
+                            <span class="next-duration-badge">{{ currentSubscription.nextDuration }}</span>
+                        </p>
+                    </div>
+                    <div class="next-plan-status">
+                        <span class="queued-badge">En attente</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="subscription-cta" *ngIf="currentSubscription.isExpired">
                 <p>Renouvelez votre abonnement pour continuer à utiliser Storiom</p>
             </div>

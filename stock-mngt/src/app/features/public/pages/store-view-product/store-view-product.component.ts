@@ -39,6 +39,7 @@ export class StoreViewProductComponent implements OnInit {
   isLoading = true;
   productNotFound = false;
   basePath = '';
+  isPrivateStore = false;
 
   // Store customer reviews
   storeReviews: any[] = [];
@@ -54,7 +55,7 @@ export class StoreViewProductComponent implements OnInit {
   isLoadingRecommendations = false;
 
   // Theme
-  showFreeShipping = true;
+  showFreeShipping = false;
 
   // Icons
   faChevronRight = faChevronRight;
@@ -105,8 +106,10 @@ export class StoreViewProductComponent implements OnInit {
     const storeId = this.route.parent?.snapshot.paramMap.get('storeId') || null;
     if (storeId) {
       this.basePath = `/preview-store/${storeId}`;
+      this.isPrivateStore = true;
     } else if (this.domainService.isCustomDomain) {
       this.basePath = '/store-home';
+      this.isPrivateStore = true;
     }
 
     this.route.paramMap.subscribe(params => {
@@ -384,7 +387,8 @@ export class StoreViewProductComponent implements OnInit {
         interactionType,
         userId,
         storeId: this.product.storeId || this.product.store?.id,
-        categoryId: this.product.categoryId || this.product.category?.id
+        categoryId: this.product.categoryId || this.product.category?.id,
+        source: this.isPrivateStore ? 'private_store' : 'marketplace'
       }).subscribe({ error: (err) => console.log('Analytics tracking failed:', err) });
     }
   }

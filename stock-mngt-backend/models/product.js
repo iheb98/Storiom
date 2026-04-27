@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(Store, { foreignKey: 'store_id', as: 'store' })
       this.hasMany(OrderItem, { foreignKey: 'product_id', as: 'orderItems' })
       this.hasMany(Review, { foreignKey: 'product_id', as: 'reviews' })
-      this.hasOne(ProductStats, { foreignKey: 'product_id', as: 'stats' })
+      this.hasMany(ProductStats, { foreignKey: 'product_id', as: 'stats' })
     }
 
     toJSON() {

@@ -1849,3 +1849,109 @@ $shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.15);
         }
     }
 }
+
+// ===================== Queued Next Plan =====================
+.next-plan-section {
+    padding: 0 24px 20px;
+}
+
+.next-plan-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+
+    &::before, &::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #e0e0e0;
+    }
+
+    .divider-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #f59e0b;
+    }
+}
+
+.next-plan-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+
+    .next-plan-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: rgba(245, 158, 11, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #f59e0b;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .next-plan-info {
+        flex: 1;
+        min-width: 0;
+
+        h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #92400e;
+            margin: 0 0 4px;
+        }
+
+        p {
+            font-size: 0.8rem;
+            color: #b45309;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .next-duration-badge {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.2);
+            color: #92400e;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+    }
+
+    .next-plan-status {
+        flex-shrink: 0;
+
+        .queued-badge {
+            display: inline-block;
+            background: #f59e0b;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        flex-wrap: wrap;
+
+        .next-plan-status {
+            width: 100%;
+            text-align: right;
+        }
+    }
+}

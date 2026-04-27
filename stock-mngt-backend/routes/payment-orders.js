@@ -186,7 +186,7 @@ router.post('/create', utility.authenticate, async (req, res) => {
             userId,
             paymentType,
             subscriptionPlan: (paymentType === 'SUBSCRIPTION' && !isUpgrade) ? subscriptionPlan : null,
-            subscriptionTier: paymentType === 'SUBSCRIPTION' ? 'STOCK_WEBSITE' : null,
+            subscriptionTier: paymentType === 'SUBSCRIPTION' ? (isUpgrade ? 'STOCK_WEBSITE' : (req.body.subscriptionTier || 'STOCK')) : null,
             isUpgrade,
             storageGB: paymentType === 'STORAGE_EXTENSION' ? (storageGB || 50) : null,
             storageDuration: paymentType === 'STORAGE_EXTENSION' ? (storageDuration || '1M') : null,
@@ -375,78 +375,132 @@ router.post('/admin/:id/validate', utility.authenticate, async (req, res) => {
 
         // Process based on payment type
         if (order.paymentType === 'SUBSCRIPTION') {
-            // Debug log
             console.log('Processing subscription order:', {
                 orderId: order.id,
                 userId: order.userId,
                 subscriptionPlan: order.subscriptionPlan,
+                subscriptionTier: order.subscriptionTier,
                 isUpgrade: order.isUpgrade
             });
 
+            let subscription = await Subscription.findOne({ where: { userId: order.userId } });
+            const now2 = new Date();
+            const orderTier = order.subscriptionTier || 'STOCK';
+            let isQueued = false;
+
             if (order.isUpgrade) {
-                // ===== PLAN UPGRADE: just change plan, keep same expiration =====
-                let subscription = await Subscription.findOne({ where: { userId: order.userId } });
+                // ===== PLAN UPGRADE: immediate change, keep same expiration =====
                 if (subscription) {
                     subscription.plan = 'STOCK_WEBSITE';
                     await subscription.save();
                     console.log('Plan upgraded to STOCK_WEBSITE for user:', order.userId);
                 }
             } else {
-                // ===== NORMAL SUBSCRIPTION: extend/create =====
+                // ===== NORMAL SUBSCRIPTION =====
                 if (!order.subscriptionPlan) {
-                    console.error('ERROR: subscriptionPlan is null or undefined for order:', order.id);
+                    console.error('ERROR: subscriptionPlan is null for order:', order.id);
                     return res.status(400).json({ success: false, message: 'Plan d\'abonnement invalide' });
                 }
 
-                let subscription = await Subscription.findOne({ where: { userId: order.userId } });
+                const currentPlanActive = subscription && subscription.expirationDate > now2;
+                const isSameTier = subscription && subscription.plan === orderTier;
 
-                const now2 = new Date();
-                let startDate = now2;
+                if (currentPlanActive && !isSameTier) {
+                    // ===== DIFFERENT TIER + ACTIVE PLAN → QUEUE =====
+                    if (subscription.nextPlan) {
+                        return res.status(400).json({
+                            success: false,
+                            message: 'Un plan est déjà en file d\'attente. Veuillez attendre son activation.'
+                        });
+                    }
 
-                // If subscription exists and not expired, extend from expiration date
-                if (subscription && subscription.expirationDate > now2) {
-                    startDate = new Date(subscription.expirationDate);
-                    console.log('Extending from existing expiration:', subscription.expirationDate);
-                } else {
-                    console.log('Starting new subscription from now');
-                }
+                    const queueStartDate = new Date(subscription.expirationDate);
+                    const queueEndDate = calculateExpirationDate(order.subscriptionPlan, queueStartDate);
 
-                const expirationDate = calculateExpirationDate(order.subscriptionPlan, startDate);
-                console.log('New expiration date calculated:', expirationDate);
+                    subscription.nextPlan = orderTier;
+                    subscription.nextDuration = order.subscriptionPlan;
+                    subscription.nextActivationDate = queueStartDate;
+                    subscription.nextExpirationDate = queueEndDate;
+                    subscription.nextPaymentOrderId = order.id;
+                    await subscription.save();
 
-                if (subscription) {
+                    isQueued = true;
+                    console.log(`Queued ${orderTier} plan for user ${order.userId}: ${queueStartDate} → ${queueEndDate}`);
+                } else if (currentPlanActive && isSameTier) {
+                    // ===== SAME TIER + ACTIVE → EXTEND =====
+                    const startDate = new Date(subscription.expirationDate);
+                    const expirationDate = calculateExpirationDate(order.subscriptionPlan, startDate);
+
                     subscription.duration = order.subscriptionPlan;
-                    subscription.plan = order.subscriptionTier || 'STOCK';
                     subscription.paymentDate = now2;
                     subscription.activationDate = startDate;
                     subscription.expirationDate = expirationDate;
                     await subscription.save();
+                    console.log('Extended same-tier plan to:', expirationDate);
+                } else if (subscription) {
+                    // ===== EXPIRED OR NO ACTIVE → SET AS CURRENT =====
+                    subscription.duration = order.subscriptionPlan;
+                    subscription.plan = orderTier;
+                    subscription.paymentDate = now2;
+                    subscription.activationDate = now2;
+                    subscription.expirationDate = calculateExpirationDate(order.subscriptionPlan, now2);
+                    // Clear any leftover queue
+                    subscription.nextPlan = null;
+                    subscription.nextDuration = null;
+                    subscription.nextActivationDate = null;
+                    subscription.nextExpirationDate = null;
+                    subscription.nextPaymentOrderId = null;
+                    await subscription.save();
+                    console.log('Set as current plan:', orderTier);
                 } else {
+                    // ===== NO SUBSCRIPTION EXISTS → CREATE =====
                     subscription = await Subscription.create({
                         userId: order.userId,
                         duration: order.subscriptionPlan,
-                        plan: order.subscriptionTier || 'STOCK',
+                        plan: orderTier,
                         paymentDate: now2,
                         activationDate: now2,
-                        expirationDate: expirationDate
+                        expirationDate: calculateExpirationDate(order.subscriptionPlan, now2)
                     });
+                    console.log('Created new subscription:', orderTier);
                 }
             }
 
-            // Send confirmation email to user with the final combined expiration date
-            const userEmailHtml = `
+            // Send confirmation email
+            const planLabel = orderTier === 'STOCK_WEBSITE' ? 'Stock + Website' : 'Stock';
+            let emailBody;
+            if (isQueued) {
+                emailBody = `
+        <h2>Votre plan a été mis en file d'attente !</h2>
+        <p>Bonjour ${order.user.firstName},</p>
+        <p>Votre paiement pour la commande <strong>#${order.orderNumber}</strong> a été reçu et validé.</p>
+        <p><strong>Détails:</strong></p>
+        <ul>
+          <li>Plan actuel: ${subscription.plan === 'STOCK_WEBSITE' ? 'Stock + Website' : 'Stock'} — expire le ${new Date(subscription.expirationDate).toLocaleDateString('fr-FR')}</li>
+          <li>Plan suivant: ${planLabel} — du ${new Date(subscription.nextActivationDate).toLocaleDateString('fr-FR')} au ${new Date(subscription.nextExpirationDate).toLocaleDateString('fr-FR')}</li>
+        </ul>
+        <p>Le plan ${planLabel} sera activé automatiquement à l'expiration de votre plan actuel.</p>
+        <p>Merci pour votre confiance !</p>
+        <p>L'équipe Storiom</p>
+      `;
+            } else {
+                const displayDate = order.isUpgrade
+                    ? new Date(subscription.expirationDate).toLocaleDateString('fr-FR')
+                    : new Date(subscription.expirationDate).toLocaleDateString('fr-FR');
+                emailBody = `
         <h2>Votre abonnement a été activé !</h2>
         <p>Bonjour ${order.user.firstName},</p>
         <p>Votre paiement pour la commande <strong>#${order.orderNumber}</strong> a été reçu et validé.</p>
         <p><strong>Détails de l'abonnement:</strong></p>
         <ul>
-          <li>Plan ajouté: ${order.subscriptionPlan}</li>
-          <li>Durée totale valide jusqu'au: ${new Date(subscription.expirationDate).toLocaleDateString('fr-FR')}</li>
+          <li>Plan: ${planLabel}</li>
+          <li>Valide jusqu'au: ${displayDate}</li>
         </ul>
         <p>Merci pour votre confiance !</p>
         <p>L'équipe Storiom</p>
       `;
-            await sendMail(order.user.email, 'Votre abonnement Storiom est activé !', userEmailHtml);
+            }
+            await sendMail(order.user.email, isQueued ? 'Votre plan Storiom a été programmé !' : 'Votre abonnement Storiom est activé !', emailBody);
 
         } else if (order.paymentType === 'STORAGE_EXTENSION') {
             // Add storage to user's store

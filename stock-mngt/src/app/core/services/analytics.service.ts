@@ -23,6 +23,7 @@ export class AnalyticsService {
         quantity?: number;
         searchTerm?: string;
         sessionId?: string;
+        source?: 'marketplace' | 'private_store';
     }): Observable<any> {
         return this.http.post(`${this.baseUrl}/track`, data);
     }

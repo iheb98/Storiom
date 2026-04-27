@@ -70,6 +70,11 @@ export class SubscriptionComponent implements OnInit {
         daysRemaining: number;
         percentRemaining: number;
         createdAt: string;
+        // Queued next plan
+        nextPlan: string | null;
+        nextDuration: string | null;
+        nextActivationDate: string | null;
+        nextExpirationDate: string | null;
     } | null = null;
 
     // View state
@@ -293,6 +298,37 @@ export class SubscriptionComponent implements OnInit {
     }
 
     selectPlan(plan: SubscriptionPlan) {
+        // Check if a next plan is already queued
+        if (this.currentSubscription?.nextPlan) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Plan en attente',
+                text: 'Vous avez déjà un plan en file d\'attente. Veuillez attendre son activation avant d\'en ajouter un autre.',
+                confirmButtonColor: '#3f51b5'
+            });
+            return;
+        }
+
+        // Check if this will be queued (different tier + active plan)
+        const willBeQueued = this.currentSubscription
+            && !this.currentSubscription.isExpired
+            && this.currentSubscription.plan !== this.selectedTier;
+
+        let warningHtml = '';
+        if (willBeQueued) {
+            const currentPlanLabel = this.currentSubscription!.plan === 'STOCK_WEBSITE' ? 'Stock + Website' : 'Stock';
+            const expDate = new Date(this.currentSubscription!.expirationDate).toLocaleDateString('fr-FR');
+            warningHtml = `
+                <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 10px; padding: 12px; margin-top: 12px; text-align: left; font-size: 0.9rem;">
+                    <strong style="color: #856404;">⚠️ Ce plan sera mis en file d'attente</strong>
+                    <p style="margin: 6px 0 0; color: #856404;">
+                        Votre plan actuel <strong>${currentPlanLabel}</strong> est actif jusqu'au <strong>${expDate}</strong>. 
+                        Le nouveau plan ne sera activé qu'après cette date.
+                    </p>
+                </div>
+            `;
+        }
+
         Swal.fire({
             title: 'Confirmer votre choix',
             html: `
@@ -304,11 +340,12 @@ export class SubscriptionComponent implements OnInit {
                         Abonnement ${plan.duration}
                     </div>
                     ${plan.discount ? `<div style="display: inline-block; background: rgba(76, 175, 80, 0.1); color: #4caf50; padding: 6px 16px; border-radius: 20px; font-weight: 600;">Économisez ${plan.discount}</div>` : ''}
+                    ${warningHtml}
                 </div>
             `,
-            icon: 'question',
+            icon: willBeQueued ? 'warning' : 'question',
             showCancelButton: true,
-            confirmButtonText: 'Confirmer',
+            confirmButtonText: willBeQueued ? 'Confirmer (file d\'attente)' : 'Confirmer',
             cancelButtonText: 'Annuler',
             confirmButtonColor: '#3f51b5',
             cancelButtonColor: '#6c757d',

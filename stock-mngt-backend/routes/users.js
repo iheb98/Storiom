@@ -434,7 +434,12 @@ router.get('/subscription/:id', utility.authenticate, async (req, res) => {
                 duration,
                 plan: plan || 'STOCK',
                 isExpired,
-                createdAt
+                createdAt,
+                // Queued next plan
+                nextPlan: user.subscription.nextPlan || null,
+                nextDuration: user.subscription.nextDuration || null,
+                nextActivationDate: user.subscription.nextActivationDate || null,
+                nextExpirationDate: user.subscription.nextExpirationDate || null
             }
         });
     } catch (err) {

@@ -45,16 +45,47 @@ export class ProductAnalyticsComponent implements OnInit {
 
     // Analytics Data
     storeAnalytics: any = null;
-    topProducts: any[] = [];
     allProductStats: any[] = [];
 
-    // Summary Stats
-    totalViews = 0;
-    totalOrders = 0;
-    totalCartAdds = 0;
-    totalWishlists = 0;
-    totalQuantitySold = 0;
-    avgConversionRate = 0;
+    // Computed top products based on source filter
+    get topProducts(): any[] {
+        return [...this.allProductStats]
+            .map(p => ({
+                product: p,
+                ...this.getProductStats(p)
+            }))
+            .sort((a, b) => (b.popularityScore || 0) - (a.popularityScore || 0))
+            .slice(0, 5)
+            .filter(p => (p.viewCount || 0) > 0 || (p.orderCount || 0) > 0);
+    }
+
+    // Source Filter
+    sourceFilter: 'all' | 'marketplace' | 'private_store' = 'all';
+
+    // Raw stats by source
+    combinedStats: any = { totalViews: 0, totalOrders: 0, totalCartAdds: 0, totalWishlists: 0, totalQuantitySold: 0 };
+    marketplaceStats: any = { totalViews: 0, totalOrders: 0, totalCartAdds: 0, totalWishlists: 0, totalQuantitySold: 0 };
+    privateStoreStats: any = { totalViews: 0, totalOrders: 0, totalCartAdds: 0, totalWishlists: 0, totalQuantitySold: 0 };
+
+    // Computed getters based on active source filter
+    get activeStats(): any {
+        switch (this.sourceFilter) {
+            case 'marketplace': return this.marketplaceStats;
+            case 'private_store': return this.privateStoreStats;
+            default: return this.combinedStats;
+        }
+    }
+
+    get totalViews(): number { return this.activeStats.totalViews || 0; }
+    get totalOrders(): number { return this.activeStats.totalOrders || 0; }
+    get totalCartAdds(): number { return this.activeStats.totalCartAdds || 0; }
+    get totalWishlists(): number { return this.activeStats.totalWishlists || 0; }
+    get totalQuantitySold(): number { return this.activeStats.totalQuantitySold || 0; }
+    get avgConversionRate(): number {
+        return this.totalViews > 0
+            ? parseFloat(((this.totalOrders / this.totalViews) * 100).toFixed(2))
+            : 0;
+    }
 
     // Filters
     searchTerm = '';
@@ -106,6 +137,8 @@ export class ProductAnalyticsComponent implements OnInit {
         // Apply sorting
         result.sort((a, b) => {
             let valueA: number, valueB: number;
+            const statsA = this.getProductStats(a);
+            const statsB = this.getProductStats(b);
 
             switch (this.sortBy) {
                 case 'name':
@@ -115,29 +148,29 @@ export class ProductAnalyticsComponent implements OnInit {
                         ? nameA.localeCompare(nameB)
                         : nameB.localeCompare(nameA);
                 case 'views':
-                    valueA = a.stats?.viewCount || 0;
-                    valueB = b.stats?.viewCount || 0;
+                    valueA = statsA?.viewCount || 0;
+                    valueB = statsB?.viewCount || 0;
                     break;
                 case 'orders':
-                    valueA = a.stats?.orderCount || 0;
-                    valueB = b.stats?.orderCount || 0;
+                    valueA = statsA?.orderCount || 0;
+                    valueB = statsB?.orderCount || 0;
                     break;
                 case 'cartAdds':
-                    valueA = a.stats?.cartAddCount || 0;
-                    valueB = b.stats?.cartAddCount || 0;
+                    valueA = statsA?.cartAddCount || 0;
+                    valueB = statsB?.cartAddCount || 0;
                     break;
                 case 'wishlist':
-                    valueA = a.stats?.wishlistCount || 0;
-                    valueB = b.stats?.wishlistCount || 0;
+                    valueA = statsA?.wishlistCount || 0;
+                    valueB = statsB?.wishlistCount || 0;
                     break;
                 case 'conversion':
-                    valueA = this.getConversionRate(a.stats);
-                    valueB = this.getConversionRate(b.stats);
+                    valueA = this.getConversionRate(statsA);
+                    valueB = this.getConversionRate(statsB);
                     break;
                 case 'popularityScore':
                 default:
-                    valueA = a.stats?.popularityScore || 0;
-                    valueB = b.stats?.popularityScore || 0;
+                    valueA = statsA?.popularityScore || 0;
+                    valueB = statsB?.popularityScore || 0;
                     break;
             }
 
@@ -179,39 +212,45 @@ export class ProductAnalyticsComponent implements OnInit {
         }).subscribe(
             results => {
                 this.storeAnalytics = results.storeAnalytics;
-                this.topProducts = results.storeAnalytics?.topProducts || [];
 
                 // Extract summary from aggregate data
                 const summary = results.storeAnalytics?.summary || {};
-                this.totalViews = parseInt(summary.totalViews) || 0;
-                this.totalOrders = parseInt(summary.totalOrders) || 0;
-                this.totalCartAdds = parseInt(summary.totalCartAdds) || 0;
-                this.totalWishlists = parseInt(summary.totalWishlists) || 0;
-                this.totalQuantitySold = parseInt(summary.totalQuantitySold) || 0;
+                this.combinedStats = {
+                    totalViews: parseInt(summary.totalViews) || 0,
+                    totalOrders: parseInt(summary.totalOrders) || 0,
+                    totalCartAdds: parseInt(summary.totalCartAdds) || 0,
+                    totalWishlists: parseInt(summary.totalWishlists) || 0,
+                    totalQuantitySold: parseInt(summary.totalQuantitySold) || 0
+                };
 
-                // Calculate conversion rate
-                this.avgConversionRate = this.totalViews > 0
-                    ? parseFloat(((this.totalOrders / this.totalViews) * 100).toFixed(2))
-                    : 0;
+                // Source breakdown
+                const mk = results.storeAnalytics?.marketplace || {};
+                const ps = results.storeAnalytics?.privateStore || {};
+                this.marketplaceStats = {
+                    totalViews: parseInt(mk.totalViews) || 0,
+                    totalOrders: parseInt(mk.totalOrders) || 0,
+                    totalCartAdds: parseInt(mk.totalCartAdds) || 0,
+                    totalWishlists: parseInt(mk.totalWishlists) || 0,
+                    totalQuantitySold: parseInt(mk.totalQuantitySold) || 0
+                };
+                this.privateStoreStats = {
+                    totalViews: parseInt(ps.totalViews) || 0,
+                    totalOrders: parseInt(ps.totalOrders) || 0,
+                    totalCartAdds: parseInt(ps.totalCartAdds) || 0,
+                    totalWishlists: parseInt(ps.totalWishlists) || 0,
+                    totalQuantitySold: parseInt(ps.totalQuantitySold) || 0
+                };
 
                 // Handle products response - could be array or object with rows/products property
                 const productsData = Array.isArray(results.products)
                     ? results.products
                     : (results.products?.rows || results.products?.products || []);
 
-                // Process all products with their stats
+                // Process all products — stats is now an array of {source, viewCount, ...}
                 this.allProductStats = productsData.map((product: any) => ({
                     ...product,
-                    stats: product.stats || {
-                        viewCount: 0,
-                        orderCount: 0,
-                        cartAddCount: 0,
-                        wishlistCount: 0,
-                        popularityScore: 0
-                    }
-                })).sort((a: any, b: any) =>
-                    (b.stats?.popularityScore || 0) - (a.stats?.popularityScore || 0)
-                );
+                    statsArray: Array.isArray(product.stats) ? product.stats : (product.stats ? [product.stats] : [])
+                }));
 
                 this.isLoading = false;
             },
@@ -220,6 +259,28 @@ export class ProductAnalyticsComponent implements OnInit {
                 this.isLoading = false;
             }
         );
+    }
+
+    /** Get aggregated stats for a product based on the current source filter */
+    getProductStats(product: any): any {
+        const empty = { viewCount: 0, orderCount: 0, cartAddCount: 0, wishlistCount: 0, popularityScore: 0 };
+        const arr = product.statsArray || [];
+        if (arr.length === 0) return empty;
+
+        if (this.sourceFilter === 'marketplace') {
+            return arr.find((s: any) => s.source === 'marketplace') || empty;
+        }
+        if (this.sourceFilter === 'private_store') {
+            return arr.find((s: any) => s.source === 'private_store') || empty;
+        }
+        // 'all' — combine both sources
+        return arr.reduce((acc: any, s: any) => ({
+            viewCount: (acc.viewCount || 0) + (s.viewCount || 0),
+            orderCount: (acc.orderCount || 0) + (s.orderCount || 0),
+            cartAddCount: (acc.cartAddCount || 0) + (s.cartAddCount || 0),
+            wishlistCount: (acc.wishlistCount || 0) + (s.wishlistCount || 0),
+            popularityScore: Math.max(acc.popularityScore || 0, s.popularityScore || 0)
+        }), { ...empty });
     }
 
     getProductImage(product: any): string {

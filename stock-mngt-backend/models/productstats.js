@@ -22,8 +22,12 @@ module.exports = (sequelize, DataTypes) => {
         productId: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            unique: true,
             field: 'product_id'
+        },
+        source: {
+            type: DataTypes.ENUM('marketplace', 'private_store'),
+            allowNull: false,
+            defaultValue: 'marketplace'
         },
         // Engagement Metrics
         viewCount: {
@@ -94,7 +98,13 @@ module.exports = (sequelize, DataTypes) => {
         modelName: 'ProductStats',
         timestamps: true,
         createdAt: 'created_at',
-        updatedAt: 'updated_at'
+        updatedAt: 'updated_at',
+        indexes: [
+            {
+                unique: true,
+                fields: ['product_id', 'source']
+            }
+        ]
     });
 
     return ProductStats;

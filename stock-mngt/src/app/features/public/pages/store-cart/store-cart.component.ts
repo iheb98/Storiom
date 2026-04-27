@@ -34,7 +34,8 @@ export class StoreCartComponent implements OnInit {
   // Theme settings
   checkoutText = 'Commander';
   showContinueShopping = true;
-  showFreeShipping = true;
+  showFreeShipping = false;
+  deliveryCost = 0;
 
   // Icons
   faShoppingCart = faShoppingCart;
@@ -145,6 +146,10 @@ export class StoreCartComponent implements OnInit {
     this.totalPrice = this.cart.reduce((acc, item) => acc + item.quantity * this.getDiscountedPrice(item.product), 0);
   }
 
+  get totalWithDelivery(): number {
+    return this.totalPrice + (this.deliveryCost || 0);
+  }
+
   continueShopping(): void {
     this.router.navigate([this.basePath, 'products']);
   }
@@ -211,6 +216,7 @@ export class StoreCartComponent implements OnInit {
         this.checkoutText = cp.checkoutText || 'Commander';
         this.showContinueShopping = cp.showContinueShopping !== false;
         this.showFreeShipping = cp.showFreeShipping !== false;
+        this.deliveryCost = cp.deliveryCost || 0;
       }
     });
   }

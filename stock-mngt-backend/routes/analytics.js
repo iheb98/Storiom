@@ -22,16 +22,18 @@ const INTERACTION_WEIGHTS = {
  */
 router.post('/track', async (req, res) => {
     try {
-        const { productId, interactionType, userId, storeId, categoryId, quantity, searchTerm, sessionId } = req.body;
+        const { productId, interactionType, userId, storeId, categoryId, quantity, searchTerm, sessionId, source } = req.body;
 
         if (!productId || !interactionType) {
             return res.status(400).json({ error: 'productId and interactionType are required' });
         }
 
-        // Get or create ProductStats record
+        const trackSource = source || 'marketplace';
+
+        // Get or create ProductStats record (keyed by productId + source)
         const [stats, created] = await ProductStats.findOrCreate({
-            where: { productId },
-            defaults: { productId }
+            where: { productId, source: trackSource },
+            defaults: { productId, source: trackSource }
         });
 
         // Update aggregate stats based on interaction type
@@ -96,44 +98,61 @@ router.post('/track', async (req, res) => {
 });
 
 /**
- * Get product statistics
+ * Get product statistics (by source)
  * GET /api/analytics/product/:productId
  */
 router.get('/product/:productId', utility.authenticate, async (req, res) => {
     try {
         const { productId } = req.params;
 
-        const stats = await ProductStats.findOne({ where: { productId } });
+        const allStats = await ProductStats.findAll({ where: { productId } });
 
-        if (!stats) {
-            return res.json({
-                productId: parseInt(productId),
-                viewCount: 0,
-                clickCount: 0,
-                cartAddCount: 0,
-                orderCount: 0,
-                wishlistCount: 0,
-                searchImpressions: 0,
-                totalQuantitySold: 0,
-                totalRevenue: 0,
-                popularityScore: 0,
-                conversionRate: 0,
-                cartToOrderRate: 0
-            });
-        }
+        const emptyStats = {
+            viewCount: 0, clickCount: 0, cartAddCount: 0, orderCount: 0,
+            wishlistCount: 0, searchImpressions: 0, totalQuantitySold: 0,
+            totalRevenue: 0, popularityScore: 0, conversionRate: 0, cartToOrderRate: 0
+        };
 
-        // Calculate derived metrics
-        const conversionRate = stats.viewCount > 0
-            ? ((stats.orderCount / stats.viewCount) * 100).toFixed(2)
-            : 0;
-        const cartToOrderRate = stats.cartAddCount > 0
-            ? ((stats.orderCount / stats.cartAddCount) * 100).toFixed(2)
-            : 0;
+        const marketplace = allStats.find(s => s.source === 'marketplace');
+        const privateStore = allStats.find(s => s.source === 'private_store');
+
+        const formatStats = (stats) => {
+            if (!stats) return { ...emptyStats };
+            const conversionRate = stats.viewCount > 0
+                ? ((stats.orderCount / stats.viewCount) * 100).toFixed(2) : 0;
+            const cartToOrderRate = stats.cartAddCount > 0
+                ? ((stats.orderCount / stats.cartAddCount) * 100).toFixed(2) : 0;
+            return {
+                ...stats.dataValues,
+                conversionRate: parseFloat(conversionRate),
+                cartToOrderRate: parseFloat(cartToOrderRate)
+            };
+        };
+
+        const mkStats = formatStats(marketplace);
+        const psStats = formatStats(privateStore);
+
+        // Combined totals
+        const combined = {
+            viewCount: (mkStats.viewCount || 0) + (psStats.viewCount || 0),
+            clickCount: (mkStats.clickCount || 0) + (psStats.clickCount || 0),
+            cartAddCount: (mkStats.cartAddCount || 0) + (psStats.cartAddCount || 0),
+            orderCount: (mkStats.orderCount || 0) + (psStats.orderCount || 0),
+            wishlistCount: (mkStats.wishlistCount || 0) + (psStats.wishlistCount || 0),
+            searchImpressions: (mkStats.searchImpressions || 0) + (psStats.searchImpressions || 0),
+            totalQuantitySold: (mkStats.totalQuantitySold || 0) + (psStats.totalQuantitySold || 0),
+            totalRevenue: parseFloat(mkStats.totalRevenue || 0) + parseFloat(psStats.totalRevenue || 0)
+        };
+        combined.conversionRate = combined.viewCount > 0
+            ? parseFloat(((combined.orderCount / combined.viewCount) * 100).toFixed(2)) : 0;
+        combined.cartToOrderRate = combined.cartAddCount > 0
+            ? parseFloat(((combined.orderCount / combined.cartAddCount) * 100).toFixed(2)) : 0;
 
         res.json({
-            ...stats.dataValues,
-            conversionRate: parseFloat(conversionRate),
-            cartToOrderRate: parseFloat(cartToOrderRate)
+            productId: parseInt(productId),
+            marketplace: mkStats,
+            privateStore: psStats,
+            combined
         });
     } catch (error) {
         console.error('Error fetching product stats:', error);
@@ -339,10 +358,11 @@ router.get('/store/:storeId', utility.authenticate, async (req, res) => {
 
         const productIds = products.map(p => p.id);
 
-        // Aggregate stats for all store products
-        const aggregateStats = await ProductStats.findOne({
+        // Aggregate stats by source
+        const aggregateBySource = await ProductStats.findAll({
             where: { productId: { [Op.in]: productIds } },
             attributes: [
+                'source',
                 [Sequelize.fn('SUM', Sequelize.col('view_count')), 'totalViews'],
                 [Sequelize.fn('SUM', Sequelize.col('order_count')), 'totalOrders'],
                 [Sequelize.fn('SUM', Sequelize.col('cart_add_count')), 'totalCartAdds'],
@@ -351,10 +371,25 @@ router.get('/store/:storeId', utility.authenticate, async (req, res) => {
                 [Sequelize.fn('SUM', Sequelize.col('total_revenue')), 'totalRevenue'],
                 [Sequelize.fn('AVG', Sequelize.col('popularity_score')), 'avgPopularityScore']
             ],
+            group: ['source'],
             raw: true
         });
 
-        // Get top 5 performing products
+        const emptyAgg = { totalViews: 0, totalOrders: 0, totalCartAdds: 0, totalWishlists: 0, totalQuantitySold: 0, totalRevenue: 0, avgPopularityScore: 0 };
+        const mkAgg = aggregateBySource.find(a => a.source === 'marketplace') || emptyAgg;
+        const psAgg = aggregateBySource.find(a => a.source === 'private_store') || emptyAgg;
+
+        // Combined summary
+        const combinedSummary = {
+            totalViews: parseInt(mkAgg.totalViews || 0) + parseInt(psAgg.totalViews || 0),
+            totalOrders: parseInt(mkAgg.totalOrders || 0) + parseInt(psAgg.totalOrders || 0),
+            totalCartAdds: parseInt(mkAgg.totalCartAdds || 0) + parseInt(psAgg.totalCartAdds || 0),
+            totalWishlists: parseInt(mkAgg.totalWishlists || 0) + parseInt(psAgg.totalWishlists || 0),
+            totalQuantitySold: parseInt(mkAgg.totalQuantitySold || 0) + parseInt(psAgg.totalQuantitySold || 0),
+            totalRevenue: parseFloat(mkAgg.totalRevenue || 0) + parseFloat(psAgg.totalRevenue || 0)
+        };
+
+        // Get top 5 performing products (combined across sources)
         const topProducts = await ProductStats.findAll({
             where: { productId: { [Op.in]: productIds } },
             include: [{
@@ -367,7 +402,9 @@ router.get('/store/:storeId', utility.authenticate, async (req, res) => {
         });
 
         res.json({
-            summary: aggregateStats || {},
+            summary: combinedSummary,
+            marketplace: mkAgg,
+            privateStore: psAgg,
             topProducts
         });
     } catch (error) {

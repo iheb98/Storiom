@@ -1,4 +1,4 @@
-const { User } = require('./models');
+const { User, Subscription } = require('./models');
 
 const checkSubscription = async (req, res, next) => {
     try {
@@ -17,7 +17,6 @@ const checkSubscription = async (req, res, next) => {
         }
 
         let { activationDate, expirationDate, duration } = user.subscription;
-        let isExpired = false;
         let calculatedExpirationDate = expirationDate;
         if (!expirationDate) {
             const durationMapping = {
@@ -34,8 +33,38 @@ const checkSubscription = async (req, res, next) => {
             }
         }
 
-        if (calculatedExpirationDate && new Date() > new Date(calculatedExpirationDate)) {
-            isExpired = true;
+        const isExpired = calculatedExpirationDate && new Date() > new Date(calculatedExpirationDate);
+
+        // Auto-promote queued plan if current plan expired
+        if (isExpired && user.subscription.nextPlan) {
+            const sub = await Subscription.findOne({ where: { userId } });
+            sub.plan = sub.nextPlan;
+            sub.duration = sub.nextDuration;
+            sub.activationDate = sub.nextActivationDate;
+            sub.expirationDate = sub.nextExpirationDate;
+            sub.paymentDate = new Date();
+            // Clear queue
+            sub.nextPlan = null;
+            sub.nextDuration = null;
+            sub.nextActivationDate = null;
+            sub.nextExpirationDate = null;
+            sub.nextPaymentOrderId = null;
+            await sub.save();
+
+            console.log(`Auto-promoted queued plan for user ${userId}: ${sub.plan} until ${sub.expirationDate}`);
+
+            // Re-check if the promoted plan is also expired
+            const nowAfterPromotion = new Date();
+            if (sub.expirationDate && nowAfterPromotion > new Date(sub.expirationDate)) {
+                return res.status(402).json({
+                    success: false,
+                    subscriptionExpired: true,
+                    message: 'Abonnement expiré. Veuillez renouveler votre abonnement pour continuer.'
+                });
+            }
+
+            req.subscriptionPlan = sub.plan || 'STOCK';
+            return next();
         }
 
         if (isExpired) {

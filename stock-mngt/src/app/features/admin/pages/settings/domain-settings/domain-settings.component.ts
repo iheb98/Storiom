@@ -169,7 +169,8 @@ export class DomainSettingsComponent implements OnInit {
     cartPage: {
       checkoutText: 'Commander',
       showContinueShopping: true,
-      showFreeShipping: true
+      showFreeShipping: true,
+      deliveryCost: 0
     },
     productCard: {
       showCartButton: true,

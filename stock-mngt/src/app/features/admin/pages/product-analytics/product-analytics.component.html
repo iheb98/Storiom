@@ -23,6 +23,19 @@
 
     <!-- Main Content -->
     <div class="analytics-content" *ngIf="!isLoading">
+        <!-- Source Filter Tabs -->
+        <div class="source-tabs">
+            <button class="source-tab" [class.active]="sourceFilter === 'all'" (click)="sourceFilter = 'all'">
+                <span class="tab-dot all"></span> Tout
+            </button>
+            <button class="source-tab" [class.active]="sourceFilter === 'marketplace'" (click)="sourceFilter = 'marketplace'">
+                <span class="tab-dot marketplace"></span> Marketplace
+            </button>
+            <button class="source-tab" [class.active]="sourceFilter === 'private_store'" (click)="sourceFilter = 'private_store'">
+                <span class="tab-dot private-store"></span> Boutique Privée
+            </button>
+        </div>
+
         <!-- Summary Cards -->
         <div class="summary-grid">
             <div class="summary-card views">
@@ -204,27 +217,27 @@
                                 </div>
                             </td>
                             <td class="text-center" data-label="Vues">
-                                <span class="stat-value">{{ product.stats?.viewCount || 0 }}</span>
+                                <span class="stat-value">{{ getProductStats(product)?.viewCount || 0 }}</span>
                             </td>
                             <td class="text-center" data-label="Paniers">
-                                <span class="stat-value">{{ product.stats?.cartAddCount || 0 }}</span>
+                                <span class="stat-value">{{ getProductStats(product)?.cartAddCount || 0 }}</span>
                             </td>
                             <td class="text-center" data-label="Commandes">
-                                <span class="stat-value orders">{{ product.stats?.orderCount || 0 }}</span>
+                                <span class="stat-value orders">{{ getProductStats(product)?.orderCount || 0 }}</span>
                             </td>
                             <td class="text-center" data-label="Favoris">
-                                <span class="stat-value">{{ product.stats?.wishlistCount || 0 }}</span>
+                                <span class="stat-value">{{ getProductStats(product)?.wishlistCount || 0 }}</span>
                             </td>
                             <td class="text-center" data-label="Conversion">
-                                <span class="conversion-badge" [class.good]="getConversionRate(product.stats) >= 5"
-                                    [class.excellent]="getConversionRate(product.stats) >= 10">
-                                    {{ getConversionRate(product.stats) }}%
+                                <span class="conversion-badge" [class.good]="getConversionRate(getProductStats(product)) >= 5"
+                                    [class.excellent]="getConversionRate(getProductStats(product)) >= 10">
+                                    {{ getConversionRate(getProductStats(product)) }}%
                                 </span>
                             </td>
                             <td class="text-center" data-label="Score">
                                 <span class="score-badge"
-                                    [class]="getPerformanceLevel(product.stats?.popularityScore || 0)">
-                                    {{ product.stats?.popularityScore || 0 | number:'1.0-0' }}
+                                    [class]="getPerformanceLevel(getProductStats(product)?.popularityScore || 0)">
+                                    {{ getProductStats(product)?.popularityScore || 0 | number:'1.0-0' }}
                                 </span>
                             </td>
                         </tr>

@@ -67,14 +67,18 @@
             <span>Sous-total ({{ totalItems }} articles)</span>
             <span>{{ totalPrice | number:'1.2-2' }} DT</span>
           </div>
-          <div class="summary-row" *ngIf="showFreeShipping">
+          <div class="summary-row" *ngIf="deliveryCost > 0">
+            <span>Livraison</span>
+            <span>{{ deliveryCost | number:'1.2-2' }} DT</span>
+          </div>
+          <div class="summary-row" *ngIf="deliveryCost === 0 && showFreeShipping">
             <span>Livraison</span>
             <span class="free-shipping">Gratuite</span>
           </div>
           <div class="summary-divider"></div>
           <div class="summary-row total">
             <span>Total</span>
-            <span>{{ totalPrice | number:'1.2-2' }} DT</span>
+            <span>{{ totalWithDelivery | number:'1.2-2' }} DT</span>
           </div>
 
           <button class="checkout-btn" (click)="checkout()" [disabled]="isPreviewMode || placingOrder">
