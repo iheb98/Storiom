@@ -875,6 +875,159 @@
         </div>
       </div>
 
+      <!-- ═══ SEO / RÉFÉRENCEMENT ═══ -->
+      <div class="panel" *ngIf="activeSection === 'seo'">
+        <div class="panel-header">
+          <i class="fa fa-search panel-icon"></i>
+          <div>
+            <h2>SEO / Référencement</h2>
+            <p>Optimisez l'apparence de votre boutique sur Google et les réseaux sociaux</p>
+          </div>
+        </div>
+        <div class="panel-body seo-panel">
+
+          <!-- SEO Score -->
+          <div class="seo-score-bar">
+            <div class="seo-score-info">
+              <span class="seo-score-label">Score SEO</span>
+              <span class="seo-score-value" [class.good]="getSeoScore() >= 70" [class.medium]="getSeoScore() >= 40 && getSeoScore() < 70" [class.low]="getSeoScore() < 40">
+                {{ getSeoScore() }}%
+              </span>
+            </div>
+            <div class="seo-score-track">
+              <div class="seo-score-fill" [style.width.%]="getSeoScore()"
+                   [class.good]="getSeoScore() >= 70" [class.medium]="getSeoScore() >= 40 && getSeoScore() < 70" [class.low]="getSeoScore() < 40"></div>
+            </div>
+            <div class="seo-score-tips">
+              <span [class.done]="theme.seo?.metaTitle"><i class="fa" [class.fa-check]="theme.seo?.metaTitle" [class.fa-times]="!theme.seo?.metaTitle"></i> Titre SEO</span>
+              <span [class.done]="theme.seo?.metaDescription"><i class="fa" [class.fa-check]="theme.seo?.metaDescription" [class.fa-times]="!theme.seo?.metaDescription"></i> Description</span>
+              <span [class.done]="theme.seo?.ogImage"><i class="fa" [class.fa-check]="theme.seo?.ogImage" [class.fa-times]="!theme.seo?.ogImage"></i> Image</span>
+            </div>
+          </div>
+
+          <!-- Live Previews -->
+          <div class="seo-previews">
+            <!-- Google Preview -->
+            <div class="seo-preview-card">
+              <div class="seo-preview-header">
+                <i class="fa fa-google"></i> Aperçu Google
+              </div>
+              <div class="seo-preview-google">
+                <div class="seo-preview-favicon-row">
+                  <div class="seo-preview-favicon">
+                    <img *ngIf="theme.browserTab?.favicon" [src]="backend + '/' + theme.browserTab.favicon" alt="">
+                    <i *ngIf="!theme.browserTab?.favicon" class="fa fa-globe"></i>
+                  </div>
+                  <div>
+                    <div class="seo-preview-site-name">{{ store?.name || 'Votre boutique' }}</div>
+                    <div class="seo-preview-url">{{ customDomain || 'votre-boutique.storiom.com' }}</div>
+                  </div>
+                </div>
+                <div class="seo-preview-title">{{ theme.seo?.metaTitle || store?.name || 'Nom de votre boutique' }}</div>
+                <div class="seo-preview-desc">{{ theme.seo?.metaDescription || store?.description || 'Ajoutez une description pour apparaître ici...' }}</div>
+              </div>
+            </div>
+
+            <!-- Social Preview -->
+            <div class="seo-preview-card social">
+              <div class="seo-preview-header">
+                <i class="fa fa-share-alt"></i> Aperçu réseaux sociaux
+              </div>
+              <div class="seo-preview-social">
+                <div class="social-preview-image" [class.has-image]="theme.seo?.ogImage">
+                  <img *ngIf="theme.seo?.ogImage" [src]="getOgImageUrl()" alt="">
+                  <div class="social-preview-placeholder" *ngIf="!theme.seo?.ogImage">
+                    <i class="fa fa-image"></i>
+                    <span>Aucune image</span>
+                  </div>
+                </div>
+                <div class="social-preview-text">
+                  <div class="social-preview-domain">{{ customDomain || 'storiom.com' }}</div>
+                  <div class="social-preview-title">{{ theme.seo?.metaTitle || store?.name || 'Titre' }}</div>
+                  <div class="social-preview-desc">{{ theme.seo?.metaDescription || 'Description...' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form: Content -->
+          <div class="seo-form-section">
+            <div class="seo-section-title"><i class="fa fa-pencil"></i> Contenu SEO</div>
+
+            <div class="seo-field">
+              <div class="seo-field-top">
+                <label>Titre SEO</label>
+                <span class="seo-char-count" [class.warn]="(theme.seo?.metaTitle?.length || 0) > 60" [class.danger]="(theme.seo?.metaTitle?.length || 0) > 65">
+                  {{ theme.seo?.metaTitle?.length || 0 }}<span class="seo-char-max">/70</span>
+                </span>
+              </div>
+              <input type="text" class="seo-input" [(ngModel)]="theme.seo.metaTitle"
+                     placeholder="Ex: Boutique Ahmed - Mode & Accessoires à Tunis" maxlength="70">
+              <div class="seo-field-desc">Apparaît en bleu dans Google. Idéalement 50-60 caractères.</div>
+            </div>
+
+            <div class="seo-field">
+              <div class="seo-field-top">
+                <label>Description SEO</label>
+                <span class="seo-char-count" [class.warn]="(theme.seo?.metaDescription?.length || 0) > 150" [class.danger]="(theme.seo?.metaDescription?.length || 0) > 155">
+                  {{ theme.seo?.metaDescription?.length || 0 }}<span class="seo-char-max">/160</span>
+                </span>
+              </div>
+              <textarea class="seo-input seo-textarea" [(ngModel)]="theme.seo.metaDescription"
+                        placeholder="Ex: Découvrez notre collection exclusive de vêtements et accessoires. Livraison rapide en Tunisie."
+                        maxlength="160" rows="3"></textarea>
+              <div class="seo-field-desc">Texte gris sous le titre dans Google. 1-2 phrases qui donnent envie de cliquer.</div>
+            </div>
+          </div>
+
+          <!-- Form: OG Image -->
+          <div class="seo-form-section">
+            <div class="seo-section-title"><i class="fa fa-image"></i> Image de partage</div>
+            <div class="seo-field-desc" style="margin-bottom: 12px;">Affichée lorsque votre boutique est partagée sur Facebook, WhatsApp, Twitter...</div>
+
+            <div class="og-image-preview" *ngIf="theme.seo?.ogImage">
+              <img [src]="getOgImageUrl()" alt="Image de partage">
+              <div class="og-preview-overlay">
+                <button class="og-action-btn" (click)="theme.seo.ogImage = ''"><i class="fa fa-trash"></i> Supprimer</button>
+              </div>
+            </div>
+
+            <div class="og-input-group" *ngIf="!theme.seo?.ogImage">
+              <div class="og-upload-zone" (click)="ogFileInput.click()"
+                   (dragover)="$event.preventDefault()" (drop)="onOgImageDrop($event)"
+                   [class.uploading]="isUploadingOgImage">
+                <div class="og-upload-icon">
+                  <i class="fa fa-cloud-upload" *ngIf="!isUploadingOgImage"></i>
+                  <i class="fa fa-spinner fa-spin" *ngIf="isUploadingOgImage"></i>
+                </div>
+                <div class="og-upload-text">
+                  <span *ngIf="!isUploadingOgImage">Glissez une image ici ou <strong>parcourir</strong></span>
+                  <span *ngIf="isUploadingOgImage">Upload en cours...</span>
+                </div>
+                <span class="og-upload-hint">1200×630px recommandé • JPG, PNG, WebP</span>
+              </div>
+              <input #ogFileInput type="file" accept="image/*" hidden (change)="uploadOgImage($event)">
+              <div class="og-separator"><span>ou coller un lien</span></div>
+              <input type="text" class="seo-input" [(ngModel)]="theme.seo.ogImage" placeholder="https://exemple.com/mon-image.jpg">
+            </div>
+          </div>
+
+          <!-- Help Card -->
+          <div class="seo-help-card">
+            <div class="seo-help-icon"><i class="fa fa-lightbulb-o"></i></div>
+            <div class="seo-help-content">
+              <h4>Conseils SEO</h4>
+              <ul>
+                <li>Champs vides = nom et description de votre boutique utilisés automatiquement</li>
+                <li>Un bon titre : <strong>Marque</strong> + <strong>Activité</strong> + <strong>Ville</strong></li>
+                <li>L'image de partage améliore les clics de <strong>+40%</strong> sur les réseaux</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </main>
   </div>
   </ng-container>

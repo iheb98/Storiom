@@ -191,6 +191,12 @@ export class DomainSettingsComponent implements OnInit {
     browserTab: {
       title: '',
       favicon: ''
+    },
+    seo: {
+      metaTitle: '',
+      metaDescription: '',
+      ogImage: '',
+      keywords: ''
     }
   };
   isSavingTheme = false;
@@ -288,7 +294,8 @@ export class DomainSettingsComponent implements OnInit {
       label: '',
       items: [
         { key: 'domain', label: 'Domaine', icon: 'globe' },
-        { key: 'browserTab', label: 'Onglet navigateur', icon: 'tag' }
+        { key: 'browserTab', label: 'Onglet navigateur', icon: 'tag' },
+        { key: 'seo', label: 'SEO / Référencement', icon: 'search' }
       ]
     },
     {
@@ -326,7 +333,8 @@ export class DomainSettingsComponent implements OnInit {
     {
       label: '',
       items: [
-        { key: 'visibility', label: 'Visibilité', icon: 'eye' }
+        { key: 'visibility', label: 'Visibilité', icon: 'eye' },
+
       ]
     }
   ];
@@ -376,7 +384,7 @@ export class DomainSettingsComponent implements OnInit {
     private authService: AuthService,
     private toastService: ToastService,
     private fileService: FileService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.storeId = this.authService.getConnectedUser()?.store;
@@ -698,5 +706,76 @@ export class DomainSettingsComponent implements OnInit {
     if (this.theme.browserTab) {
       this.theme.browserTab.favicon = '';
     }
+  }
+
+  // ── SEO OG Image Upload ──
+  isUploadingOgImage = false;
+
+  uploadOgImage(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    this.doUploadOgImage(input.files[0]);
+    input.value = '';
+  }
+
+  onOgImageDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.dataTransfer?.files) {
+      const file = Array.from(event.dataTransfer.files).find(f => f.type.startsWith('image/'));
+      if (file) this.doUploadOgImage(file);
+    }
+  }
+
+  private doUploadOgImage(file: File): void {
+    const userId = this.authService.getConnectedUser()?.id || 'og';
+    const fileName = `og-${userId}-${Date.now()}${file.name.substring(file.name.lastIndexOf('.'))}`;
+    const formData = new FormData();
+    formData.set('file', file, fileName);
+
+    this.isUploadingOgImage = true;
+    this.fileService.uploadFile(formData).subscribe(
+      res => {
+        this.isUploadingOgImage = false;
+        if (!this.theme.seo) this.theme.seo = { metaTitle: '', metaDescription: '', ogImage: '', keywords: '' };
+        this.theme.seo.ogImage = res.fileUrl.split('/').pop();
+        this.toastService.showSuccess('Image ajoutée');
+      },
+      () => {
+        this.isUploadingOgImage = false;
+        this.toastService.showError('Erreur lors de l\'upload');
+      }
+    );
+  }
+
+  getOgImageUrl(): string {
+    const img = this.theme.seo?.ogImage || '';
+    if (!img) return '';
+    if (img.startsWith('http')) return img;
+    return `${this.backend}/${img}`;
+  }
+
+  getSeoScore(): number {
+    let score = 0;
+    const seo = this.theme.seo || {};
+
+    // Title: 40 points max
+    if (seo.metaTitle) {
+      score += 25;
+      if (seo.metaTitle.length >= 30 && seo.metaTitle.length <= 60) score += 15; // optimal length
+      else if (seo.metaTitle.length > 0) score += 5;
+    }
+
+    // Description: 40 points max
+    if (seo.metaDescription) {
+      score += 25;
+      if (seo.metaDescription.length >= 80 && seo.metaDescription.length <= 155) score += 15;
+      else if (seo.metaDescription.length > 0) score += 5;
+    }
+
+    // OG Image: 20 points
+    if (seo.ogImage) score += 20;
+
+    return Math.min(100, score);
   }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
+import { Title, Meta } from '@angular/platform-browser';
 import { environment } from 'src/environments/environment';
 import { ProductService } from 'src/app/core/services/product.service';
 import { PublicService } from 'src/app/core/services/public.service';
@@ -91,6 +92,8 @@ export class StoreViewProductComponent implements OnInit {
     private toastService: ToastService,
     private domainService: DomainService,
     private storeAuth: StoreAuthService,
+    private titleService: Title,
+    private metaService: Meta,
     private location: Location,
     private cdr: ChangeDetectorRef
   ) { }
@@ -162,6 +165,9 @@ export class StoreViewProductComponent implements OnInit {
         this.isDefaultImage = true;
       }
       this.isLoading = false;
+
+      // SEO meta tags
+      this.updateProductSeoTags();
 
       // Load store-specific reviews
       this.isCustomerLoggedIn = this.storeAuth.isLoggedIn();
@@ -415,6 +421,31 @@ export class StoreViewProductComponent implements OnInit {
         next: () => { this.isInWishlist = true; this.toastService.showSuccess('Ajouté aux favoris'); },
         error: () => this.toastService.showError('Échec de l\'ajout')
       });
+    }
+  }
+
+  private updateProductSeoTags(): void {
+    if (!this.product) return;
+    const productName = this.product.name || 'Produit';
+    const storeName = this.product.store?.name || '';
+    const title = storeName ? `${productName} - ${storeName}` : productName;
+    const description = this.product.description
+      ? this.product.description.replace(/<[^>]*>/g, '').substring(0, 160)
+      : `${productName} disponible sur ${storeName || 'Storiom'}`;
+    const imageUrl = this.selectedImage && !this.isDefaultImage ? this.selectedImage : '';
+
+    this.titleService.setTitle(title);
+    this.metaService.updateTag({ name: 'description', content: description });
+    this.metaService.updateTag({ property: 'og:title', content: title });
+    this.metaService.updateTag({ property: 'og:description', content: description });
+    this.metaService.updateTag({ property: 'og:type', content: 'product' });
+    if (imageUrl) {
+      this.metaService.updateTag({ property: 'og:image', content: imageUrl });
+    }
+    // Product price for rich snippets
+    if (this.product.sellPrice) {
+      this.metaService.updateTag({ property: 'product:price:amount', content: this.product.sellPrice.toString() });
+      this.metaService.updateTag({ property: 'product:price:currency', content: 'TND' });
     }
   }
 }

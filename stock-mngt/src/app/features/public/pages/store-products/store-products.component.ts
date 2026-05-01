@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 import { PublicService } from 'src/app/core/services/public.service';
 import { CartService } from 'src/app/core/services/cart.service';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -64,7 +65,9 @@ export class StoreProductsComponent implements OnInit {
     private cartService: CartService,
     private authService: AuthService,
     private productService: ProductService,
-    private domainService: DomainService
+    private domainService: DomainService,
+    private titleService: Title,
+    private metaService: Meta
   ) {}
 
   ngOnInit(): void {
@@ -256,6 +259,13 @@ export class StoreProductsComponent implements OnInit {
       }
       this.themeLoaded = true;
       this.loadProducts();
+
+      // SEO
+      const storeName = store.name || 'Boutique';
+      this.titleService.setTitle(`Produits - ${storeName}`);
+      this.metaService.updateTag({ name: 'description', content: `Découvrez tous les produits de ${storeName}` });
+      this.metaService.updateTag({ property: 'og:title', content: `Produits - ${storeName}` });
+      this.metaService.updateTag({ property: 'og:type', content: 'website' });
     });
   }
 }

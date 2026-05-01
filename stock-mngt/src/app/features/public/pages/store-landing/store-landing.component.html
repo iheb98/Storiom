@@ -20,7 +20,7 @@
       <div class="hero-split-image" *ngIf="getHeroImages().length > 0">
         <div class="hero-split-carousel">
           <img *ngFor="let img of getHeroImages(); let i = index"
-            [class.active]="i === currentHeroSlide" [src]="environment.backend + '/' + img" alt="Banner">
+            [class.active]="i === currentHeroSlide" [src]="environment.backend + '/' + img" [alt]="store?.name + ' - Bannière ' + (i + 1)">
         </div>
         <div class="hero-indicators" *ngIf="getHeroImages().length > 1">
           <button *ngFor="let img of getHeroImages(); let i = index" class="hero-indicator"
@@ -73,7 +73,7 @@
       <!-- Image Carousel -->
       <div class="hero-carousel" *ngIf="getHeroImages().length > 0">
         <img *ngFor="let img of getHeroImages(); let i = index" class="hero-slide-img"
-          [class.active]="i === currentHeroSlide" [src]="environment.backend + '/' + img" alt="Banner">
+          [class.active]="i === currentHeroSlide" [src]="environment.backend + '/' + img" [alt]="store?.name + ' - Bannière ' + (i + 1)">
         <!-- Overlay -->
         <div class="hero-overlay" [style.opacity]="themeConfig.hero.overlayOpacity ?? 0.5"></div>
         <!-- Carousel Indicators -->
@@ -169,7 +169,7 @@
           <p>{{ themeConfig.about.content }}</p>
         </div>
         <div class="about-image" *ngIf="themeConfig.about.image">
-          <img [src]="environment.backend + '/' + themeConfig.about.image" alt="About">
+          <img [src]="environment.backend + '/' + themeConfig.about.image" [alt]="(themeConfig.about.title || 'Notre histoire') + ' - ' + store?.name">
         </div>
       </div>
     </div>

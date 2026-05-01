@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Title, Meta } from '@angular/platform-browser';
 import { DomainService, DomainStore } from 'src/app/core/services/domain.service';
 import { PublicService } from 'src/app/core/services/public.service';
 import { AuthService } from 'src/app/core/services/auth.service';
@@ -93,6 +94,8 @@ export class StoreLandingComponent implements OnInit, OnDestroy {
     private cartService: CartService,
     private productService: ProductService,
     private toastService: ToastService,
+    private titleService: Title,
+    private metaService: Meta,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -111,6 +114,7 @@ export class StoreLandingComponent implements OnInit, OnDestroy {
       this.currentStoreId = this.domainService.storeId;
       this.store = this.domainService.currentStore;
       this.applyTheme(this.store.theme);
+      this.updateSeoTags();
       this.loadFeaturedProducts();
       this.loadCategories();
     }
@@ -170,6 +174,7 @@ export class StoreLandingComponent implements OnInit, OnDestroy {
           isSupportingDeliveries: storeData.isSupportingDeliveries
         };
         this.applyTheme(this.store.theme);
+        this.updateSeoTags();
         this.loadFeaturedProducts();
         this.loadCategories();
       },
@@ -300,5 +305,31 @@ export class StoreLandingComponent implements OnInit, OnDestroy {
 
   formatAddress(...parts: string[]): string {
     return parts.filter(p => !!p).join(', ');
+  }
+
+  private updateSeoTags(): void {
+    if (!this.store) return;
+    const seo = this.themeConfig?.seo || {};
+    const storeName = this.store.name || 'Boutique';
+
+    // Use custom SEO fields if set, otherwise fall back to store data
+    const title = seo.metaTitle || storeName;
+    const description = seo.metaDescription
+      || (this.store.description ? this.store.description.substring(0, 160) : `Découvrez ${storeName} sur Storiom`);
+    const ogImageRaw = seo.ogImage
+      || (this.store.logo ? this.store.logo : '');
+    // Resolve: full URL stays as-is, uploaded filename gets backend prefix
+    const ogImage = ogImageRaw
+      ? (ogImageRaw.startsWith('http') ? ogImageRaw : `${environment.backend}/${ogImageRaw}`)
+      : '';
+
+    this.titleService.setTitle(title);
+    this.metaService.updateTag({ name: 'description', content: description });
+    this.metaService.updateTag({ property: 'og:title', content: title });
+    this.metaService.updateTag({ property: 'og:description', content: description });
+    this.metaService.updateTag({ property: 'og:type', content: 'website' });
+    if (ogImage) {
+      this.metaService.updateTag({ property: 'og:image', content: ogImage });
+    }
   }
 }

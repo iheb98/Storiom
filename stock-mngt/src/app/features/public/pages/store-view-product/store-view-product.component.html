@@ -53,7 +53,7 @@
             <div class="thumbnails" *ngIf="product?.images?.length > 1">
                 <button class="thumb" *ngFor="let img of product.images; let i = index"
                     [class.active]="selectedImageIndex === i" (click)="selectImage(i)">
-                    <img [src]="environment.backend + '/' + img" [alt]="'Image ' + (i + 1)">
+                    <img [src]="environment.backend + '/' + img" [alt]="product?.name + ' - Photo ' + (i + 1)">
                 </button>
             </div>
         </div>

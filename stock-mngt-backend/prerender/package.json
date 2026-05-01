@@ -1,0 +1,13 @@
+{
+  "name": "storiom-prerender",
+  "version": "1.0.0",
+  "description": "Prerender service for SEO - renders store pages for search engine crawlers",
+  "main": "prerender-server.js",
+  "scripts": {
+    "start": "node prerender-server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "puppeteer": "^21.0.0"
+  }
+}
