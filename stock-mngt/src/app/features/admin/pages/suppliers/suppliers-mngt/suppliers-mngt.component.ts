@@ -64,13 +64,14 @@ export class SuppliersMngtComponent implements OnInit {
       document.body.scrollTop = 0;
       document.documentElement.scrollTop = 0;
     }, 0);
+    this.restoreFiltersState();
     this.loadData();
   }
 
   loadData() {
     this.isLoading = true;
     Promise.all([
-      this.getSuppliers(0, 5),
+      this.getSuppliers(this.currentPage, this.currentSize),
       this.countSuppliers()
     ]).then(() => {
       this.isLoading = false;
@@ -98,10 +99,12 @@ export class SuppliersMngtComponent implements OnInit {
     this.phoneFilter = '';
     this.minCreditFilter = null;
     this.maxCreditFilter = null;
+    this.clearFiltersState();
     this.filter();
   }
 
   create() {
+    this.saveFiltersState();
     this.router.navigate(['/suppliers/add']);
   }
 
@@ -193,6 +196,7 @@ export class SuppliersMngtComponent implements OnInit {
   }
 
   editSupplier(supplier: any) {
+    this.saveFiltersState();
     this.router.navigate(['suppliers/edit/' + supplier.id]);
   }
 
@@ -203,5 +207,49 @@ export class SuppliersMngtComponent implements OnInit {
     this.getSuppliers(this.currentPage, this.currentSize).then(() => {
       this.isLoading = false;
     });
+  }
+
+  // ========================================
+  // Filter State Persistence
+  // ========================================
+  private readonly STORAGE_KEY = 'suppliers_filters_state';
+
+  private saveFiltersState() {
+    const state = {
+      firstNameFilter: this.firstNameFilter,
+      lastNameFilter: this.lastNameFilter,
+      emailFilter: this.emailFilter,
+      phoneFilter: this.phoneFilter,
+      minCreditFilter: this.minCreditFilter,
+      maxCreditFilter: this.maxCreditFilter,
+      currentPage: this.currentPage,
+      currentSize: this.currentSize,
+      filtersCollapsed: this.filtersCollapsed
+    };
+    sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+  }
+
+  private restoreFiltersState() {
+    const saved = sessionStorage.getItem(this.STORAGE_KEY);
+    if (!saved) return;
+    try {
+      const state = JSON.parse(saved);
+      this.firstNameFilter = state.firstNameFilter || '';
+      this.lastNameFilter = state.lastNameFilter || '';
+      this.emailFilter = state.emailFilter || '';
+      this.phoneFilter = state.phoneFilter || '';
+      this.minCreditFilter = state.minCreditFilter ?? null;
+      this.maxCreditFilter = state.maxCreditFilter ?? null;
+      this.currentPage = state.currentPage ?? 0;
+      this.currentSize = state.currentSize ?? 5;
+      this.filtersCollapsed = state.filtersCollapsed ?? true;
+      sessionStorage.removeItem(this.STORAGE_KEY);
+    } catch (e) {
+      sessionStorage.removeItem(this.STORAGE_KEY);
+    }
+  }
+
+  private clearFiltersState() {
+    sessionStorage.removeItem(this.STORAGE_KEY);
   }
 }

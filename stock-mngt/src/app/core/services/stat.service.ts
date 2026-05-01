@@ -53,11 +53,21 @@ export class StatService {
     });
   }
 
-  generateReport(id, from, to): Observable<any> {
+  generateReport(id, from, to, reportType = 'sales', includeDeleted = false): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'store/' + id + '/generate-report', {
       params: {
         from,
-        to
+        to,
+        reportType,
+        includeDeleted: includeDeleted.toString()
+      }
+    });
+  }
+
+  exportStock(id, includeDeleted = false): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'store/' + id + '/export-stock', {
+      params: {
+        includeDeleted: includeDeleted.toString()
       }
     });
   }

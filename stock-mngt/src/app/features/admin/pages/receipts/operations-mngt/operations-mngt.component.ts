@@ -87,6 +87,7 @@ export class OperationsMngtComponent implements OnInit {
       document.body.scrollTop = 0;
       document.documentElement.scrollTop = 0;
     }, 0);
+    this.restoreFiltersState();
     this.loadData();
   }
 
@@ -100,7 +101,7 @@ export class OperationsMngtComponent implements OnInit {
     this.getSuppliers();
 
     Promise.all([
-      this.getOperations(0, 5),
+      this.getOperations(this.currentPage, this.currentSize),
       this.countOperations()
     ]).then(() => {
       this.isLoading = false;
@@ -188,6 +189,7 @@ export class OperationsMngtComponent implements OnInit {
     this.toDateFilter = null;
     this.productName = null;
     this.typeFilter = null;
+    this.clearFiltersState();
     this.filter();
   }
 
@@ -254,10 +256,66 @@ export class OperationsMngtComponent implements OnInit {
   }
 
   viewOperation(receipt) {
+    this.saveFiltersState();
     this.router.navigate(['operations/view/' + receipt.id]);
   }
 
   editOperation(operation: any) {
+    this.saveFiltersState();
     this.router.navigate(['operations/edit/' + operation.id]);
+  }
+
+  // ========================================
+  // Filter State Persistence
+  // ========================================
+  private readonly STORAGE_KEY = 'operations_filters_state';
+
+  private saveFiltersState() {
+    const state = {
+      minTotalFilter: this.minTotalFilter,
+      maxTotalFilter: this.maxTotalFilter,
+      minPriceFilter: this.minPriceFilter,
+      maxPriceFilter: this.maxPriceFilter,
+      minAmountFilter: this.minAmountFilter,
+      maxAmountFilter: this.maxAmountFilter,
+      fromDateFilter: this.fromDateFilter,
+      toDateFilter: this.toDateFilter,
+      productName: this.productName,
+      typeFilter: this.typeFilter,
+      currentPage: this.currentPage,
+      currentSize: this.currentSize,
+      filtersCollapsed: this.filtersCollapsed
+    };
+    sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+  }
+
+  private restoreFiltersState() {
+    const saved = sessionStorage.getItem(this.STORAGE_KEY);
+    if (!saved) return;
+
+    try {
+      const state = JSON.parse(saved);
+      this.minTotalFilter = state.minTotalFilter ?? null;
+      this.maxTotalFilter = state.maxTotalFilter ?? null;
+      this.minPriceFilter = state.minPriceFilter ?? null;
+      this.maxPriceFilter = state.maxPriceFilter ?? null;
+      this.minAmountFilter = state.minAmountFilter ?? null;
+      this.maxAmountFilter = state.maxAmountFilter ?? null;
+      this.fromDateFilter = state.fromDateFilter ?? null;
+      this.toDateFilter = state.toDateFilter ?? null;
+      this.productName = state.productName ?? null;
+      this.typeFilter = state.typeFilter ?? null;
+      this.currentPage = state.currentPage ?? 0;
+      this.currentSize = state.currentSize ?? 5;
+      this.filtersCollapsed = state.filtersCollapsed ?? true;
+
+      sessionStorage.removeItem(this.STORAGE_KEY);
+    } catch (e) {
+      sessionStorage.removeItem(this.STORAGE_KEY);
+    }
+  }
+
+  private clearFiltersState() {
+    sessionStorage.removeItem(this.STORAGE_KEY);
   }
 }

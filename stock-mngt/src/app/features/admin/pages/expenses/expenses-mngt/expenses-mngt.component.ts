@@ -63,13 +63,14 @@ export class ExpensesMngtComponent implements OnInit {
       document.body.scrollTop = 0;
       document.documentElement.scrollTop = 0;
     }, 0);
+    this.restoreFiltersState();
     this.loadData();
   }
 
   loadData() {
     this.isLoading = true;
     Promise.all([
-      this.getExpenses(0, 5),
+      this.getExpenses(this.currentPage, this.currentSize),
       this.countExpenses()
     ]).then(() => {
       this.isLoading = false;
@@ -97,6 +98,7 @@ export class ExpensesMngtComponent implements OnInit {
     this.maxAmountFilter = null;
     this.fromDateFilter = null;
     this.toDateFilter = null;
+    this.clearFiltersState();
     this.filter();
   }
 
@@ -118,6 +120,7 @@ export class ExpensesMngtComponent implements OnInit {
   }
 
   create() {
+    this.saveFiltersState();
     this.router.navigate(['/expenses/add']);
   }
 
@@ -199,6 +202,7 @@ export class ExpensesMngtComponent implements OnInit {
   }
 
   editExpense(expense: any) {
+    this.saveFiltersState();
     this.router.navigate(['expenses/' + expense.id]);
   }
 
@@ -209,5 +213,49 @@ export class ExpensesMngtComponent implements OnInit {
     this.getExpenses(this.currentPage, this.currentSize).then(() => {
       this.isLoading = false;
     });
+  }
+
+  // ========================================
+  // Filter State Persistence
+  // ========================================
+  private readonly STORAGE_KEY = 'expenses_filters_state';
+
+  private saveFiltersState() {
+    const state = {
+      titleFilter: this.titleFilter,
+      commentFilter: this.commentFilter,
+      minAmountFilter: this.minAmountFilter,
+      maxAmountFilter: this.maxAmountFilter,
+      fromDateFilter: this.fromDateFilter,
+      toDateFilter: this.toDateFilter,
+      currentPage: this.currentPage,
+      currentSize: this.currentSize,
+      filtersCollapsed: this.filtersCollapsed
+    };
+    sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+  }
+
+  private restoreFiltersState() {
+    const saved = sessionStorage.getItem(this.STORAGE_KEY);
+    if (!saved) return;
+    try {
+      const state = JSON.parse(saved);
+      this.titleFilter = state.titleFilter || '';
+      this.commentFilter = state.commentFilter || '';
+      this.minAmountFilter = state.minAmountFilter ?? null;
+      this.maxAmountFilter = state.maxAmountFilter ?? null;
+      this.fromDateFilter = state.fromDateFilter ?? null;
+      this.toDateFilter = state.toDateFilter ?? null;
+      this.currentPage = state.currentPage ?? 0;
+      this.currentSize = state.currentSize ?? 5;
+      this.filtersCollapsed = state.filtersCollapsed ?? true;
+      sessionStorage.removeItem(this.STORAGE_KEY);
+    } catch (e) {
+      sessionStorage.removeItem(this.STORAGE_KEY);
+    }
+  }
+
+  private clearFiltersState() {
+    sessionStorage.removeItem(this.STORAGE_KEY);
   }
 }

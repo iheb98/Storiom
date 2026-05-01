@@ -66,6 +66,7 @@ export class UserSettingsComponent implements OnInit {
             mode: ['light'],
             productVisibleToPublic: [true],
             productToDisplay: [true],
+            showBuyingPrice: [false],
             defaultScreen: ['dashboard']
         });
     }
@@ -108,6 +109,7 @@ export class UserSettingsComponent implements OnInit {
             mode: settings.theme?.mode || 'light',
             productVisibleToPublic: settings.defaults?.productVisibleToPublic ?? true,
             productToDisplay: settings.defaults?.productToDisplay ?? true,
+            showBuyingPrice: settings.defaults?.showBuyingPrice ?? false,
             defaultScreen: settings.navigation?.defaultScreen || 'dashboard'
         });
     }
@@ -129,7 +131,8 @@ export class UserSettingsComponent implements OnInit {
             },
             defaults: {
                 productVisibleToPublic: formValues.productVisibleToPublic,
-                productToDisplay: formValues.productToDisplay
+                productToDisplay: formValues.productToDisplay,
+                showBuyingPrice: formValues.showBuyingPrice
             },
             navigation: {
                 defaultScreen: formValues.defaultScreen

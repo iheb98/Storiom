@@ -66,6 +66,21 @@
                         </label>
                     </div>
 
+                    <div class="setting-item toggle-item">
+                        <div class="toggle-info">
+                            <fa-icon
+                                [icon]="settingsForm.get('showBuyingPrice').value ? faEye : faEyeSlash"></fa-icon>
+                            <div>
+                                <label>Afficher le prix d'achat</label>
+                                <p>Afficher le prix d'achat sur les cartes produits dans la page de gestion</p>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" formControlName="showBuyingPrice">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
                 </div>
             </div>
 

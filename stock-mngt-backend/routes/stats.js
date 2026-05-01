@@ -758,12 +758,17 @@ router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => 
 
 router.get('/store/:id/generate-report', utility.authenticate, checkSubscription, async (req, res) => {
     try {
-        const { from, to } = req.query;
+        const { from, to, reportType, includeDeleted } = req.query;
 
         // Validate date inputs
         if (!from || !to) {
             return res.status(400).json({ message: "Please provide 'from' and 'to' date parameters." });
         }
+
+        // Determine operation types based on reportType
+        const type = reportType === 'load' ? 'LOADED'
+                   : reportType === 'both' ? ['SOLD', 'LOADED']
+                   : 'SOLD'; // default: sales
 
         // Fetch operations within date range
         const operations = await Operation.findAll({
@@ -772,22 +777,23 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
                     [Op.between]: [new Date(from), new Date(to)]
                 },
                 creatorUserId: req.user.id,
-                type: "SOLD",
+                type,
                 [Op.or]: [
                     { '$receipt.visible$': true },
-                    { receiptId: null } // Adjust if your FK is named differently
+                    { receiptId: null }
                 ]
             },
             include: [
                 {
                     model: Product,
                     as: 'product',
-                    attributes: ['name', 'buyingPrice', 'sellingPrice']
+                    attributes: ['name', 'buyingPrice', 'sellingPrice'],
+                    where: includeDeleted === 'true' ? {} : { isVisible: true }
                 },
                 {
                     model: Receipt,
                     as: 'receipt',
-                    required: false, // important to allow null receipts
+                    required: false,
                     attributes: []
                 }
             ]
@@ -800,20 +806,29 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
 
         // Calculate report data
         let totalEarnings = 0;
+        let totalCost = 0;
         let totalReceipts = new Set();
         let totalProductsSold = 0;
+        let totalProductsLoaded = 0;
 
         const groupedOperations = {};
 
         operations.forEach(op => {
-            const { productId, amount, price, receiptId, product } = op;
+            const { productId, amount, price, receiptId, product, type: opType } = op;
             if (product) {
-                const revenue = amount * (product.sellingPrice || 0);
-                const cost = amount * (product.buyingPrice || 0);
-                const earnings = revenue - cost;
+                if (opType === 'SOLD') {
+                    const revenue = amount * (product.sellingPrice || 0);
+                    const cost = amount * (product.buyingPrice || 0);
+                    const earnings = revenue - cost;
 
-                totalEarnings += earnings;
-                totalProductsSold += amount;
+                    totalEarnings += earnings;
+                    totalProductsSold += amount;
+                } else if (opType === 'LOADED') {
+                    const loadCost = amount * (price || product.buyingPrice || 0);
+                    totalCost += loadCost;
+                    totalProductsLoaded += amount;
+                }
+
                 totalReceipts.add(receiptId);
 
                 // Group operations by product
@@ -823,12 +838,19 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
                         buyingPrice: product.buyingPrice || 0,
                         sellingPrice: product.sellingPrice || 0,
                         quantitySold: 0,
-                        earnings: 0
+                        quantityLoaded: 0,
+                        earnings: 0,
+                        loadCost: 0
                     };
                 }
 
-                groupedOperations[productId].quantitySold += amount;
-                groupedOperations[productId].earnings += earnings;
+                if (opType === 'SOLD') {
+                    groupedOperations[productId].quantitySold += amount;
+                    groupedOperations[productId].earnings += (amount * (product.sellingPrice || 0)) - (amount * (product.buyingPrice || 0));
+                } else if (opType === 'LOADED') {
+                    groupedOperations[productId].quantityLoaded += amount;
+                    groupedOperations[productId].loadCost += amount * (price || product.buyingPrice || 0);
+                }
             }
         });
 
@@ -836,15 +858,89 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
         const report = {
             from,
             to,
+            reportType: reportType || 'sales',
             totalEarnings,
+            totalCost,
             numberOfReceipts: totalReceipts.size,
             numberOfProductsSold: totalProductsSold,
+            numberOfProductsLoaded: totalProductsLoaded,
             products: Object.values(groupedOperations)
         };
 
         res.json(report);
     } catch (error) {
         console.error("Error generating report:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+
+
+router.get('/store/:id/export-stock', utility.authenticate, checkSubscription, async (req, res) => {
+    try {
+        const { includeDeleted } = req.query;
+
+        const whereClause = {
+            creatorUserId: req.user.id,
+        };
+
+        if (includeDeleted !== 'true') {
+            whereClause.isVisible = true;
+        }
+
+        const products = await Product.findAll({
+            where: whereClause,
+            attributes: ['id', 'name', 'code', 'buyingPrice', 'sellingPrice', 'quantity', 'isVisible'],
+            include: [
+                {
+                    model: Category,
+                    as: 'category',
+                    attributes: ['name'],
+                    required: false
+                }
+            ],
+            order: [['name', 'ASC']]
+        });
+
+        let totalBuyingValue = 0;
+        let totalSellingValue = 0;
+        let totalProducts = 0;
+        let totalQuantity = 0;
+
+        const formattedProducts = products.map(p => {
+            const qty = p.quantity || 0;
+            const bp = p.buyingPrice || 0;
+            const sp = p.sellingPrice || 0;
+            const totalBuying = qty * bp;
+            const totalSelling = qty * sp;
+
+            totalBuyingValue += totalBuying;
+            totalSellingValue += totalSelling;
+            totalProducts++;
+            totalQuantity += qty;
+
+            return {
+                productName: p.name,
+                code: p.code || '',
+                category: p.category ? p.category.name : 'Non classé',
+                buyingPrice: bp,
+                sellingPrice: sp,
+                quantity: qty,
+                totalBuying,
+                totalSelling,
+                isVisible: p.isVisible
+            };
+        });
+
+        res.json({
+            totalProducts,
+            totalQuantity,
+            totalBuyingValue,
+            totalSellingValue,
+            netStockValue: totalSellingValue - totalBuyingValue,
+            products: formattedProducts
+        });
+    } catch (error) {
+        console.error("Error exporting stock:", error);
         res.status(500).json({ message: "Server error" });
     }
 });

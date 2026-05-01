@@ -69,13 +69,14 @@ export class CreditsMngtComponent implements OnInit {
       document.body.scrollTop = 0;
       document.documentElement.scrollTop = 0;
     }, 0);
+    this.restoreFiltersState();
     this.loadData();
   }
 
   loadData() {
     this.isLoading = true;
     Promise.all([
-      this.getBorrowers(0, 5),
+      this.getBorrowers(this.currentPage, this.currentSize),
       this.countBorrowers()
     ]).then(() => {
       this.isLoading = false;
@@ -108,6 +109,7 @@ export class CreditsMngtComponent implements OnInit {
     this.fromReturnDateFilter = null;
     this.toReturnDateFilter = null;
     this.statusFilter = null;
+    this.clearFiltersState();
     this.filter();
   }
 
@@ -139,6 +141,7 @@ export class CreditsMngtComponent implements OnInit {
   }
 
   create() {
+    this.saveFiltersState();
     this.router.navigate(['/credits/add']);
   }
 
@@ -220,6 +223,7 @@ export class CreditsMngtComponent implements OnInit {
   }
 
   editBorrower(borrower: any) {
+    this.saveFiltersState();
     this.router.navigate(['/admin/credits/edit/' + borrower.id]);
   }
 
@@ -230,5 +234,59 @@ export class CreditsMngtComponent implements OnInit {
     this.getBorrowers(this.currentPage, this.currentSize).then(() => {
       this.isLoading = false;
     });
+  }
+
+  // ========================================
+  // Filter State Persistence
+  // ========================================
+  private readonly STORAGE_KEY = 'credits_filters_state';
+
+  private saveFiltersState() {
+    const state = {
+      firstNameFilter: this.firstNameFilter,
+      lastNameFilter: this.lastNameFilter,
+      emailFilter: this.emailFilter,
+      phoneFilter: this.phoneFilter,
+      minAmountFilter: this.minAmountFilter,
+      maxAmountFilter: this.maxAmountFilter,
+      fromGivenDateFilter: this.fromGivenDateFilter,
+      toGivenDateFilter: this.toGivenDateFilter,
+      fromReturnDateFilter: this.fromReturnDateFilter,
+      toReturnDateFilter: this.toReturnDateFilter,
+      statusFilter: this.statusFilter,
+      currentPage: this.currentPage,
+      currentSize: this.currentSize,
+      filtersCollapsed: this.filtersCollapsed
+    };
+    sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+  }
+
+  private restoreFiltersState() {
+    const saved = sessionStorage.getItem(this.STORAGE_KEY);
+    if (!saved) return;
+    try {
+      const state = JSON.parse(saved);
+      this.firstNameFilter = state.firstNameFilter || '';
+      this.lastNameFilter = state.lastNameFilter || '';
+      this.emailFilter = state.emailFilter || '';
+      this.phoneFilter = state.phoneFilter || '';
+      this.minAmountFilter = state.minAmountFilter ?? null;
+      this.maxAmountFilter = state.maxAmountFilter ?? null;
+      this.fromGivenDateFilter = state.fromGivenDateFilter ?? null;
+      this.toGivenDateFilter = state.toGivenDateFilter ?? null;
+      this.fromReturnDateFilter = state.fromReturnDateFilter ?? null;
+      this.toReturnDateFilter = state.toReturnDateFilter ?? null;
+      this.statusFilter = state.statusFilter ?? null;
+      this.currentPage = state.currentPage ?? 0;
+      this.currentSize = state.currentSize ?? 5;
+      this.filtersCollapsed = state.filtersCollapsed ?? true;
+      sessionStorage.removeItem(this.STORAGE_KEY);
+    } catch (e) {
+      sessionStorage.removeItem(this.STORAGE_KEY);
+    }
+  }
+
+  private clearFiltersState() {
+    sessionStorage.removeItem(this.STORAGE_KEY);
   }
 }

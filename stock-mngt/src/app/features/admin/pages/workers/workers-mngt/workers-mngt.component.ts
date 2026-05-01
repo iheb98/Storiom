@@ -64,13 +64,14 @@ export class WorkersMngtComponent implements OnInit {
       document.body.scrollTop = 0;
       document.documentElement.scrollTop = 0;
     }, 0);
+    this.restoreFiltersState();
     this.loadData();
   }
 
   loadData() {
     this.isLoading = true;
     Promise.all([
-      this.getWorkers(0, 5),
+      this.getWorkers(this.currentPage, this.currentSize),
       this.countWorkers()
     ]).then(() => {
       this.isLoading = false;
@@ -98,6 +99,7 @@ export class WorkersMngtComponent implements OnInit {
     this.phoneFilter = '';
     this.fromEntryDateFilter = null;
     this.toEntryDateFilter = null;
+    this.clearFiltersState();
     this.filter();
   }
 
@@ -119,6 +121,7 @@ export class WorkersMngtComponent implements OnInit {
   }
 
   create() {
+    this.saveFiltersState();
     this.router.navigate(['/workers/add']);
   }
 
@@ -200,6 +203,7 @@ export class WorkersMngtComponent implements OnInit {
   }
 
   editWorker(worker: any) {
+    this.saveFiltersState();
     this.router.navigate(['workers/' + worker.id]);
   }
 
@@ -210,5 +214,49 @@ export class WorkersMngtComponent implements OnInit {
     this.getWorkers(this.currentPage, this.currentSize).then(() => {
       this.isLoading = false;
     });
+  }
+
+  // ========================================
+  // Filter State Persistence
+  // ========================================
+  private readonly STORAGE_KEY = 'workers_filters_state';
+
+  private saveFiltersState() {
+    const state = {
+      firstNameFilter: this.firstNameFilter,
+      lastNameFilter: this.lastNameFilter,
+      emailFilter: this.emailFilter,
+      phoneFilter: this.phoneFilter,
+      fromEntryDateFilter: this.fromEntryDateFilter,
+      toEntryDateFilter: this.toEntryDateFilter,
+      currentPage: this.currentPage,
+      currentSize: this.currentSize,
+      filtersCollapsed: this.filtersCollapsed
+    };
+    sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+  }
+
+  private restoreFiltersState() {
+    const saved = sessionStorage.getItem(this.STORAGE_KEY);
+    if (!saved) return;
+    try {
+      const state = JSON.parse(saved);
+      this.firstNameFilter = state.firstNameFilter || '';
+      this.lastNameFilter = state.lastNameFilter || '';
+      this.emailFilter = state.emailFilter || '';
+      this.phoneFilter = state.phoneFilter || '';
+      this.fromEntryDateFilter = state.fromEntryDateFilter ?? null;
+      this.toEntryDateFilter = state.toEntryDateFilter ?? null;
+      this.currentPage = state.currentPage ?? 0;
+      this.currentSize = state.currentSize ?? 5;
+      this.filtersCollapsed = state.filtersCollapsed ?? true;
+      sessionStorage.removeItem(this.STORAGE_KEY);
+    } catch (e) {
+      sessionStorage.removeItem(this.STORAGE_KEY);
+    }
+  }
+
+  private clearFiltersState() {
+    sessionStorage.removeItem(this.STORAGE_KEY);
   }
 }

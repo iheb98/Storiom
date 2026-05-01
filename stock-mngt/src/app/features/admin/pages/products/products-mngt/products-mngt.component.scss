@@ -461,7 +461,6 @@ $radius-lg: 16px;
 
         @media (max-width: 576px) {
             width: 100%;
-            order: -1;
 
             .barcode-input-wrapper {
                 flex: 1;
@@ -1183,6 +1182,18 @@ $radius-lg: 16px;
 
                 @media (max-width: 576px) {
                     font-size: 1rem;
+                }
+            }
+
+            &.buying {
+                margin-bottom: 6px;
+                padding-bottom: 6px;
+                border-bottom: 1px dashed $border-color;
+
+                .price-value {
+                    font-size: 1rem;
+                    font-weight: 600;
+                    color: $warning;
                 }
             }
         }

@@ -13,6 +13,7 @@ export interface UserSettings {
     defaults: {
         productVisibleToPublic: boolean;
         productToDisplay: boolean;
+        showBuyingPrice: boolean;
     };
     navigation: {
         defaultScreen: 'none' | 'dashboard' | 'products' | 'orders' | 'stats';
@@ -26,7 +27,8 @@ const DEFAULT_SETTINGS: UserSettings = {
     },
     defaults: {
         productVisibleToPublic: true,
-        productToDisplay: true
+        productToDisplay: true,
+        showBuyingPrice: false
     },
     navigation: {
         defaultScreen: 'none'
@@ -114,12 +116,12 @@ export class UserSettingsService {
     }
 
     // Helper method to update defaults
-    updateDefaults(productVisibleToPublic: boolean, productToDisplay: boolean): Observable<any> {
+    updateDefaults(productVisibleToPublic: boolean, productToDisplay: boolean, showBuyingPrice: boolean = false): Observable<any> {
         const user = this.authService.getConnectedUser();
         if (!user?.id) return new Observable(observer => observer.error('No user'));
 
         return this.updateSettings(user.id, {
-            defaults: { productVisibleToPublic, productToDisplay }
+            defaults: { productVisibleToPublic, productToDisplay, showBuyingPrice }
         });
     }
 

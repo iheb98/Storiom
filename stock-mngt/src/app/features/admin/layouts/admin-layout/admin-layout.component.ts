@@ -266,7 +266,9 @@ export class AdminLayoutComponent implements OnInit {
   setMenu() {
     this.menu = [
       { label: 'Ma Boutique', icon: faInfoCircle, link: 'admin/stores/view' },
+      { label: 'Domaine & Thème', icon: faGlobe, link: 'admin/domain-settings' },
       { label: 'Statistiques', icon: this.statsIcon, link: 'admin/dashboard' },
+      { label: 'Rapport', icon: faFile, link: 'admin/reports/generate' },
       { label: 'Commandes', icon: faShoppingCart, link: 'admin/orders' },
       { label: 'Produits', icon: faBox, link: 'admin/products' },
       { label: 'Analytique', icon: faChartLine, link: 'admin/analytics' },
@@ -281,8 +283,6 @@ export class AdminLayoutComponent implements OnInit {
       { label: 'Travailleurs', icon: this.userIcon, link: 'admin/workers' },
       { label: 'Dépenses', icon: faCoins, link: 'admin/expenses' },
       { label: 'Crédits', icon: faHandHoldingUsd, link: 'admin/credits' },
-      { label: 'Rapport', icon: faFile, link: 'admin/reports/generate' },
-      { label: 'Domaine & Thème', icon: faGlobe, link: 'admin/domain-settings' },
     ];
   }
 }

@@ -16,6 +16,7 @@ import { QueryService } from 'src/app/core/services/query.service';
 import { ReceiptService } from 'src/app/core/services/receipt.service';
 import { StoreService } from 'src/app/core/services/store.service';
 import { SupplierService } from 'src/app/core/services/supplier.service';
+import { UserSettingsService } from 'src/app/core/services/user-settings.service';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 import { SellProductComponent } from '../sell-product/sell-product.component';
@@ -111,6 +112,9 @@ export class ProductsMngtComponent implements OnInit {
   selectedIds: number[] = [];
   bulkActionsCollapsed = true;
 
+  // Display Settings
+  showBuyingPrice = false;
+
   constructor(
     private productService: ProductService,
     private receiptService: ReceiptService,
@@ -122,6 +126,7 @@ export class ProductsMngtComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private queryService: QueryService,
+    private userSettingsService: UserSettingsService,
     public dialog: MatDialog
   ) { }
 
@@ -131,6 +136,10 @@ export class ProductsMngtComponent implements OnInit {
       document.body.scrollTop = 0;
       document.documentElement.scrollTop = 0;
     }, 0);
+    this.restoreFiltersState();
+    this.userSettingsService.settings$.subscribe(settings => {
+      this.showBuyingPrice = settings?.defaults?.showBuyingPrice ?? false;
+    });
     this.route.queryParams.subscribe(params => {
       this.isCriticalFilter = params['filter'] === 'critical';
       this.loadInitialData();
@@ -226,6 +235,7 @@ export class ProductsMngtComponent implements OnInit {
   }
 
   create() {
+    this.saveFiltersState();
     this.router.navigate(['/products/add']);
   }
 
@@ -242,10 +252,12 @@ export class ProductsMngtComponent implements OnInit {
     this.maxSellingPriceFilter = null;
     this.searchable = '';
     this.codeFilter = '';
+    this.clearFiltersState();
     this.filter();
   }
 
   filter() {
+    this.currentPage = 0
     this.isLoading = true;
     this.getProducts(this.currentPage, this.currentSize);
     this.countProducts();
@@ -259,6 +271,7 @@ export class ProductsMngtComponent implements OnInit {
   }
 
   consulter(id: number) {
+    this.saveFiltersState();
     this.router.navigate(['/products/view/' + id]);
   }
 
@@ -295,7 +308,71 @@ export class ProductsMngtComponent implements OnInit {
   }
 
   navigateTo(link: string) {
+    this.saveFiltersState();
     this.router.navigate([link]);
+  }
+
+  // ========================================
+  // Filter State Persistence
+  // ========================================
+  private readonly STORAGE_KEY = 'products_filters_state';
+
+  private saveFiltersState() {
+    const state = {
+      nameFilter: this.nameFilter,
+      descriptionFilter: this.descriptionFilter,
+      colorFilter: this.colorFilter,
+      supplierFilter: this.supplierFilter,
+      categoryFilter: this.categoryFilter,
+      codeFilter: this.codeFilter,
+      minBuyingPriceFilter: this.minBuyingPriceFilter,
+      maxBuyingPriceFilter: this.maxBuyingPriceFilter,
+      minSellingPriceFilter: this.minSellingPriceFilter,
+      maxSellingPriceFilter: this.maxSellingPriceFilter,
+      minQuantityFilter: this.minQuantityFilter,
+      maxQuantityFilter: this.maxQuantityFilter,
+      searchable: this.searchable,
+      currentPage: this.currentPage,
+      currentSize: this.currentSize,
+      filtersCollapsed: this.filtersCollapsed,
+      isCriticalFilter: this.isCriticalFilter
+    };
+    sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+  }
+
+  private restoreFiltersState() {
+    const saved = sessionStorage.getItem(this.STORAGE_KEY);
+    if (!saved) return;
+
+    try {
+      const state = JSON.parse(saved);
+      this.nameFilter = state.nameFilter || '';
+      this.descriptionFilter = state.descriptionFilter || '';
+      this.colorFilter = state.colorFilter || '';
+      this.supplierFilter = state.supplierFilter ?? null;
+      this.categoryFilter = state.categoryFilter ?? null;
+      this.codeFilter = state.codeFilter || '';
+      this.minBuyingPriceFilter = state.minBuyingPriceFilter ?? null;
+      this.maxBuyingPriceFilter = state.maxBuyingPriceFilter ?? null;
+      this.minSellingPriceFilter = state.minSellingPriceFilter ?? null;
+      this.maxSellingPriceFilter = state.maxSellingPriceFilter ?? null;
+      this.minQuantityFilter = state.minQuantityFilter ?? null;
+      this.maxQuantityFilter = state.maxQuantityFilter ?? null;
+      this.searchable = state.searchable || '';
+      this.currentPage = state.currentPage ?? 0;
+      this.currentSize = state.currentSize ?? 24;
+      this.filtersCollapsed = state.filtersCollapsed ?? true;
+      this.isCriticalFilter = state.isCriticalFilter ?? false;
+
+      // Clear after restoring so it doesn't persist forever
+      sessionStorage.removeItem(this.STORAGE_KEY);
+    } catch (e) {
+      sessionStorage.removeItem(this.STORAGE_KEY);
+    }
+  }
+
+  private clearFiltersState() {
+    sessionStorage.removeItem(this.STORAGE_KEY);
   }
 
   deleteProduct(product: any) {

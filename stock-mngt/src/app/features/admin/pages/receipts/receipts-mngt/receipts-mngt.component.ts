@@ -102,6 +102,7 @@ export class ReceiptsMngtComponent implements OnInit {
       document.body.scrollTop = 0;
       document.documentElement.scrollTop = 0;
     }, 0);
+    this.restoreFiltersState();
     this.loadData();
   }
 
@@ -115,7 +116,7 @@ export class ReceiptsMngtComponent implements OnInit {
     this.getSuppliers();
 
     Promise.all([
-      this.getReceipts(0, 5),
+      this.getReceipts(this.currentPage, this.currentSize),
       this.countReceipts()
     ]).then(() => {
       this.isLoading = false;
@@ -189,6 +190,7 @@ export class ReceiptsMngtComponent implements OnInit {
   }
 
   create() {
+    this.saveFiltersState();
     this.router.navigate(['/receipts/add']);
   }
 
@@ -201,6 +203,7 @@ export class ReceiptsMngtComponent implements OnInit {
     this.codeFilter = null;
     this.supplierFilter = null;
     this.typeFilter = null;
+    this.clearFiltersState();
     this.filter();
   }
 
@@ -264,6 +267,7 @@ export class ReceiptsMngtComponent implements OnInit {
   }
 
   viewReceipt(receipt) {
+    this.saveFiltersState();
     this.router.navigate(['receipts/view/' + receipt.id]);
   }
 
@@ -327,5 +331,55 @@ export class ReceiptsMngtComponent implements OnInit {
       console.error("Receipt Fetch Error:", error);
       Swal.fire('Erreur', 'Impossible de charger la facture.', 'error');
     });
+  }
+
+  // ========================================
+  // Filter State Persistence
+  // ========================================
+  private readonly STORAGE_KEY = 'receipts_filters_state';
+
+  private saveFiltersState() {
+    const state = {
+      minTotalFilter: this.minTotalFilter,
+      maxTotalFilter: this.maxTotalFilter,
+      fromDateFilter: this.fromDateFilter,
+      toDateFilter: this.toDateFilter,
+      nameFilter: this.nameFilter,
+      codeFilter: this.codeFilter,
+      supplierFilter: this.supplierFilter,
+      typeFilter: this.typeFilter,
+      currentPage: this.currentPage,
+      currentSize: this.currentSize,
+      filtersCollapsed: this.filtersCollapsed
+    };
+    sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+  }
+
+  private restoreFiltersState() {
+    const saved = sessionStorage.getItem(this.STORAGE_KEY);
+    if (!saved) return;
+
+    try {
+      const state = JSON.parse(saved);
+      this.minTotalFilter = state.minTotalFilter ?? null;
+      this.maxTotalFilter = state.maxTotalFilter ?? null;
+      this.fromDateFilter = state.fromDateFilter ?? null;
+      this.toDateFilter = state.toDateFilter ?? null;
+      this.nameFilter = state.nameFilter ?? null;
+      this.codeFilter = state.codeFilter ?? null;
+      this.supplierFilter = state.supplierFilter ?? null;
+      this.typeFilter = state.typeFilter ?? null;
+      this.currentPage = state.currentPage ?? 0;
+      this.currentSize = state.currentSize ?? 5;
+      this.filtersCollapsed = state.filtersCollapsed ?? true;
+
+      sessionStorage.removeItem(this.STORAGE_KEY);
+    } catch (e) {
+      sessionStorage.removeItem(this.STORAGE_KEY);
+    }
+  }
+
+  private clearFiltersState() {
+    sessionStorage.removeItem(this.STORAGE_KEY);
   }
 }

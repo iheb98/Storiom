@@ -7,7 +7,7 @@
       </div>
       <div class="header-text">
         <h1>Générer un Rapport</h1>
-        <p>Analysez les performances de vos ventes sur une période donnée</p>
+        <p>Analysez les performances de vos ventes et chargements sur une période donnée</p>
       </div>
     </div>
   </header>
@@ -32,6 +32,34 @@
       </div>
     </div>
 
+    <!-- Report Type Selector -->
+    <div class="report-type-selector">
+      <label class="selector-label">Type de rapport</label>
+      <div class="type-options">
+        <button class="type-option" [class.active]="reportType === 'sales'" (click)="reportType = 'sales'">
+          <fa-icon [icon]="coinsIcon"></fa-icon>
+          <span>Ventes</span>
+        </button>
+        <button class="type-option" [class.active]="reportType === 'load'" (click)="reportType = 'load'">
+          <fa-icon [icon]="truckIcon"></fa-icon>
+          <span>Chargement</span>
+        </button>
+        <button class="type-option" [class.active]="reportType === 'both'" (click)="reportType = 'both'">
+          <fa-icon [icon]="exchangeIcon"></fa-icon>
+          <span>Les deux</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Include Deleted Toggle -->
+    <div class="toggle-option">
+      <label class="toggle-switch">
+        <input type="checkbox" [(ngModel)]="includeDeleted">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="toggle-label">Inclure les produits supprimés</span>
+    </div>
+
     <button class="btn-generate" (click)="generateReport()" [disabled]="loading">
       <fa-icon [icon]="loading ? spinnerIcon : searchIcon" [spin]="loading"></fa-icon>
       {{ loading ? 'Génération en cours...' : 'Générer le rapport' }}
@@ -52,8 +80,9 @@
       <span class="date-badge">{{ fromDate }} → {{ toDate }}</span>
     </div>
 
-    <div class="stats-grid">
-      <div class="stat-card earnings">
+    <div class="stats-grid" [class.four-cols]="reportData.reportType === 'both'">
+      <!-- Sales stats -->
+      <div class="stat-card earnings" *ngIf="reportData.reportType === 'sales' || reportData.reportType === 'both'">
         <div class="stat-icon">
           <fa-icon [icon]="coinsIcon"></fa-icon>
         </div>
@@ -63,6 +92,28 @@
         </div>
       </div>
 
+      <div class="stat-card products" *ngIf="reportData.reportType === 'sales' || reportData.reportType === 'both'">
+        <div class="stat-icon">
+          <fa-icon [icon]="boxIcon"></fa-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ reportData.numberOfProductsSold }}</span>
+          <span class="stat-label">Produits vendus</span>
+        </div>
+      </div>
+
+      <!-- Load stats -->
+      <div class="stat-card load-cost" *ngIf="reportData.reportType === 'load' || reportData.reportType === 'both'">
+        <div class="stat-icon">
+          <fa-icon [icon]="truckIcon"></fa-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ reportData.totalCost | number:'1.2-2' }}</span>
+          <span class="stat-label">Coût chargement (DT)</span>
+        </div>
+      </div>
+
+      <!-- Always show receipts -->
       <div class="stat-card receipts">
         <div class="stat-icon">
           <fa-icon [icon]="receiptIcon"></fa-icon>
@@ -70,16 +121,6 @@
         <div class="stat-content">
           <span class="stat-value">{{ reportData.numberOfReceipts }}</span>
           <span class="stat-label">Nombre de reçus</span>
-        </div>
-      </div>
-
-      <div class="stat-card products">
-        <div class="stat-icon">
-          <fa-icon [icon]="boxIcon"></fa-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ reportData.numberOfProductsSold }}</span>
-          <span class="stat-label">Produits vendus</span>
         </div>
       </div>
     </div>
@@ -92,7 +133,8 @@
       </div>
 
       <div class="products-table-wrapper">
-        <table class="products-table">
+        <!-- SALES TABLE -->
+        <table class="products-table" *ngIf="reportData.reportType === 'sales'">
           <thead>
             <tr>
               <th>Produit</th>
@@ -117,6 +159,66 @@
             </tr>
           </tbody>
         </table>
+
+        <!-- LOAD TABLE -->
+        <table class="products-table" *ngIf="reportData.reportType === 'load'">
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Prix Achat</th>
+              <th>Quantité Chargée</th>
+              <th>Coût Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of reportData.products">
+              <td class="product-name" data-label="Produit">{{ product.productName }}</td>
+              <td class="price buying" data-label="Prix Achat">{{ product.buyingPrice | number:'1.2-2' }} DT</td>
+              <td class="quantity" data-label="Qté Chargée">{{ product.quantityLoaded }}</td>
+              <td class="cost" data-label="Coût Total">
+                <span class="cost-badge">{{ product.loadCost | number:'1.2-2' }} DT</span>
+              </td>
+            </tr>
+            <tr *ngIf="!reportData.products?.length">
+              <td colspan="4" class="no-data">Aucun chargement sur cette période</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- BOTH TABLE -->
+        <table class="products-table" *ngIf="reportData.reportType === 'both'">
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Prix Achat</th>
+              <th>Prix Vente</th>
+              <th>Vendu</th>
+              <th>Chargé</th>
+              <th>Bénéfices</th>
+              <th>Coût</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of reportData.products">
+              <td class="product-name" data-label="Produit">{{ product.productName }}</td>
+              <td class="price buying" data-label="Prix Achat">{{ product.buyingPrice | number:'1.2-2' }} DT</td>
+              <td class="price selling" data-label="Prix Vente">{{ product.sellingPrice | number:'1.2-2' }} DT</td>
+              <td class="quantity" data-label="Vendu">{{ product.quantitySold }}</td>
+              <td class="quantity" data-label="Chargé">{{ product.quantityLoaded }}</td>
+              <td class="earnings" data-label="Bénéfices">
+                <span class="earnings-badge" *ngIf="product.earnings > 0">+{{ product.earnings | number:'1.2-2' }} DT</span>
+                <span *ngIf="product.earnings === 0">—</span>
+              </td>
+              <td class="cost" data-label="Coût">
+                <span class="cost-badge" *ngIf="product.loadCost > 0">{{ product.loadCost | number:'1.2-2' }} DT</span>
+                <span *ngIf="product.loadCost === 0">—</span>
+              </td>
+            </tr>
+            <tr *ngIf="!reportData.products?.length">
+              <td colspan="7" class="no-data">Aucune opération sur cette période</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -134,5 +236,146 @@
     <fa-icon [icon]="chartLineIcon"></fa-icon>
     <h3>Sélectionnez une période</h3>
     <p>Choisissez les dates de début et de fin, puis cliquez sur "Générer le rapport" pour voir les statistiques</p>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- STOCK EXPORT SECTION -->
+  <!-- ============================================ -->
+  <div class="section-divider">
+    <span>Export du Stock</span>
+  </div>
+
+  <div class="date-range-card">
+    <h3 class="card-title"><fa-icon [icon]="warehouseIcon"></fa-icon> Export du stock actuel</h3>
+    <p class="card-subtitle">Exportez un inventaire complet de votre stock avec les prix et quantités actuels</p>
+
+    <!-- Include Deleted Toggle -->
+    <div class="toggle-option">
+      <label class="toggle-switch">
+        <input type="checkbox" [(ngModel)]="stockIncludeDeleted">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="toggle-label">Inclure les produits supprimés</span>
+    </div>
+
+    <button class="btn-generate stock-btn" (click)="exportStock()" [disabled]="stockLoading">
+      <fa-icon [icon]="stockLoading ? spinnerIcon : warehouseIcon" [spin]="stockLoading"></fa-icon>
+      {{ stockLoading ? 'Chargement...' : 'Exporter le stock' }}
+    </button>
+  </div>
+
+  <!-- Stock Error Message -->
+  <div class="error-message" *ngIf="stockErrorMessage">
+    <fa-icon [icon]="warningIcon"></fa-icon>
+    <span>{{ stockErrorMessage }}</span>
+  </div>
+
+  <!-- Stock Results -->
+  <div class="report-results" *ngIf="stockData">
+    <div class="stats-header">
+      <h3><fa-icon [icon]="boxOpenIcon"></fa-icon> Résumé du stock</h3>
+      <span class="date-badge">{{ stockData.totalProducts }} produits</span>
+    </div>
+
+    <div class="stats-grid four-cols">
+      <div class="stat-card products">
+        <div class="stat-icon">
+          <fa-icon [icon]="boxIcon"></fa-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stockData.totalProducts }}</span>
+          <span class="stat-label">Produits</span>
+        </div>
+      </div>
+
+      <div class="stat-card stock-qty">
+        <div class="stat-icon">
+          <fa-icon [icon]="listIcon"></fa-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stockData.totalQuantity }}</span>
+          <span class="stat-label">Quantité totale</span>
+        </div>
+      </div>
+
+      <div class="stat-card load-cost">
+        <div class="stat-icon">
+          <fa-icon [icon]="coinsIcon"></fa-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stockData.totalBuyingValue | number:'1.2-2' }}</span>
+          <span class="stat-label">Valeur achat (DT)</span>
+        </div>
+      </div>
+
+      <div class="stat-card earnings">
+        <div class="stat-icon">
+          <fa-icon [icon]="coinsIcon"></fa-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stockData.totalSellingValue | number:'1.2-2' }}</span>
+          <span class="stat-label">Valeur vente (DT)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stock Products Table -->
+    <div class="products-section">
+      <div class="section-header">
+        <h3><fa-icon [icon]="listIcon"></fa-icon> Détails par produit</h3>
+        <span class="product-count">{{ stockData.totalProducts }} produits</span>
+      </div>
+
+      <div class="products-table-wrapper">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Catégorie</th>
+              <th>Prix Achat</th>
+              <th>Prix Vente</th>
+              <th>Quantité</th>
+              <th>Total Achat</th>
+              <th>Total Vente</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of stockData.products" [class.deleted-row]="!product.isVisible">
+              <td class="product-name" data-label="Produit">
+                {{ product.productName }}
+                <span class="deleted-tag" *ngIf="!product.isVisible">supprimé</span>
+              </td>
+              <td data-label="Catégorie">{{ product.category }}</td>
+              <td class="price buying" data-label="Prix Achat">{{ product.buyingPrice | number:'1.2-2' }} DT</td>
+              <td class="price selling" data-label="Prix Vente">{{ product.sellingPrice | number:'1.2-2' }} DT</td>
+              <td class="quantity" data-label="Quantité">{{ product.quantity }}</td>
+              <td data-label="Total Achat">{{ product.totalBuying | number:'1.2-2' }} DT</td>
+              <td data-label="Total Vente">
+                <span class="earnings-badge">{{ product.totalSelling | number:'1.2-2' }} DT</span>
+              </td>
+            </tr>
+            <tr class="totals-row">
+              <td class="product-name" data-label=""><strong>TOTAL</strong></td>
+              <td data-label=""></td>
+              <td data-label=""></td>
+              <td data-label=""></td>
+              <td class="quantity" data-label="Qté Totale"><strong>{{ stockData.totalQuantity }}</strong></td>
+              <td data-label="Total Achat"><strong>{{ stockData.totalBuyingValue | number:'1.2-2' }} DT</strong></td>
+              <td data-label="Total Vente">
+                <strong class="earnings-badge">{{ stockData.totalSellingValue | number:'1.2-2' }} DT</strong>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Download Stock PDF -->
+    <div class="download-section">
+      <button class="btn-download" (click)="downloadStockPDF()">
+        <fa-icon [icon]="pdfIcon"></fa-icon>
+        Télécharger l'export PDF
+      </button>
+    </div>
   </div>
 </div>

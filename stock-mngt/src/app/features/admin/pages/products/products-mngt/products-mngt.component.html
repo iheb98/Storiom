@@ -43,9 +43,9 @@
                     <input type="text" [(ngModel)]="codeFilter" placeholder="Code-barres..."
                         (keyup.enter)="searchByBarcode()">
                 </div>
-                <button class="btn-scan-inline" (click)="startScanner()" title="Scanner avec la caméra">
+                <!--<button class="btn-scan-inline" (click)="startScanner()" title="Scanner avec la caméra">
                     <fa-icon [icon]="faCamera"></fa-icon>
-                </button>
+                </button>-->
             </div>
 
             <div class="action-buttons">
@@ -88,13 +88,13 @@
                             <span>Marketplace</span>
                         </div>
                         <div class="section-actions">
-                            <button class="btn-bulk show" (click)="bulkUpdateDisplay(true)" [disabled]="selectedIds.length === 0"
-                                title="Afficher les sélectionnés">
+                            <button class="btn-bulk show" (click)="bulkUpdateDisplay(true)"
+                                [disabled]="selectedIds.length === 0" title="Afficher les sélectionnés">
                                 <fa-icon [icon]="faEye"></fa-icon>
                                 <span>Afficher</span>
                             </button>
-                            <button class="btn-bulk hide" (click)="bulkUpdateDisplay(false)" [disabled]="selectedIds.length === 0"
-                                title="Masquer les sélectionnés">
+                            <button class="btn-bulk hide" (click)="bulkUpdateDisplay(false)"
+                                [disabled]="selectedIds.length === 0" title="Masquer les sélectionnés">
                                 <fa-icon [icon]="faEyeSlash"></fa-icon>
                                 <span>Masquer</span>
                             </button>
@@ -118,13 +118,13 @@
                             <span>Boutique en ligne</span>
                         </div>
                         <div class="section-actions">
-                            <button class="btn-bulk store-show" (click)="bulkUpdateStoreDisplay(true)" [disabled]="selectedIds.length === 0"
-                                title="Afficher les sélectionnés">
+                            <button class="btn-bulk store-show" (click)="bulkUpdateStoreDisplay(true)"
+                                [disabled]="selectedIds.length === 0" title="Afficher les sélectionnés">
                                 <fa-icon [icon]="faEye"></fa-icon>
                                 <span>Afficher</span>
                             </button>
-                            <button class="btn-bulk store-hide" (click)="bulkUpdateStoreDisplay(false)" [disabled]="selectedIds.length === 0"
-                                title="Masquer les sélectionnés">
+                            <button class="btn-bulk store-hide" (click)="bulkUpdateStoreDisplay(false)"
+                                [disabled]="selectedIds.length === 0" title="Masquer les sélectionnés">
                                 <fa-icon [icon]="faEyeSlash"></fa-icon>
                                 <span>Masquer</span>
                             </button>
@@ -233,8 +233,8 @@
                         title="Marketplace">
                         <fa-icon [icon]="item?.toDisplay ? faEye : faEyeSlash"></fa-icon>
                     </span>
-                    <span class="visibility-badge store" [class.visible]="item?.toDisplayStore" [class.hidden]="!item?.toDisplayStore"
-                        title="Boutique en ligne">
+                    <span class="visibility-badge store" [class.visible]="item?.toDisplayStore"
+                        [class.hidden]="!item?.toDisplayStore" title="Boutique en ligne">
                         <fa-icon [icon]="faStore"></fa-icon>
                     </span>
                 </div>
@@ -269,6 +269,11 @@
                     <span class="product-category">{{ item?.category?.name || 'Sans catégorie' }}</span>
 
                     <div class="product-prices">
+                        <div class="price buying" *ngIf="showBuyingPrice">
+                            <span class="price-label">Achat</span>
+                            <span class="price-value">{{ item?.buyingPrice | number:'1.2-2' }} {{ item?.currency || 'DT'
+                                }}</span>
+                        </div>
                         <div class="price selling">
                             <span class="price-label">Vente</span>
                             <span class="price-original" *ngIf="item?.discount > 0">{{ item?.sellingPrice |
@@ -311,8 +316,8 @@
 
         <!-- Pagination -->
         <div class="pagination-wrapper" *ngIf="!isLoading && products?.length > 0">
-            <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="24"
-                [showFirstLastButtons]="true" [pageSizeOptions]="[24, 48, 100, 200]" [pageIndex]="currentPage">
+            <mat-paginator #paginator (page)="handlePageEvent($event)" [length]="count" [pageSize]="currentSize"
+                [showFirstLastButtons]="true" [pageSizeOptions]="[24,48,100,200]" [pageIndex]="currentPage">
             </mat-paginator>
         </div>
     </div>
