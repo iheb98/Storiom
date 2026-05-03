@@ -4,6 +4,7 @@ import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { ToastService } from 'src/app/core/services/toast.service';
 import { FileService } from 'src/app/core/services/file.service';
+import { GoogleFontsService } from 'src/app/core/services/google-fonts.service';
 import {
   faGlobe, faSave, faCheckCircle, faClock, faSync, faTrash,
   faInfoCircle, faCog, faExclamationTriangle, faPaintBrush,
@@ -383,7 +384,8 @@ export class DomainSettingsComponent implements OnInit {
     private http: HttpClient,
     private authService: AuthService,
     private toastService: ToastService,
-    private fileService: FileService
+    private fileService: FileService,
+    private googleFontsService: GoogleFontsService
   ) { }
 
   ngOnInit(): void {
@@ -408,6 +410,9 @@ export class DomainSettingsComponent implements OnInit {
     if (this.storeId) {
       this.loadStoreSettings();
     }
+
+    // Load all Google Fonts for the typography picker
+    this.googleFontsService.loadFonts(this.fonts);
   }
 
   setActiveSection(section: string): void {

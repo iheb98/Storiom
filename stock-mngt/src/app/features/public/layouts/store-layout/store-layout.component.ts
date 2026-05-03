@@ -4,6 +4,7 @@ import { Title } from '@angular/platform-browser';
 import { DomainService } from 'src/app/core/services/domain.service';
 import { PublicService } from 'src/app/core/services/public.service';
 import { StoreAuthService } from 'src/app/core/services/store-auth.service';
+import { GoogleFontsService } from 'src/app/core/services/google-fonts.service';
 import { environment } from 'src/environments/environment.prod';
 import { filter } from 'rxjs/operators';
 
@@ -39,6 +40,7 @@ export class StoreLayoutComponent implements OnInit, OnDestroy {
     private domainService: DomainService,
     private publicService: PublicService,
     private storeAuth: StoreAuthService,
+    private googleFontsService: GoogleFontsService,
     private titleService: Title
   ) {}
 
@@ -139,6 +141,9 @@ export class StoreLayoutComponent implements OnInit, OnDestroy {
     root.style.setProperty('--store-primary', this.themeConfig.primaryColor || '#4f46e5');
     root.style.setProperty('--store-accent', this.themeConfig.accentColor || '#f59e0b');
     root.style.setProperty('--store-font', this.themeConfig.fontFamily || 'Inter');
+
+    // Load the Google Font
+    this.googleFontsService.loadFont(this.themeConfig.fontFamily || 'Inter');
 
     // Set tab title
     const tabTitle = this.themeConfig.browserTab?.title || this.store?.name || 'Boutique';

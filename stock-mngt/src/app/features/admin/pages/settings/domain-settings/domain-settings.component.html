@@ -271,11 +271,15 @@
             <button *ngFor="let font of fonts"
                     class="font-option"
                     [class.active]="theme.fontFamily === font"
-                    [style.font-family]="font"
                     (click)="theme.fontFamily = font">
-              <span class="font-preview">Aa</span>
-              <span class="font-name">{{ font }}</span>
-              <fa-icon [icon]="faCheck" class="font-check" *ngIf="theme.fontFamily === font"></fa-icon>
+              <div class="font-preview-area" [style.font-family]="font">
+                <span class="font-preview-large">Aa Bb Cc</span>
+                <span class="font-preview-sentence">Bienvenue dans notre boutique</span>
+              </div>
+              <div class="font-meta">
+                <span class="font-name">{{ font }}</span>
+                <fa-icon [icon]="faCheck" class="font-check" *ngIf="theme.fontFamily === font"></fa-icon>
+              </div>
             </button>
           </div>
         </div>

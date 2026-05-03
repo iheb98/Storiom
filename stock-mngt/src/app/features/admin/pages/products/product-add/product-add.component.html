@@ -70,10 +70,10 @@
                                 <label for="code"><fa-icon [icon]="faBarcode"></fa-icon> Code-barres / Référence</label>
                                 <div class="input-with-action">
                                     <input type="text" id="code" formControlName="code" placeholder="Ex: 3017620422003">
-                                    <button type="button" class="btn-scan" (click)="startScanner()"
+                                    <!--<button type="button" class="btn-scan" (click)="startScanner()"
                                         title="Scanner un code-barres">
                                         <fa-icon [icon]="faCamera"></fa-icon>
-                                    </button>
+                                    </button>-->
                                 </div>
                             </div>
 
@@ -160,7 +160,8 @@
                                         <fa-icon [icon]="faStore" class="setting-icon store-icon"></fa-icon>
                                         <div class="toggle-text">
                                             <span class="toggle-title">Visible sur la boutique</span>
-                                            <span class="toggle-desc">Le produit sera visible sur votre boutique en ligne</span>
+                                            <span class="toggle-desc">Le produit sera visible sur votre boutique en
+                                                ligne</span>
                                         </div>
                                     </div>
                                     <label class="toggle-switch">

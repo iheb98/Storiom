@@ -7,6 +7,7 @@ import { AuthService } from 'src/app/core/services/auth.service';
 import { CartService } from 'src/app/core/services/cart.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { ToastService } from 'src/app/core/services/toast.service';
+import { GoogleFontsService } from 'src/app/core/services/google-fonts.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -94,6 +95,7 @@ export class StoreLandingComponent implements OnInit, OnDestroy {
     private cartService: CartService,
     private productService: ProductService,
     private toastService: ToastService,
+    private googleFontsService: GoogleFontsService,
     private titleService: Title,
     private metaService: Meta,
     private router: Router,
@@ -139,6 +141,9 @@ export class StoreLandingComponent implements OnInit, OnDestroy {
     root.style.setProperty('--store-primary', this.themeConfig.primaryColor || '#4f46e5');
     root.style.setProperty('--store-accent', this.themeConfig.accentColor || '#f59e0b');
     root.style.setProperty('--store-font', this.themeConfig.fontFamily || 'Inter');
+
+    // Load the selected Google Font
+    this.googleFontsService.loadFont(this.themeConfig.fontFamily || 'Inter');
 
     // Start hero carousel if multiple images
     this.initHeroCarousel();

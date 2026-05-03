@@ -722,29 +722,87 @@ $radius: 12px;
 // Font grid
 .font-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
 }
 
 .font-option {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 16px 12px;
-  border: 1px solid $border;
-  border-radius: 12px;
+  padding: 0;
+  border: 2px solid $border;
+  border-radius: 14px;
   background: #fff;
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
-  .font-preview { font-size: 26px; font-weight: 600; color: $text-primary; }
-  .font-name { font-size: 11px; color: $text-secondary; margin-top: 6px; }
-  .font-check {
-    position: absolute; top: 8px; right: 8px;
-    color: $primary; font-size: 14px;
+  overflow: hidden;
+
+  .font-preview-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 16px 14px;
+    gap: 6px;
+    min-height: 90px;
   }
-  &:hover { border-color: #cbd5e1; }
-  &.active { border-color: $primary; background: rgba($primary, 0.04); }
+
+  .font-preview-large {
+    font-size: 28px;
+    font-weight: 600;
+    color: $text-primary;
+    letter-spacing: 1px;
+  }
+
+  .font-preview-sentence {
+    font-size: 13px;
+    color: $text-secondary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .font-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    border-top: 1px solid #f1f5f9;
+    background: #fafbfc;
+  }
+
+  .font-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: $text-secondary;
+    letter-spacing: 0.3px;
+  }
+
+  .font-check {
+    color: $primary;
+    font-size: 14px;
+  }
+
+  &:hover {
+    border-color: #cbd5e1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  &.active {
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, 0.1);
+
+    .font-meta {
+      background: rgba($primary, 0.04);
+    }
+
+    .font-name {
+      color: $primary;
+    }
+  }
 }
 
 // Toggle switch

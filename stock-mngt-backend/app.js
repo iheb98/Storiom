@@ -300,6 +300,10 @@ const paymentOrdersRoute = require('./routes/payment-orders');
 const analyticsRoute = require('./routes/analytics');
 const wishlistRoute = require('./routes/wishlist');
 const storeCustomersRoute = require('./routes/store-customers');
+const ogTagsMiddleware = require('./ogTagsMiddleware');
+
+// OG tags for social media crawlers (must be before API routes)
+app.use('/og', ogTagsMiddleware);
 
 app.use('/api/receipts', receiptsRoute)
 app.use('/api/credits', creditsRoute)
