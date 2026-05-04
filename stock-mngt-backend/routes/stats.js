@@ -160,12 +160,16 @@ router.get('/store/:id/mostProfitable', utility.authenticate, checkSubscription,
     Operation.findAll({
         where: {
             type: "SOLD",
-            creatorUserId: req.user.id
+            creatorUserId: req.user.id,
+            [Op.or]: [
+                { '$receipt.visible$': true },
+                { receiptId: null }
+            ]
         }, include: ['product',
             {
                 model: Receipt,
                 as: 'receipt',
-                where: { visible: true },
+                required: false,
                 attributes: []
             }
         ],
@@ -817,7 +821,7 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
             const { productId, amount, price, receiptId, product, type: opType } = op;
             if (product) {
                 if (opType === 'SOLD') {
-                    const revenue = amount * (product.sellingPrice || 0);
+                    const revenue = amount * (price || product.sellingPrice || 0);
                     const cost = amount * (product.buyingPrice || 0);
                     const earnings = revenue - cost;
 
@@ -846,7 +850,7 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
 
                 if (opType === 'SOLD') {
                     groupedOperations[productId].quantitySold += amount;
-                    groupedOperations[productId].earnings += (amount * (product.sellingPrice || 0)) - (amount * (product.buyingPrice || 0));
+                    groupedOperations[productId].earnings += (amount * (price || product.sellingPrice || 0)) - (amount * (product.buyingPrice || 0));
                 } else if (opType === 'LOADED') {
                     groupedOperations[productId].quantityLoaded += amount;
                     groupedOperations[productId].loadCost += amount * (price || product.buyingPrice || 0);
@@ -1143,8 +1147,18 @@ router.get('/store/:id/total-sold-pie', utility.authenticate, async (req, res) =
                 where: {
                     productId: { [Op.in]: productIds },
                     type: 'SOLD',
-                    date: dateFilter
+                    date: dateFilter,
+                    [Op.or]: [
+                        { '$receipt.visible$': true },
+                        { receiptId: null }
+                    ]
                 },
+                include: [{
+                    model: Receipt,
+                    as: 'receipt',
+                    required: false,
+                    attributes: []
+                }],
                 attributes: [
                     [utility.Sequelize.fn('SUM', utility.Sequelize.literal('amount * price')), 'total']
                 ],
@@ -1175,8 +1189,18 @@ router.get('/store/:id/total-sold-pie', utility.authenticate, async (req, res) =
                 where: {
                     productId: { [Op.in]: uncategorizedProductIds },
                     type: 'SOLD',
-                    date: dateFilter
+                    date: dateFilter,
+                    [Op.or]: [
+                        { '$receipt.visible$': true },
+                        { receiptId: null }
+                    ]
                 },
+                include: [{
+                    model: Receipt,
+                    as: 'receipt',
+                    required: false,
+                    attributes: []
+                }],
                 attributes: [
                     [utility.Sequelize.fn('SUM', utility.Sequelize.literal('amount * price')), 'total']
                 ],
@@ -1259,14 +1283,26 @@ router.get('/store/:id/net-sold-pie', utility.authenticate, async (req, res) => 
                 where: {
                     productId: { [Op.in]: productIds },
                     type: 'SOLD',
-                    date: dateFilter
+                    date: dateFilter,
+                    [Op.or]: [
+                        { '$receipt.visible$': true },
+                        { receiptId: null }
+                    ]
                 },
-                include: [{
-                    model: Product,
-                    as: 'product',
-                    required: true,
-                    attributes: []
-                }],
+                include: [
+                    {
+                        model: Product,
+                        as: 'product',
+                        required: true,
+                        attributes: []
+                    },
+                    {
+                        model: Receipt,
+                        as: 'receipt',
+                        required: false,
+                        attributes: []
+                    }
+                ],
                 attributes: [
                     [utility.Sequelize.literal('SUM("Operation"."amount" * ("Operation"."price" - "product"."buying_price"))'), 'total']
                 ],
@@ -1297,14 +1333,26 @@ router.get('/store/:id/net-sold-pie', utility.authenticate, async (req, res) => 
                 where: {
                     productId: { [Op.in]: uncategorizedProductIds },
                     type: 'SOLD',
-                    date: dateFilter
+                    date: dateFilter,
+                    [Op.or]: [
+                        { '$receipt.visible$': true },
+                        { receiptId: null }
+                    ]
                 },
-                include: [{
-                    model: Product,
-                    as: 'product',
-                    required: true,
-                    attributes: []
-                }],
+                include: [
+                    {
+                        model: Product,
+                        as: 'product',
+                        required: true,
+                        attributes: []
+                    },
+                    {
+                        model: Receipt,
+                        as: 'receipt',
+                        required: false,
+                        attributes: []
+                    }
+                ],
                 attributes: [
                     [utility.Sequelize.literal('SUM("Operation"."amount" * ("Operation"."price" - "product"."buying_price"))'), 'total']
                 ],

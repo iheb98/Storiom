@@ -118,11 +118,10 @@ export class CategoryStatsComponent implements OnInit, OnChanges {
           },
         },
         title: {
-          display: true,
-          fontSize: 10,
+          display: false,
         },
         legend: {
-          position: 'bottom',
+          display: false,
         },
       },
     };
@@ -188,7 +187,7 @@ export class CategoryStatsComponent implements OnInit, OnChanges {
           day = new Date(this.dayFilter).getDate();
           month = new Date(this.dayFilter).getMonth() + 1;
           year = new Date(this.dayFilter).getFullYear();
-          filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day;
+          filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
           break;
         case 'Annuel':
           year = this.yearFilter;
@@ -223,7 +222,7 @@ export class CategoryStatsComponent implements OnInit, OnChanges {
           day = new Date(this.dayFilter).getDate();
           month = new Date(this.dayFilter).getMonth() + 1;
           year = new Date(this.dayFilter).getFullYear();
-          filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day;
+          filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
           break;
         case 'Annuel':
           year = this.yearFilter;
@@ -258,7 +257,7 @@ export class CategoryStatsComponent implements OnInit, OnChanges {
           day = new Date(this.dayFilter).getDate();
           month = new Date(this.dayFilter).getMonth() + 1;
           year = new Date(this.dayFilter).getFullYear();
-          filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day;
+          filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
           break;
         case 'Annuel':
           year = this.yearFilter;
@@ -293,7 +292,7 @@ export class CategoryStatsComponent implements OnInit, OnChanges {
           day = new Date(this.dayFilter).getDate();
           month = new Date(this.dayFilter).getMonth() + 1;
           year = new Date(this.dayFilter).getFullYear();
-          filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day;
+          filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
           break;
         case 'Annuel':
           year = this.yearFilter;
@@ -336,5 +335,17 @@ export class CategoryStatsComponent implements OnInit, OnChanges {
     ]).then(() => {
       this.isLoading = false;
     });
+  }
+
+  getTotal(chartData: any): number {
+    if (!chartData?.datasets?.[0]?.data) return 0;
+    return chartData.datasets[0].data.reduce((sum: number, v: number) => sum + (v || 0), 0);
+  }
+
+  getPercentage(chartData: any, index: number): string {
+    const total = this.getTotal(chartData);
+    if (total === 0) return '0.0';
+    const value = chartData.datasets[0].data[index] || 0;
+    return ((value / total) * 100).toFixed(1);
   }
 }

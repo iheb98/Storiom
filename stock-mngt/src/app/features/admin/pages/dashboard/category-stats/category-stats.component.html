@@ -25,6 +25,18 @@
                 <div class="chart-body">
                     <p-chart type="pie" [data]="totalSoldData" [options]="pieChartOptions"></p-chart>
                 </div>
+                <div class="chart-breakdown" *ngIf="totalSoldData?.labels?.length">
+                    <div class="breakdown-item" *ngFor="let label of totalSoldData.labels; let i = index">
+                        <span class="breakdown-dot" [style.background]="totalSoldData.datasets[0].backgroundColor[i]"></span>
+                        <span class="breakdown-label">{{ label }}</span>
+                        <span class="breakdown-value">{{ totalSoldData.datasets[0].data[i] | number:'1.2-2' }} DT</span>
+                        <span class="breakdown-pct">{{ getPercentage(totalSoldData, i) }}%</span>
+                    </div>
+                    <div class="breakdown-total">
+                        <span class="breakdown-label">Total</span>
+                        <span class="breakdown-value">{{ getTotal(totalSoldData) | number:'1.2-2' }} DT</span>
+                    </div>
+                </div>
             </div>
 
             <div class="chart-card">
@@ -34,6 +46,18 @@
                 </div>
                 <div class="chart-body">
                     <p-chart type="pie" [data]="totalSoldNetData" [options]="pieChartOptions"></p-chart>
+                </div>
+                <div class="chart-breakdown" *ngIf="totalSoldNetData?.labels?.length">
+                    <div class="breakdown-item" *ngFor="let label of totalSoldNetData.labels; let i = index">
+                        <span class="breakdown-dot" [style.background]="totalSoldNetData.datasets[0].backgroundColor[i]"></span>
+                        <span class="breakdown-label">{{ label }}</span>
+                        <span class="breakdown-value">{{ totalSoldNetData.datasets[0].data[i] | number:'1.2-2' }} DT</span>
+                        <span class="breakdown-pct">{{ getPercentage(totalSoldNetData, i) }}%</span>
+                    </div>
+                    <div class="breakdown-total">
+                        <span class="breakdown-label">Total</span>
+                        <span class="breakdown-value">{{ getTotal(totalSoldNetData) | number:'1.2-2' }} DT</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -47,6 +71,18 @@
                 <div class="chart-body bar-chart-body">
                     <p-chart type="bar" [data]="operationsData" [options]="operationsOptions"></p-chart>
                 </div>
+                <div class="chart-breakdown" *ngIf="operationsData?.labels?.length">
+                    <div class="breakdown-item" *ngFor="let label of operationsData.labels; let i = index">
+                        <span class="breakdown-dot" [style.background]="operationsData.datasets[0]?.backgroundColor[i] || operationsData.datasets[0]?.backgroundColor[0]"></span>
+                        <span class="breakdown-label">{{ label }}</span>
+                        <span class="breakdown-value">{{ operationsData.datasets[0].data[i] | number:'1.2-2' }} DT</span>
+                        <span class="breakdown-pct">{{ getPercentage(operationsData, i) }}%</span>
+                    </div>
+                    <div class="breakdown-total">
+                        <span class="breakdown-label">Total</span>
+                        <span class="breakdown-value">{{ getTotal(operationsData) | number:'1.2-2' }} DT</span>
+                    </div>
+                </div>
             </div>
 
             <div class="chart-card">
@@ -55,6 +91,18 @@
                 </div>
                 <div class="chart-body bar-chart-body">
                     <p-chart type="bar" [data]="operationsItemsData" [options]="operationsOptions"></p-chart>
+                </div>
+                <div class="chart-breakdown" *ngIf="operationsItemsData?.labels?.length">
+                    <div class="breakdown-item" *ngFor="let label of operationsItemsData.labels; let i = index">
+                        <span class="breakdown-dot" [style.background]="operationsItemsData.datasets[0]?.backgroundColor[i] || operationsItemsData.datasets[0]?.backgroundColor[0]"></span>
+                        <span class="breakdown-label">{{ label }}</span>
+                        <span class="breakdown-value">{{ operationsItemsData.datasets[0].data[i] | number:'1.0-0' }} unités</span>
+                        <span class="breakdown-pct">{{ getPercentage(operationsItemsData, i) }}%</span>
+                    </div>
+                    <div class="breakdown-total">
+                        <span class="breakdown-label">Total</span>
+                        <span class="breakdown-value">{{ getTotal(operationsItemsData) | number:'1.0-0' }} unités</span>
+                    </div>
                 </div>
             </div>
         </div>

@@ -194,18 +194,35 @@ $radius-md: 12px;
 }
 
 // ============================================
-// CHART WRAPPER
+// CHART WRAPPER (scrollable on mobile)
 // ============================================
-.chart-wrapper {
-    background: $white;
+.chart-scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
     border-radius: $radius-md;
     border: 1px solid $border-color;
+    box-shadow: $shadow-sm;
+    position: relative;
+
+    // Subtle scrollbar
+    &::-webkit-scrollbar {
+        height: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.15);
+        border-radius: 4px;
+    }
+}
+
+.chart-wrapper {
+    background: $white;
     padding: 25px;
     min-height: 350px;
-    box-shadow: $shadow-sm;
 
     p-chart {
         width: 100%;
+        display: block;
     }
 
     @media (max-width: 576px) {

@@ -64,11 +64,19 @@ export class OperationStatsComponent implements OnInit, OnChanges {
     const surfaceBorder = 'lightgray';
 
     this.operationsOptions = {
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
       plugins: {
         legend: {
-          labels: {
-            color: textColor
-          }
+          display: false
+        },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
         }
       },
       scales: {
@@ -84,7 +92,8 @@ export class OperationStatsComponent implements OnInit, OnChanges {
         },
         x: {
           ticks: {
-            color: textColorSecondary
+            color: textColorSecondary,
+            maxRotation: 0,
           },
           grid: {
             color: surfaceBorder,
@@ -228,7 +237,7 @@ export class OperationStatsComponent implements OnInit, OnChanges {
         day = new Date(this.dayFilter).getDate();
         month = new Date(this.dayFilter).getMonth() + 1;
         year = new Date(this.dayFilter).getFullYear();
-        filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + day;
+        filterValue = year + '-' + (month < 10 ? '0' + month : month) + '-' + (day < 10 ? '0' + day : day);
         break;
       case 'Annuel':
         year = this.yearFilter;
@@ -265,5 +274,11 @@ export class OperationStatsComponent implements OnInit, OnChanges {
   round(value, precision) {
     var multiplier = Math.pow(10, precision || 0);
     return Math.round(value * multiplier) / multiplier;
+  }
+
+  getChartMinWidth(): number {
+    const labelCount = this.operationsLabels?.length || 0;
+    // Ensure bars are always wide enough to tap on mobile
+    return Math.max(labelCount * 45, 500);
   }
 }

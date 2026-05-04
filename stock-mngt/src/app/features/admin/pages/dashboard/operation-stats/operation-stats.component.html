@@ -22,8 +22,10 @@
         </div>
 
         <!-- Chart Container -->
-        <div class="chart-wrapper">
-            <p-chart type="bar" [data]="operationsData" [options]="operationsOptions"></p-chart>
+        <div class="chart-scroll-wrapper">
+            <div class="chart-wrapper" [style.min-width.px]="getChartMinWidth()">
+                <p-chart type="bar" [data]="operationsData" [options]="operationsOptions"></p-chart>
+            </div>
         </div>
     </div>
 </div>
