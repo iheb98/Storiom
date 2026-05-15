@@ -131,11 +131,16 @@ router.get('/store/:id/bestSelling', utility.authenticate, checkSubscription, (r
             ]
         },
         include: [
-            'product',
+            {
+                model: Product,
+                as: 'product',
+                required: true,
+                where: { isVisible: true }
+            },
             {
                 model: Receipt,
                 as: 'receipt',
-                required: false,   // LEFT JOIN to include null receipts
+                required: false,
                 attributes: []
             }
         ],
@@ -165,7 +170,13 @@ router.get('/store/:id/mostProfitable', utility.authenticate, checkSubscription,
                 { '$receipt.visible$': true },
                 { receiptId: null }
             ]
-        }, include: ['product',
+        }, include: [
+            {
+                model: Product,
+                as: 'product',
+                required: true,
+                where: { isVisible: true }
+            },
             {
                 model: Receipt,
                 as: 'receipt',

@@ -11,7 +11,7 @@ export class TermsComponent implements OnInit {
   faFileContract = faFileContract;
   faChevronRight = faChevronRight;
 
-  lastUpdated = '7 Janvier 2026';
+  lastUpdated = '5 Mai 2026';
 
   sections = [
     {
@@ -19,8 +19,8 @@ export class TermsComponent implements OnInit {
       title: 'Objet',
       content: `Storiom est une application permettant aux commerçants de gérer leur inventaire 
         (produits, employés, dépenses, fournisseurs, reçus, crédits), de consulter des statistiques, 
-        de générer des rapports, et prochainement, de publier leurs produits dans une marketplace 
-        visible par des clients externes.`
+        de générer des rapports, de publier leurs produits dans une marketplace 
+        visible par des clients externes, et de créer un magasin privé accessible via un nom de domaine personnalisé.`
     },
     {
       id: 'acceptation',
@@ -47,6 +47,21 @@ export class TermsComponent implements OnInit {
         <li>En cas de modification des tarifs, les utilisateurs seront informés <strong>au moins 30 jours à l'avance</strong> par email ou notification dans l'application.</li>
         <li>Les utilisateurs peuvent résilier leur abonnement avant l'entrée en vigueur des nouveaux tarifs.</li>
         <li>Storiom se réserve le droit de modifier ou suspendre certaines fonctionnalités avec préavis raisonnable.</li>
+      </ul>`
+    },
+    {
+      id: 'domaine',
+      title: 'Magasin privé et nom de domaine personnalisé',
+      content: `Storiom offre la possibilité de créer un <strong>magasin privé</strong> accessible via un nom de domaine personnalisé. Cette fonctionnalité est soumise aux conditions suivantes :
+      <ul>
+        <li>Le magasin privé permet au commerçant de disposer d'une vitrine en ligne dédiée, avec une personnalisation avancée du thème (couleurs, typographie, sections, images, liens vers les réseaux sociaux).</li>
+        <li>L'activation d'un nom de domaine personnalisé est soumise à un <strong>tarif distinct</strong> de l'abonnement standard. Ce tarif est indiqué dans la section « Domaine & Thème » de l'espace d'administration.</li>
+        <li>Le commerçant est responsable de l'achat et de la configuration DNS de son nom de domaine (enregistrement CNAME ou A record pointant vers les serveurs Storiom).</li>
+        <li>Storiom fournit les instructions nécessaires à la configuration DNS, mais ne garantit pas la disponibilité ou le renouvellement du nom de domaine, qui relève de la responsabilité du propriétaire.</li>
+        <li>La vérification du domaine doit être effectuée via l'interface d'administration. Un domaine non vérifié ne sera pas actif.</li>
+        <li>Storiom se réserve le droit de désactiver un domaine personnalisé en cas de non-paiement, d'utilisation abusive, ou de violation des présentes CGU.</li>
+        <li>Les contenus publiés sur le magasin privé sont soumis aux mêmes règles que les contenus de la marketplace (voir section « Contenus interdits »).</li>
+        <li>En cas de résiliation de l'abonnement au domaine personnalisé, le magasin privé redeviendra inaccessible via le domaine. Les données restent disponibles dans l'espace d'administration standard.</li>
       </ul>`
     },
     {
