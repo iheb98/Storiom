@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   faEdit, faTrash, faPlus, faFilter, faUndo, faUser, faPhone,
-  faCoins, faSearch, faHandHoldingUsd, faCalendarPlus, faCalendarCheck
+  faCoins, faSearch, faHandHoldingUsd, faCalendarPlus, faCalendarCheck, faExchangeAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { CreditService } from 'src/app/core/services/credit.service';
@@ -28,6 +28,7 @@ export class CreditsMngtComponent implements OnInit {
   faHandHoldingUsd = faHandHoldingUsd;
   faCalendarPlus = faCalendarPlus;
   faCalendarCheck = faCalendarCheck;
+  faExchangeAlt = faExchangeAlt;
 
   // Filters
   firstNameFilter = '';
@@ -41,6 +42,7 @@ export class CreditsMngtComponent implements OnInit {
   fromReturnDateFilter: string | null = null;
   toReturnDateFilter: string | null = null;
   statusFilter: boolean | null = false;
+  directionFilter: string | null = null;
 
   // Data
   borrowers: any[] = [];
@@ -109,6 +111,7 @@ export class CreditsMngtComponent implements OnInit {
     this.fromReturnDateFilter = null;
     this.toReturnDateFilter = null;
     this.statusFilter = null;
+    this.directionFilter = null;
     this.clearFiltersState();
     this.filter();
   }
@@ -137,6 +140,8 @@ export class CreditsMngtComponent implements OnInit {
       query += query ? ",returnDate < '" + this.toReturnDateFilter + "'" : "returnDate < '" + this.toReturnDateFilter + "'";
     if (this.statusFilter !== null)
       query += query ? ",status = '" + this.statusFilter + "'" : "status = '" + this.statusFilter + "'";
+    if (this.directionFilter)
+      query += query ? ",direction = '" + this.directionFilter + "'" : "direction = '" + this.directionFilter + "'";
     return query;
   }
 
@@ -254,6 +259,7 @@ export class CreditsMngtComponent implements OnInit {
       fromReturnDateFilter: this.fromReturnDateFilter,
       toReturnDateFilter: this.toReturnDateFilter,
       statusFilter: this.statusFilter,
+      directionFilter: this.directionFilter,
       currentPage: this.currentPage,
       currentSize: this.currentSize,
       filtersCollapsed: this.filtersCollapsed
@@ -277,6 +283,7 @@ export class CreditsMngtComponent implements OnInit {
       this.fromReturnDateFilter = state.fromReturnDateFilter ?? null;
       this.toReturnDateFilter = state.toReturnDateFilter ?? null;
       this.statusFilter = state.statusFilter ?? null;
+      this.directionFilter = state.directionFilter ?? null;
       this.currentPage = state.currentPage ?? 0;
       this.currentSize = state.currentSize ?? 5;
       this.filtersCollapsed = state.filtersCollapsed ?? true;

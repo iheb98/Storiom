@@ -39,6 +39,8 @@ import { ServiceAddComponent } from './pages/services/service-add/service-add.co
 import { ServiceRequestsMngtComponent } from './pages/services/service-requests-mngt/service-requests-mngt.component';
 import { SubscriptionComponent } from './pages/subscription/subscription.component';
 import { PaymentOrdersAdminComponent } from '../superadmin/pages/payment-orders-admin/payment-orders-admin.component';
+import { UsersAdminComponent } from '../superadmin/pages/users-admin/users-admin.component';
+import { PromoSettingsComponent } from '../superadmin/pages/promo-settings/promo-settings.component';
 import { RoleGuard } from 'src/app/core/services/role.guard';
 import { ProductAnalyticsComponent } from './pages/product-analytics/product-analytics.component';
 import { DomainSettingsComponent } from './pages/settings/domain-settings/domain-settings.component';
@@ -125,6 +127,22 @@ const routes: Routes = [
       {
         path: 'payment-orders',
         component: PaymentOrdersAdminComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['Admin'] }
+      },
+
+      // ------------ Users Admin (Admin role only) ------------
+      {
+        path: 'users-admin',
+        component: UsersAdminComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['Admin'] }
+      },
+
+      // ------------ Promo Settings (Admin role only) ------------
+      {
+        path: 'promo-settings',
+        component: PromoSettingsComponent,
         canActivate: [RoleGuard],
         data: { roles: ['Admin'] }
       },

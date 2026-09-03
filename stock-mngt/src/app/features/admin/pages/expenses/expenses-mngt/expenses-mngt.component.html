@@ -93,6 +93,13 @@
                 <div class="expense-info">
                     <div class="expense-header">
                         <span class="expense-title">{{ expense?.title }}</span>
+                        <span class="recurring-badge" *ngIf="expense?.isRecurring">
+                            <fa-icon [icon]="faSync"></fa-icon>
+                            {{ expense?.recurrenceType === 'daily' ? 'Quotidienne' :
+                               expense?.recurrenceType === 'weekly' ? 'Hebdomadaire' :
+                               expense?.recurrenceType === 'monthly' ? 'Mensuelle' :
+                               expense?.recurrenceType === 'yearly' ? 'Annuelle' : 'Récurrente' }}
+                        </span>
                     </div>
                     <div class="expense-details">
                         <span class="detail-item" *ngIf="expense?.comment">
@@ -101,7 +108,7 @@
                         </span>
                         <span class="detail-item">
                             <fa-icon [icon]="faCalendar"></fa-icon>
-                            {{ expense?.date | date:'dd/MM/yyyy' }}
+                            {{ expense?.isRecurring ? 'Début: ' : '' }}{{ expense?.date | date:'dd/MM/yyyy' }}
                         </span>
                     </div>
                 </div>

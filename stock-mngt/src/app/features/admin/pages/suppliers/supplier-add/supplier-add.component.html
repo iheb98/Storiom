@@ -85,17 +85,24 @@
                     </div>
                 </div>
 
-                <!-- Financial Section -->
-                <div class="form-section">
+                <!-- Credit Summary (Only visible when editing - auto-calculated) -->
+                <div class="form-section" *ngIf="supplierId">
                     <h3 class="section-title"><fa-icon [icon]="faCoins"></fa-icon> Crédit</h3>
 
-                    <div class="form-group">
-                        <label for="credit"><fa-icon [icon]="faWallet"></fa-icon> Montant du crédit</label>
-                        <div class="input-with-suffix">
-                            <input type="number" id="credit" formControlName="credit" placeholder="0.00">
-                            <span class="suffix">DT</span>
+                    <div class="calculated-credit-display"
+                        [class.positive]="calculatedCredit > 0"
+                        [class.negative]="calculatedCredit < 0"
+                        [class.neutral]="calculatedCredit === 0">
+                        <div class="credit-amount-row">
+                            <span class="credit-amount-label">Solde calculé</span>
+                            <span class="credit-amount-value">{{ calculatedCredit | number:'1.2-2' }} DT</span>
                         </div>
-                        <span class="input-hint">Montant que vous devez à ce fournisseur</span>
+                        <span class="credit-hint">
+                            Ce montant est calculé automatiquement à partir des crédits liés à ce fournisseur
+                        </span>
+                        <a class="credit-link" (click)="navigateTo('/credits')">
+                            <fa-icon [icon]="faHandHoldingUsd"></fa-icon> Voir les crédits
+                        </a>
                     </div>
                 </div>
 

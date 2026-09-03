@@ -5,16 +5,24 @@ const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 
 router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
-    const { title, amount, comment, date, storeId } = req.body
-    Expense.create({ title, amount, comment, date, storeId, creatorUserId: req.user.id }).then(createdExpense => {
+    const { title, amount, comment, date, storeId, isRecurring, recurrenceType, recurrenceDay, reminderEnabled, reminderBefore } = req.body
+    Expense.create({
+        title, amount, comment, date, storeId,
+        isRecurring: isRecurring || false,
+        recurrenceType: isRecurring ? recurrenceType : null,
+        recurrenceDay: isRecurring ? recurrenceDay : null,
+        reminderEnabled: isRecurring ? (reminderEnabled || false) : false,
+        reminderBefore: (isRecurring && reminderEnabled) ? reminderBefore : null,
+        creatorUserId: req.user.id
+    }).then(createdExpense => {
         res.json({
             expense: createdExpense
         })
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 })
 
@@ -32,9 +40,9 @@ router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) 
             res.status(500).json({ success: false, message: "Expense not found" })
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
@@ -52,9 +60,9 @@ router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, nex
     }).catch(err => {
         console.log(err)
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
@@ -74,9 +82,9 @@ router.get('/count/store/:id', utility.authenticate, checkSubscription, (req, re
         res.json(countUsers)
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
@@ -91,14 +99,19 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res, next) =>
         expense.amount = req.body.amount
         expense.date = req.body.date
         expense.comment = req.body.comment
+        expense.isRecurring = req.body.isRecurring || false
+        expense.recurrenceType = req.body.isRecurring ? req.body.recurrenceType : null
+        expense.recurrenceDay = req.body.isRecurring ? req.body.recurrenceDay : null
+        expense.reminderEnabled = req.body.isRecurring ? (req.body.reminderEnabled || false) : false
+        expense.reminderBefore = (req.body.isRecurring && req.body.reminderEnabled) ? req.body.reminderBefore : null
         expense.save().then(savedExpense => {
             res.json({ message: "Expense updated", success: true })
         })
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 
@@ -114,9 +127,9 @@ router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => 
 
     }).catch(err => {
         res.status(500).json({
-success:false,
-message:err.toString()
-})
+            success: false,
+            message: err.toString()
+        })
     })
 });
 

@@ -4,6 +4,7 @@ const { Store, Brand, Expense, Address, Subscription, StoragePurchase, User } = 
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 const checkPlanTier = require('../checkPlanTier');
+const { invalidate, invalidatePattern, flushBucket } = require('../cacheService');
 
 router.post('/create', utility.authenticate, async (req, res) => {
     try {
@@ -11,7 +12,7 @@ router.post('/create', utility.authenticate, async (req, res) => {
 
         const createdStore = await Store.create({
             name, logo, images: JSON.stringify(images), active: true, phone, email, site,
-            description, userId, creatorUserId: req.user.id, isVisibleToPublic, isSupportingDeliveries, taxId
+            description, userId, creatorUserId: req.user.id, isVisibleToPublic: false, isSupportingDeliveries, taxId
         });
 
         await Address.create({ storeId: createdStore.id, country, street, city, state, postalCode });
@@ -68,6 +69,9 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
                 address.state = state
                 address.postalCode = postalCode
                 address.save().then(savedAddress => {
+                    // Invalidate caches for this store
+                    invalidate('storeDetails', `store:${req.body.id}`);
+                    invalidatePattern('storefront', `store:${req.body.id}`);
                     res.json({ message: 'Store updated successfully!', success: true })
                 })
             }).catch(err => {
@@ -541,6 +545,10 @@ router.put('/:id/theme', utility.authenticate, checkSubscription, checkPlanTier(
             const { clearDomainCache } = require('../domainResolver');
             clearDomainCache(store.customDomain);
         }
+
+        // Invalidate caches
+        invalidate('storeDetails', `store:${id}`);
+        invalidatePattern('storefront', `store:${id}`);
 
         res.json({ success: true, theme: store.theme });
     } catch (err) {

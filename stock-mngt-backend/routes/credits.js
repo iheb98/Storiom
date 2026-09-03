@@ -1,12 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const { Credit } = require('../models');
+const { Credit, Supplier } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 
 router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
-    const { firstName, lastName, phone, email, comment, amount, givenDate, returnDate, storeId, status } = req.body
-    Credit.create({ firstName, lastName, phone, email, comment, amount, givenDate, returnDate, storeId, status: status || false, creatorUserId: req.user.id }).then(createdCredit => {
+    const { firstName, lastName, phone, email, comment, amount, givenDate, returnDate, storeId, status, direction, supplierId, reminderEnabled, reminderBefore } = req.body
+    Credit.create({
+        firstName, lastName, phone, email, comment, amount, givenDate, returnDate, storeId,
+        status: status || false,
+        direction: direction || 'owed_to_me',
+        supplierId: supplierId || null,
+        reminderEnabled: reminderEnabled || false,
+        reminderBefore: reminderEnabled ? reminderBefore : null,
+        creatorUserId: req.user.id
+    }).then(createdCredit => {
         res.json({
             credit: createdCredit
         })
@@ -54,6 +62,10 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res, next) =>
         credit.amount = req.body.amount
         credit.comment = req.body.comment
         credit.status = req.body.status
+        credit.direction = req.body.direction || credit.direction
+        credit.supplierId = req.body.supplierId !== undefined ? (req.body.supplierId || null) : credit.supplierId
+        credit.reminderEnabled = req.body.reminderEnabled || false
+        credit.reminderBefore = req.body.reminderEnabled ? req.body.reminderBefore : null
         credit.save().then(savedCredit => {
             res.json({ message: "Credit updated", success: true })
         })
@@ -72,7 +84,8 @@ router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, nex
             storeId: id,
             ...utility.buildQuery(req.query.query),
             creatorUserId: req.user.id
-        }
+        },
+        include: [{ model: Supplier, as: 'supplier', attributes: ['id', 'firstName', 'lastName', 'phone', 'email'] }]
     }, { page: req.query.page, pageSize: req.query.size })).then(users => {
         res.json(users)
     }).catch(err => {
@@ -109,7 +122,8 @@ router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => 
         where: {
             id,
             creatorUserId: req.user.id
-        }
+        },
+        include: [{ model: Supplier, as: 'supplier', attributes: ['id', 'firstName', 'lastName', 'phone', 'email'] }]
     }).then(credit => {
         res.json(credit)
 

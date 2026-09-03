@@ -8,12 +8,14 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { PaymentOrderService, PaymentOrder, PricingInfo, BankInstructions } from 'src/app/core/services/payment-order.service';
 import { AuthService } from 'src/app/core/services/auth.service';
+import { PromotionAdminService, PromotionStatus } from 'src/app/core/services/promotion-admin.service';
 import Swal from 'sweetalert2';
 
 interface SubscriptionPlan {
     key: '1M' | '3M' | '6M' | '12M';
     name: string;
     price: number;
+    originalPrice?: number;
     duration: string;
     discount?: string;
     popular?: boolean;
@@ -121,9 +123,16 @@ export class SubscriptionComponent implements OnInit {
     // Plans
     plans: SubscriptionPlan[] = [];
 
+    // Promo
+    promoActive = false;
+    promoDiscountPercent = 0;
+    promoSlotsRemaining = 0;
+    promoDescription = '';
+
     constructor(
         private paymentOrderService: PaymentOrderService,
         private authService: AuthService,
+        private promoService: PromotionAdminService,
         private router: Router,
         private route: ActivatedRoute
     ) { }
@@ -190,6 +199,20 @@ export class SubscriptionComponent implements OnInit {
 
         // Load current subscription
         this.loadCurrentSubscription();
+
+        // Load promo status
+        this.promoService.getStatus().subscribe(
+            (status: PromotionStatus) => {
+                if (status.active) {
+                    this.promoActive = true;
+                    this.promoDiscountPercent = status.discountPercent || 0;
+                    this.promoSlotsRemaining = status.slotsRemaining || 0;
+                    this.promoDescription = status.description || '';
+                    this.initPlans(); // Refresh with discounted prices
+                }
+            },
+            error => console.error('Error loading promo status:', error)
+        );
     }
 
     loadCurrentSubscription() {
@@ -237,14 +260,16 @@ export class SubscriptionComponent implements OnInit {
             {
                 key: '1M',
                 name: '1 Mois',
-                price: tierPrices['1M'],
+                price: this.promoActive ? Math.ceil(tierPrices['1M'] * (1 - this.promoDiscountPercent / 100)) : tierPrices['1M'],
+                originalPrice: this.promoActive ? tierPrices['1M'] : undefined,
                 duration: '1 mois',
                 icon: faStar
             },
             {
                 key: '3M',
                 name: '3 Mois',
-                price: tierPrices['3M'],
+                price: this.promoActive ? Math.ceil(tierPrices['3M'] * (1 - this.promoDiscountPercent / 100)) : tierPrices['3M'],
+                originalPrice: this.promoActive ? tierPrices['3M'] : undefined,
                 duration: '3 mois',
                 discount: Math.round((1 - tierPrices['3M'] / (monthlyPrice * 3)) * 100) + '%',
                 icon: faRocket
@@ -252,7 +277,8 @@ export class SubscriptionComponent implements OnInit {
             {
                 key: '6M',
                 name: '6 Mois',
-                price: tierPrices['6M'],
+                price: this.promoActive ? Math.ceil(tierPrices['6M'] * (1 - this.promoDiscountPercent / 100)) : tierPrices['6M'],
+                originalPrice: this.promoActive ? tierPrices['6M'] : undefined,
                 duration: '6 mois',
                 discount: Math.round((1 - tierPrices['6M'] / (monthlyPrice * 6)) * 100) + '%',
                 popular: true,
@@ -261,7 +287,8 @@ export class SubscriptionComponent implements OnInit {
             {
                 key: '12M',
                 name: '12 Mois',
-                price: tierPrices['12M'],
+                price: this.promoActive ? Math.ceil(tierPrices['12M'] * (1 - this.promoDiscountPercent / 100)) : tierPrices['12M'],
+                originalPrice: this.promoActive ? tierPrices['12M'] : undefined,
                 duration: '12 mois',
                 discount: Math.round((1 - tierPrices['12M'] / (monthlyPrice * 12)) * 100) + '%',
                 icon: faCreditCard

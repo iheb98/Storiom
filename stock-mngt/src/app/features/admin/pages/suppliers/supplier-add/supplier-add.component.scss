@@ -408,3 +408,71 @@ $radius-lg: 16px;
         }
     }
 }
+
+// ============================================
+// CALCULATED CREDIT DISPLAY
+// ============================================
+.calculated-credit-display {
+    padding: 20px;
+    border-radius: $radius-md;
+    background: $background;
+    border: 1px solid $border-color;
+
+    &.positive {
+        background: $success-light;
+        border-color: rgba($success, 0.2);
+
+        .credit-amount-value { color: $success; }
+    }
+
+    &.negative {
+        background: $danger-light;
+        border-color: rgba($danger, 0.2);
+
+        .credit-amount-value { color: $danger; }
+    }
+
+    &.neutral {
+        .credit-amount-value { color: $text-secondary; }
+    }
+
+    .credit-amount-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .credit-amount-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: $text-secondary;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .credit-amount-value {
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+
+    .credit-hint {
+        display: block;
+        font-size: 0.8rem;
+        color: $text-secondary;
+        margin-bottom: 12px;
+    }
+
+    .credit-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: $primary;
+        cursor: pointer;
+        transition: opacity 0.2s;
+
+        &:hover { opacity: 0.7; }
+    }
+}

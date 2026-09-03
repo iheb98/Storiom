@@ -239,6 +239,174 @@
   </div>
 
   <!-- ============================================ -->
+  <!-- PROFIT REPORT SECTION -->
+  <!-- ============================================ -->
+  <div class="section-divider">
+    <span>Rapport de Profit</span>
+  </div>
+
+  <div class="date-range-card">
+    <h3 class="card-title"><fa-icon [icon]="chartLineIcon"></fa-icon> Rapport de Profit / Pertes</h3>
+    <p class="card-subtitle">Calculez le profit net en combinant les ventes et les dépenses sur une période</p>
+
+    <div class="date-inputs">
+      <div class="date-group">
+        <label for="profitFrom">Date de début</label>
+        <input type="date" id="profitFrom" [(ngModel)]="profitFromDate">
+      </div>
+      <div class="date-separator">
+        <fa-icon [icon]="arrowRightIcon"></fa-icon>
+      </div>
+      <div class="date-group">
+        <label for="profitTo">Date de fin</label>
+        <input type="date" id="profitTo" [(ngModel)]="profitToDate">
+      </div>
+    </div>
+
+    <!-- Include Deleted Toggle -->
+    <div class="toggle-option">
+      <label class="toggle-switch">
+        <input type="checkbox" [(ngModel)]="profitIncludeDeleted">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="toggle-label">Inclure les produits supprimés</span>
+    </div>
+
+    <button class="btn-generate profit-btn" (click)="generateProfitReport()" [disabled]="profitLoading">
+      <fa-icon [icon]="profitLoading ? spinnerIcon : chartLineIcon" [spin]="profitLoading"></fa-icon>
+      {{ profitLoading ? 'Calcul en cours...' : 'Calculer le profit' }}
+    </button>
+  </div>
+
+  <!-- Profit Error -->
+  <div class="error-message" *ngIf="profitErrorMessage">
+    <fa-icon [icon]="warningIcon"></fa-icon>
+    <span>{{ profitErrorMessage }}</span>
+  </div>
+
+  <!-- Profit Results -->
+  <div class="report-results" *ngIf="profitData">
+    <div class="stats-header">
+      <h3><fa-icon [icon]="chartPieIcon"></fa-icon> Résumé Profit / Pertes</h3>
+      <span class="date-badge">{{ profitFromDate }} → {{ profitToDate }}</span>
+    </div>
+
+    <div class="stats-grid four-cols">
+      <div class="stat-card earnings">
+        <div class="stat-icon"><fa-icon [icon]="coinsIcon"></fa-icon></div>
+        <div class="stat-content">
+          <span class="stat-value">{{ profitData.totalRevenue | number:'1.2-2' }}</span>
+          <span class="stat-label">Chiffre d'affaires (DT)</span>
+        </div>
+      </div>
+
+      <div class="stat-card load-cost">
+        <div class="stat-icon"><fa-icon [icon]="receiptIcon"></fa-icon></div>
+        <div class="stat-content">
+          <span class="stat-value">{{ profitData.totalExpenses | number:'1.2-2' }}</span>
+          <span class="stat-label">Dépenses totales (DT)</span>
+        </div>
+      </div>
+
+      <div class="stat-card products">
+        <div class="stat-icon"><fa-icon [icon]="coinsIcon"></fa-icon></div>
+        <div class="stat-content">
+          <span class="stat-value">{{ profitData.grossProfit | number:'1.2-2' }}</span>
+          <span class="stat-label">Profit brut (DT)</span>
+        </div>
+      </div>
+
+      <div class="stat-card" [ngClass]="profitData.netProfit >= 0 ? 'net-positive' : 'net-negative'">
+        <div class="stat-icon"><fa-icon [icon]="chartLineIcon"></fa-icon></div>
+        <div class="stat-content">
+          <span class="stat-value">{{ profitData.netProfit | number:'1.2-2' }}</span>
+          <span class="stat-label">Profit net (DT) · {{ profitData.profitMargin | number:'1.1-1' }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Breakdown -->
+    <div class="products-section" *ngIf="profitData.products?.length > 0">
+      <div class="section-header">
+        <h3><fa-icon [icon]="boxIcon"></fa-icon> Profit par produit</h3>
+        <span class="product-count">{{ profitData.products.length }} produits · {{ profitData.totalProductsSold }} vendus</span>
+      </div>
+
+      <div class="products-table-wrapper">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Produit</th>
+              <th>Qté Vendue</th>
+              <th>Revenu</th>
+              <th>Coût</th>
+              <th>Profit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of profitData.products">
+              <td class="product-name" data-label="Produit">{{ product.productName }}</td>
+              <td class="quantity" data-label="Qté">{{ product.quantitySold }}</td>
+              <td data-label="Revenu">{{ product.revenue | number:'1.2-2' }} DT</td>
+              <td data-label="Coût">{{ product.cost | number:'1.2-2' }} DT</td>
+              <td class="earnings" data-label="Profit">
+                <span class="earnings-badge" [class.negative]="product.profit < 0">
+                  {{ product.profit >= 0 ? '+' : '' }}{{ product.profit | number:'1.2-2' }} DT
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Expenses List -->
+    <div class="products-section" *ngIf="profitData.expenses?.length > 0">
+      <div class="section-header">
+        <h3><fa-icon [icon]="receiptIcon"></fa-icon> Détail des dépenses</h3>
+        <span class="product-count">{{ profitData.expensesCount }} dépenses</span>
+      </div>
+
+      <div class="products-table-wrapper">
+        <table class="products-table">
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Date</th>
+              <th>Montant</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let expense of profitData.expenses">
+              <td class="product-name" data-label="Titre">
+                {{ expense.title }}
+                <span class="recurring-tag" *ngIf="expense.isRecurring">🔄</span>
+              </td>
+              <td data-label="Date">{{ expense.date | date:'dd/MM/yyyy' }}</td>
+              <td class="cost" data-label="Montant">
+                <span class="cost-badge">{{ expense.amount | number:'1.2-2' }} DT</span>
+              </td>
+            </tr>
+            <tr class="totals-row">
+              <td class="product-name"><strong>TOTAL</strong></td>
+              <td></td>
+              <td class="cost"><strong class="cost-badge">{{ profitData.totalExpenses | number:'1.2-2' }} DT</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Download Profit PDF -->
+    <div class="download-section">
+      <button class="btn-download" (click)="downloadProfitPDF()">
+        <fa-icon [icon]="pdfIcon"></fa-icon>
+        Télécharger le rapport de profit PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
   <!-- STOCK EXPORT SECTION -->
   <!-- ============================================ -->
   <div class="section-divider">

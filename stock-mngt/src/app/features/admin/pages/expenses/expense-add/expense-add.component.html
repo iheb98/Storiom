@@ -66,8 +66,90 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="date"><fa-icon [icon]="faCalendarAlt"></fa-icon> Date</label>
+                            <label for="date"><fa-icon [icon]="faCalendarAlt"></fa-icon> {{ form.get('isRecurring').value ? 'Date de début' : 'Date' }}</label>
                             <input type="date" id="date" formControlName="date">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recurring Section -->
+                <div class="form-section">
+                    <h3 class="section-title"><fa-icon [icon]="faSync"></fa-icon> Récurrence</h3>
+
+                    <div class="form-group">
+                        <label><fa-icon [icon]="faSync"></fa-icon> Dépense récurrente ?</label>
+                        <div class="status-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" formControlName="isRecurring">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label" [class.active]="form.get('isRecurring').value">
+                                {{ form.get('isRecurring').value ? 'Oui' : 'Non' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div *ngIf="form.get('isRecurring').value">
+                        <div class="form-group">
+                            <label><fa-icon [icon]="faCalendarDay"></fa-icon> Fréquence</label>
+                            <select formControlName="recurrenceType" (change)="onRecurrenceTypeChange()">
+                                <option value="daily">Quotidienne</option>
+                                <option value="weekly">Hebdomadaire</option>
+                                <option value="monthly">Mensuelle</option>
+                                <option value="yearly">Annuelle</option>
+                            </select>
+                        </div>
+
+                        <!-- Day of week (for weekly) -->
+                        <div class="form-group" *ngIf="form.get('recurrenceType').value === 'weekly'">
+                            <label><fa-icon [icon]="faCalendarDay"></fa-icon> Jour de la semaine</label>
+                            <select formControlName="recurrenceDay">
+                                <option [ngValue]="null" disabled>-- Choisir un jour --</option>
+                                <option *ngFor="let day of daysOfWeek" [ngValue]="day.value">{{ day.label }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Day of month (for monthly) -->
+                        <div class="form-group" *ngIf="form.get('recurrenceType').value === 'monthly'">
+                            <label><fa-icon [icon]="faCalendarDay"></fa-icon> Jour du mois</label>
+                            <select formControlName="recurrenceDay">
+                                <option [ngValue]="null" disabled>-- Choisir un jour --</option>
+                                <option *ngFor="let day of daysOfMonth" [ngValue]="day">Le {{ day }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Month + day (for yearly) -->
+                        <div class="form-group" *ngIf="form.get('recurrenceType').value === 'yearly'">
+                            <label><fa-icon [icon]="faCalendarDay"></fa-icon> Jour du mois (chaque année)</label>
+                            <select formControlName="recurrenceDay">
+                                <option [ngValue]="null" disabled>-- Choisir un jour --</option>
+                                <option *ngFor="let day of daysOfMonth" [ngValue]="day">Le {{ day }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Reminder Section -->
+                        <div class="reminder-section">
+                            <div class="form-group">
+                                <label><fa-icon [icon]="faBell"></fa-icon> Activer le rappel ?</label>
+                                <div class="status-toggle">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" formControlName="reminderEnabled">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span class="toggle-label" [class.active]="form.get('reminderEnabled').value">
+                                        {{ form.get('reminderEnabled').value ? 'Oui' : 'Non' }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="form-group" *ngIf="form.get('reminderEnabled').value">
+                                <label><fa-icon [icon]="faBell"></fa-icon> Rappeler avant ({{ getReminderUnit() }})</label>
+                                <input type="number" formControlName="reminderBefore" min="1"
+                                    [placeholder]="'Ex: ' + (form.get('recurrenceType').value === 'daily' || form.get('recurrenceType').value === 'weekly' ? '2 heures' : '3 jours')">
+                                <span class="field-hint">
+                                    Vous serez notifié {{ form.get('reminderBefore').value || '?' }} {{ getReminderUnit() }} avant chaque occurrence
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>

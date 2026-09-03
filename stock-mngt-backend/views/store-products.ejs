@@ -1,0 +1,88 @@
+<%- include('partials/head', {
+    title, description, ogType: 'website', canonicalUrl, storeName,
+    ogImage, jsonLd: null, storeLogo, fontFamily, primaryColor, accentColor
+}) %>
+<body class="<%= mode === 'dark' ? 'dark-mode' : '' %>">
+
+    <!-- ═══ HEADER ═══ -->
+    <div class="products-page-header" style="background: linear-gradient(135deg, <%= primaryColor %>, <%= accentColor || primaryColor %>);">
+        <h1 style="font-family: '<%= fontFamily %>'"><%= storeName %></h1>
+        <p><%= productCount %> produit<%= productCount !== 1 ? 's' : '' %> disponible<%= productCount !== 1 ? 's' : '' %></p>
+    </div>
+
+    <!-- ═══ BREADCRUMB ═══ -->
+    <div class="products-page-content">
+        <div class="breadcrumb">
+            <a href="/">Accueil</a>
+            <span>/</span>
+            <span>Produits</span>
+            <% if (selectedCategoryName) { %>
+            <span>/</span>
+            <span><%= selectedCategoryName %></span>
+            <% } %>
+        </div>
+
+        <!-- ═══ CATEGORY CHIPS ═══ -->
+        <% if (categories.length > 0) { %>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px;">
+            <a href="/products" style="padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; border: 1px solid; text-decoration: none;
+                <%= !selectedCategory ? 'background:' + primaryColor + '; color: #fff; border-color:' + primaryColor : 'background: #fff; color: #64748b; border-color: #e2e8f0' %>;">
+                Tous
+            </a>
+            <% categories.forEach(function(cat) { %>
+            <a href="/products?category=<%= cat.id %>" style="padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; border: 1px solid; text-decoration: none;
+                <%= selectedCategory == cat.id ? 'background:' + primaryColor + '; color: #fff; border-color:' + primaryColor : 'background: #fff; color: #64748b; border-color: #e2e8f0' %>;">
+                <%= cat.name %>
+            </a>
+            <% }); %>
+        </div>
+        <% } %>
+
+        <!-- ═══ PRODUCTS GRID ═══ -->
+        <% if (products.length > 0) { %>
+        <div class="products-page-grid">
+            <% products.forEach(function(product, i) { %>
+            <a href="/product/<%= product.id %>" class="product-card animate-in" style="animation-delay: <%= (i * 0.03) %>s">
+                <div class="product-image-wrapper">
+                    <% if (product._image) { %>
+                    <img class="product-image" src="<%= product._image %>" alt="<%= product.name %>" loading="lazy">
+                    <% } else { %>
+                    <div class="product-image" style="background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 32px;"><i class="fa fa-image"></i></div>
+                    <% } %>
+                </div>
+                <div class="product-info">
+                    <p class="product-name"><%= product.name %></p>
+                    <p class="product-price" style="color: <%= primaryColor %>;"><%= product.sellingPrice ? product.sellingPrice.toFixed(2) + ' DT' : '' %></p>
+                </div>
+            </a>
+            <% }); %>
+        </div>
+
+        <!-- ═══ PAGINATION INFO ═══ -->
+        <div class="pagination-info">
+            <% if (productCount > products.length) { %>
+            <p>Affichage de <%= products.length %> sur <%= productCount %> produits</p>
+            <% if (currentPage > 0) { %>
+            <a href="/products?page=<%= currentPage - 1 %><%= selectedCategory ? '&category=' + selectedCategory : '' %>" style="color: <%= primaryColor %>; margin-right: 12px;">&larr; Page précédente</a>
+            <% } %>
+            <% if ((currentPage + 1) * pageSize < productCount) { %>
+            <a href="/products?page=<%= currentPage + 1 %><%= selectedCategory ? '&category=' + selectedCategory : '' %>" style="color: <%= primaryColor %>;">Page suivante &rarr;</a>
+            <% } %>
+            <% } %>
+        </div>
+
+        <% } else { %>
+        <div class="empty-state">
+            <i class="fa fa-archive"></i>
+            <p>Aucun produit trouvé</p>
+        </div>
+        <% } %>
+    </div>
+
+<%- include('partials/footer', {
+    storeName, footerBgColor: footer.bgColor, footerTextColor: footer.textColor,
+    footerText: footer.text, showQuickLinks: footer.showQuickLinks,
+    showContact: footer.showContact, showSocial: footer.showSocial,
+    storePhone, storeEmail, storeAddress,
+    socialFacebook, socialInstagram, socialTiktok
+}) %>

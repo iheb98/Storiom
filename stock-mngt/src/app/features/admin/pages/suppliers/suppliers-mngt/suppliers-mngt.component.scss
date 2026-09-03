@@ -486,6 +486,14 @@ $radius-lg: 16px;
         }
     }
 
+    &.negative {
+        background: $danger-light;
+
+        .credit-value {
+            color: $danger;
+        }
+    }
+
     .credit-label {
         font-size: 0.7rem;
         color: $text-secondary;

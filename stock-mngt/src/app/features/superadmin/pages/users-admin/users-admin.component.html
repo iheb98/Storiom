@@ -1,0 +1,279 @@
+<div class="users-admin">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1>
+                    <fa-icon [icon]="faUsers"></fa-icon>
+                    Gestion des utilisateurs
+                </h1>
+                <p>Gérez les comptes utilisateurs de la plateforme</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card total" [class.active]="activeFilter === ''" (click)="filterBy('')">
+            <fa-icon [icon]="faUsers"></fa-icon>
+            <div class="stat-info">
+                <span class="stat-value">{{ totalCount }}</span>
+                <span class="stat-label">Total</span>
+            </div>
+        </div>
+        <div class="stat-card active-users" [class.active]="activeFilter === 'active'"
+            (click)="filterBy('active')">
+            <fa-icon [icon]="faCheckCircle"></fa-icon>
+            <div class="stat-info">
+                <span class="stat-value">{{ activeCount }}</span>
+                <span class="stat-label">Actifs</span>
+            </div>
+        </div>
+        <div class="stat-card with-store" [class.active]="activeFilter === 'withStore'"
+            (click)="filterBy('withStore')">
+            <fa-icon [icon]="faStore"></fa-icon>
+            <div class="stat-info">
+                <span class="stat-value">{{ withStoreCount }}</span>
+                <span class="stat-label">Avec boutique</span>
+            </div>
+        </div>
+        <div class="stat-card expired" [class.active]="activeFilter === 'expired'"
+            (click)="filterBy('expired')">
+            <fa-icon [icon]="faExclamationTriangle"></fa-icon>
+            <div class="stat-info">
+                <span class="stat-value">{{ expiredCount }}</span>
+                <span class="stat-label">Abonnement expiré</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-bar">
+        <fa-icon [icon]="faSearch"></fa-icon>
+        <input type="text" [(ngModel)]="searchQuery" (input)="onSearch()"
+            placeholder="Rechercher par nom, email ou boutique...">
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-container" *ngIf="isLoading">
+        <fa-icon [icon]="faSpinner" [spin]="true"></fa-icon>
+        <p>Chargement des utilisateurs...</p>
+    </div>
+
+    <!-- Users Table -->
+    <div class="users-table-container" *ngIf="!isLoading">
+        <div class="users-empty" *ngIf="filteredUsers.length === 0">
+            <fa-icon [icon]="faUsers"></fa-icon>
+            <p>Aucun utilisateur trouvé</p>
+        </div>
+
+        <table class="users-table" *ngIf="filteredUsers.length > 0">
+            <thead>
+                <tr>
+                    <th>Utilisateur</th>
+                    <th>Rôle</th>
+                    <th>Boutique</th>
+                    <th>Abonnement</th>
+                    <th>Statut</th>
+                    <th>Inscription</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of filteredUsers" [class.disabled-row]="!user.isConfirmed"
+                    (click)="selectUser(user)">
+                    <td class="user-info-cell">
+                        <div class="user-avatar">
+                            <fa-icon [icon]="faUser"></fa-icon>
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
+                            <span class="user-email">{{ user.email }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="role-badge" [ngClass]="getRoleClass(user.role)">
+                            {{ getRoleLabel(user.role) }}
+                        </span>
+                    </td>
+                    <td class="store-cell">
+                        <span *ngIf="user.store" class="store-name">{{ user.store.name }}</span>
+                        <span *ngIf="!user.store" class="no-store">—</span>
+                    </td>
+                    <td>
+                        <div class="sub-info" *ngIf="user.subscription">
+                            <span class="sub-badge" [ngClass]="getSubscriptionStatusClass(user)">
+                                {{ getSubscriptionLabel(user) }}
+                            </span>
+                            <span class="sub-plan">{{ getPlanLabel(user.subscription.plan) }}</span>
+                        </div>
+                        <span *ngIf="!user.subscription" class="no-sub">Aucun</span>
+                    </td>
+                    <td>
+                        <span class="status-dot" [class.active]="user.isConfirmed"
+                            [class.inactive]="!user.isConfirmed">
+                        </span>
+                        {{ user.isConfirmed ? 'Actif' : 'Inactif' }}
+                    </td>
+                    <td class="date">{{ user.createdAt | date:'dd/MM/yyyy' }}</td>
+                    <td class="actions" (click)="$event.stopPropagation()">
+                        <button class="btn-action view" (click)="selectUser(user)" title="Voir détails">
+                            <fa-icon [icon]="faEye"></fa-icon>
+                        </button>
+                        <button class="btn-action extend" *ngIf="user.subscription"
+                            (click)="extendSubscription(user)" title="Prolonger abonnement">
+                            <fa-icon [icon]="faPlus"></fa-icon>
+                        </button>
+                        <button class="btn-action toggle"
+                            (click)="toggleStatus(user)"
+                            [title]="user.isConfirmed ? 'Désactiver' : 'Activer'">
+                            <fa-icon [icon]="user.isConfirmed ? faToggleOn : faToggleOff"></fa-icon>
+                        </button>
+                        <button class="btn-action delete" (click)="deleteUser(user)" title="Supprimer">
+                            <fa-icon [icon]="faTrash"></fa-icon>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- User Details Modal -->
+    <div class="modal-overlay" *ngIf="selectedUser" (click)="closeDetails()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Détails de l'utilisateur</h2>
+                <button class="btn-close" (click)="closeDetails()">
+                    <fa-icon [icon]="faTimes"></fa-icon>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- User Identity -->
+                <div class="modal-section">
+                    <h3 class="section-title">
+                        <fa-icon [icon]="faUser"></fa-icon> Identité
+                    </h3>
+                    <div class="detail-row">
+                        <span class="label">Nom</span>
+                        <span class="value">{{ selectedUser.firstName }} {{ selectedUser.lastName }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Email</span>
+                        <span class="value highlight">{{ selectedUser.email }}</span>
+                    </div>
+                    <div class="detail-row" *ngIf="selectedUser.phone">
+                        <span class="label">Téléphone</span>
+                        <span class="value">{{ selectedUser.phone }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Rôle</span>
+                        <span class="role-badge" [ngClass]="getRoleClass(selectedUser.role)">
+                            {{ getRoleLabel(selectedUser.role) }}
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Statut</span>
+                        <span class="value">
+                            <span class="status-dot" [class.active]="selectedUser.isConfirmed"
+                                [class.inactive]="!selectedUser.isConfirmed"></span>
+                            {{ selectedUser.isConfirmed ? 'Actif' : 'Inactif' }}
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Inscrit le</span>
+                        <span class="value">{{ selectedUser.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+                    <div class="detail-row" *ngIf="selectedUser.referredBy">
+                        <span class="label">Référé par</span>
+                        <span class="value">{{ selectedUser.referredBy }}</span>
+                    </div>
+                </div>
+
+                <!-- Store Info -->
+                <div class="modal-section" *ngIf="selectedUser.store">
+                    <h3 class="section-title">
+                        <fa-icon [icon]="faStore"></fa-icon> Boutique
+                    </h3>
+                    <div class="detail-row">
+                        <span class="label">Nom</span>
+                        <span class="value">{{ selectedUser.store.name }}</span>
+                    </div>
+                    <div class="detail-row" *ngIf="selectedUser.store.type">
+                        <span class="label">Type</span>
+                        <span class="value">{{ selectedUser.store.type }}</span>
+                    </div>
+                    <div class="detail-row" *ngIf="selectedUser.store.customDomain">
+                        <span class="label">Domaine</span>
+                        <span class="value highlight">{{ selectedUser.store.customDomain }}</span>
+                    </div>
+                </div>
+
+                <!-- Subscription Info -->
+                <div class="modal-section" *ngIf="selectedUser.subscription">
+                    <h3 class="section-title">
+                        <fa-icon [icon]="faCreditCard"></fa-icon> Abonnement
+                    </h3>
+                    <div class="detail-row">
+                        <span class="label">Plan</span>
+                        <span class="value">{{ getPlanLabel(selectedUser.subscription.plan) }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Durée</span>
+                        <span class="value">{{ getDurationLabel(selectedUser.subscription.duration) }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Statut</span>
+                        <span class="sub-badge" [ngClass]="getSubscriptionStatusClass(selectedUser)">
+                            {{ getSubscriptionLabel(selectedUser) }}
+                        </span>
+                    </div>
+                    <div class="detail-row" *ngIf="selectedUser.subscription.activationDate">
+                        <span class="label">Activation</span>
+                        <span class="value">{{ selectedUser.subscription.activationDate | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                    <div class="detail-row" *ngIf="selectedUser.subscription.expirationDate">
+                        <span class="label">Expiration</span>
+                        <span class="value">{{ selectedUser.subscription.expirationDate | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                </div>
+
+                <!-- Address Info -->
+                <div class="modal-section" *ngIf="selectedUser.address">
+                    <h3 class="section-title">
+                        <fa-icon [icon]="faCalendar"></fa-icon> Adresse
+                    </h3>
+                    <div class="detail-row" *ngIf="selectedUser.address.country">
+                        <span class="label">Pays</span>
+                        <span class="value">{{ selectedUser.address.country }}</span>
+                    </div>
+                    <div class="detail-row" *ngIf="selectedUser.address.city">
+                        <span class="label">Ville</span>
+                        <span class="value">{{ selectedUser.address.city }}</span>
+                    </div>
+                    <div class="detail-row" *ngIf="selectedUser.address.state">
+                        <span class="label">État</span>
+                        <span class="value">{{ selectedUser.address.state }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer Actions -->
+            <div class="modal-footer">
+                <button class="btn-extend" *ngIf="selectedUser.subscription"
+                    (click)="extendSubscription(selectedUser)" [disabled]="isProcessing">
+                    <fa-icon [icon]="faPlus"></fa-icon>
+                    Prolonger
+                </button>
+                <button class="btn-toggle" (click)="toggleStatus(selectedUser)" [disabled]="isProcessing"
+                    [class.deactivate]="selectedUser.isConfirmed">
+                    <fa-icon [icon]="selectedUser.isConfirmed ? faToggleOff : faToggleOn"></fa-icon>
+                    {{ selectedUser.isConfirmed ? 'Désactiver' : 'Activer' }}
+                </button>
+                <button class="btn-delete" (click)="deleteUser(selectedUser)" [disabled]="isProcessing">
+                    <fa-icon [icon]="faTrash"></fa-icon>
+                    Supprimer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

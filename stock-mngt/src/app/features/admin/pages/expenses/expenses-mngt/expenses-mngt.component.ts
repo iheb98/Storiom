@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   faEdit, faTrash, faPlus, faFilter, faUndo, faTag,
-  faCoins, faSearch, faReceipt, faComment, faCalendar
+  faCoins, faSearch, faReceipt, faComment, faCalendar, faSync
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { ExpenseService } from 'src/app/core/services/expense.service';
@@ -27,6 +27,7 @@ export class ExpensesMngtComponent implements OnInit {
   faReceipt = faReceipt;
   faComment = faComment;
   faCalendar = faCalendar;
+  faSync = faSync;
 
   // Filters
   titleFilter = '';
@@ -203,7 +204,7 @@ export class ExpensesMngtComponent implements OnInit {
 
   editExpense(expense: any) {
     this.saveFiltersState();
-    this.router.navigate(['expenses/' + expense.id]);
+    this.router.navigate(['expenses/edit/' + expense.id]);
   }
 
   handlePageEvent(event: any) {

@@ -269,7 +269,8 @@ $radius-lg: 16px;
     }
 
     input,
-    textarea {
+    textarea,
+    select {
         width: 100%;
         padding: 14px 16px;
         border: 1px solid $border-color;
@@ -293,6 +294,11 @@ $radius-lg: 16px;
         &::placeholder {
             color: lighten($text-secondary, 20%);
         }
+    }
+
+    select {
+        cursor: pointer;
+        appearance: auto;
     }
 
     textarea {
@@ -469,4 +475,62 @@ $radius-lg: 16px;
         color: $success;
         font-weight: 600;
     }
+}
+
+// ============================================
+// DIRECTION TOGGLE
+// ============================================
+.direction-toggle {
+    display: flex;
+    gap: 0;
+    border-radius: $radius-sm;
+    overflow: hidden;
+    border: 1px solid $border-color;
+}
+
+.direction-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: $white;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: $text-secondary;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:first-child {
+        border-right: 1px solid $border-color;
+    }
+
+    &.active {
+        background: $primary-light;
+        color: $primary;
+        font-weight: 600;
+    }
+
+    &:hover:not(.active) {
+        background: $background;
+    }
+
+    i {
+        font-size: 0.85rem;
+    }
+}
+
+.toggle-label.active {
+    color: $primary;
+    font-weight: 600;
+}
+
+.field-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: $text-secondary;
+    font-style: italic;
 }

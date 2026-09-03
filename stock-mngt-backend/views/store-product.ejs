@@ -1,0 +1,89 @@
+<%- include('partials/head', {
+    title, description, ogType: 'product', canonicalUrl, storeName,
+    ogImage, jsonLd, storeLogo, fontFamily, primaryColor, accentColor
+}) %>
+<body class="<%= mode === 'dark' ? 'dark-mode' : '' %>">
+
+    <!-- ═══ BREADCRUMB ═══ -->
+    <div class="product-detail">
+        <div class="breadcrumb">
+            <a href="/">Accueil</a>
+            <span>/</span>
+            <a href="/products">Produits</a>
+            <span>/</span>
+            <span><%= product.name %></span>
+        </div>
+
+        <!-- ═══ PRODUCT DETAIL ═══ -->
+        <div class="product-detail-grid">
+            <!-- Gallery -->
+            <div class="product-gallery">
+                <% if (mainImage) { %>
+                <img src="<%= mainImage %>" alt="<%= product.name %>">
+                <% } else { %>
+                <div style="width: 100%; height: 100%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 64px;">
+                    <i class="fa fa-image"></i>
+                </div>
+                <% } %>
+            </div>
+
+            <!-- Info -->
+            <div class="product-detail-info">
+                <h1 style="font-family: '<%= fontFamily %>'"><%= product.name %></h1>
+                <p class="product-detail-price" style="color: <%= primaryColor %>;"><%= product.sellingPrice ? product.sellingPrice.toFixed(2) + ' DT' : '' %></p>
+
+                <% if (product.description) { %>
+                <div class="product-detail-description">
+                    <%- product.description %>
+                </div>
+                <% } %>
+
+                <div class="product-detail-meta">
+                    <% if (product.quantity != null) { %>
+                    <div class="product-meta-item">
+                        <i class="fa fa-cube"></i>
+                        <span><%= product.quantity > 0 ? 'En stock (' + product.quantity + ' disponibles)' : 'Rupture de stock' %></span>
+                    </div>
+                    <% } %>
+                    <% if (product.brand) { %>
+                    <div class="product-meta-item">
+                        <i class="fa fa-tag"></i>
+                        <span>Marque: <%= product.brand.name || product.brand %></span>
+                    </div>
+                    <% } %>
+                    <% if (categoryName) { %>
+                    <div class="product-meta-item">
+                        <i class="fa fa-folder-open"></i>
+                        <span>Catégorie: <a href="/products?category=<%= product.category ? product.category.id : '' %>" style="color: <%= primaryColor %>; text-decoration: underline;"><%= categoryName %></a></span>
+                    </div>
+                    <% } %>
+                </div>
+
+                <!-- Additional images -->
+                <% if (allImages.length > 1) { %>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px;">
+                    <% allImages.forEach(function(img, i) { %>
+                    <div style="width: 72px; height: 72px; border-radius: 10px; overflow: hidden; border: 2px solid <%= i === 0 ? primaryColor : '#e2e8f0' %>;">
+                        <img src="<%= img %>" alt="<%= product.name %> - Image <%= i + 1 %>" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                    </div>
+                    <% }); %>
+                </div>
+                <% } %>
+
+                <!-- Actions -->
+                <div style="margin-top: 24px; display: flex; gap: 12px;">
+                    <a href="/products" class="btn-hero-primary" style="background: <%= primaryColor %>; color: #fff;">
+                        <i class="fa fa-arrow-left"></i> Retour aux produits
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<%- include('partials/footer', {
+    storeName, footerBgColor: footer.bgColor, footerTextColor: footer.textColor,
+    footerText: footer.text, showQuickLinks: footer.showQuickLinks,
+    showContact: footer.showContact, showSocial: footer.showSocial,
+    storePhone, storeEmail, storeAddress,
+    socialFacebook, socialInstagram, socialTiktok
+}) %>

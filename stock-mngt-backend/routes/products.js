@@ -4,6 +4,7 @@ const { Product, Operation, Supplier, Category, CartItem } = require('../models'
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 const { Op, literal } = require('sequelize');
+const { invalidate, invalidatePattern } = require('../cacheService');
 
 
 
@@ -105,6 +106,9 @@ router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
         if (quantity > 0) {
             Operation.create({ receiptId: null, type: "LOADED", productId: createdProduct.id, amount: quantity, price: createdProduct.buyingPrice, date: new Date(), creatorUserId: req.user.id, impactStock: true })
                 .then(createdOperation => {
+                    invalidatePattern('publicProducts', `product:`);
+                    invalidatePattern('storefront', `store:${createdProduct.storeId}`);
+                    invalidatePattern('brands', `store:${createdProduct.storeId}`);
                     res.json({
                         product: createdProduct
                     })
@@ -113,6 +117,9 @@ router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
                     res.status(500).json({ err })
                 })
         } else {
+            invalidatePattern('publicProducts', `product:`);
+            invalidatePattern('storefront', `store:${createdProduct.storeId}`);
+            invalidatePattern('brands', `store:${createdProduct.storeId}`);
             res.json({
                 product: createdProduct
             })
@@ -156,6 +163,9 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
         product.condition = condition !== undefined ? condition : product.condition
         product.save().then(
             savedProduct => {
+                invalidate('publicProducts', `product:${id}:store`);
+                invalidate('publicProducts', `product:${id}:marketplace`);
+                invalidatePattern('storefront', `store:${product.storeId}`);
                 res.json({ message: 'Produit modifié', success: true })
             }
         ).catch(err => {
@@ -638,6 +648,9 @@ router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) 
         product.isVisible = false;
         product.save().then(
             savedProduct => {
+                invalidate('publicProducts', `product:${id}:store`);
+                invalidate('publicProducts', `product:${id}:marketplace`);
+                invalidatePattern('storefront', `store:${product.storeId}`);
                 res.status(200).json({ success: true, message: "Produit supprimé" })
             }
         ).catch(err => {

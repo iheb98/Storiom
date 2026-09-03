@@ -99,7 +99,7 @@ export class WorkerAddComponent implements OnInit {
       lastName: ['', Validators.required],
       email: ['', [Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
       phone: [''],
-      salary: [''],
+      salary: [0],
       role: ['Worker'],
       functionInStore: [''],
       superiorId: [this.authService.getConnectedUser()?.id],

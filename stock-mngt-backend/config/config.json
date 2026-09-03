@@ -5,7 +5,13 @@
     "database": "storiom",
     "host": "localhost",
     "dialect": "postgres",
-    "timezone": "+00:00"
+    "timezone": "+00:00",
+    "pool": {
+      "max": 20,
+      "min": 5,
+      "acquire": 30000,
+      "idle": 10000
+    }
   },
   "test": {
    "username": "root",
@@ -23,18 +29,17 @@
     }
   },
   "production": {
-    "username": "root",
-    "password": "T0xcHOiuqxIrgQQMr2DaQAYwjYQhJh6b",
-    "database": "fides_tnvm",
-    "host": "crirg868ii6s73f9336g-a.frankfurt-postgres.render.com",
+    "username": "iheb",
+    "password": "1234",
+    "database": "storiom",
+    "host": "localhost",
     "dialect": "postgres",
-    "port":5432,
     "timezone": "+00:00",
-    "dialectOptions": {
-      "ssl": {
-        "require": true,
-        "rejectUnauthorized": false 
-      }
+    "pool": {
+      "max": 10,
+      "min": 2,
+      "acquire": 30000,
+      "idle": 10000
     }
   }
 }

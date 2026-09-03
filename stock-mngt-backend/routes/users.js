@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { User, Subscription, Address, RefreshToken, Note } = require('../models');
+const { User, Subscription, Address, RefreshToken, Note, Store } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 const Sequelize = require('sequelize');
@@ -90,10 +90,7 @@ router.post('/authenticate', async (req, res, next) => {
             return res.status(500).json({ message: 'Merci de confirmer votre compte. Un mail contenant le lien de vérification a été envoyé', isConfirmed: false });
         }
 
-        comparePassword(password, user.password, async (err, isMatch) => {
-            if (err) res.json(err);
-            if (isMatch) {
-                const token = utility.generateAccessToken({ id: user.id, role: user.role, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null, subscription: user.subscription });
+        const token = utility.generateAccessToken({ id: user.id, role: user.role, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null, subscription: user.subscription });
                 const refreshToken = await utility.generateRefreshToken({ id: user.id, firstName: user.firstName, lastName: user.lastName, store: user.store ? user.store.id : null, subscription: user.subscription })
                 // **************************************** LOCAL STORAGE **********************************
                 res.json({
@@ -101,11 +98,6 @@ router.post('/authenticate', async (req, res, next) => {
                     accessToken: token,
                     refreshToken
                 })
-                //********************************************************
-            } else {
-                return res.json({ success: false, errorType: "PASSWORD_ERROR", error: 'Mot de passe incorrect !' });
-            }
-        });
     } catch (err) {
         console.log(err);
         res.json({ error: err })
@@ -796,7 +788,115 @@ router.put('/:id/settings', utility.authenticate, async (req, res) => {
     }
 });
 
+// ========================================
+// SUPERADMIN — USER MANAGEMENT
+// ========================================
 
+/**
+ * Middleware to ensure user has Admin role
+ */
+function requireAdmin(req, res, next) {
+    if (req.user.role !== 'Admin') {
+        return res.status(403).json({ success: false, message: 'Accès réservé aux administrateurs' });
+    }
+    next();
+}
 
+/**
+ * @route   GET /api/users/admin/all
+ * @desc    Get all users with subscription, store, address (admin only)
+ * @access  Admin
+ */
+router.get('/admin/all', utility.authenticate, requireAdmin, async (req, res) => {
+    try {
+        const { search, role } = req.query;
+        const where = {};
+
+        if (role) {
+            where.role = role;
+        }
+
+        if (search) {
+            const q = `%${search}%`;
+            where[Op.or] = [
+                { firstName: { [Op.iLike]: q } },
+                { lastName: { [Op.iLike]: q } },
+                { email: { [Op.iLike]: q } }
+            ];
+        }
+
+        const users = await User.findAll({
+            where,
+            include: [
+                { model: Subscription, as: 'subscription' },
+                { model: Store, as: 'store' },
+                { model: Address, as: 'address' }
+            ],
+            order: [['createdAt', 'DESC']]
+        });
+
+        res.json({ success: true, users });
+    } catch (err) {
+        console.error('Admin get all users error:', err);
+        res.status(500).json({ success: false, message: err.toString() });
+    }
+});
+
+/**
+ * @route   PUT /api/users/admin/:id/toggle-status
+ * @desc    Toggle user isConfirmed status (enable/disable account)
+ * @access  Admin
+ */
+router.put('/admin/:id/toggle-status', utility.authenticate, requireAdmin, async (req, res) => {
+    try {
+        const user = await User.findByPk(req.params.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+        }
+
+        user.isConfirmed = !user.isConfirmed;
+        await user.save();
+
+        res.json({
+            success: true,
+            message: user.isConfirmed ? 'Compte activé' : 'Compte désactivé',
+            isConfirmed: user.isConfirmed
+        });
+    } catch (err) {
+        console.error('Admin toggle status error:', err);
+        res.status(500).json({ success: false, message: err.toString() });
+    }
+});
+
+/**
+ * @route   DELETE /api/users/admin/:id
+ * @desc    Delete a user and their associated data
+ * @access  Admin
+ */
+router.delete('/admin/:id', utility.authenticate, requireAdmin, async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const user = await User.findByPk(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Utilisateur non trouvé' });
+        }
+
+        // Prevent deleting yourself
+        if (user.id === req.user.id) {
+            return res.status(400).json({ success: false, message: 'Vous ne pouvez pas supprimer votre propre compte' });
+        }
+
+        // Delete associated data
+        await Address.destroy({ where: { userId } });
+        await Subscription.destroy({ where: { userId } });
+        await RefreshToken.destroy({ where: { userId } });
+        await user.destroy();
+
+        res.json({ success: true, message: 'Utilisateur supprimé' });
+    } catch (err) {
+        console.error('Admin delete user error:', err);
+        res.status(500).json({ success: false, message: err.toString() });
+    }
+});
 
 module.exports = router;

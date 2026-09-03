@@ -17,9 +17,13 @@ const PLATFORM_DOMAINS = [
     '161.97.186.60'
 ];
 
-// Cache resolved domains for 5 minutes to avoid DB lookups on every request
+// Cache resolved domains to avoid DB lookups on every request
 const domainCache = new Map();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+const MAX_CACHE_SIZE = 500;        // Prevent memory leaks from domain scan attacks
+
+// Stats
+const domainCacheStats = { hits: 0, misses: 0 };
 
 function isPlatformDomain(host) {
     // Remove port number if present
@@ -31,8 +35,11 @@ async function resolveDomain(hostname) {
     // Check cache first
     const cached = domainCache.get(hostname);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+        domainCacheStats.hits++;
         return cached.store;
     }
+
+    domainCacheStats.misses++;
 
     // Look up in database
     const store = await Store.findOne({
@@ -43,6 +50,12 @@ async function resolveDomain(hostname) {
         },
         include: [{ model: Address, as: 'address' }]
     });
+
+    // Evict oldest entry if cache is full (LRU-style)
+    if (domainCache.size >= MAX_CACHE_SIZE) {
+        const oldestKey = domainCache.keys().next().value;
+        domainCache.delete(oldestKey);
+    }
 
     // Cache the result (even null to avoid repeated DB lookups for invalid domains)
     domainCache.set(hostname, {
@@ -61,6 +74,19 @@ function clearDomainCache(hostname) {
 // Clear entire cache
 function clearAllDomainCache() {
     domainCache.clear();
+}
+
+// Get domain cache stats
+function getDomainCacheStats() {
+    return {
+        size: domainCache.size,
+        maxSize: MAX_CACHE_SIZE,
+        ttlMinutes: CACHE_TTL / 60000,
+        ...domainCacheStats,
+        hitRate: domainCacheStats.hits + domainCacheStats.misses > 0
+            ? ((domainCacheStats.hits / (domainCacheStats.hits + domainCacheStats.misses)) * 100).toFixed(1) + '%'
+            : '0%'
+    };
 }
 
 const domainResolver = async (req, res, next) => {
@@ -97,4 +123,4 @@ const domainResolver = async (req, res, next) => {
     }
 };
 
-module.exports = { domainResolver, clearDomainCache, clearAllDomainCache, isPlatformDomain };
+module.exports = { domainResolver, clearDomainCache, clearAllDomainCache, isPlatformDomain, getDomainCacheStats };

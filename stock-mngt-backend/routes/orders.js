@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Order, OrderItem, CartItem, Product, Store, User, Address, DeliveryWorker, Operation } = require('../models');
+const { Order, OrderItem, CartItem, Product, Store, User, Address, DeliveryWorker, Operation, Notification } = require('../models');
 const utility = require('../utility');
 const { Op } = require('sequelize');
 const sendMail = require('../mailService');
@@ -213,7 +213,27 @@ router.post('/create', utility.authenticate, async (req, res) => {
             await order.save();
             createdOrders.push(order);
 
-            // 5. Notify delivery workers (async, don't wait)
+            // 5. Create in-app notification for store admin
+            try {
+                const itemNames = items.map(i => i.product.name).slice(0, 3).join(', ');
+                const extra = items.length > 3 ? ` +${items.length - 3} autres` : '';
+                await Notification.create({
+                    storeId: parseInt(storeId),
+                    type: 'NEW_ORDER',
+                    title: `Nouvelle commande #${order.id}`,
+                    message: `${user.firstName} ${user.lastName} a passé une commande de ${totalAmount.toFixed(2)} DT — ${itemNames}${extra}`,
+                    orderId: order.id,
+                    metadata: {
+                        customerName: `${user.firstName} ${user.lastName}`,
+                        totalAmount,
+                        itemCount: items.length
+                    }
+                });
+            } catch (notifErr) {
+                console.error('Failed to create notification:', notifErr);
+            }
+
+            // 6. Notify delivery workers (async, don't wait)
             notifyDeliveryWorkers(order, user, store, items).catch(err => {
                 console.error('Delivery worker notification failed:', err);
             });

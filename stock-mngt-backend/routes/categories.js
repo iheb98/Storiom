@@ -4,6 +4,7 @@ const { Category, StoreCategoryVisibility } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 const { Op } = require('sequelize');
+const { flushBucket } = require('../cacheService');
 
 // CREATE CATEGORY
 // Admin creates static categories, Owner creates store-specific ones
@@ -21,6 +22,7 @@ router.post('/create', utility.authenticate, checkSubscription, (req, res) => {
         static: isStatic,
         creatorUserId: req.user.id
     }).then(createdCategory => {
+        flushBucket('categories');
         res.json(createdCategory)
     }).catch(err => {
         res.status(500).json({
@@ -53,6 +55,7 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
         if (image !== undefined) category.image = image;
         if (icon !== undefined) category.icon = icon;
         category.save().then(() => {
+            flushBucket('categories');
             res.json({ message: 'Catégorie modifiée', success: true })
         }).catch(err => {
             res.status(500).json({ success: false, message: err.toString() })
@@ -188,8 +191,10 @@ router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) 
         }
 
         Category.destroy({ where: { id } }).then(deletedRows => {
-            if (deletedRows > 0)
+            if (deletedRows > 0) {
+                flushBucket('categories');
                 res.json({ success: true, message: "Category deleted" })
+            }
             else
                 res.status(500).json({ success: false, message: "Category not found" })
         }).catch(err => {
@@ -288,6 +293,7 @@ router.put('/store/:storeId/visibility/:categoryId', utility.authenticate, check
             await record.save();
         }
 
+        flushBucket('categories');
         res.json({ success: true, categoryId: parseInt(categoryId), visible: record.visible });
     } catch (err) {
         res.status(500).json({ success: false, message: err.toString() });
@@ -313,6 +319,7 @@ router.put('/store/:storeId/visibility', utility.authenticate, checkSubscription
         );
 
         await Promise.all(promises);
+        flushBucket('categories');
         res.json({ success: true, message: `${categories.length} catégorie(s) mises à jour` });
     } catch (err) {
         res.status(500).json({ success: false, message: err.toString() });

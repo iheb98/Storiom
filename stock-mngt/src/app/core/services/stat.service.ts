@@ -72,6 +72,16 @@ export class StatService {
     });
   }
 
+  profitReport(id, from, to, includeDeleted = false): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'store/' + id + '/profit-report', {
+      params: { from, to, includeDeleted: includeDeleted.toString() }
+    });
+  }
+
+  getReminders(id): Observable<any> {
+    return this.http.get<any>(this.baseUrl + 'store/' + id + '/reminders');
+  }
+
   getOperationStatsByCategoryItems(id, type, value): Observable<any> {
     return this.http.get<any>(this.baseUrl + 'store/' + id + '/operationStats/categories/items', {
       params: {

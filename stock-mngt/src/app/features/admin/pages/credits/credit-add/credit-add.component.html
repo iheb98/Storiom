@@ -38,44 +38,84 @@
                 <div class="form-section">
                     <h3 class="section-title"><fa-icon [icon]="faUser"></fa-icon> Informations de l'emprunteur</h3>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="firstName">
-                                <fa-icon [icon]="faUser"></fa-icon> Prénom <span class="required">*</span>
-                            </label>
-                            <input type="text" id="firstName" formControlName="firstName"
-                                placeholder="Entrez le prénom..."
-                                [class.invalid]="submitted && !form.get('firstName').value">
-                            <span class="error-message" *ngIf="submitted && !form.get('firstName').value">
-                                Le prénom est obligatoire
-                            </span>
+                    <!-- Supplier Toggle -->
+                    <div class="form-group" *ngIf="suppliers.length > 0">
+                        <label><fa-icon [icon]="faTruck"></fa-icon> Lier à un fournisseur ?</label>
+                        <div class="direction-toggle">
+                            <button type="button" class="direction-btn"
+                                [class.active]="!isSupplier"
+                                (click)="toggleSupplierMode(false)">
+                                <fa-icon [icon]="faUser"></fa-icon>
+                                Autre personne
+                            </button>
+                            <button type="button" class="direction-btn"
+                                [class.active]="isSupplier"
+                                (click)="toggleSupplierMode(true)">
+                                <fa-icon [icon]="faTruck"></fa-icon>
+                                Fournisseur existant
+                            </button>
                         </div>
+                    </div>
 
+                    <!-- Supplier Dropdown (when linked to supplier) -->
+                    <div *ngIf="isSupplier">
                         <div class="form-group">
-                            <label for="lastName">
-                                <fa-icon [icon]="faUser"></fa-icon> Nom <span class="required">*</span>
-                            </label>
-                            <input type="text" id="lastName" formControlName="lastName" placeholder="Entrez le nom..."
-                                [class.invalid]="submitted && !form.get('lastName').value">
-                            <span class="error-message" *ngIf="submitted && !form.get('lastName').value">
-                                Le nom est obligatoire
+                            <label><fa-icon [icon]="faTruck"></fa-icon> Sélectionner un fournisseur <span class="required">*</span></label>
+                            <select formControlName="supplierId" (change)="onSupplierSelected()"
+                                [class.invalid]="submitted && isSupplier && !form.get('supplierId').value">
+                                <option [ngValue]="null" disabled>-- Choisir un fournisseur --</option>
+                                <option *ngFor="let supplier of suppliers" [ngValue]="supplier.id">
+                                    {{ supplier.firstName }} {{ supplier.lastName }}
+                                    <ng-container *ngIf="supplier.phone"> — {{ supplier.phone }}</ng-container>
+                                </option>
+                            </select>
+                            <span class="error-message" *ngIf="submitted && isSupplier && !form.get('supplierId').value">
+                                Veuillez sélectionner un fournisseur
                             </span>
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="email"><fa-icon [icon]="faEnvelope"></fa-icon> Email</label>
-                            <input type="email" id="email" formControlName="email" placeholder="exemple@email.com"
-                                [class.invalid]="submitted && form.get('email').errors?.pattern">
-                            <span class="error-message" *ngIf="submitted && form.get('email').errors?.pattern">
-                                Format d'email invalide
-                            </span>
+                    <!-- Manual Entry (when NOT linked to supplier) -->
+                    <div *ngIf="!isSupplier">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">
+                                    <fa-icon [icon]="faUser"></fa-icon> Prénom <span class="required">*</span>
+                                </label>
+                                <input type="text" id="firstName" formControlName="firstName"
+                                    placeholder="Entrez le prénom..."
+                                    [class.invalid]="submitted && !form.get('firstName').value">
+                                <span class="error-message" *ngIf="submitted && !form.get('firstName').value">
+                                    Le prénom est obligatoire
+                                </span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="lastName">
+                                    <fa-icon [icon]="faUser"></fa-icon> Nom <span class="required">*</span>
+                                </label>
+                                <input type="text" id="lastName" formControlName="lastName" placeholder="Entrez le nom..."
+                                    [class.invalid]="submitted && !form.get('lastName').value">
+                                <span class="error-message" *ngIf="submitted && !form.get('lastName').value">
+                                    Le nom est obligatoire
+                                </span>
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="phone"><fa-icon [icon]="faPhone"></fa-icon> Téléphone</label>
-                            <input type="tel" id="phone" formControlName="phone" placeholder="+216 XX XXX XXX">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email"><fa-icon [icon]="faEnvelope"></fa-icon> Email</label>
+                                <input type="email" id="email" formControlName="email" placeholder="exemple@email.com"
+                                    [class.invalid]="submitted && form.get('email').errors?.pattern">
+                                <span class="error-message" *ngIf="submitted && form.get('email').errors?.pattern">
+                                    Format d'email invalide
+                                </span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="phone"><fa-icon [icon]="faPhone"></fa-icon> Téléphone</label>
+                                <input type="tel" id="phone" formControlName="phone" placeholder="+216 XX XXX XXX">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -83,6 +123,25 @@
                 <!-- Credit Info Section -->
                 <div class="form-section">
                     <h3 class="section-title"><fa-icon [icon]="faHandHoldingUsd"></fa-icon> Informations du crédit</h3>
+
+                    <!-- Direction Selector -->
+                    <div class="form-group">
+                        <label><fa-icon [icon]="faExchangeAlt"></fa-icon> Type de crédit</label>
+                        <div class="direction-toggle">
+                            <button type="button" class="direction-btn"
+                                [class.active]="form.get('direction').value === 'owed_to_me'"
+                                (click)="form.get('direction').setValue('owed_to_me')">
+                                <i class="fa fa-arrow-down" style="color: #ef4444;"></i>
+                                On me doit
+                            </button>
+                            <button type="button" class="direction-btn"
+                                [class.active]="form.get('direction').value === 'i_owe'"
+                                (click)="form.get('direction').setValue('i_owe')">
+                                <i class="fa fa-arrow-up" style="color: #10b981;"></i>
+                                Je dois
+                            </button>
+                        </div>
+                    </div>
 
                     <div class="form-group">
                         <label for="amount"><fa-icon [icon]="faCoins"></fa-icon> Montant</label>
@@ -117,6 +176,33 @@
                                 {{ form.get('status').value ? 'Réclamé' : 'Non réclamé' }}
                             </span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Reminder Section -->
+                <div class="form-section">
+                    <h3 class="section-title"><fa-icon [icon]="faBell"></fa-icon> Rappel</h3>
+
+                    <div class="form-group">
+                        <label><fa-icon [icon]="faBell"></fa-icon> Activer le rappel ?</label>
+                        <div class="status-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" formControlName="reminderEnabled">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label" [class.active]="form.get('reminderEnabled').value">
+                                {{ form.get('reminderEnabled').value ? 'Oui' : 'Non' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group" *ngIf="form.get('reminderEnabled').value">
+                        <label><fa-icon [icon]="faBell"></fa-icon> Rappeler avant (jours)</label>
+                        <input type="number" formControlName="reminderBefore" min="1"
+                            placeholder="Ex: 3 jours avant la date de retour">
+                        <span class="field-hint">
+                            Vous serez notifié {{ form.get('reminderBefore').value || '?' }} jours avant la date de retour prévue
+                        </span>
                     </div>
                 </div>
 

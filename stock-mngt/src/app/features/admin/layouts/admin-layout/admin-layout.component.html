@@ -66,12 +66,99 @@
       </div>
 
       <div class="header-right">
-        <!-- Subscription Status (Mobile) -->
-        <!--<div class="subscription-status-mobile" *ngIf="subscriptionStatus"
-          [class.active]="subscriptionStatus === 'Active'" [class.expired]="subscriptionStatus === 'Expired'">
-          <i class="fa" [class.fa-check-circle]="subscriptionStatus === 'Active'"
-            [class.fa-exclamation-circle]="subscriptionStatus === 'Expired'"></i>
-        </div>-->
+        <!-- Order Notifications Bell -->
+        <div class="notifications-wrapper">
+          <button class="notification-bell" (click)="toggleNotifications()" [class.has-unread]="notificationsCount > 0">
+            <fa-icon [icon]="orderIcon"></fa-icon>
+            <span class="notification-badge" *ngIf="notificationsCount > 0">{{ notificationsCount > 9 ? '9+' : notificationsCount }}</span>
+          </button>
+
+          <!-- Notifications Dropdown -->
+          <div class="notifications-dropdown" *ngIf="notificationsOpen">
+            <div class="notifications-header">
+              <h3>Commandes</h3>
+              <div class="notifications-actions">
+                <button class="mark-all-btn" (click)="markAllNotificationsRead()" *ngIf="notificationsCount > 0" title="Tout marquer comme lu">
+                  ✓ Tout lu
+                </button>
+                <button class="refresh-btn" (click)="loadNotifications()" [disabled]="notificationsLoading">
+                  <fa-icon [icon]="syncIcon" [spin]="notificationsLoading"></fa-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="notifications-list" *ngIf="notifications.length > 0">
+              <div class="notification-item" *ngFor="let n of notifications"
+                (click)="onNotificationClick(n)"
+                [class.unread]="!n.isRead">
+                <div class="notification-icon-wrap">
+                  <div class="notification-icon">🛒</div>
+                </div>
+                <div class="notification-content">
+                  <span class="notification-title">{{ n.title }}</span>
+                  <span class="notification-message">{{ n.message }}</span>
+                  <span class="notification-time">{{ getNotificationTimeAgo(n.createdAt) }}</span>
+                </div>
+                <div class="notification-dot" *ngIf="!n.isRead"></div>
+              </div>
+            </div>
+
+            <div class="notifications-empty" *ngIf="notifications.length === 0 && !notificationsLoading">
+              <span class="empty-icon">📦</span>
+              <span>Aucune notification</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reminders Bell -->
+        <div class="reminders-wrapper">
+          <button class="reminder-bell" (click)="toggleReminders()" [class.has-urgent]="urgentCount > 0">
+            <fa-icon [icon]="bellIcon"></fa-icon>
+            <span class="reminder-badge" *ngIf="remindersCount > 0">{{ remindersCount > 9 ? '9+' : remindersCount }}</span>
+          </button>
+
+          <!-- Reminders Dropdown -->
+          <div class="reminders-dropdown" *ngIf="remindersOpen">
+            <div class="reminders-header">
+              <h3>Rappels</h3>
+              <button class="refresh-btn" (click)="loadReminders()" [disabled]="remindersLoading">
+                <fa-icon [icon]="syncIcon" [spin]="remindersLoading"></fa-icon>
+              </button>
+            </div>
+
+            <div class="reminders-list" *ngIf="reminders.length > 0">
+              <div class="reminder-item" *ngFor="let r of reminders"
+                (click)="openReminderDetail(r)"
+                [class.urgency-overdue]="r.urgency === 'overdue'"
+                [class.urgency-now]="r.urgency === 'now'"
+                [class.urgency-urgent]="r.urgency === 'urgent'"
+                [class.urgency-soon]="r.urgency === 'soon'">
+                <div class="reminder-icon">
+                  <fa-icon [icon]="r.type === 'expense' ? calendarDayIcon : heartIcon"></fa-icon>
+                </div>
+                <div class="reminder-content">
+                  <span class="reminder-title">{{ r.title }}</span>
+                  <span class="reminder-meta">
+                    {{ r.amount | number:'1.2-2' }} DT ·
+                    <ng-container *ngIf="r.daysUntil < 0">En retard de {{ -r.daysUntil }}j</ng-container>
+                    <ng-container *ngIf="r.daysUntil === 0">Aujourd'hui</ng-container>
+                    <ng-container *ngIf="r.daysUntil === 1">Demain</ng-container>
+                    <ng-container *ngIf="r.daysUntil > 1">Dans {{ r.daysUntil }}j</ng-container>
+                  </span>
+                  <span class="reminder-offset" *ngIf="r.reminderBefore && r.type === 'expense'">
+                    🔔 Rappel: {{ r.reminderBefore }}{{ r.reminderUnit === 'hours' ? 'h' : 'j' }} avant
+                  </span>
+                </div>
+                <button class="dismiss-btn" title="Marquer comme vu" (click)="dismissReminder(r, $event)">&times;</button>
+              </div>
+            </div>
+
+            <div class="reminders-empty" *ngIf="reminders.length === 0 && !remindersLoading">
+              <fa-icon [icon]="bellIcon"></fa-icon>
+              <span>Aucun rappel</span>
+            </div>
+          </div>
+        </div>
 
         <!-- User Profile -->
         <div class="user-profile" (click)="toggleUserMenu()">
@@ -111,4 +198,85 @@
       <router-outlet></router-outlet>
     </div>
   </main>
+
+  <!-- Reminder Detail Modal -->
+  <div class="reminder-modal-overlay" *ngIf="selectedReminder" (click)="closeReminderDetail()">
+    <div class="reminder-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-header-icon" [class.expense-icon]="selectedReminder.type === 'expense'" [class.credit-icon]="selectedReminder.type === 'credit'">
+          <fa-icon [icon]="selectedReminder.type === 'expense' ? calendarDayIcon : heartIcon"></fa-icon>
+        </div>
+        <div class="modal-header-text">
+          <h3>{{ selectedReminder.title }}</h3>
+          <span class="modal-type-badge" [class.expense]="selectedReminder.type === 'expense'" [class.credit]="selectedReminder.type === 'credit'">
+            {{ selectedReminder.type === 'expense' ? 'Dépense récurrente' : 'Crédit' }}
+          </span>
+        </div>
+        <button class="modal-close" (click)="closeReminderDetail()">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Urgency Banner -->
+        <div class="urgency-banner"
+          [class.urgency-overdue]="selectedReminder.urgency === 'overdue'"
+          [class.urgency-now]="selectedReminder.urgency === 'now'"
+          [class.urgency-urgent]="selectedReminder.urgency === 'urgent'"
+          [class.urgency-soon]="selectedReminder.urgency === 'soon'">
+          <fa-icon [icon]="warningIcon"></fa-icon>
+          <span>{{ getUrgencyLabel(selectedReminder.urgency) }}</span>
+          <span class="urgency-days" *ngIf="selectedReminder.daysUntil !== 0">
+            <ng-container *ngIf="selectedReminder.daysUntil < 0">({{ -selectedReminder.daysUntil }} jours de retard)</ng-container>
+            <ng-container *ngIf="selectedReminder.daysUntil > 0">(dans {{ selectedReminder.daysUntil }} jours)</ng-container>
+          </span>
+        </div>
+
+        <!-- Detail Rows -->
+        <div class="detail-grid">
+          <div class="detail-row">
+            <span class="detail-label">Montant</span>
+            <span class="detail-value amount">{{ selectedReminder.amount | number:'1.2-2' }} DT</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="detail-label">Date prévue</span>
+            <span class="detail-value">{{ selectedReminder.date | date:'dd/MM/yyyy' }}</span>
+          </div>
+
+          <!-- Expense-specific -->
+          <div class="detail-row" *ngIf="selectedReminder.type === 'expense' && selectedReminder.recurrenceType">
+            <span class="detail-label">Fréquence</span>
+            <span class="detail-value">{{ getRecurrenceLabel(selectedReminder.recurrenceType) }}</span>
+          </div>
+
+          <!-- Credit-specific -->
+          <div class="detail-row" *ngIf="selectedReminder.type === 'credit' && selectedReminder.direction">
+            <span class="detail-label">Direction</span>
+            <span class="detail-value">
+              <span class="direction-badge" [class.owed]="selectedReminder.direction === 'owed_to_me'" [class.iowe]="selectedReminder.direction === 'i_owe'">
+                {{ selectedReminder.direction === 'owed_to_me' ? 'On me doit' : 'Je dois' }}
+              </span>
+            </span>
+          </div>
+
+          <div class="detail-row" *ngIf="selectedReminder.type === 'credit' && selectedReminder.phone">
+            <span class="detail-label">Téléphone</span>
+            <span class="detail-value">{{ selectedReminder.phone }}</span>
+          </div>
+
+          <!-- Reminder config -->
+          <div class="detail-row" *ngIf="selectedReminder.reminderBefore">
+            <span class="detail-label">🔔 Rappel configuré</span>
+            <span class="detail-value">
+              {{ selectedReminder.reminderBefore }}{{ selectedReminder.reminderUnit === 'hours' ? ' heures' : ' jours' }} avant
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="modal-btn-close" (click)="closeReminderDetail()">Fermer</button>
+        <button class="modal-btn-dismiss" (click)="dismissReminder(selectedReminder)">✓ Marquer comme vu</button>
+      </div>
+    </div>
+  </div>
 </div>

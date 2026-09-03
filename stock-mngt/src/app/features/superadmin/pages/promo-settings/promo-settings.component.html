@@ -1,0 +1,147 @@
+<div class="promo-settings">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <h1>
+                <fa-icon [icon]="faGift"></fa-icon>
+                Promotion Early-Bird
+            </h1>
+            <p>Configurez une réduction pour les premiers utilisateurs</p>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-container" *ngIf="isLoading">
+        <fa-icon [icon]="faSpinner" [spin]="true"></fa-icon>
+        <p>Chargement...</p>
+    </div>
+
+    <div class="settings-grid" *ngIf="!isLoading">
+        <!-- Left Column: Config -->
+        <div class="config-card">
+            <div class="card-header">
+                <h2>Configuration</h2>
+            </div>
+
+            <!-- Active Toggle -->
+            <div class="setting-row toggle-row">
+                <div class="setting-label">
+                    <span class="label-text">Promotion active</span>
+                    <span class="label-hint">Activer ou désactiver la promotion</span>
+                </div>
+                <button class="toggle-btn" [class.active]="isActive" (click)="toggleActive()">
+                    <fa-icon [icon]="isActive ? faToggleOn : faToggleOff"></fa-icon>
+                    <span>{{ isActive ? 'Activée' : 'Désactivée' }}</span>
+                </button>
+            </div>
+
+            <!-- Discount Percent -->
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span class="label-text">Pourcentage de réduction</span>
+                    <span class="label-hint">Entre 1% et 90%</span>
+                </div>
+                <div class="input-with-unit">
+                    <input type="number" [(ngModel)]="discountPercent" min="1" max="90" class="setting-input">
+                    <span class="unit">%</span>
+                </div>
+                <input type="range" [(ngModel)]="discountPercent" min="1" max="90" class="slider">
+            </div>
+
+            <!-- Max Users -->
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span class="label-text">Nombre maximum d'utilisateurs</span>
+                    <span class="label-hint">Nombre de places disponibles</span>
+                </div>
+                <div class="input-with-unit">
+                    <input type="number" [(ngModel)]="maxUsers" min="1" class="setting-input">
+                    <span class="unit">
+                        <fa-icon [icon]="faUsers"></fa-icon>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span class="label-text">Description</span>
+                    <span class="label-hint">Note interne (optionnelle)</span>
+                </div>
+                <textarea [(ngModel)]="description" class="setting-textarea"
+                    placeholder="Ex: Offre de lancement..."></textarea>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions-row">
+                <button class="btn-save" (click)="saveConfig()" [disabled]="isSaving">
+                    <fa-icon [icon]="isSaving ? faSpinner : faSave" [spin]="isSaving"></fa-icon>
+                    {{ isSaving ? 'Enregistrement...' : 'Enregistrer' }}
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Column: Stats + Preview -->
+        <div class="right-column">
+            <!-- Progress Card -->
+            <div class="progress-card" *ngIf="config">
+                <div class="card-header">
+                    <h2>
+                        <fa-icon [icon]="faChartBar"></fa-icon>
+                        Utilisation
+                    </h2>
+                    <button class="btn-reset" (click)="resetCount()" title="Réinitialiser">
+                        <fa-icon [icon]="faUndo"></fa-icon>
+                    </button>
+                </div>
+
+                <div class="progress-stats">
+                    <div class="progress-numbers">
+                        <span class="used">{{ config.usedCount }}</span>
+                        <span class="separator">/</span>
+                        <span class="total">{{ maxUsers }}</span>
+                    </div>
+                    <span class="progress-label">places utilisées</span>
+                </div>
+
+                <div class="progress-bar-container">
+                    <div class="progress-bar" [style.width.%]="getProgressPercent()"
+                        [class.low]="getProgressPercent() < 50"
+                        [class.medium]="getProgressPercent() >= 50 && getProgressPercent() < 80"
+                        [class.high]="getProgressPercent() >= 80">
+                    </div>
+                </div>
+
+                <div class="slots-remaining">
+                    <fa-icon [icon]="faInfoCircle"></fa-icon>
+                    {{ maxUsers - config.usedCount }} places restantes
+                </div>
+
+                <div class="status-badge" [class.active]="isActive" [class.inactive]="!isActive">
+                    {{ isActive ? '🟢 Promotion en cours' : '🔴 Promotion inactive' }}
+                </div>
+            </div>
+
+            <!-- Price Preview -->
+            <div class="preview-card">
+                <div class="card-header">
+                    <h2>Aperçu des prix</h2>
+                    <span class="discount-badge">-{{ discountPercent }}%</span>
+                </div>
+
+                <div class="preview-tier" *ngFor="let tier of tiers">
+                    <h3>{{ getTierLabel(tier) }}</h3>
+                    <div class="preview-plans">
+                        <div class="preview-plan" *ngFor="let plan of plans">
+                            <span class="plan-name">{{ getPlanLabel(plan) }}</span>
+                            <div class="plan-prices">
+                                <span class="original-price">{{ prices[tier][plan] }} TND</span>
+                                <span class="discounted-price">{{ getDiscountedPrice(tier, plan) }} TND</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

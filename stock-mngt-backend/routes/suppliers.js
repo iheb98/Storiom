@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Supplier } = require('../models');
+const { Supplier, Credit, sequelize } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 
@@ -51,6 +51,15 @@ router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, nex
     console.log("------", (req.query.creditFrom != 'null' || req.query.creditTo != 'null'))
     const id = req.params.id;
     Supplier.findAll(utility.paginate({
+        attributes: {
+            include: [
+                [sequelize.literal(`(
+                    SELECT COALESCE(SUM(CASE WHEN direction = 'i_owe' AND status = false THEN amount ELSE 0 END), 0)
+                    - COALESCE(SUM(CASE WHEN direction = 'owed_to_me' AND status = false THEN amount ELSE 0 END), 0)
+                    FROM credits WHERE credits.supplier_id = "Supplier".id
+                )`), 'calculatedCredit']
+            ]
+        },
         where: {
             store_id: id,
             firstName: {
@@ -81,6 +90,15 @@ router.get('/store/:id', utility.authenticate, checkSubscription, (req, res, nex
 router.get('/all/store/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Supplier.findAll({
+        attributes: {
+            include: [
+                [sequelize.literal(`(
+                    SELECT COALESCE(SUM(CASE WHEN direction = 'i_owe' AND status = false THEN amount ELSE 0 END), 0)
+                    - COALESCE(SUM(CASE WHEN direction = 'owed_to_me' AND status = false THEN amount ELSE 0 END), 0)
+                    FROM credits WHERE credits.supplier_id = "Supplier".id
+                )`), 'calculatedCredit']
+            ]
+        },
         where: {
             store_id: id,
             creatorUserId: req.user.id
@@ -148,6 +166,15 @@ router.delete('/:id', utility.authenticate, checkSubscription, (req, res, next) 
 router.get('/:id', utility.authenticate, checkSubscription, (req, res, next) => {
     const id = req.params.id;
     Supplier.findOne({
+        attributes: {
+            include: [
+                [sequelize.literal(`(
+                    SELECT COALESCE(SUM(CASE WHEN direction = 'i_owe' AND status = false THEN amount ELSE 0 END), 0)
+                    - COALESCE(SUM(CASE WHEN direction = 'owed_to_me' AND status = false THEN amount ELSE 0 END), 0)
+                    FROM credits WHERE credits.supplier_id = "Supplier".id
+                )`), 'calculatedCredit']
+            ]
+        },
         where: {
             id,
             creatorUserId: req.user.id

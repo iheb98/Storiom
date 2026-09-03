@@ -3,6 +3,7 @@ const router = express.Router();
 const { Product, Category, Store, Supplier, Review, User, Address, ProductStats, Brand } = require('../models');
 const { Op, Sequelize, where } = require('sequelize');
 const utility = require('../utility');
+const { getOrSet } = require('../cacheService');
 
 // Helper: determine if request is in store context (custom domain or preview)
 function isStoreContext(req) {
@@ -55,59 +56,53 @@ router.get('/products/random', async (req, res) => {
 router.get('/categories/tree', async (req, res) => {
     try {
         const storeId = req.query.storeId || (req.resolvedStore ? req.resolvedStore.id : null);
+        const cacheKey = `tree:${storeId || 'marketplace'}`;
 
-        const subCategoryInclude = {
-            model: Category,
-            as: 'subCategories',
-            include: {
+        const result = await getOrSet('categories', cacheKey, async () => {
+            const subCategoryInclude = {
                 model: Category,
                 as: 'subCategories',
                 include: {
                     model: Category,
                     as: 'subCategories',
-                    include: { model: Category, as: 'subCategories' }
+                    include: {
+                        model: Category,
+                        as: 'subCategories',
+                        include: { model: Category, as: 'subCategories' }
+                    }
                 }
+            };
+
+            if (storeId) {
+                const { StoreCategoryVisibility } = require('../models');
+                const visibilityRecords = await StoreCategoryVisibility.findAll({
+                    where: { storeId },
+                    attributes: ['categoryId', 'visible']
+                });
+                const visibilityMap = {};
+                visibilityRecords.forEach(r => { visibilityMap[r.categoryId] = r.visible; });
+
+                const staticCategories = await Category.findAll({
+                    where: { parentCategoryId: null, static: true },
+                    include: [subCategoryInclude]
+                });
+                const customCategories = await Category.findAll({
+                    where: { storeId, parentCategoryId: null, static: { [Op.not]: true } },
+                    include: [subCategoryInclude]
+                });
+                const visibleStaticCategories = staticCategories.filter(cat => {
+                    return visibilityMap[cat.id] !== false;
+                });
+                return [...visibleStaticCategories, ...customCategories];
+            } else {
+                return await Category.findAll({
+                    where: { parentCategoryId: null, static: true },
+                    include: [subCategoryInclude]
+                });
             }
-        };
+        });
 
-        if (storeId) {
-            // Store context: get visible static categories + store's custom categories
-            const { StoreCategoryVisibility } = require('../models');
-
-            // Get visibility overrides for this store
-            const visibilityRecords = await StoreCategoryVisibility.findAll({
-                where: { storeId },
-                attributes: ['categoryId', 'visible']
-            });
-            const visibilityMap = {};
-            visibilityRecords.forEach(r => { visibilityMap[r.categoryId] = r.visible; });
-
-            // Get static categories (global)
-            const staticCategories = await Category.findAll({
-                where: { parentCategoryId: null, static: true },
-                include: [subCategoryInclude]
-            });
-
-            // Get store's custom categories (non-static, belonging to this store)
-            const customCategories = await Category.findAll({
-                where: { storeId, parentCategoryId: null, static: { [Op.not]: true } },
-                include: [subCategoryInclude]
-            });
-
-            // Filter static categories: only include if visible (default: visible if no override)
-            const visibleStaticCategories = staticCategories.filter(cat => {
-                return visibilityMap[cat.id] !== false; // visible unless explicitly set to false
-            });
-
-            res.json([...visibleStaticCategories, ...customCategories]);
-        } else {
-            // Marketplace: only static categories
-            const categories = await Category.findAll({
-                where: { parentCategoryId: null, static: true },
-                include: [subCategoryInclude]
-            });
-            res.json(categories);
-        }
+        res.json(result);
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server Error' });
@@ -386,19 +381,23 @@ router.get('/allStores/products', async (req, res) => {
 router.get('/brands/store/:storeId', async (req, res) => {
     try {
         const storeId = req.params.storeId;
-        const products = await Product.findAll({
-            where: { storeId, isVisible: true, brandId: { [Op.not]: null } },
-            attributes: ['brandId'],
-            group: ['brandId'],
-            raw: true
-        });
-        const brandIds = products.map(p => p.brandId).filter(Boolean);
-        if (brandIds.length === 0) return res.json([]);
 
-        const brands = await Brand.findAll({
-            where: { id: { [Op.in]: brandIds } },
-            order: [['name', 'ASC']]
+        const brands = await getOrSet('brands', `store:${storeId}`, async () => {
+            const products = await Product.findAll({
+                where: { storeId, isVisible: true, brandId: { [Op.not]: null } },
+                attributes: ['brandId'],
+                group: ['brandId'],
+                raw: true
+            });
+            const brandIds = products.map(p => p.brandId).filter(Boolean);
+            if (brandIds.length === 0) return [];
+
+            return await Brand.findAll({
+                where: { id: { [Op.in]: brandIds } },
+                order: [['name', 'ASC']]
+            });
         });
+
         res.json(brands);
     } catch (err) {
         console.error(err);
@@ -538,9 +537,11 @@ router.get('/allStores', (req, res, next) => {
 router.get('/store/:id', async (req, res) => {
     const id = req.params.id;
     try {
-        const store = await Store.findOne({
-            where: { id, active: true },
-            include: ['address']
+        const store = await getOrSet('storeDetails', `store:${id}`, async () => {
+            return await Store.findOne({
+                where: { id, active: true },
+                include: ['address']
+            });
         });
         if (!store) {
             return res.status(404).json({ message: 'Store not found' });
@@ -552,33 +553,36 @@ router.get('/store/:id', async (req, res) => {
     }
 });
 
-router.get('/publicProduct/:id', (req, res, next) => {
+router.get('/publicProduct/:id', async (req, res) => {
     const id = req.params.id;
-    Product.findOne({
-        where: {
-            id,
-            isVisible: true,
-            ...(isStoreContext(req) ? { toDisplayStore: true } : { toDisplay: true })
-        }, include: ['brand', 'category', 'supplier', 'store', {
-            model: Review,
-            as: 'reviews',
-            where: { status: 'approved' },
-            required: false, // Include even if no reviews
-            include: [{
-                model: User,
-                as: 'user',
-                attributes: ['firstName', 'lastName']
-            }]
-        }]
-    }).then(product => {
-        res.json(product)
-
-    }).catch(err => {
+    const context = isStoreContext(req) ? 'store' : 'marketplace';
+    try {
+        const product = await getOrSet('publicProducts', `product:${id}:${context}`, async () => {
+            return await Product.findOne({
+                where: {
+                    id,
+                    isVisible: true,
+                    ...(isStoreContext(req) ? { toDisplayStore: true } : { toDisplay: true })
+                }, include: ['brand', 'category', 'supplier', 'store', {
+                    model: Review,
+                    as: 'reviews',
+                    where: { status: 'approved' },
+                    required: false,
+                    include: [{
+                        model: User,
+                        as: 'user',
+                        attributes: ['firstName', 'lastName']
+                    }]
+                }]
+            });
+        });
+        res.json(product);
+    } catch (err) {
         res.status(500).json({
             success: false,
             message: err.toString()
-        })
-    })
+        });
+    }
 });
 
 /**

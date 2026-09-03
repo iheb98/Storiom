@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   faArrowLeft, faUser, faAddressBook, faEnvelope, faPhone,
-  faCoins, faWallet, faAlignLeft, faPlus, faSave, faTruck
+  faCoins, faWallet, faAlignLeft, faPlus, faSave, faTruck, faHandHoldingUsd
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { SupplierService } from 'src/app/core/services/supplier.service';
@@ -28,6 +28,7 @@ export class SupplierAddComponent implements OnInit {
   faPlus = faPlus;
   faSave = faSave;
   faTruck = faTruck;
+  faHandHoldingUsd = faHandHoldingUsd;
 
   // Form
   form: FormGroup;
@@ -37,6 +38,7 @@ export class SupplierAddComponent implements OnInit {
   // Data
   user: any;
   supplierId: string;
+  calculatedCredit = 0;
 
   // Loading States
   isLoading = false;
@@ -75,7 +77,7 @@ export class SupplierAddComponent implements OnInit {
         this.form.get('lastName').setValue(response.lastName);
         this.form.get('phone').setValue(response.phone);
         this.form.get('email').setValue(response.email);
-        this.form.get('credit').setValue(response.credit);
+        this.calculatedCredit = parseFloat(response.calculatedCredit) || 0;
         this.form.get('description').setValue(response.description);
         this.isLoading = false;
       },
@@ -97,7 +99,6 @@ export class SupplierAddComponent implements OnInit {
       lastName: [''],
       email: ['', [Validators.pattern("^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$")]],
       phone: [''],
-      credit: [''],
       description: ['']
     });
   }

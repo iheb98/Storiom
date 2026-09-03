@@ -1,10 +1,249 @@
 const express = require('express');
 const router = express.Router();
-const { Product, Operation, Credit, Category, Receipt, ServiceRequest, StoreService } = require('../models');
+const { Product, Operation, Credit, Category, Receipt, ServiceRequest, StoreService, Expense } = require('../models');
 const utility = require('../utility');
 const checkSubscription = require('../checkSubscription');
 const sequelize = require('sequelize');
 const { Op } = require('sequelize');
+
+function getRecurringOccurrences(startDate, recurrenceType, recurrenceDay, rangeFrom, rangeTo) {
+    const from = new Date(rangeFrom);
+    const to = new Date(rangeTo);
+    to.setHours(23, 59, 59, 999);
+    const occurrences = [];
+
+    if (recurrenceType === 'daily') {
+        let current = new Date(Math.max(startDate.getTime(), from.getTime()));
+        current.setHours(0, 0, 0, 0);
+        while (current <= to) {
+            occurrences.push(new Date(current));
+            current.setDate(current.getDate() + 1);
+        }
+    } else if (recurrenceType === 'weekly') {
+        const targetDay = recurrenceDay || 1;
+        const jsDay = targetDay === 7 ? 0 : targetDay;
+        let current = new Date(Math.max(startDate.getTime(), from.getTime()));
+        current.setHours(0, 0, 0, 0);
+        while (current.getDay() !== jsDay) {
+            current.setDate(current.getDate() + 1);
+        }
+        while (current <= to) {
+            if (current >= from && current >= startDate) {
+                occurrences.push(new Date(current));
+            }
+            current.setDate(current.getDate() + 7);
+        }
+    } else if (recurrenceType === 'monthly') {
+        const dayOfMonth = recurrenceDay || 1;
+        let year = from.getFullYear();
+        let month = from.getMonth();
+        for (let i = 0; i < 1200; i++) {
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const actualDay = Math.min(dayOfMonth, daysInMonth);
+            const occDate = new Date(year, month, actualDay);
+            if (occDate > to) break;
+            if (occDate >= from && occDate >= startDate) {
+                occurrences.push(occDate);
+            }
+            month++;
+            if (month > 11) { month = 0; year++; }
+        }
+    } else if (recurrenceType === 'yearly') {
+        const dayOfMonth = recurrenceDay || startDate.getDate();
+        const monthOfYear = startDate.getMonth();
+        let year = from.getFullYear();
+        for (let i = 0; i < 200; i++) {
+            const daysInMonth = new Date(year, monthOfYear + 1, 0).getDate();
+            const actualDay = Math.min(dayOfMonth, daysInMonth);
+            const occDate = new Date(year, monthOfYear, actualDay);
+            if (occDate > to) break;
+            if (occDate >= from && occDate >= startDate) {
+                occurrences.push(occDate);
+            }
+            year++;
+        }
+    }
+
+    return occurrences;
+}
+
+function getNextOccurrence(startDate, recurrenceType, recurrenceDay) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (recurrenceType === 'daily') {
+        const next = new Date(Math.max(startDate.getTime(), today.getTime()));
+        next.setHours(0, 0, 0, 0);
+        return next;
+    } else if (recurrenceType === 'weekly') {
+        const targetDay = recurrenceDay || 1;
+        const jsDay = targetDay === 7 ? 0 : targetDay;
+        let current = new Date(today);
+        while (current.getDay() !== jsDay || current < startDate) {
+            current.setDate(current.getDate() + 1);
+        }
+        return current;
+    } else if (recurrenceType === 'monthly') {
+        const dayOfMonth = recurrenceDay || 1;
+        let year = today.getFullYear();
+        let month = today.getMonth();
+        for (let i = 0; i < 24; i++) {
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const actualDay = Math.min(dayOfMonth, daysInMonth);
+            const occDate = new Date(year, month, actualDay);
+            if (occDate >= today && occDate >= startDate) {
+                return occDate;
+            }
+            month++;
+            if (month > 11) { month = 0; year++; }
+        }
+    } else if (recurrenceType === 'yearly') {
+        const dayOfMonth = recurrenceDay || startDate.getDate();
+        const monthOfYear = startDate.getMonth();
+        let year = today.getFullYear();
+        for (let i = 0; i < 10; i++) {
+            const daysInMonth = new Date(year, monthOfYear + 1, 0).getDate();
+            const actualDay = Math.min(dayOfMonth, daysInMonth);
+            const occDate = new Date(year, monthOfYear, actualDay);
+            if (occDate >= today && occDate >= startDate) {
+                return occDate;
+            }
+            year++;
+        }
+    }
+    return null;
+}
+
+router.get('/store/:id/reminders', utility.authenticate, checkSubscription, async (req, res) => {
+    try {
+        const reminders = [];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const recurringExpenses = await Expense.findAll({
+            where: {
+                creatorUserId: req.user.id,
+                isRecurring: true,
+                reminderEnabled: true
+            },
+            order: [['date', 'ASC']]
+        });
+
+        recurringExpenses.forEach(expense => {
+            const startDate = new Date(expense.date);
+            const nextDate = getNextOccurrence(startDate, expense.recurrenceType, expense.recurrenceDay);
+            if (nextDate) {
+                const daysUntil = Math.ceil((nextDate - today) / (1000 * 60 * 60 * 24));
+
+                let reminderOffset = 0;
+                if (expense.reminderBefore) {
+                    if (expense.recurrenceType === 'daily' || expense.recurrenceType === 'weekly') {
+                        reminderOffset = expense.reminderBefore / 24;
+                    } else {
+                        reminderOffset = expense.reminderBefore;
+                    }
+                }
+
+                const reminderDaysUntil = daysUntil - reminderOffset;
+                const shouldShow = daysUntil <= 0 || reminderDaysUntil <= 0;
+
+                if (shouldShow) {
+                    const unit = (expense.recurrenceType === 'daily' || expense.recurrenceType === 'weekly') ? 'hours' : 'days';
+
+                    let urgency = 'upcoming';
+                    if (daysUntil <= 0) {
+                        urgency = 'now';
+                    } else if (reminderDaysUntil <= 0) {
+                        urgency = daysUntil <= 1 ? 'urgent' : 'soon';
+                    } else if (daysUntil <= 3) {
+                        urgency = 'urgent';
+                    } else if (daysUntil <= 7) {
+                        urgency = 'soon';
+                    }
+
+                    reminders.push({
+                        type: 'expense',
+                        entityId: expense.id,
+                        title: expense.title,
+                        amount: expense.amount,
+                        date: nextDate,
+                        daysUntil,
+                        recurrenceType: expense.recurrenceType,
+                        reminderBefore: expense.reminderBefore,
+                        reminderUnit: unit,
+                        urgency
+                    });
+                }
+            }
+        });
+
+        const unpaidCredits = await Credit.findAll({
+            where: {
+                creatorUserId: req.user.id,
+                status: false,
+                returnDate: { [Op.not]: null },
+                reminderEnabled: true
+            },
+            order: [['return_date', 'ASC']]
+        });
+
+        unpaidCredits.forEach(credit => {
+            const returnDate = new Date(credit.returnDate);
+            returnDate.setHours(0, 0, 0, 0);
+            const daysUntil = Math.ceil((returnDate - today) / (1000 * 60 * 60 * 24));
+            const name = [credit.firstName, credit.lastName].filter(Boolean).join(' ') || 'Inconnu';
+
+            const reminderOffset = credit.reminderBefore || 0;
+            const reminderDaysUntil = daysUntil - reminderOffset;
+            const shouldShow = daysUntil <= 0 || reminderDaysUntil <= 0;
+
+            if (shouldShow) {
+                let urgency = 'upcoming';
+                if (daysUntil < 0) {
+                    urgency = 'overdue';
+                } else if (daysUntil <= 0) {
+                    urgency = 'now';
+                } else if (reminderDaysUntil <= 0) {
+                    urgency = daysUntil <= 1 ? 'urgent' : 'soon';
+                } else if (daysUntil <= 3) {
+                    urgency = 'urgent';
+                } else if (daysUntil <= 7) {
+                    urgency = 'soon';
+                }
+
+                reminders.push({
+                    type: 'credit',
+                    entityId: credit.id,
+                    title: `Crédit: ${name}`,
+                    amount: credit.amount,
+                    date: returnDate,
+                    daysUntil,
+                    direction: credit.direction,
+                    phone: credit.phone || null,
+                    reminderBefore: credit.reminderBefore,
+                    reminderUnit: 'days',
+                    urgency
+                });
+            }
+        });
+
+        reminders.sort((a, b) => {
+            const urgencyOrder = { overdue: 0, now: 1, urgent: 2, soon: 3, upcoming: 4 };
+            const diff = (urgencyOrder[a.urgency] || 4) - (urgencyOrder[b.urgency] || 4);
+            if (diff !== 0) return diff;
+            return new Date(a.date) - new Date(b.date);
+        });
+
+        res.json({
+            count: reminders.length,
+            urgentCount: reminders.filter(r => ['overdue', 'now', 'urgent'].includes(r.urgency)).length,
+            reminders: reminders.slice(0, 20)
+        });
+    } catch (error) {
+        console.error("Error fetching reminders:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+});
 
 router.get('/store/:id/widgets', utility.authenticate, checkSubscription, async (req, res, next) => {
     const id = req.params.id;
@@ -34,7 +273,7 @@ router.get('/store/:id/widgets', utility.authenticate, checkSubscription, async 
                     {
                         [utility.Op.or]: [
                             { '$receipt.visible$': true },
-                            { receiptId: null } // Adjust if your foreign key is named differently
+                            { receiptId: null }
                         ]
                     }
                 ],
@@ -44,8 +283,8 @@ router.get('/store/:id/widgets', utility.authenticate, checkSubscription, async 
                 {
                     model: Receipt,
                     as: 'receipt',
-                    required: false,       // <-- crucial to allow null receipts
-                    attributes: []         // <-- only if you don't need receipt fields
+                    required: false,
+                    attributes: []
                 }
             ]
         });
@@ -127,7 +366,7 @@ router.get('/store/:id/bestSelling', utility.authenticate, checkSubscription, (r
             creatorUserId: req.user.id,
             [Op.or]: [
                 { '$receipt.visible$': true },
-                { receiptId: null } // Adjust if foreign key has a different name
+                { receiptId: null }
             ]
         },
         include: [
@@ -220,22 +459,21 @@ router.get('/store/:id/operationStats', utility.authenticate, checkSubscription,
                 break;
 
             case 'Mensuel':
-                console.log("Received Mensuel value:", value); // Debugging log
+                console.log("Received Mensuel value:", value);
 
                 if (typeof value !== 'string') {
                     return res.status(400).json({ success: false, message: 'Invalid month format. Expected a string in "YYYY-MM" format.' });
                 }
 
-                value = value.trim(); // Remove extra spaces
+                value = value.trim();
 
-                // Ensure the month is always two digits (e.g., "2026-02" instead of "2026-2")
                 let [year, month] = value.split('-');
 
                 if (!year || !month) {
                     return res.status(400).json({ success: false, message: `Invalid month format. Received "${value}". Use "YYYY-MM".` });
                 }
 
-                month = month.padStart(2, '0'); // Convert "2" to "02" if needed
+                month = month.padStart(2, '0');
 
                 if (!/^\d{4}-\d{2}$/.test(`${year}-${month}`)) {
                     return res.status(400).json({ success: false, message: `Invalid month format. Expected "YYYY-MM", but received "${year}-${month}".` });
@@ -333,22 +571,21 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, c
                 break;
 
             case 'Mensuel':
-                console.log("Received Mensuel value:", value); // Debugging log
+                console.log("Received Mensuel value:", value);
 
                 if (typeof value !== 'string') {
                     return res.status(400).json({ success: false, message: 'Invalid month format. Expected a string in "YYYY-MM" format.' });
                 }
 
-                value = value.trim(); // Remove extra spaces
+                value = value.trim();
 
-                // Ensure the month is always two digits (e.g., "2026-02" instead of "2026-2")
                 let [year, month] = value.split('-');
 
                 if (!year || !month) {
                     return res.status(400).json({ success: false, message: `Invalid month format. Received "${value}". Use "YYYY-MM".` });
                 }
 
-                month = month.padStart(2, '0'); // Convert "2" to "02" if needed
+                month = month.padStart(2, '0');
 
                 if (!/^\d{4}-\d{2}$/.test(`${year}-${month}`)) {
                     return res.status(400).json({ success: false, message: `Invalid month format. Expected "YYYY-MM", but received "${year}-${month}".` });
@@ -404,7 +641,7 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, c
                 {
                     [Op.or]: [
                         { '$receipt.visible$': true },
-                        { receiptId: null } // adjust this if your foreign key is named differently
+                        { receiptId: null }
                     ]
                 }
             ]
@@ -424,12 +661,11 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, c
                 model: Receipt,
                 as: 'receipt',
                 attributes: [],
-                required: false // Important: left join to allow nulls
+                required: false
             }
         ]
     })
         .then(operations => {
-            // Group by category and calculate total number of items sold per category
             const categoryData = operations.reduce((acc, operation) => {
                 const category = operation.product.category ? operation.product.category.name : "Non classé";
                 const amountSold = operation.amount;
@@ -442,26 +678,22 @@ router.get('/store/:id/operationStats/categories/items', utility.authenticate, c
                 return acc;
             }, {});
 
-            // Convert to array and sort by number of items sold in descending order
             const sortedCategories = Object.entries(categoryData)
                 .sort(([, a], [, b]) => b.totalAmount - a.totalAmount)
-                .slice(0, 5);  // Limit to top 5
+                .slice(0, 5);
 
-            // Prepare data for the chart
             const labels = sortedCategories.map(([category]) => category);
             const totalSold = sortedCategories.map(([, data]) => data.totalAmount);
 
-            // Define different background colors for each category
             const backgroundColors = ['#1E88E5', '#43A047', '#F4511E', '#FB8C00', '#8E24AA']
-                ;  // You can add more or generate dynamically
+                ;
 
             const chartData = {
                 labels: labels,
                 datasets: [
                     {
                         label: 'Produits Vendues',
-                        backgroundColor: backgroundColors.slice(0, labels.length), // Assign colors to each category
-                        data: totalSold
+                        backgroundColor: backgroundColors.slice(0, labels.length), data: totalSold
                     }
                 ]
             };
@@ -494,22 +726,21 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, checkSu
                 break;
 
             case 'Mensuel':
-                console.log("Received Mensuel value:", value); // Debugging log
+                console.log("Received Mensuel value:", value);
 
                 if (typeof value !== 'string') {
                     return res.status(400).json({ success: false, message: 'Invalid month format. Expected a string in "YYYY-MM" format.' });
                 }
 
-                value = value.trim(); // Remove extra spaces
+                value = value.trim();
 
-                // Ensure the month is always two digits (e.g., "2026-02" instead of "2026-2")
                 let [year, month] = value.split('-');
 
                 if (!year || !month) {
                     return res.status(400).json({ success: false, message: `Invalid month format. Received "${value}". Use "YYYY-MM".` });
                 }
 
-                month = month.padStart(2, '0'); // Convert "2" to "02" if needed
+                month = month.padStart(2, '0');
 
                 if (!/^\d{4}-\d{2}$/.test(`${year}-${month}`)) {
                     return res.status(400).json({ success: false, message: `Invalid month format. Expected "YYYY-MM", but received "${year}-${month}".` });
@@ -565,7 +796,7 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, checkSu
                 {
                     [Op.or]: [
                         { '$receipt.visible$': true },
-                        { receiptId: null } // adjust if your foreign key is different
+                        { receiptId: null }
                     ]
                 }
             ]
@@ -584,13 +815,12 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, checkSu
             {
                 model: Receipt,
                 as: 'receipt',
-                required: false,       // <-- important: allows nulls (LEFT JOIN)
-                attributes: []         // <-- no fields selected from receipt
+                required: false,
+                attributes: []
             }
         ]
     })
         .then(operations => {
-            // Group by category
             const categoryData = operations.reduce((acc, operation) => {
                 const category = operation.product.category ? operation.product.category.name : "Non classé";
                 const profit = (operation.price - operation.product.buyingPrice) * operation.amount;
@@ -603,25 +833,22 @@ router.get('/store/:id/operationStats/categories', utility.authenticate, checkSu
                 return acc;
             }, {});
 
-            // Convert to array and sort by profit in descending order
             const sortedCategories = Object.entries(categoryData)
                 .sort(([, a], [, b]) => b.totalProfit - a.totalProfit)
-                .slice(0, 5);  // Limit to top 5
+                .slice(0, 5);
 
-            // Prepare data for the chart
             const labels = sortedCategories.map(([category]) => category);
             const mostProfitable = sortedCategories.map(([, data]) => data.totalProfit);
 
-            // Define different background colors for each category
             const backgroundColors = ['#1E88E5', '#43A047', '#F4511E', '#FB8C00', '#8E24AA']
-                ;  // You can add more or generate dynamically
+                ;
 
             const chartData = {
                 labels: labels,
                 datasets: [
                     {
                         label: 'Profit',
-                        backgroundColor: backgroundColors.slice(0, labels.length), // Assign colors to each category
+                        backgroundColor: backgroundColors.slice(0, labels.length),
                         data: mostProfitable
                     }
                 ]
@@ -658,22 +885,21 @@ router.get('/store/:id/operationStats/product', utility.authenticate, checkSubsc
                 break;
 
             case 'Mensuel':
-                console.log("Received Mensuel value:", value); // Debugging log
+                console.log("Received Mensuel value:", value);
 
                 if (typeof value !== 'string') {
                     return res.status(400).json({ success: false, message: 'Invalid month format. Expected a string in "YYYY-MM" format.' });
                 }
 
-                value = value.trim(); // Remove extra spaces
+                value = value.trim();
 
-                // Ensure the month is always two digits (e.g., "2026-02" instead of "2026-2")
                 let [year, month] = value.split('-');
 
                 if (!year || !month) {
                     return res.status(400).json({ success: false, message: `Invalid month format. Received "${value}". Use "YYYY-MM".` });
                 }
 
-                month = month.padStart(2, '0'); // Convert "2" to "02" if needed
+                month = month.padStart(2, '0');
 
                 if (!/^\d{4}-\d{2}$/.test(`${year}-${month}`)) {
                     return res.status(400).json({ success: false, message: `Invalid month format. Expected "YYYY-MM", but received "${year}-${month}".` });
@@ -728,7 +954,7 @@ router.get('/store/:id/operationStats/product', utility.authenticate, checkSubsc
                 {
                     [Op.or]: [
                         { '$receipt.visible$': true },
-                        { receiptId: null } // adjust this if the foreign key is named differently
+                        { receiptId: null }
                     ]
                 }
             ]
@@ -737,7 +963,7 @@ router.get('/store/:id/operationStats/product', utility.authenticate, checkSubsc
             {
                 model: Receipt,
                 as: 'receipt',
-                required: false, // LEFT JOIN to allow nulls
+                required: false,
                 attributes: []
             }
         ]
@@ -775,17 +1001,14 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
     try {
         const { from, to, reportType, includeDeleted } = req.query;
 
-        // Validate date inputs
         if (!from || !to) {
             return res.status(400).json({ message: "Please provide 'from' and 'to' date parameters." });
         }
 
-        // Determine operation types based on reportType
         const type = reportType === 'load' ? 'LOADED'
-                   : reportType === 'both' ? ['SOLD', 'LOADED']
-                   : 'SOLD'; // default: sales
+            : reportType === 'both' ? ['SOLD', 'LOADED']
+                : 'SOLD'; // default: sales
 
-        // Fetch operations within date range
         const operations = await Operation.findAll({
             where: {
                 date: {
@@ -819,7 +1042,6 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
             return res.status(404).json({ message: "Aucune opération trouvée dans la plage de dates donnée." });
         }
 
-        // Calculate report data
         let totalEarnings = 0;
         let totalCost = 0;
         let totalReceipts = new Set();
@@ -846,7 +1068,6 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
 
                 totalReceipts.add(receiptId);
 
-                // Group operations by product
                 if (!groupedOperations[productId]) {
                     groupedOperations[productId] = {
                         productName: product.name,
@@ -869,7 +1090,6 @@ router.get('/store/:id/generate-report', utility.authenticate, checkSubscription
             }
         });
 
-        // Format final response
         const report = {
             from,
             to,
@@ -964,10 +1184,15 @@ router.get('/store/:id/export-stock', utility.authenticate, checkSubscription, a
 router.get('/store/:id/parentCategoriesStats', utility.authenticate, checkSubscription, async (req, res, next) => {
     try {
         const allCategories = await Category.findAll({
+            where: {
+                [Op.or]: [
+                    { static: true },
+                    { storeId: req.params.id }
+                ]
+            },
             attributes: ['id', 'name', 'parentCategoryId']
         });
 
-        // Build map: parentId -> [children...]
         const categoryMap = new Map();
         allCategories.forEach(cat => {
             const parentId = cat.parentCategoryId || null;
@@ -975,7 +1200,6 @@ router.get('/store/:id/parentCategoriesStats', utility.authenticate, checkSubscr
             categoryMap.get(parentId).push(cat);
         });
 
-        // Get only top-level categories
         const parentCategories = categoryMap.get(null) || [];
 
         const results = [];
@@ -1028,18 +1252,19 @@ router.get('/store/:id/parentCategoriesStats', utility.authenticate, checkSubscr
                 }
             }
 
-            results.push({
-                categoryId: parentCategory.id,
-                categoryName: parentCategory.name,
-                stockValue,
-                stockSellingValue,
-                stockNetValue,
-                totalSold,
-                totalSoldNet
-            });
+            if (products.length > 0 || totalSold > 0) {
+                results.push({
+                    categoryId: parentCategory.id,
+                    categoryName: parentCategory.name,
+                    stockValue,
+                    stockSellingValue,
+                    stockNetValue,
+                    totalSold,
+                    totalSoldNet
+                });
+            }
         }
 
-        // ⬇️ Extra Row: Products with no category
         const uncategorizedProducts = await Product.findAll({
             where: {
                 categoryId: null,
@@ -1113,7 +1338,6 @@ router.get('/store/:id/total-sold-pie', utility.authenticate, async (req, res) =
         const parentCategories = categories.filter(c => !c.parentCategoryId);
         const result = [];
 
-        // Date filter
         const dateFilter = {};
         if (type === 'Quotidien') {
             dateFilter[Op.gte] = new Date(value + ' 00:00:00');
@@ -1136,7 +1360,6 @@ router.get('/store/:id/total-sold-pie', utility.authenticate, async (req, res) =
             dateFilter[Op.lt] = new Date(`${parseInt(value) + 1}-01-01`);
         }
 
-        // Handle parent categories
         for (const parent of parentCategories) {
             const descendantIds = await getAllDescendantCategoryIds(parent.id, categories);
             const categoryIds = [parent.id, ...descendantIds];
@@ -1183,7 +1406,6 @@ router.get('/store/:id/total-sold-pie', utility.authenticate, async (req, res) =
             });
         }
 
-        // Handle uncategorized products ONCE
         const uncategorizedProducts = await Product.findAll({
             where: {
                 categoryId: null,
@@ -1249,7 +1471,6 @@ router.get('/store/:id/net-sold-pie', utility.authenticate, async (req, res) => 
         const parentCategories = categories.filter(c => !c.parentCategoryId);
         const result = [];
 
-        // Build date filter
         const dateFilter = {};
         if (type === 'Quotidien') {
             dateFilter[Op.gte] = new Date(value + ' 00:00:00');
@@ -1272,7 +1493,6 @@ router.get('/store/:id/net-sold-pie', utility.authenticate, async (req, res) => 
             dateFilter[Op.lt] = new Date(`${parseInt(value) + 1}-01-01`);
         }
 
-        // 👇 Loop for each parent category
         for (const parent of parentCategories) {
             const descendantIds = await getAllDescendantCategoryIds(parent.id, categories);
             const categoryIds = [parent.id, ...descendantIds];
@@ -1327,7 +1547,7 @@ router.get('/store/:id/net-sold-pie', utility.authenticate, async (req, res) => 
             });
         }
 
-        // ✅ Handle uncategorized products separately (only once)
+        // Handle uncategorized products separately
         const uncategorizedProducts = await Product.findAll({
             where: {
                 categoryId: null,
@@ -1422,11 +1642,6 @@ async function getAllDescendantCategoryIds(categoryId, allCategories) {
     return descendants;
 }
 
-// ============================================
-// SERVICE REQUESTS STATS
-// ============================================
-
-// Helper function to build date filter for service requests
 function buildServiceRequestDateFilter(type, value) {
     if (!type || !value) return {};
 
@@ -1460,20 +1675,17 @@ function buildServiceRequestDateFilter(type, value) {
     };
 }
 
-// Pie chart: Sum of prices for completed requests, grouped by service
 router.get('/store/:id/service-requests/completed-revenue-pie', utility.authenticate, async (req, res) => {
     try {
         const storeId = req.params.id;
         const { type, value } = req.query;
 
-        // Build where clause with date filter
         const whereClause = {
             storeId: storeId,
             status: 'COMPLETED',
             ...buildServiceRequestDateFilter(type, value)
         };
 
-        // Get all completed requests for this store, grouped by service
         const requests = await ServiceRequest.findAll({
             where: whereClause,
             include: [{
@@ -1511,13 +1723,11 @@ router.get('/store/:id/service-requests/completed-revenue-pie', utility.authenti
     }
 });
 
-// Pie chart: Count of requests by status
 router.get('/store/:id/service-requests/requests-by-status-pie', utility.authenticate, async (req, res) => {
     try {
         const storeId = req.params.id;
         const { type, value } = req.query;
 
-        // Build where clause with date filter
         const whereClause = {
             storeId: storeId,
             ...buildServiceRequestDateFilter(type, value)
@@ -1565,6 +1775,151 @@ router.get('/store/:id/service-requests/requests-by-status-pie', utility.authent
     } catch (err) {
         console.error(err);
         res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+router.get('/store/:id/profit-report', utility.authenticate, checkSubscription, async (req, res) => {
+    try {
+        const { from, to, includeDeleted } = req.query;
+
+        if (!from || !to) {
+            return res.status(400).json({ message: "Please provide 'from' and 'to' date parameters." });
+        }
+
+        const fromDate = new Date(from);
+        const toDate = new Date(to);
+        toDate.setHours(23, 59, 59, 999);
+
+        const soldOperations = await Operation.findAll({
+            where: {
+                date: { [Op.between]: [fromDate, toDate] },
+                creatorUserId: req.user.id,
+                type: 'SOLD',
+                [Op.or]: [
+                    { '$receipt.visible$': true },
+                    { receiptId: null }
+                ]
+            },
+            include: [
+                {
+                    model: Product,
+                    as: 'product',
+                    attributes: ['name', 'buyingPrice', 'sellingPrice'],
+                    where: includeDeleted === 'true' ? {} : { isVisible: true }
+                },
+                {
+                    model: Receipt,
+                    as: 'receipt',
+                    required: false,
+                    attributes: []
+                }
+            ]
+        });
+
+        let totalRevenue = 0;
+        let totalCOGS = 0;
+        let totalProductsSold = 0;
+        const productBreakdown = {};
+
+        soldOperations.forEach(op => {
+            if (op.product) {
+                const revenue = op.amount * (op.price || op.product.sellingPrice || 0);
+                const cost = op.amount * (op.product.buyingPrice || 0);
+                totalRevenue += revenue;
+                totalCOGS += cost;
+                totalProductsSold += op.amount;
+
+                const name = op.product.name;
+                if (!productBreakdown[name]) {
+                    productBreakdown[name] = {
+                        productName: name,
+                        buyingPrice: op.product.buyingPrice || 0,
+                        sellingPrice: op.product.sellingPrice || 0,
+                        quantitySold: 0,
+                        revenue: 0,
+                        cost: 0,
+                        profit: 0
+                    };
+                }
+                productBreakdown[name].quantitySold += op.amount;
+                productBreakdown[name].revenue += revenue;
+                productBreakdown[name].cost += cost;
+                productBreakdown[name].profit += (revenue - cost);
+            }
+        });
+
+        const grossProfit = totalRevenue - totalCOGS;
+
+        const allExpenses = await Expense.findAll({
+            where: {
+                creatorUserId: req.user.id,
+                [Op.or]: [
+                    {
+                        is_recurring: false,
+                        date: { [Op.between]: [fromDate, toDate] }
+                    },
+                    {
+                        is_recurring: true,
+                        date: { [Op.lte]: toDate }
+                    }
+                ]
+            },
+            order: [['date', 'ASC']]
+        });
+
+        let totalExpenses = 0;
+        const expensesList = [];
+
+        allExpenses.forEach(e => {
+            const amount = e.amount || 0;
+
+            if (!e.isRecurring) {
+                totalExpenses += amount;
+                expensesList.push({
+                    title: e.title,
+                    amount,
+                    date: e.date,
+                    isRecurring: false
+                });
+            } else {
+                const startDate = new Date(e.date);
+                const recType = e.recurrenceType;
+                const recDay = e.recurrenceDay;
+                const occurrences = getRecurringOccurrences(startDate, recType, recDay, fromDate, toDate);
+
+                occurrences.forEach(occDate => {
+                    totalExpenses += amount;
+                    expensesList.push({
+                        title: e.title,
+                        amount,
+                        date: occDate,
+                        isRecurring: true
+                    });
+                });
+            }
+        });
+
+        expensesList.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        const netProfit = grossProfit - totalExpenses;
+
+        res.json({
+            from,
+            to,
+            totalRevenue,
+            totalCOGS,
+            grossProfit,
+            totalExpenses,
+            expensesCount: expensesList.length,
+            expenses: expensesList,
+            netProfit,
+            profitMargin: totalRevenue > 0 ? ((netProfit / totalRevenue) * 100) : 0,
+            totalProductsSold,
+            products: Object.values(productBreakdown).sort((a, b) => b.profit - a.profit)
+        });
+    } catch (error) {
+        console.error("Error generating profit report:", error);
+        res.status(500).json({ message: "Server error" });
     }
 });
 

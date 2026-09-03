@@ -108,6 +108,19 @@ module.exports = (sequelize, DataTypes) => {
     notes: {
       type: DataTypes.TEXT,
       allowNull: true
+    },
+    // Promotional discount applied
+    discountPercent: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      defaultValue: null,
+      field: 'discount_percent'
+    },
+    originalAmount: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+      defaultValue: null,
+      field: 'original_amount'
     }
   }, {
     sequelize,

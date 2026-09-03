@@ -9,8 +9,9 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
+    static associate({ Supplier }) {
       // define association here
+      this.belongsTo(Supplier, { foreignKey: 'supplier_id', as: 'supplier' })
     }
 
     toJSON() {
@@ -45,6 +46,27 @@ module.exports = (sequelize, DataTypes) => {
     storeId: {
       type: DataTypes.INTEGER,
       field: 'store_id'
+    },
+    direction: {
+      type: DataTypes.ENUM('owed_to_me', 'i_owe'),
+      allowNull: false,
+      defaultValue: 'owed_to_me'
+    },
+    supplierId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      field: 'supplier_id'
+    },
+    reminderEnabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+      field: 'reminder_enabled'
+    },
+    reminderBefore: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      field: 'reminder_before'
     },
     creatorUserId: {
       type: DataTypes.INTEGER

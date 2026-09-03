@@ -1,0 +1,445 @@
+$primary: #3f51b5;
+$success: #4caf50;
+$warning: #ff9800;
+$danger: #f44336;
+$purple: #9c27b0;
+$white: #ffffff;
+$text-primary: #2c3e50;
+$text-secondary: #6c757d;
+$border-color: #e0e0e0;
+$bg-light: #f8f9fa;
+$radius: 12px;
+$radius-sm: 8px;
+$shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+.promo-settings {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+// Header
+.page-header {
+    margin-bottom: 32px;
+
+    h1 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: $text-primary;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+
+        fa-icon {
+            color: $warning;
+        }
+    }
+
+    p {
+        color: $text-secondary;
+        margin: 0;
+    }
+}
+
+// Loading
+.loading-container {
+    text-align: center;
+    padding: 60px;
+    color: $text-secondary;
+
+    fa-icon {
+        font-size: 2rem;
+        color: $primary;
+        margin-bottom: 16px;
+    }
+}
+
+// Grid
+.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+
+    @media (max-width: 992px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+// Cards
+.config-card,
+.progress-card,
+.preview-card {
+    background: $white;
+    border-radius: $radius;
+    box-shadow: $shadow;
+    padding: 28px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    h2 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: $text-primary;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .discount-badge {
+        background: linear-gradient(135deg, $danger, #e91e63);
+        color: $white;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+}
+
+// Settings Rows
+.setting-row {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid $border-color;
+
+    &:last-of-type {
+        border-bottom: none;
+    }
+
+    &.toggle-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.setting-label {
+    margin-bottom: 10px;
+
+    .label-text {
+        display: block;
+        font-weight: 600;
+        color: $text-primary;
+        margin-bottom: 4px;
+    }
+
+    .label-hint {
+        font-size: 0.85rem;
+        color: $text-secondary;
+    }
+}
+
+.toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 2px solid $border-color;
+    border-radius: $radius-sm;
+    background: $bg-light;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    color: $text-secondary;
+    transition: all 0.3s;
+
+    &.active {
+        border-color: $success;
+        background: rgba($success, 0.1);
+        color: $success;
+    }
+
+    fa-icon {
+        font-size: 1.4rem;
+    }
+}
+
+.input-with-unit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    .setting-input {
+        width: 120px;
+        padding: 10px 14px;
+        border: 2px solid $border-color;
+        border-radius: $radius-sm;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-align: center;
+        color: $text-primary;
+        transition: border-color 0.2s;
+
+        &:focus {
+            outline: none;
+            border-color: $primary;
+        }
+    }
+
+    .unit {
+        font-weight: 600;
+        color: $text-secondary;
+        font-size: 1.1rem;
+    }
+}
+
+.slider {
+    width: 100%;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(90deg, $success, $warning, $danger);
+    border-radius: 3px;
+    outline: none;
+
+    &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 22px;
+        height: 22px;
+        background: $white;
+        border: 3px solid $primary;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.setting-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px;
+    border: 2px solid $border-color;
+    border-radius: $radius-sm;
+    font-size: 0.95rem;
+    color: $text-primary;
+    resize: vertical;
+    font-family: inherit;
+
+    &:focus {
+        outline: none;
+        border-color: $primary;
+    }
+}
+
+// Actions
+.actions-row {
+    display: flex;
+    gap: 12px;
+    padding-top: 8px;
+
+    .btn-save {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px;
+        background: $primary;
+        color: $white;
+        border: none;
+        border-radius: $radius-sm;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover:not(:disabled) {
+            background: darken($primary, 10%);
+        }
+
+        &:disabled {
+            opacity: 0.7;
+            cursor: wait;
+        }
+    }
+}
+
+// Progress Card
+.progress-stats {
+    text-align: center;
+    margin-bottom: 16px;
+
+    .progress-numbers {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: $text-primary;
+
+        .used {
+            color: $primary;
+        }
+
+        .separator {
+            color: $text-secondary;
+            margin: 0 4px;
+        }
+
+        .total {
+            color: $text-secondary;
+        }
+    }
+
+    .progress-label {
+        display: block;
+        color: $text-secondary;
+        font-size: 0.9rem;
+        margin-top: 4px;
+    }
+}
+
+.progress-bar-container {
+    height: 12px;
+    background: $bg-light;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 16px;
+
+    .progress-bar {
+        height: 100%;
+        border-radius: 6px;
+        transition: width 0.5s ease;
+
+        &.low {
+            background: linear-gradient(90deg, $success, lighten($success, 10%));
+        }
+
+        &.medium {
+            background: linear-gradient(90deg, $warning, lighten($warning, 10%));
+        }
+
+        &.high {
+            background: linear-gradient(90deg, $danger, lighten($danger, 10%));
+        }
+    }
+}
+
+.slots-remaining {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: $text-secondary;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+
+    fa-icon {
+        color: $primary;
+    }
+}
+
+.status-badge {
+    text-align: center;
+    padding: 10px;
+    border-radius: $radius-sm;
+    font-weight: 600;
+    font-size: 0.9rem;
+
+    &.active {
+        background: rgba($success, 0.1);
+        color: $success;
+    }
+
+    &.inactive {
+        background: rgba($danger, 0.1);
+        color: $danger;
+    }
+}
+
+.btn-reset {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: rgba($danger, 0.1);
+    color: $danger;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+
+    &:hover {
+        background: $danger;
+        color: $white;
+    }
+}
+
+// Price Preview
+.preview-tier {
+    margin-bottom: 20px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    h3 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: $primary;
+        margin: 0 0 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid rgba($primary, 0.1);
+    }
+}
+
+.preview-plans {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.preview-plan {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: $bg-light;
+    border-radius: $radius-sm;
+
+    .plan-name {
+        font-weight: 500;
+        color: $text-primary;
+    }
+
+    .plan-prices {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .original-price {
+            text-decoration: line-through;
+            color: $text-secondary;
+            font-size: 0.85rem;
+        }
+
+        .discounted-price {
+            font-weight: 700;
+            color: $success;
+            font-size: 1.05rem;
+        }
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .promo-settings {
+        padding: 16px;
+    }
+
+    .setting-row.toggle-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}

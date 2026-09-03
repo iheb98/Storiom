@@ -31,6 +31,14 @@ export class GenerateReportComponent implements OnInit {
   stockIncludeDeleted = false;
   stockErrorMessage: string | null = null;
 
+  // Profit report
+  profitData: any = null;
+  profitLoading = false;
+  profitFromDate: string;
+  profitToDate: string;
+  profitErrorMessage: string | null = null;
+  profitIncludeDeleted = false;
+
   // Icons
   downloadIcon = faFileDownload;
   chartBarIcon = faChartBar;
@@ -55,8 +63,10 @@ export class GenerateReportComponent implements OnInit {
     private authService: AuthService
   ) {
     const today = new Date();
-    this.fromDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0]; // First day of the month
-    this.toDate = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0]; // Last day of the month
+    this.fromDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+    this.toDate = new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString().split('T')[0];
+    this.profitFromDate = this.fromDate;
+    this.profitToDate = this.toDate;
   }
   ngOnInit(): void {
     setTimeout(() => {
@@ -455,5 +465,186 @@ export class GenerateReportComponent implements OnInit {
     doc.text("Ce rapport a ete genere automatiquement par le systeme de gestion de stock.", margin, footerY);
 
     doc.save(`export_stock_${new Date().toISOString().split('T')[0]}.pdf`);
+  }
+
+  // ============================================
+  // PROFIT REPORT
+  // ============================================
+  generateProfitReport() {
+    this.profitLoading = true;
+    this.profitErrorMessage = null;
+    this.profitData = null;
+
+    this.statService.profitReport(
+      this.authService.getConnectedUser()?.store,
+      this.profitFromDate,
+      this.profitToDate,
+      this.profitIncludeDeleted
+    ).subscribe(
+      response => {
+        this.profitData = response;
+        this.profitLoading = false;
+      },
+      error => {
+        this.profitErrorMessage = error.error?.message || "Erreur lors du calcul du profit.";
+        this.profitLoading = false;
+      }
+    );
+  }
+
+  downloadProfitPDF() {
+    if (!this.profitData) return;
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 15;
+    let yPos = 0;
+
+    const successColor: [number, number, number] = [46, 125, 50];
+    const dangerColor: [number, number, number] = [198, 40, 40];
+    const purpleColor: [number, number, number] = [124, 58, 237];
+    const warningColor: [number, number, number] = [245, 124, 0];
+    const textPrimary: [number, number, number] = [44, 62, 80];
+    const textSecondary: [number, number, number] = [127, 140, 141];
+    const bgLight: [number, number, number] = [245, 247, 250];
+
+    // Header
+    const headerColor: [number, number, number] = this.profitData.netProfit >= 0 ? successColor : dangerColor;
+    doc.setFillColor(...headerColor);
+    doc.rect(0, 0, pageWidth, 45, 'F');
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.setTextColor(255, 255, 255);
+    doc.text("Rapport de Profit / Pertes", margin, 22);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.setTextColor(220, 255, 220);
+    doc.text(`Periode: ${this.formatDate(this.profitFromDate)} - ${this.formatDate(this.profitToDate)}`, margin, 33);
+    doc.setFontSize(9);
+    doc.text(`Genere le: ${this.formatDate(new Date().toISOString().split('T')[0])}`, pageWidth - margin - 50, 33);
+
+    yPos = 60;
+
+    // Summary cards
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(...textPrimary);
+    doc.text("Resume Financier", margin, yPos);
+    yPos += 10;
+
+    const cardWidth = (pageWidth - margin * 2 - 15) / 4;
+    const cardHeight = 35;
+    const cardY = yPos;
+
+    const drawCard = (idx: number, label: string, value: string, bgRgb: [number,number,number], accentRgb: [number,number,number]) => {
+      const x = margin + idx * (cardWidth + 5);
+      doc.setFillColor(...bgRgb);
+      doc.roundedRect(x, cardY, cardWidth, cardHeight, 3, 3, 'F');
+      doc.setFillColor(...accentRgb);
+      doc.roundedRect(x, cardY, 5, cardHeight, 2, 2, 'F');
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(...accentRgb);
+      doc.text(value, x + 10, cardY + 15);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(...textSecondary);
+      doc.text(label, x + 10, cardY + 26);
+    };
+
+    drawCard(0, "Chiffre d'affaires", `${this.profitData.totalRevenue.toFixed(2)} DT`, [232, 245, 233], successColor);
+    drawCard(1, 'Depenses', `${this.profitData.totalExpenses.toFixed(2)} DT`, [255, 235, 238], dangerColor);
+    drawCard(2, 'Profit brut', `${this.profitData.grossProfit.toFixed(2)} DT`, [237, 231, 246], purpleColor);
+    const netColor = this.profitData.netProfit >= 0 ? successColor : dangerColor;
+    drawCard(3, `Profit net (${this.profitData.profitMargin.toFixed(1)}%)`, `${this.profitData.netProfit.toFixed(2)} DT`, this.profitData.netProfit >= 0 ? [232, 245, 233] : [255, 235, 238], netColor);
+
+    yPos = cardY + cardHeight + 20;
+
+    // Products table
+    if (this.profitData.products?.length > 0) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.setTextColor(...textPrimary);
+      doc.text("Profit par Produit", margin, yPos);
+      yPos += 8;
+
+      autoTable(doc, {
+        startY: yPos,
+        head: [["Produit", "Qte", "Revenu", "Cout", "Profit"]],
+        body: this.profitData.products.map((p: any) => [
+          p.productName,
+          p.quantitySold.toString(),
+          `${p.revenue.toFixed(2)} DT`,
+          `${p.cost.toFixed(2)} DT`,
+          `${p.profit >= 0 ? '+' : ''}${p.profit.toFixed(2)} DT`
+        ]),
+        theme: "plain",
+        styles: { fontSize: 9, cellPadding: 5, textColor: textPrimary, lineColor: [232, 236, 239], lineWidth: 0.5 },
+        headStyles: { fillColor: bgLight, textColor: textSecondary, fontSize: 8, fontStyle: 'bold' },
+        columnStyles: {
+          0: { cellWidth: 'auto', fontStyle: 'bold' },
+          1: { cellWidth: 20, halign: 'center' },
+          2: { cellWidth: 30, halign: 'right' },
+          3: { cellWidth: 30, halign: 'right' },
+          4: { cellWidth: 35, halign: 'right' }
+        },
+        didParseCell: (data) => {
+          if (data.section === 'body' && data.column.index === 4) {
+            const val = parseFloat(data.cell.raw as string);
+            data.cell.styles.textColor = val >= 0 ? successColor : dangerColor;
+            data.cell.styles.fontStyle = 'bold';
+          }
+        },
+        alternateRowStyles: { fillColor: [250, 251, 252] },
+        margin: { left: margin, right: margin }
+      });
+    }
+
+    // Expenses table
+    if (this.profitData.expenses?.length > 0) {
+      const finalY = (doc as any).lastAutoTable?.finalY || yPos + 20;
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.setTextColor(...textPrimary);
+      doc.text("Detail des Depenses", margin, finalY + 15);
+
+      autoTable(doc, {
+        startY: finalY + 23,
+        head: [["Titre", "Date", "Montant"]],
+        body: [
+          ...this.profitData.expenses.map((e: any) => [
+            e.title + (e.isRecurring ? ' (Rec.)' : ''),
+            new Date(e.date).toLocaleDateString('fr-FR'),
+            `${e.amount.toFixed(2)} DT`
+          ]),
+          [{ content: 'TOTAL', styles: { fontStyle: 'bold', fillColor: [232, 236, 239] } },
+           { content: '', styles: { fillColor: [232, 236, 239] } },
+           { content: `${this.profitData.totalExpenses.toFixed(2)} DT`, styles: { fontStyle: 'bold', fillColor: [232, 236, 239], textColor: dangerColor } }]
+        ],
+        theme: "plain",
+        styles: { fontSize: 9, cellPadding: 5, textColor: textPrimary, lineColor: [232, 236, 239], lineWidth: 0.5 },
+        headStyles: { fillColor: bgLight, textColor: textSecondary, fontSize: 8, fontStyle: 'bold' },
+        columnStyles: {
+          0: { cellWidth: 'auto', fontStyle: 'bold' },
+          1: { cellWidth: 35 },
+          2: { cellWidth: 35, halign: 'right' }
+        },
+        alternateRowStyles: { fillColor: [250, 251, 252] },
+        margin: { left: margin, right: margin }
+      });
+    }
+
+    // Footer
+    const footerY = pageHeight - 20;
+    doc.setDrawColor(232, 236, 239);
+    doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
+    doc.setFontSize(8);
+    doc.setTextColor(...textSecondary);
+    doc.text("Ce rapport a ete genere automatiquement par le systeme de gestion de stock.", margin, footerY);
+
+    doc.save(`rapport_profit_${this.profitFromDate}_${this.profitToDate}.pdf`);
   }
 }

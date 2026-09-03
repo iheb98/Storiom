@@ -79,13 +79,32 @@ export class ProductViewComponent implements OnInit {
   // Marketplace Analytics
   isAnalyticsLoading = false;
   productStats: any = null;
-  viewCount = 0;
-  orderCount = 0;
-  cartAddCount = 0;
-  wishlistCount = 0;
-  quantitySold = 0;
-  conversionRate = 0;
-  popularityScore = 0;
+  analyticsSourceFilter: 'all' | 'marketplace' | 'private_store' = 'all';
+
+  // Stats by source
+  combinedStats: any = { viewCount: 0, orderCount: 0, cartAddCount: 0, wishlistCount: 0, totalQuantitySold: 0, popularityScore: 0, conversionRate: 0 };
+  marketplaceStats: any = { viewCount: 0, orderCount: 0, cartAddCount: 0, wishlistCount: 0, totalQuantitySold: 0, popularityScore: 0, conversionRate: 0 };
+  privateStoreStats: any = { viewCount: 0, orderCount: 0, cartAddCount: 0, wishlistCount: 0, totalQuantitySold: 0, popularityScore: 0, conversionRate: 0 };
+
+  get activeAnalytics(): any {
+    switch (this.analyticsSourceFilter) {
+      case 'marketplace': return this.marketplaceStats;
+      case 'private_store': return this.privateStoreStats;
+      default: return this.combinedStats;
+    }
+  }
+
+  get viewCount(): number { return this.activeAnalytics.viewCount || 0; }
+  get orderCount(): number { return this.activeAnalytics.orderCount || 0; }
+  get cartAddCount(): number { return this.activeAnalytics.cartAddCount || 0; }
+  get wishlistCount(): number { return this.activeAnalytics.wishlistCount || 0; }
+  get quantitySold(): number { return this.activeAnalytics.totalQuantitySold || 0; }
+  get popularityScore(): number { return this.activeAnalytics.popularityScore || 0; }
+  get conversionRate(): number {
+    return this.viewCount > 0
+      ? parseFloat(((this.orderCount / this.viewCount) * 100).toFixed(2))
+      : 0;
+  }
 
   hoursLabels = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
 
@@ -360,17 +379,40 @@ export class ProductViewComponent implements OnInit {
     this.analyticsService.getProductStats(parseInt(this.id)).subscribe(
       (response: any) => {
         this.productStats = response;
-        this.viewCount = response?.viewCount || 0;
-        this.orderCount = response?.orderCount || 0;
-        this.cartAddCount = response?.cartAddCount || 0;
-        this.wishlistCount = response?.wishlistCount || 0;
-        this.quantitySold = response?.totalQuantitySold || 0;
-        this.popularityScore = response?.popularityScore || 0;
 
-        // Calculate conversion rate (orders / views * 100)
-        this.conversionRate = this.viewCount > 0
-          ? parseFloat(((this.orderCount / this.viewCount) * 100).toFixed(2))
-          : 0;
+        const mk = response?.marketplace || {};
+        const ps = response?.privateStore || {};
+        const cb = response?.combined || {};
+
+        this.marketplaceStats = {
+          viewCount: mk.viewCount || 0,
+          orderCount: mk.orderCount || 0,
+          cartAddCount: mk.cartAddCount || 0,
+          wishlistCount: mk.wishlistCount || 0,
+          totalQuantitySold: mk.totalQuantitySold || 0,
+          popularityScore: parseFloat(mk.popularityScore) || 0,
+          conversionRate: mk.conversionRate || 0
+        };
+
+        this.privateStoreStats = {
+          viewCount: ps.viewCount || 0,
+          orderCount: ps.orderCount || 0,
+          cartAddCount: ps.cartAddCount || 0,
+          wishlistCount: ps.wishlistCount || 0,
+          totalQuantitySold: ps.totalQuantitySold || 0,
+          popularityScore: parseFloat(ps.popularityScore) || 0,
+          conversionRate: ps.conversionRate || 0
+        };
+
+        this.combinedStats = {
+          viewCount: cb.viewCount || 0,
+          orderCount: cb.orderCount || 0,
+          cartAddCount: cb.cartAddCount || 0,
+          wishlistCount: cb.wishlistCount || 0,
+          totalQuantitySold: cb.totalQuantitySold || 0,
+          popularityScore: Math.max(this.marketplaceStats.popularityScore, this.privateStoreStats.popularityScore),
+          conversionRate: cb.conversionRate || 0
+        };
 
         this.isAnalyticsLoading = false;
       },

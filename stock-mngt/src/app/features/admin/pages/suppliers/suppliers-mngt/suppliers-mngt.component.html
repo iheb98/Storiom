@@ -107,9 +107,11 @@
                     </div>
                 </div>
 
-                <div class="supplier-credit" *ngIf="supplier?.credit" [class.positive]="supplier?.credit > 0">
+                <div class="supplier-credit" *ngIf="supplier?.calculatedCredit != 0"
+                    [class.positive]="supplier?.calculatedCredit > 0"
+                    [class.negative]="supplier?.calculatedCredit < 0">
                     <span class="credit-label">Crédit</span>
-                    <span class="credit-value">{{ supplier?.credit | number:'1.2-2' }} DT</span>
+                    <span class="credit-value">{{ supplier?.calculatedCredit | number:'1.2-2' }} DT</span>
                 </div>
 
                 <div class="supplier-actions">

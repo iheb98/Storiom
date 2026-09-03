@@ -3,7 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const { StoreCustomer, Store, Address, Order, OrderItem, Product, Review } = require('../models');
+const { StoreCustomer, Store, Address, Order, OrderItem, Product, Review, Notification } = require('../models');
 const utility = require('../utility');
 const sendMail = require('../mailService');
 const Sequelize = require('sequelize');
@@ -498,6 +498,32 @@ router.post('/place-order', authenticateCustomer, async (req, res) => {
                 quantity: item.quantity,
                 price: item.price
             });
+        }
+
+        // Create in-app notification for store admin
+        try {
+            const store = await Store.findByPk(storeId);
+            const customerFullName = customerName || `${customer.firstName} ${customer.lastName}`;
+            const itemNames = [];
+            for (const item of orderItems.slice(0, 3)) {
+                const product = await Product.findByPk(item.productId);
+                if (product) itemNames.push(product.name);
+            }
+            const extra = orderItems.length > 3 ? ` +${orderItems.length - 3} autres` : '';
+            await Notification.create({
+                storeId,
+                type: 'NEW_ORDER',
+                title: `Nouvelle commande #${order.id}`,
+                message: `${customerFullName} a passé une commande de ${totalAmount.toFixed(2)} DT — ${itemNames.join(', ')}${extra}`,
+                orderId: order.id,
+                metadata: {
+                    customerName: customerFullName,
+                    totalAmount,
+                    itemCount: orderItems.length
+                }
+            });
+        } catch (notifErr) {
+            console.error('Failed to create notification:', notifErr);
         }
 
         res.json({ success: true, order });

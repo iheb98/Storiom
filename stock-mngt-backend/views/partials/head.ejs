@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= title %></title>
+    <meta name="description" content="<%= description %>">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="<%= ogType || 'website' %>">
+    <meta property="og:title" content="<%= title %>">
+    <meta property="og:description" content="<%= description %>">
+    <meta property="og:url" content="<%= canonicalUrl %>">
+    <meta property="og:site_name" content="<%= storeName %>">
+    <% if (ogImage) { %>
+    <meta property="og:image" content="<%= ogImage %>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <% } %>
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="<%= ogImage ? 'summary_large_image' : 'summary' %>">
+    <meta name="twitter:title" content="<%= title %>">
+    <meta name="twitter:description" content="<%= description %>">
+    <% if (ogImage) { %>
+    <meta name="twitter:image" content="<%= ogImage %>">
+    <% } %>
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="<%= canonicalUrl %>">
+
+    <% if (typeof jsonLd !== 'undefined' && jsonLd) { %>
+    <!-- Structured Data -->
+    <script type="application/ld+json"><%- JSON.stringify(jsonLd) %></script>
+    <% } %>
+
+    <!-- Favicon -->
+    <% if (storeLogo) { %>
+    <link rel="icon" type="image/png" href="<%= storeLogo %>">
+    <% } %>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=<%= encodeURIComponent(fontFamily || 'Inter') %>:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 4 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- Store CSS -->
+    <link rel="stylesheet" href="/views/store.css">
+
+    <!-- Theme CSS Variables -->
+    <style>
+        :root {
+            --store-primary: <%= primaryColor || '#4f46e5' %>;
+            --store-accent: <%= accentColor || '#f59e0b' %>;
+            --store-font: '<%= fontFamily || 'Inter' %>';
+        }
+        body {
+            font-family: var(--store-font), system-ui, -apple-system, sans-serif;
+        }
+    </style>
+</head>

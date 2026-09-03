@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   faArrowLeft, faReceipt, faTag, faCoins, faCalendarAlt,
-  faComment, faPlus, faSave
+  faComment, faPlus, faSave, faSync, faCalendarDay, faBell
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { ExpenseService } from 'src/app/core/services/expense.service';
@@ -25,6 +25,9 @@ export class ExpenseAddComponent implements OnInit {
   faComment = faComment;
   faPlus = faPlus;
   faSave = faSave;
+  faSync = faSync;
+  faCalendarDay = faCalendarDay;
+  faBell = faBell;
 
   // Form
   form: FormGroup;
@@ -37,6 +40,19 @@ export class ExpenseAddComponent implements OnInit {
   // Loading States
   isLoading = false;
   isSubmitting = false;
+
+  // Days helpers
+  daysOfWeek = [
+    { value: 1, label: 'Lundi' },
+    { value: 2, label: 'Mardi' },
+    { value: 3, label: 'Mercredi' },
+    { value: 4, label: 'Jeudi' },
+    { value: 5, label: 'Vendredi' },
+    { value: 6, label: 'Samedi' },
+    { value: 7, label: 'Dimanche' }
+  ];
+
+  daysOfMonth: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
 
   constructor(
     private router: Router,
@@ -71,6 +87,11 @@ export class ExpenseAddComponent implements OnInit {
         this.form.get('amount').setValue(response.amount);
         this.form.get('comment').setValue(response.comment);
         this.form.get('date').setValue(response.date?.substring(0, 10) || null);
+        this.form.get('isRecurring').setValue(response.isRecurring || false);
+        this.form.get('recurrenceType').setValue(response.recurrenceType || 'monthly');
+        this.form.get('recurrenceDay').setValue(response.recurrenceDay || null);
+        this.form.get('reminderEnabled').setValue(response.reminderEnabled || false);
+        this.form.get('reminderBefore').setValue(response.reminderBefore || null);
         this.isLoading = false;
       },
       error => {
@@ -91,7 +112,32 @@ export class ExpenseAddComponent implements OnInit {
       amount: ['', Validators.required],
       date: [''],
       comment: [''],
+      isRecurring: [false],
+      recurrenceType: ['monthly'],
+      recurrenceDay: [null],
+      reminderEnabled: [false],
+      reminderBefore: [null]
     });
+  }
+
+  onRecurrenceTypeChange() {
+    this.form.get('recurrenceDay').setValue(null);
+  }
+
+  getRecurrenceLabel(): string {
+    const type = this.form.get('recurrenceType').value;
+    switch (type) {
+      case 'daily': return 'Chaque jour';
+      case 'weekly': return 'Chaque semaine';
+      case 'monthly': return 'Chaque mois';
+      case 'yearly': return 'Chaque année';
+      default: return '';
+    }
+  }
+
+  getReminderUnit(): string {
+    const type = this.form.get('recurrenceType').value;
+    return (type === 'daily' || type === 'weekly') ? 'heures' : 'jours';
   }
 
   create() {

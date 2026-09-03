@@ -18,10 +18,37 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Expense.init({
-    title:DataTypes.STRING,
+    title: DataTypes.STRING,
     amount: DataTypes.FLOAT,
     comment: DataTypes.TEXT,
     date: DataTypes.DATE,
+    isRecurring: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+      field: 'is_recurring'
+    },
+    recurrenceType: {
+      type: DataTypes.ENUM('daily', 'weekly', 'monthly', 'yearly'),
+      allowNull: true,
+      field: 'recurrence_type'
+    },
+    recurrenceDay: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      field: 'recurrence_day'
+    },
+    reminderEnabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+      field: 'reminder_enabled'
+    },
+    reminderBefore: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      field: 'reminder_before'
+    },
     storeId: {
       type: DataTypes.INTEGER,
       field: 'store_id'

@@ -1,12 +1,17 @@
 const { User, Subscription } = require('./models');
+const { getOrSet, invalidate } = require('./cacheService');
 
 const checkSubscription = async (req, res, next) => {
     try {
         const userId = req.user.id;
 
-        const user = await User.findOne({
-            where: { id: userId },
-            include: ['subscription']
+        // Cache subscription lookup per user (5 min TTL)
+        const user = await getOrSet('subscriptions', `user:${userId}`, async () => {
+            const u = await User.findOne({
+                where: { id: userId },
+                include: ['subscription']
+            });
+            return u ? u.toJSON() : null;
         });
 
         if (!user || !user.subscription) {
@@ -51,6 +56,9 @@ const checkSubscription = async (req, res, next) => {
             sub.nextPaymentOrderId = null;
             await sub.save();
 
+            // Invalidate cache since subscription changed
+            invalidate('subscriptions', `user:${userId}`);
+
             console.log(`Auto-promoted queued plan for user ${userId}: ${sub.plan} until ${sub.expirationDate}`);
 
             // Re-check if the promoted plan is also expired
@@ -89,3 +97,4 @@ const checkSubscription = async (req, res, next) => {
 };
 
 module.exports = checkSubscription;
+

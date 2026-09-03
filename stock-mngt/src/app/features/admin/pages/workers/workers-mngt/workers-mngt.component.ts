@@ -204,7 +204,7 @@ export class WorkersMngtComponent implements OnInit {
 
   editWorker(worker: any) {
     this.saveFiltersState();
-    this.router.navigate(['workers/' + worker.id]);
+    this.router.navigate(['workers/edit/' + worker.id]);
   }
 
   handlePageEvent(event: any) {

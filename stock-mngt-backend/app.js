@@ -1,6 +1,11 @@
 const express = require('express');
 const { sequelize } = require('./models')
 const app = express();
+const ejs = require('ejs');
+
+// EJS view engine
+app.set('view engine', 'ejs');
+app.set('views', require('path').join(__dirname, 'views'));
 const bodyparser = require("body-parser");
 const path = require('path');
 const { User } = require('./models');
@@ -79,6 +84,7 @@ app.use(cors({
 //**************************************************************************************************************
 
 app.use(express.static('.'));
+app.use('/views', express.static(require('path').join(__dirname, 'views')));
 app.use(bodyparser.json({ limit: '50mb' }));
 
 // Domain resolver — detect custom store domains from Host header
@@ -300,10 +306,21 @@ const paymentOrdersRoute = require('./routes/payment-orders');
 const analyticsRoute = require('./routes/analytics');
 const wishlistRoute = require('./routes/wishlist');
 const storeCustomersRoute = require('./routes/store-customers');
+const notificationsRoute = require('./routes/notifications');
+const promotionsRoute = require('./routes/promotions');
 const ogTagsMiddleware = require('./ogTagsMiddleware');
+const storefrontRouter = require('./routes/storefront');
 
 // OG tags for social media crawlers (must be before API routes)
 app.use('/og', ogTagsMiddleware);
+
+// SSR store pages for custom domains (before API routes)
+app.use((req, res, next) => {
+    if (req.isCustomDomain && req.resolvedStore) {
+        return storefrontRouter(req, res, next);
+    }
+    next();
+});
 
 app.use('/api/receipts', receiptsRoute)
 app.use('/api/credits', creditsRoute)
@@ -325,8 +342,52 @@ app.use('/api/payment-orders', paymentOrdersRoute)
 app.use('/api/analytics', analyticsRoute)
 app.use('/api/wishlist', wishlistRoute)
 app.use('/api/store-customers', storeCustomersRoute)
+app.use('/api/notifications', notificationsRoute)
+app.use('/api/promotions', promotionsRoute)
 
 //require('./config/passport')(passport);
+
+// Health check endpoint — monitor cache, memory, and DB pool
+app.get('/api/health', async (req, res) => {
+  try {
+    const { getStats } = require('./cacheService');
+    const { getDomainCacheStats } = require('./domainResolver');
+
+    // DB pool status
+    let dbPool = {};
+    try {
+      const pool = sequelize.connectionManager.pool;
+      dbPool = {
+        size: pool.size,
+        available: pool.available,
+        pending: pool.pending,
+        max: pool.max,
+        min: pool.min
+      };
+    } catch (e) {
+      dbPool = { error: 'Unable to read pool stats' };
+    }
+
+    // Memory usage
+    const mem = process.memoryUsage();
+
+    res.json({
+      status: 'ok',
+      uptime: Math.floor(process.uptime()) + 's',
+      memory: {
+        rss: (mem.rss / 1024 / 1024).toFixed(1) + ' MB',
+        heapUsed: (mem.heapUsed / 1024 / 1024).toFixed(1) + ' MB',
+        heapTotal: (mem.heapTotal / 1024 / 1024).toFixed(1) + ' MB'
+      },
+      cache: getStats(),
+      domainCache: getDomainCacheStats(),
+      dbPool,
+      pid: process.pid
+    });
+  } catch (err) {
+    res.status(500).json({ status: 'error', message: err.toString() });
+  }
+});
 
 app.use('/', (req, res) => {
   res.json({ message: "Welcome to the stock management application's backend!" });

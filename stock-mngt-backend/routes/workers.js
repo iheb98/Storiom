@@ -7,7 +7,7 @@ const checkSubscription = require('../checkSubscription');
 router.post('/create', utility.authenticate, checkSubscription, async (req, res) => {
     const { firstName, lastName, email, password, phone, country, street, city, state, postalCode, language, entryDate, salary, functionInStore, worksInStore, superiorId, role } = req.body
     try {
-        const createdWorker = await Worker.create({ firstName, lastName, email, password, phone, language, password: password, entryDate, salary, function: functionInStore, storeId: worksInStore, superiorId, role, creatorUserId: req.user.id })
+        const createdWorker = await Worker.create({ firstName, lastName, email, password, phone, language, password: password, entryDate, salary: salary || 0, function: functionInStore, storeId: worksInStore, superiorId, role, creatorUserId: req.user.id })
         const createdAddress = await Address.create({ userId: createdWorker.id, country, street, city, state, postalCode })
         res.json({
             success: true,

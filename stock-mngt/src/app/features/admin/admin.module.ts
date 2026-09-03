@@ -83,6 +83,8 @@ import { ServiceRequestsStatsComponent } from './pages/dashboard/service-request
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { SubscriptionComponent } from './pages/subscription/subscription.component';
 import { PaymentOrdersAdminComponent } from '../superadmin/pages/payment-orders-admin/payment-orders-admin.component';
+import { UsersAdminComponent } from '../superadmin/pages/users-admin/users-admin.component';
+import { PromoSettingsComponent } from '../superadmin/pages/promo-settings/promo-settings.component';
 import { ProductAnalyticsComponent } from './pages/product-analytics/product-analytics.component';
 import { DomainSettingsComponent } from './pages/settings/domain-settings/domain-settings.component';
 
@@ -147,7 +149,9 @@ import { DomainSettingsComponent } from './pages/settings/domain-settings/domain
     SubscriptionComponent,
     PaymentOrdersAdminComponent,
     ProductAnalyticsComponent,
-    DomainSettingsComponent
+    DomainSettingsComponent,
+    UsersAdminComponent,
+    PromoSettingsComponent
   ],
   imports: [
     CommonModule,

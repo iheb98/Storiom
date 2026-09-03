@@ -92,6 +92,15 @@
                         <option value="false">Non réclamé</option>
                     </select>
                 </div>
+
+                <div class="filter-group">
+                    <label><fa-icon [icon]="faExchangeAlt"></fa-icon> Type</label>
+                    <select [(ngModel)]="directionFilter">
+                        <option [ngValue]="null">Tous</option>
+                        <option value="owed_to_me">On me doit</option>
+                        <option value="i_owe">Je dois</option>
+                    </select>
+                </div>
             </div>
 
             <div class="filters-actions">
@@ -115,11 +124,24 @@
 
                 <div class="credit-info">
                     <div class="credit-header">
-                        <span class="borrower-name">{{ borrower?.firstName }} {{ borrower?.lastName }}</span>
-                        <span class="status-badge" [class.claimed]="borrower?.status"
-                            [class.not-claimed]="!borrower?.status">
-                            {{ borrower?.status ? 'Réclamé' : 'Non réclamé' }}
+                        <span class="borrower-name">
+                            {{ borrower?.firstName }} {{ borrower?.lastName }}
+                            <span class="supplier-tag" *ngIf="borrower?.supplier">
+                                <i class="fa fa-truck"></i> Fournisseur
+                            </span>
                         </span>
+                        <div class="credit-badges">
+                            <span class="direction-badge" [class.owed-to-me]="borrower?.direction !== 'i_owe'"
+                                [class.i-owe]="borrower?.direction === 'i_owe'">
+                                <i class="fa" [class.fa-arrow-down]="borrower?.direction !== 'i_owe'"
+                                    [class.fa-arrow-up]="borrower?.direction === 'i_owe'"></i>
+                                {{ borrower?.direction === 'i_owe' ? 'Je dois' : 'On me doit' }}
+                            </span>
+                            <span class="status-badge" [class.claimed]="borrower?.status"
+                                [class.not-claimed]="!borrower?.status">
+                                {{ borrower?.status ? 'Réclamé' : 'Non réclamé' }}
+                            </span>
+                        </div>
                     </div>
                     <div class="credit-details">
                         <span class="detail-item" *ngIf="borrower?.phone">
@@ -128,11 +150,11 @@
                         </span>
                         <span class="detail-item">
                             <fa-icon [icon]="faCalendarPlus"></fa-icon>
-                            Prêté: {{ borrower?.givenDate | date:'dd/MM/yyyy' }}
+                            Prêté: {{ borrower?.givenDate ? (borrower.givenDate | date:'dd/MM/yyyy') : '—' }}
                         </span>
-                        <span class="detail-item" *ngIf="borrower?.returnDate">
+                        <span class="detail-item">
                             <fa-icon [icon]="faCalendarCheck"></fa-icon>
-                            Retour: {{ borrower?.returnDate | date:'dd/MM/yyyy' }}
+                            Retour: {{ borrower?.returnDate ? (borrower.returnDate | date:'dd/MM/yyyy') : '—' }}
                         </span>
                     </div>
                 </div>

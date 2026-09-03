@@ -160,10 +160,18 @@
             </div>
         </div>
 
-        <!-- Marketplace Analytics Section -->
+        <!-- Product Analytics Section -->
         <div class="marketplace-analytics-section">
             <div class="section-header">
-                <h2><fa-icon [icon]="faChartLine"></fa-icon> Analytique Marketplace</h2>
+                <h2><fa-icon [icon]="faChartLine"></fa-icon> Analytique Produit</h2>
+                <div class="source-filter">
+                    <button class="source-btn" [class.active]="analyticsSourceFilter === 'all'"
+                        (click)="analyticsSourceFilter = 'all'">Tous</button>
+                    <button class="source-btn" [class.active]="analyticsSourceFilter === 'marketplace'"
+                        (click)="analyticsSourceFilter = 'marketplace'">Marketplace</button>
+                    <button class="source-btn" [class.active]="analyticsSourceFilter === 'private_store'"
+                        (click)="analyticsSourceFilter = 'private_store'">Site privé</button>
+                </div>
             </div>
 
             <div class="analytics-loading" *ngIf="isAnalyticsLoading">

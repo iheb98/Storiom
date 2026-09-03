@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { PaymentOrder, User, Subscription, Store, StoragePurchase } = require('../models');
+const { PaymentOrder, User, Subscription, Store, StoragePurchase, PromotionConfig } = require('../models');
 const utility = require('../utility');
 const sendMail = require('../mailService');
+const { invalidate } = require('../cacheService');
 
 // Pricing configuration (in TND) — tiered
 const SUBSCRIPTION_PRICES = {
@@ -141,6 +142,9 @@ router.post('/create', utility.authenticate, async (req, res) => {
 
         // Calculate amount
         let amount = 0;
+        let originalAmount = null;
+        let discountPercent = null;
+
         if (paymentType === 'SUBSCRIPTION') {
             if (isUpgrade) {
                 // Calculate upgrade price server-side for security
@@ -168,6 +172,24 @@ router.post('/create', utility.authenticate, async (req, res) => {
                     return res.status(400).json({ success: false, message: 'Invalid subscription plan or tier' });
                 }
                 amount = SUBSCRIPTION_PRICES[tier][subscriptionPlan];
+
+                // Check promotional discount eligibility
+                try {
+                    const promoConfig = await PromotionConfig.findByPk(1);
+                    if (promoConfig && promoConfig.isActive && promoConfig.usedCount < promoConfig.maxUsers) {
+                        const hasPaidBefore = await PaymentOrder.count({
+                            where: { userId, paymentType: 'SUBSCRIPTION', status: 'PAID' }
+                        });
+                        if (hasPaidBefore === 0) {
+                            originalAmount = amount;
+                            discountPercent = promoConfig.discountPercent;
+                            amount = Math.ceil(amount * (1 - discountPercent / 100));
+                        }
+                    }
+                } catch (promoErr) {
+                    console.error('Error checking promo:', promoErr);
+                    // Continue without discount if promo check fails
+                }
             }
         } else if (paymentType === 'STORAGE_EXTENSION') {
             const gb = storageGB || 50;
@@ -191,6 +213,8 @@ router.post('/create', utility.authenticate, async (req, res) => {
             storageGB: paymentType === 'STORAGE_EXTENSION' ? (storageGB || 50) : null,
             storageDuration: paymentType === 'STORAGE_EXTENSION' ? (storageDuration || '1M') : null,
             amount,
+            originalAmount,
+            discountPercent,
             currency: 'TND',
             status: 'PENDING'
         });
@@ -373,6 +397,19 @@ router.post('/admin/:id/validate', utility.authenticate, async (req, res) => {
         order.notes = notes;
         await order.save();
 
+        // If order had a promotional discount, increment the promo used count
+        if (order.discountPercent && order.discountPercent > 0) {
+            try {
+                const promoConfig = await PromotionConfig.findByPk(1);
+                if (promoConfig) {
+                    promoConfig.usedCount = (promoConfig.usedCount || 0) + 1;
+                    await promoConfig.save();
+                }
+            } catch (promoErr) {
+                console.error('Error incrementing promo count:', promoErr);
+            }
+        }
+
         // Process based on payment type
         if (order.paymentType === 'SUBSCRIPTION') {
             console.log('Processing subscription order:', {
@@ -393,6 +430,7 @@ router.post('/admin/:id/validate', utility.authenticate, async (req, res) => {
                 if (subscription) {
                     subscription.plan = 'STOCK_WEBSITE';
                     await subscription.save();
+                    invalidate('subscriptions', `user:${order.userId}`);
                     console.log('Plan upgraded to STOCK_WEBSITE for user:', order.userId);
                 }
             } else {
@@ -402,7 +440,17 @@ router.post('/admin/:id/validate', utility.authenticate, async (req, res) => {
                     return res.status(400).json({ success: false, message: 'Plan d\'abonnement invalide' });
                 }
 
-                const currentPlanActive = subscription && subscription.expirationDate > now2;
+                const currentPlanActive = subscription && (() => {
+                    // For TRIAL subscriptions, expirationDate may be NULL — compute it dynamically
+                    let effectiveExpiration = subscription.expirationDate;
+                    if (!effectiveExpiration && subscription.duration === 'TRIAL' && subscription.activationDate) {
+                        effectiveExpiration = new Date(subscription.activationDate);
+                        effectiveExpiration.setDate(effectiveExpiration.getDate() + 30);
+                    }
+                    // Store it for later use in extension logic
+                    subscription._effectiveExpiration = effectiveExpiration;
+                    return effectiveExpiration && new Date(effectiveExpiration) > now2;
+                })();
                 const isSameTier = subscription && subscription.plan === orderTier;
 
                 if (currentPlanActive && !isSameTier) {
@@ -414,7 +462,7 @@ router.post('/admin/:id/validate', utility.authenticate, async (req, res) => {
                         });
                     }
 
-                    const queueStartDate = new Date(subscription.expirationDate);
+                    const queueStartDate = new Date(subscription._effectiveExpiration || subscription.expirationDate);
                     const queueEndDate = calculateExpirationDate(order.subscriptionPlan, queueStartDate);
 
                     subscription.nextPlan = orderTier;
@@ -423,12 +471,13 @@ router.post('/admin/:id/validate', utility.authenticate, async (req, res) => {
                     subscription.nextExpirationDate = queueEndDate;
                     subscription.nextPaymentOrderId = order.id;
                     await subscription.save();
+                    invalidate('subscriptions', `user:${order.userId}`);
 
                     isQueued = true;
                     console.log(`Queued ${orderTier} plan for user ${order.userId}: ${queueStartDate} → ${queueEndDate}`);
                 } else if (currentPlanActive && isSameTier) {
-                    // ===== SAME TIER + ACTIVE → EXTEND =====
-                    const startDate = new Date(subscription.expirationDate);
+                    // ===== SAME TIER + ACTIVE → EXTEND from effective expiration =====
+                    const startDate = new Date(subscription._effectiveExpiration || subscription.expirationDate);
                     const expirationDate = calculateExpirationDate(order.subscriptionPlan, startDate);
 
                     subscription.duration = order.subscriptionPlan;
@@ -436,6 +485,7 @@ router.post('/admin/:id/validate', utility.authenticate, async (req, res) => {
                     subscription.activationDate = startDate;
                     subscription.expirationDate = expirationDate;
                     await subscription.save();
+                    invalidate('subscriptions', `user:${order.userId}`);
                     console.log('Extended same-tier plan to:', expirationDate);
                 } else if (subscription) {
                     // ===== EXPIRED OR NO ACTIVE → SET AS CURRENT =====
@@ -451,6 +501,7 @@ router.post('/admin/:id/validate', utility.authenticate, async (req, res) => {
                     subscription.nextExpirationDate = null;
                     subscription.nextPaymentOrderId = null;
                     await subscription.save();
+                    invalidate('subscriptions', `user:${order.userId}`);
                     console.log('Set as current plan:', orderTier);
                 } else {
                     // ===== NO SUBSCRIPTION EXISTS → CREATE =====
@@ -462,6 +513,7 @@ router.post('/admin/:id/validate', utility.authenticate, async (req, res) => {
                         activationDate: now2,
                         expirationDate: calculateExpirationDate(order.subscriptionPlan, now2)
                     });
+                    invalidate('subscriptions', `user:${order.userId}`);
                     console.log('Created new subscription:', orderTier);
                 }
             }

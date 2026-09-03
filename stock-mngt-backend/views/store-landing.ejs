@@ -1,0 +1,241 @@
+<%- include('partials/head', {
+    title, description, ogType: 'website', canonicalUrl, storeName,
+    ogImage, jsonLd, storeLogo, fontFamily, primaryColor, accentColor
+}) %>
+<body class="<%= mode === 'dark' ? 'dark-mode' : '' %>">
+<div class="store-landing">
+
+    <!-- ═══ ANNOUNCEMENT BAR ═══ -->
+    <% if (announcement && announcement.enabled && announcement.text) { %>
+    <div class="announcement-bar" style="background: <%= announcement.bgColor || primaryColor %>;">
+        <% if (announcement.link) { %>
+        <a href="<%= announcement.link %>" class="announcement-link"><%= announcement.text %></a>
+        <% } else { %>
+        <span><%= announcement.text %></span>
+        <% } %>
+    </div>
+    <% } %>
+
+    <!-- ═══ HERO SECTION ═══ -->
+    <% if (sections.hero !== false) { %>
+    <section class="hero-section <%= hero.style === 'gradient' ? 'hero-gradient' : '' %> <%= hero.style === 'split' ? 'hero-split' : '' %>"
+        <% if (hero.style === 'gradient') { %>
+        style="background: linear-gradient(135deg, <%= hero.gradientColor1 || primaryColor %>, <%= hero.gradientColor2 || accentColor %>);"
+        <% } %>>
+
+        <% if (hero.style === 'split') { %>
+        <!-- Split: image side -->
+        <% if (heroImages.length > 0) { %>
+        <div class="hero-split-image">
+            <img src="<%= cdnUrl + '/' + heroImages[0] %>" alt="<%= storeName %> - Bannière">
+        </div>
+        <% } %>
+        <!-- Split: content side -->
+        <div class="hero-content" style="background: <%= primaryColor %>;">
+            <h1 class="hero-title animate-in delay-1" style="font-family: '<%= fontFamily %>'"><%= heroTitle %></h1>
+            <% if (heroSubtitle) { %><p class="hero-subtitle animate-in delay-2"><%= heroSubtitle %></p><% } %>
+            <div class="hero-actions animate-in delay-3">
+                <a href="/products" class="btn-hero-primary"><i class="fa fa-shopping-bag"></i> <%= heroCta %></a>
+            </div>
+            <% if (storeCity) { %>
+            <div class="hero-badges animate-in delay-4">
+                <span class="badge"><i class="fa fa-map-marker"></i> <%= storeCity %></span>
+            </div>
+            <% } %>
+        </div>
+
+        <% } else if (hero.style === 'gradient') { %>
+        <!-- Gradient -->
+        <div class="hero-content">
+            <h1 class="hero-title animate-in delay-1" style="font-family: '<%= fontFamily %>'"><%= heroTitle %></h1>
+            <% if (heroSubtitle) { %><p class="hero-subtitle animate-in delay-2"><%= heroSubtitle %></p><% } %>
+            <div class="hero-actions animate-in delay-3">
+                <a href="/products" class="btn-hero-primary"><i class="fa fa-shopping-bag"></i> <%= heroCta %></a>
+            </div>
+            <% if (storeCity) { %>
+            <div class="hero-badges animate-in delay-4">
+                <span class="badge"><i class="fa fa-map-marker"></i> <%= storeCity %></span>
+            </div>
+            <% } %>
+        </div>
+
+        <% } else { %>
+        <!-- Full Image (default) -->
+        <% if (heroImages.length > 0) { %>
+        <div class="hero-carousel">
+            <img class="hero-slide-img" src="<%= cdnUrl + '/' + heroImages[0] %>" alt="<%= storeName %> - Bannière">
+            <div class="hero-overlay" style="opacity: <%= hero.overlayOpacity || 0.5 %>"></div>
+        </div>
+        <% } else { %>
+        <div class="hero-carousel hero-fallback"></div>
+        <% } %>
+        <div class="hero-content" style="background: <%= primaryColor %>;">
+            <h1 class="hero-title animate-in delay-1" style="font-family: '<%= fontFamily %>'"><%= heroTitle %></h1>
+            <% if (heroSubtitle) { %><p class="hero-subtitle animate-in delay-2"><%= heroSubtitle %></p><% } %>
+            <div class="hero-actions animate-in delay-3">
+                <a href="/products" class="btn-hero-primary"><i class="fa fa-shopping-bag"></i> <%= heroCta %></a>
+            </div>
+            <% if (storeCity) { %>
+            <div class="hero-badges animate-in delay-4">
+                <span class="badge"><i class="fa fa-map-marker"></i> <%= storeCity %></span>
+            </div>
+            <% } %>
+        </div>
+        <% } %>
+    </section>
+    <% } %>
+
+    <!-- ═══ USP FEATURES BAR ═══ -->
+    <% if (sections.usps !== false && usps && usps.enabled && usps.items && usps.items.length > 0) { %>
+    <section class="usps-section">
+        <div class="section-container">
+            <div class="usps-grid">
+                <% usps.items.forEach(function(usp, i) { %>
+                <div class="usp-card animate-in" style="animation-delay: <%= (i * 0.08) %>s">
+                    <div class="usp-icon-wrap" style="background: <%= primaryColor %>12; color: <%= primaryColor %>;">
+                        <i class="fa <%= iconMap[usp.icon] || 'fa-star' %>"></i>
+                    </div>
+                    <h4 class="usp-title"><%= usp.title %></h4>
+                    <% if (usp.subtitle) { %><p class="usp-subtitle"><%= usp.subtitle %></p><% } %>
+                </div>
+                <% }); %>
+            </div>
+        </div>
+    </section>
+    <% } %>
+
+    <!-- ═══ FEATURED PRODUCTS ═══ -->
+    <% if (sections.products !== false) { %>
+    <section class="featured-section">
+        <div class="section-container">
+            <div class="section-header animate-in">
+                <h2 style="font-family: '<%= fontFamily %>'">Produits en vedette</h2>
+                <a href="/products" class="view-all-btn" style="color: <%= primaryColor %>;">
+                    Voir tout <i class="fa fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <% if (products.length > 0) { %>
+            <div class="products-grid">
+                <% products.forEach(function(product, i) { %>
+                <a href="/product/<%= product.id %>" class="product-card animate-in" style="animation-delay: <%= (i * 0.05) %>s">
+                    <div class="product-image-wrapper">
+                        <% if (product._image) { %>
+                        <img class="product-image" src="<%= product._image %>" alt="<%= product.name %>" loading="lazy">
+                        <% } else { %>
+                        <div class="product-image" style="background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 32px;"><i class="fa fa-image"></i></div>
+                        <% } %>
+                    </div>
+                    <div class="product-info">
+                        <p class="product-name"><%= product.name %></p>
+                        <p class="product-price" style="color: <%= primaryColor %>;"><%= product.sellingPrice ? product.sellingPrice.toFixed(2) + ' DT' : '' %></p>
+                    </div>
+                </a>
+                <% }); %>
+            </div>
+            <% } else { %>
+            <div class="empty-state">
+                <i class="fa fa-archive"></i>
+                <p>Aucun produit disponible pour le moment</p>
+            </div>
+            <% } %>
+        </div>
+    </section>
+    <% } %>
+
+    <!-- ═══ ABOUT SECTION ═══ -->
+    <% if (sections.about !== false && about && about.enabled && about.content) { %>
+    <section class="about-section animate-in">
+        <div class="section-container">
+            <div class="about-grid <%= about.image ? 'has-image' : '' %>">
+                <div class="about-content">
+                    <h2 style="font-family: '<%= fontFamily %>'"><%= about.title || 'Notre histoire' %></h2>
+                    <p><%= about.content %></p>
+                </div>
+                <% if (about.image) { %>
+                <div class="about-image">
+                    <img src="<%= cdnUrl + '/' + about.image %>" alt="<%= about.title || 'Notre histoire' %> - <%= storeName %>">
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </section>
+    <% } %>
+
+    <!-- ═══ CATEGORIES ═══ -->
+    <% if (sections.categories !== false && categories.length > 0) { %>
+    <section class="categories-section">
+        <div class="section-container">
+            <div class="section-header animate-in">
+                <h2 style="font-family: '<%= fontFamily %>'">Nos catégories</h2>
+            </div>
+            <div class="categories-grid">
+                <% categories.forEach(function(cat, i) { %>
+                <a href="/products?category=<%= cat.id %>" class="category-card animate-in" style="animation-delay: <%= (i * 0.05) %>s">
+                    <div class="category-icon" style="background: <%= primaryColor %>15; color: <%= primaryColor %>;">
+                        <i class="fa fa-tag"></i>
+                    </div>
+                    <span class="category-name"><%= cat.name %></span>
+                    <span class="category-arrow"><i class="fa fa-chevron-right"></i></span>
+                </a>
+                <% }); %>
+            </div>
+        </div>
+    </section>
+    <% } %>
+
+    <!-- ═══ STORE INFO ═══ -->
+    <% if (sections.info !== false) { %>
+    <section class="info-section">
+        <div class="section-container">
+            <div class="info-grid">
+                <% if (storePhone) { %>
+                <div class="info-card animate-in">
+                    <i class="fa fa-phone" style="color: <%= primaryColor %>;"></i>
+                    <h3>Téléphone</h3>
+                    <a href="tel:<%= storePhone %>"><%= storePhone %></a>
+                </div>
+                <% } %>
+                <% if (storeEmail) { %>
+                <div class="info-card animate-in">
+                    <i class="fa fa-envelope" style="color: <%= primaryColor %>;"></i>
+                    <h3>Email</h3>
+                    <a href="mailto:<%= storeEmail %>"><%= storeEmail %></a>
+                </div>
+                <% } %>
+                <% if (storeAddress) { %>
+                <div class="info-card animate-in">
+                    <i class="fa fa-map-marker" style="color: <%= primaryColor %>;"></i>
+                    <h3>Adresse</h3>
+                    <p><%= storeAddress %></p>
+                </div>
+                <% } %>
+                <% if (storeSite) { %>
+                <div class="info-card animate-in">
+                    <i class="fa fa-globe" style="color: <%= primaryColor %>;"></i>
+                    <h3>Site web</h3>
+                    <a href="<%= storeSite %>" target="_blank"><%= storeSite %></a>
+                </div>
+                <% } %>
+            </div>
+
+            <% if (socialFacebook || socialInstagram || socialTiktok) { %>
+            <div class="social-links animate-in">
+                <% if (socialFacebook) { %><a href="<%= socialFacebook %>" target="_blank" class="social-link facebook"><i class="fa fa-facebook"></i></a><% } %>
+                <% if (socialInstagram) { %><a href="<%= socialInstagram %>" target="_blank" class="social-link instagram"><i class="fa fa-instagram"></i></a><% } %>
+                <% if (socialTiktok) { %><a href="<%= socialTiktok %>" target="_blank" class="social-link tiktok"><svg class="tiktok-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor"><path d="M448 209.9a210.1 210.1 0 01-122.8-39.3v178.8A162.6 162.6 0 11185 188.3v89.9a74.6 74.6 0 1052.2 71.2V0h88a121 121 0 00122.8 121z"/></svg></a><% } %>
+            </div>
+            <% } %>
+        </div>
+    </section>
+    <% } %>
+
+</div>
+
+<%- include('partials/footer', {
+    storeName, footerBgColor: footer.bgColor, footerTextColor: footer.textColor,
+    footerText: footer.text, showQuickLinks: footer.showQuickLinks,
+    showContact: footer.showContact, showSocial: footer.showSocial,
+    storePhone, storeEmail, storeAddress,
+    socialFacebook, socialInstagram, socialTiktok
+}) %>

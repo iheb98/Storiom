@@ -864,7 +864,12 @@ $radius-lg: 16px;
     margin-bottom: 30px;
 
     .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
 
         h2 {
             margin: 0;
@@ -877,6 +882,47 @@ $radius-lg: 16px;
 
             fa-icon {
                 color: $primary;
+            }
+        }
+
+        .source-filter {
+            display: flex;
+            gap: 6px;
+            background: $background;
+            padding: 4px;
+            border-radius: $radius-sm;
+            border: 1px solid $border-color;
+
+            .source-btn {
+                padding: 7px 16px;
+                border: none;
+                border-radius: 6px;
+                background: transparent;
+                font-size: 0.82rem;
+                font-weight: 500;
+                color: $text-secondary;
+                cursor: pointer;
+                transition: all 0.2s;
+                white-space: nowrap;
+
+                &:hover {
+                    color: $text-primary;
+                    background: rgba($primary, 0.05);
+                }
+
+                &.active {
+                    background: $white;
+                    color: $primary;
+                    font-weight: 600;
+                    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+                }
+            }
+
+            @media (max-width: 480px) {
+                .source-btn {
+                    padding: 6px 10px;
+                    font-size: 0.75rem;
+                }
             }
         }
     }
