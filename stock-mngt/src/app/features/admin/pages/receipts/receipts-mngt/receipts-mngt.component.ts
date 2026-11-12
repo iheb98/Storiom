@@ -13,15 +13,9 @@ import { ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import Swal from 'sweetalert2';
-declare var require: any;
 import * as html2pdf from 'html2pdf.js';
-
-import * as pdfMake from "pdfmake/build/pdfmake";
-import * as pdfFonts from "pdfmake/build/vfs_fonts";
 import { StoreService } from 'src/app/core/services/store.service';
 import { DatePipe } from '@angular/common';
-const htmlToPdfmake = require("html-to-pdfmake");
-(pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-receipts-mngt',

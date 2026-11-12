@@ -3,20 +3,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ReceiptService } from 'src/app/core/services/receipt.service';
 import { ElementRef, ViewChild } from '@angular/core';
 
-declare var require: any;
 import * as html2pdf from 'html2pdf.js';
-
-import * as pdfMake from "pdfmake/build/pdfmake";
-import * as pdfFonts from "pdfmake/build/vfs_fonts";
 import { faAngleDoubleLeft, faFilePdf, faPrint } from '@fortawesome/free-solid-svg-icons';
-
 import { AuthService } from 'src/app/core/services/auth.service';
 import { StoreService } from 'src/app/core/services/store.service';
 import { environment } from 'src/environments/environment.prod';
 import Swal from 'sweetalert2';
-
-const htmlToPdfmake = require("html-to-pdfmake");
-(pdfMake as any).vfs = pdfFonts.pdfMake.vfs;
 
 @Component({
   selector: 'app-receipt-view',

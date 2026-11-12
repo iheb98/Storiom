@@ -81,6 +81,25 @@
                         </label>
                     </div>
 
+                    <div class="setting-item">
+                        <div class="lock-password-header">
+                            <fa-icon [icon]="faLock"></fa-icon>
+                            <div>
+                                <label>Mot de passe de verrouillage</label>
+                                <p>Ce mot de passe protège l'accès au bouton de modification des produits</p>
+                            </div>
+                        </div>
+                        <div class="lock-password-input">
+                            <input [type]="showLockPassword ? 'text' : 'password'"
+                                formControlName="lockPassword"
+                                placeholder="Définir un mot de passe...">
+                            <button type="button" class="toggle-visibility-btn"
+                                (click)="showLockPassword = !showLockPassword">
+                                <fa-icon [icon]="showLockPassword ? faEye : faEyeSlash"></fa-icon>
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 

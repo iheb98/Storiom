@@ -4,13 +4,15 @@ import { faChartBar } from '@fortawesome/free-regular-svg-icons';
 import {
   faEdit, faFile, faTimes, faArrowDown, faArrowUp, faCoins, faExclamationTriangle,
   faImages, faSearchPlus, faImage, faArrowLeft, faCube, faTag, faAlignLeft,
-  faCalendarAlt, faClock, faBox, faPercent, faEye, faShoppingCart, faHeart, faTrophy, faChartLine, faCheckCircle
+  faCalendarAlt, faClock, faBox, faPercent, faEye, faShoppingCart, faHeart, faTrophy, faChartLine, faCheckCircle,
+  faLock, faLockOpen
 } from '@fortawesome/free-solid-svg-icons';
 import { AuthService } from 'src/app/core/services/auth.service';
 import { ProductService } from 'src/app/core/services/product.service';
 import { StatService } from 'src/app/core/services/stat.service';
 import { AnalyticsService } from 'src/app/core/services/analytics.service';
 import { environment } from 'src/environments/environment';
+import { UserSettingsService } from 'src/app/core/services/user-settings.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -44,6 +46,8 @@ export class ProductViewComponent implements OnInit {
   faTrophy = faTrophy;
   faChartLine = faChartLine;
   faCheckCircle = faCheckCircle;
+  faLock = faLock;
+  faLockOpen = faLockOpen;
   textIcon = faFile;
   chartIcon = faChartBar;
 
@@ -75,6 +79,9 @@ export class ProductViewComponent implements OnInit {
   id: string;
   product: any;
   selectedImage: string | null = null;
+
+  // Edit Lock
+  lockPassword = '';
 
   // Marketplace Analytics
   isAnalyticsLoading = false;
@@ -113,6 +120,7 @@ export class ProductViewComponent implements OnInit {
     private statService: StatService,
     private analyticsService: AnalyticsService,
     private authService: AuthService,
+    private userSettingsService: UserSettingsService,
     private route: ActivatedRoute,
     private router: Router
   ) { }
@@ -124,6 +132,9 @@ export class ProductViewComponent implements OnInit {
       document.documentElement.scrollTop = 0;
     }, 0);
     this.user = this.authService.getConnectedUser();
+    this.userSettingsService.settings$.subscribe(settings => {
+      this.lockPassword = settings?.defaults?.lockPassword || '';
+    });
 
     this.route.paramMap.subscribe(paramMap => {
       this.id = paramMap.get('id');
@@ -437,5 +448,66 @@ export class ProductViewComponent implements OnInit {
       case 'USED_GOOD_CONDITION': return 'Occasion en bon état';
       default: return 'Non spécifié';
     }
+  }
+
+  // ========================================
+  // Edit Lock
+  // ========================================
+  toggleEditLock() {
+    // If no password is configured, toggle directly
+    if (!this.lockPassword) {
+      this.productService.toggleProductLock(this.product.id).subscribe({
+        next: (res) => {
+          this.product.locked = res.locked;
+        }
+      });
+      return;
+    }
+
+    // Prompt for password
+    const isLocking = !this.product.locked;
+    Swal.fire({
+      title: isLocking ? 'Verrouiller la modification' : 'Déverrouiller la modification',
+      input: 'password',
+      inputPlaceholder: 'Entrez le mot de passe...',
+      inputAttributes: {
+        autocapitalize: 'off',
+        autocorrect: 'off'
+      },
+      showCancelButton: true,
+      confirmButtonText: isLocking ? 'Verrouiller' : 'Déverrouiller',
+      cancelButtonText: 'Annuler',
+      confirmButtonColor: isLocking ? '#c62828' : '#3f51b5',
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Veuillez entrer le mot de passe';
+        }
+        return null;
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (result.value === this.lockPassword) {
+          this.productService.toggleProductLock(this.product.id).subscribe({
+            next: (res) => {
+              this.product.locked = res.locked;
+              Swal.fire({
+                icon: 'success',
+                title: res.locked ? 'Verrouillé !' : 'Déverrouillé !',
+                text: res.locked ? 'Le bouton de modification est maintenant protégé.' : 'Le bouton de modification est maintenant accessible.',
+                showConfirmButton: false,
+                timer: 1500
+              });
+            }
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Mot de passe incorrect',
+            text: 'Le mot de passe saisi est incorrect.',
+            confirmButtonColor: '#c62828'
+          });
+        }
+      }
+    });
   }
 }

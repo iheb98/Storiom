@@ -20,10 +20,18 @@
                 <fa-icon [icon]="faArrowLeft"></fa-icon>
                 <span>Retour aux produits</span>
             </button>
-            <button class="btn-edit" (click)="navigateTo('/admin/products/edit/' + product?.id)">
-                <fa-icon [icon]="faEdit"></fa-icon>
-                <span>Modifier</span>
-            </button>
+            <div class="nav-actions">
+                <button class="btn-lock" (click)="toggleEditLock()"
+                    [class.locked]="product?.locked" [class.unlocked]="!product?.locked"
+                    [title]="product?.locked ? 'Déverrouiller la modification' : 'Verrouiller la modification'">
+                    <fa-icon [icon]="product?.locked ? faLock : faLockOpen"></fa-icon>
+                </button>
+                <button class="btn-edit" (click)="navigateTo('/admin/products/edit/' + product?.id)"
+                    [disabled]="product?.locked" [class.disabled]="product?.locked">
+                    <fa-icon [icon]="faEdit"></fa-icon>
+                    <span>Modifier</span>
+                </button>
+            </div>
         </div>
 
         <!-- Product Header -->

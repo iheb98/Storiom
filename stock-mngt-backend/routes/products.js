@@ -177,6 +177,30 @@ router.put('/edit', utility.authenticate, checkSubscription, (req, res) => {
     })
 })
 
+// Toggle lock state for a product
+router.put('/toggle-lock/:id', utility.authenticate, async (req, res) => {
+    try {
+        const product = await Product.findOne({
+            where: {
+                id: req.params.id,
+                creatorUserId: req.user.id
+            }
+        });
+
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Produit non trouvé' });
+        }
+
+        product.locked = !product.locked;
+        await product.save();
+
+        res.json({ success: true, locked: product.locked });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ success: false, message: err.message });
+    }
+})
+
 // Bulk update toDisplay for selected products or all products
 router.put('/bulk-visibility', utility.authenticate, checkSubscription, async (req, res) => {
     try {

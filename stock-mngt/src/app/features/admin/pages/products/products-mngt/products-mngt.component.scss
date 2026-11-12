@@ -1038,6 +1038,34 @@ $radius-lg: 16px;
                 }
             }
         }
+
+        .lock-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            cursor: pointer;
+
+            &.locked {
+                background: $danger;
+                color: $white;
+            }
+
+            &.unlocked {
+                background: $success;
+                color: $white;
+            }
+
+            &:hover {
+                transform: scale(1.15);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            }
+        }
     }
 }
 
@@ -1246,6 +1274,27 @@ $radius-lg: 16px;
 
         &.delete:hover {
             background: $danger;
+        }
+
+        &.lock-toggle {
+            &.locked {
+                color: $danger;
+            }
+
+            &.unlocked {
+                color: $success;
+            }
+
+            &:hover {
+                background: rgba($text-secondary, 0.1);
+                color: $text-primary;
+            }
+        }
+
+        &.disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
         }
     }
 }

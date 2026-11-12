@@ -124,6 +124,11 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: false,
       field: 'to_display_store'
     },
+    locked: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
   }, {
     sequelize,
     tableName: 'products',

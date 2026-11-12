@@ -6,7 +6,7 @@ import { ToastService } from 'src/app/core/services/toast.service';
 import {
     faCog, faPalette, faHome, faBox, faChartLine,
     faShoppingCart, faSave, faUndo, faEye, faEyeSlash,
-    faSun, faMoon
+    faSun, faMoon, faLock
 } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -28,6 +28,9 @@ export class UserSettingsComponent implements OnInit {
     faEyeSlash = faEyeSlash;
     faSun = faSun;
     faMoon = faMoon;
+    faLock = faLock;
+
+    showLockPassword = false;
 
     settingsForm: FormGroup;
     isLoading = true;
@@ -67,6 +70,7 @@ export class UserSettingsComponent implements OnInit {
             productVisibleToPublic: [true],
             productToDisplay: [true],
             showBuyingPrice: [false],
+            lockPassword: [''],
             defaultScreen: ['dashboard']
         });
     }
@@ -110,6 +114,7 @@ export class UserSettingsComponent implements OnInit {
             productVisibleToPublic: settings.defaults?.productVisibleToPublic ?? true,
             productToDisplay: settings.defaults?.productToDisplay ?? true,
             showBuyingPrice: settings.defaults?.showBuyingPrice ?? false,
+            lockPassword: settings.defaults?.lockPassword || '',
             defaultScreen: settings.navigation?.defaultScreen || 'dashboard'
         });
     }
@@ -132,7 +137,8 @@ export class UserSettingsComponent implements OnInit {
             defaults: {
                 productVisibleToPublic: formValues.productVisibleToPublic,
                 productToDisplay: formValues.productToDisplay,
-                showBuyingPrice: formValues.showBuyingPrice
+                showBuyingPrice: formValues.showBuyingPrice,
+                lockPassword: formValues.lockPassword
             },
             navigation: {
                 defaultScreen: formValues.defaultScreen

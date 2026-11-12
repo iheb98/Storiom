@@ -169,6 +169,7 @@
                 <div class="filter-group">
                     <label><fa-icon [icon]="faFolder"></fa-icon> Catégorie</label>
                     <ng-select [(ngModel)]="categoryFilter" placeholder="Toutes les catégories">
+                        <ng-option [value]="'none'">Sans catégorie</ng-option>
                         <ng-option *ngFor="let element of categories" [value]="element?.id">
                             {{ element.name }}
                         </ng-option>
@@ -237,6 +238,11 @@
                         [class.hidden]="!item?.toDisplayStore" title="Boutique en ligne">
                         <fa-icon [icon]="faStore"></fa-icon>
                     </span>
+                    <span class="lock-badge" (click)="toggleEditLock(item)"
+                        [class.locked]="item?.locked" [class.unlocked]="!item?.locked"
+                        [title]="item?.locked ? 'Déverrouiller la modification' : 'Verrouiller la modification'">
+                        <fa-icon [icon]="item?.locked ? faLock : faLockOpen"></fa-icon>
+                    </span>
                 </div>
 
                 <!-- Product Image -->
@@ -291,7 +297,8 @@
                     <button class="btn-action view" (click)="consulter(item?.id)" title="Consulter">
                         <fa-icon [icon]="faEye"></fa-icon>
                     </button>
-                    <button class="btn-action edit" (click)="navigateTo('/products/edit/' + item?.id)" title="Modifier">
+                    <button class="btn-action edit" (click)="navigateTo('/products/edit/' + item?.id)"
+                        [disabled]="item?.locked" [class.disabled]="item?.locked" title="Modifier">
                         <fa-icon [icon]="faEdit"></fa-icon>
                     </button>
                     <button class="btn-action delete" (click)="deleteProduct(item)" title="Supprimer">

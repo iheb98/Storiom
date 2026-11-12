@@ -54,11 +54,14 @@ const buildQuery = (sentQuery) => {
                     ...finalQuery[name],
                     [Op.gte]: value
                 }
-            }
-            else if (operator == '<') {
+            } else if (operator == '<') {
                 finalQuery[name] = {
                     ...finalQuery[name],
                     [Op.lte]: value
+                }
+            } else if (operator == 'isnull') {
+                finalQuery[name] = {
+                    [Op.is]: null
                 }
             }
         }

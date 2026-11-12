@@ -121,4 +121,8 @@ export class ProductService {
   bulkUpdateStoreVisibility(body: { ids: number[], toDisplayStore: boolean, updateAll?: boolean, storeId?: number }): Observable<any> {
     return this.http.put<any>(this.baseUrl + 'bulk-store-visibility', body);
   }
+
+  toggleProductLock(productId: number): Observable<any> {
+    return this.http.put<any>(this.baseUrl + 'toggle-lock/' + productId, {});
+  }
 }

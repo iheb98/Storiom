@@ -4,7 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import {
   faEdit, faTrash, faEye, faArrowUp, faArrowDown, faPlus, faSearch,
   faFilter, faUndo, faTag, faAlignLeft, faTruck, faFolder, faCubes,
-  faEyeSlash, faGlobe, faLock, faSearchPlus, faShoppingCart, faTimes, faBox,
+  faEyeSlash, faGlobe, faLock, faLockOpen, faSearchPlus, faShoppingCart, faTimes, faBox,
   faBarcode, faCamera, faImages, faStar, faStore, faChevronDown
 } from '@fortawesome/free-solid-svg-icons';
 import { BarcodeFormat } from '@zxing/library';
@@ -47,6 +47,7 @@ export class ProductsMngtComponent implements OnInit {
   faCubes = faCubes;
   faGlobe = faGlobe;
   faLock = faLock;
+  faLockOpen = faLockOpen;
   faSearchPlus = faSearchPlus;
   faShoppingCart = faShoppingCart;
   faTimes = faTimes;
@@ -76,7 +77,7 @@ export class ProductsMngtComponent implements OnInit {
   descriptionFilter = '';
   colorFilter = '';
   supplierFilter: number = null;
-  categoryFilter: number = null;
+  categoryFilter: any = null;
   codeFilter = '';
 
   // Scanner
@@ -115,6 +116,9 @@ export class ProductsMngtComponent implements OnInit {
   // Display Settings
   showBuyingPrice = false;
 
+  // Edit Lock
+  lockPassword = '';
+
   constructor(
     private productService: ProductService,
     private receiptService: ReceiptService,
@@ -139,6 +143,7 @@ export class ProductsMngtComponent implements OnInit {
     this.restoreFiltersState();
     this.userSettingsService.settings$.subscribe(settings => {
       this.showBuyingPrice = settings?.defaults?.showBuyingPrice ?? false;
+      this.lockPassword = settings?.defaults?.lockPassword || '';
     });
     this.route.queryParams.subscribe(params => {
       this.isCriticalFilter = params['filter'] === 'critical';
@@ -167,7 +172,9 @@ export class ProductsMngtComponent implements OnInit {
       query += query ? ",description ~ '" + this.descriptionFilter + "'" : "description ~ '" + this.descriptionFilter + "'";
     if (this.supplierFilter)
       query += query ? ",supplierId = '" + this.supplierFilter + "'" : "supplierId = '" + this.supplierFilter + "'";
-    if (this.categoryFilter)
+    if (this.categoryFilter === 'none')
+      query += query ? ",categoryId isnull 'true'" : "categoryId isnull 'true'";
+    else if (this.categoryFilter)
       query += query ? ",categoryId = '" + this.categoryFilter + "'" : "categoryId = '" + this.categoryFilter + "'";
     if (this.minQuantityFilter != null)
       query += query ? ",quantity > '" + this.minQuantityFilter + "'" : "quantity > '" + this.minQuantityFilter + "'";
@@ -836,5 +843,82 @@ export class ProductsMngtComponent implements OnInit {
     if (this.codeFilter) {
       this.filter();
     }
+  }
+
+  // ========================================
+  // Edit Lock
+  // ========================================
+  toggleEditLock(product: any) {
+    // If no password is configured, toggle directly
+    if (!this.lockPassword) {
+      this.productService.toggleProductLock(product.id).subscribe({
+        next: (res) => {
+          product.locked = res.locked;
+        },
+        error: () => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: 'Impossible de modifier le verrouillage.',
+            confirmButtonColor: '#c62828'
+          });
+        }
+      });
+      return;
+    }
+
+    // Prompt for password
+    const isLocking = !product.locked;
+    Swal.fire({
+      title: isLocking ? 'Verrouiller la modification' : 'Déverrouiller la modification',
+      input: 'password',
+      inputPlaceholder: 'Entrez le mot de passe...',
+      inputAttributes: {
+        autocapitalize: 'off',
+        autocorrect: 'off'
+      },
+      showCancelButton: true,
+      confirmButtonText: isLocking ? 'Verrouiller' : 'Déverrouiller',
+      cancelButtonText: 'Annuler',
+      confirmButtonColor: isLocking ? '#c62828' : '#3f51b5',
+      inputValidator: (value) => {
+        if (!value) {
+          return 'Veuillez entrer le mot de passe';
+        }
+        return null;
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (result.value === this.lockPassword) {
+          this.productService.toggleProductLock(product.id).subscribe({
+            next: (res) => {
+              product.locked = res.locked;
+              Swal.fire({
+                icon: 'success',
+                title: res.locked ? 'Verrouillé !' : 'Déverrouillé !',
+                text: res.locked ? 'Le bouton de modification est maintenant protégé.' : 'Le bouton de modification est maintenant accessible.',
+                showConfirmButton: false,
+                timer: 1500
+              });
+            },
+            error: () => {
+              Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: 'Impossible de modifier le verrouillage.',
+                confirmButtonColor: '#c62828'
+              });
+            }
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Mot de passe incorrect',
+            text: 'Le mot de passe saisi est incorrect.',
+            confirmButtonColor: '#c62828'
+          });
+        }
+      }
+    });
   }
 }
